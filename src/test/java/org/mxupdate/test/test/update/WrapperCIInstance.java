@@ -16,16 +16,20 @@
 package org.mxupdate.test.test.update;
 
 import java.io.File;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 
 import org.mxupdate.test.data.AbstractData;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 
 /**
  * Wrapper for CI instances.
@@ -114,13 +118,7 @@ public class WrapperCIInstance<DATA extends AbstractObject_mxJPO<?>>
     public void parse(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        final Method write = this.evalMethod("parse", ParameterCache_mxJPO.class);
-        write.setAccessible(true);
-        try {
-            write.invoke(this.data, _paramCache);
-        } finally  {
-            write.setAccessible(false);
-        }
+        this.data.parse(_paramCache);
     }
 
     /**
@@ -145,15 +143,26 @@ public class WrapperCIInstance<DATA extends AbstractObject_mxJPO<?>>
     public String write(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        final StringBuilder generated = new StringBuilder();
-        final Method write = this.evalMethod("write", ParameterCache_mxJPO.class, Appendable.class);
-        write.setAccessible(true);
-        try {
-            write.invoke(this.data, _paramCache, generated);
-        } finally  {
-            write.setAccessible(false);
-        }
-        return generated.toString();
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO("", _paramCache);
+        updateBuilder.childStart("mxUpdate \"${NAME}\"");
+        this.data.writeUpdate(updateBuilder);
+        updateBuilder.childEnd();
+        return updateBuilder.toString().substring(MessageFormat.format(_paramCache.getValueString(ValueKeys.ExportFileHeader), "").length());
+    }
+
+    /**
+     * Writes this instance as CI update w/o mxUpdate call.
+     *
+     * @param _paramCache   parameter cache
+     * @return written string
+     * @throws Exception if write failed
+     */
+    public String writeWOMxUpdateCall(final ParameterCache_mxJPO _paramCache)
+        throws Exception
+    {
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO("", _paramCache);
+        this.data.writeUpdate(updateBuilder);
+        return updateBuilder.toString().substring(MessageFormat.format(_paramCache.getValueString(ValueKeys.ExportFileHeader), "").length());
     }
 
     /**
@@ -172,29 +181,20 @@ public class WrapperCIInstance<DATA extends AbstractObject_mxJPO<?>>
         final MultiLineMqlBuilder ret;
 
         // initialize MQL builder depending on the type
-        if ((this.getTypeDef().getMxAdminSuffix()) != null && !this.getTypeDef().getMxAdminSuffix().isEmpty())  {
-            ret = MqlBuilder_mxJPO.multiLine(_file, "escape mod " + this.data.getTypeDef().getMxAdminName() + " $1 " + this.data.getTypeDef().getMxAdminSuffix(), _current.data.getName());
-        } else if (this.getTypeDef().getMxAdminName() != null) {
-            ret = MqlBuilder_mxJPO.multiLine(_file, "escape mod " + this.data.getTypeDef().getMxAdminName() + " $1", this.data.getName());
+        if (this.data instanceof AbstractAdminObject_mxJPO<?>)  {
+            final EMxAdmin_mxJPO mxClassDef = ((AbstractAdminObject_mxJPO<?>) this.data).mxClassDef();
+            if (mxClassDef.hasMxClassSuffix())  {
+                ret = MqlBuilder_mxJPO.multiLine(_file, "escape mod " + mxClassDef.mxClass() + " $1 " + mxClassDef.mxClassSuffix(), _current.data.getName());
+            } else  {
+                ret = MqlBuilder_mxJPO.multiLine(_file, "escape mod " + mxClassDef.mxClass() + " $1", this.data.getName());
+            }
         } else  {
             final BusObject_mxJPO bus = (BusObject_mxJPO) this.data;
             ret = MqlBuilder_mxJPO.multiLine(_file, "escape mod bus $1 $2 $3", bus.getBusType(), bus.getBusName(), bus.getBusRevision());
         }
 
-        Method write = this.evalMethod("calcDelta", ParameterCache_mxJPO.class, MultiLineMqlBuilder.class, this.data.getClass());
-        // if not found, try with parent class as parameter
-        // (e.g. attributes works then...)
-        Class<?> clazz = this.data.getClass().getSuperclass();
-        while ((write == null) && (clazz != null))  {
-            write = this.evalMethod("calcDelta", ParameterCache_mxJPO.class, MultiLineMqlBuilder.class, clazz);
-            clazz = clazz.getSuperclass();
-        }
-        write.setAccessible(true);
-        try {
-            write.invoke(this.data, _paramCache, ret, _current.data);
-        } finally  {
-            write.setAccessible(false);
-        }
+        // casting is work-arround so that calc delta method can be called
+        ((AbstractObject_mxJPO) this.data).calcDelta(_paramCache, ret, _current.data);
 
         return ret;
     }
@@ -225,15 +225,15 @@ public class WrapperCIInstance<DATA extends AbstractObject_mxJPO<?>>
     private WrapperCIInstance<DATA> newInstance()
         throws Exception
     {
-        Constructor<?> constr = null;
+        WrapperCIInstance<DATA> ret = null;
         try {
-            constr = this.data.getClass().getConstructor(TypeDef_mxJPO.class, String.class);
+            ret = new WrapperCIInstance<>((DATA) this.data.getClass().getConstructor(String.class).newInstance(this.data.getName()));
         } catch (final NoSuchMethodException e)  {
-            // data class is an anonymoous class => use super class!
-            constr = this.data.getClass().getSuperclass().getConstructor(TypeDef_mxJPO.class, String.class);
+            // data class is a business object
+            ret = new WrapperCIInstance<>((DATA) this.data.getClass().getConstructor(TypeDef_mxJPO.class, String.class).newInstance(((BusObject_mxJPO) this.data).getTypeDef(), this.data.getName()));
         }
 
-        return new WrapperCIInstance<DATA>((DATA) constr.newInstance(this.data.getTypeDef(), this.data.getName()));
+        return ret;
     }
 
     /**
@@ -263,15 +263,5 @@ public class WrapperCIInstance<DATA extends AbstractObject_mxJPO<?>>
             }
         }
         return ret;
-    }
-
-    /**
-     * Returns the type definition instance.
-     *
-     * @return type definition enumeration
-     */
-    public final TypeDef_mxJPO getTypeDef()
-    {
-        return this.data.getTypeDef();
     }
 }

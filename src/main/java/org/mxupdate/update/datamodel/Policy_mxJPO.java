@@ -30,7 +30,7 @@ import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
 
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
@@ -123,19 +123,15 @@ public class Policy_mxJPO
 
     /** Stack with all states of this policy. */
     private final Stack<State> states = new Stack<>();
-    /** Map with all state names and depending symbolic state names and  */
-    private final Map<String,Set<String>> symbStates = new HashMap<>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
      *
-     * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the policy object
      */
-    public Policy_mxJPO(final TypeDef_mxJPO _typeDef,
-                        final String _mxName)
+    public Policy_mxJPO(final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(EMxAdmin_mxJPO.Policy, _mxName);
     }
 
     @Override()
@@ -323,24 +319,20 @@ public class Policy_mxJPO
     }
 
     /**
-     * The {@code _create} flag is stored in {@link #updateWithCreate}.
+     * Defines the {@link #updateWithCreate} flag.
+     *
+     * @param _updateWithCreate new value
      */
-    @Override()
-    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
-                               final String _file,
-                               final String _fileDate,
-                               final String _code,
-                               final boolean _create)
+    public void setUpdateWithCreate(final boolean _updateWithCreate)
         throws Exception
     {
-        this.updateWithCreate = _create;
-        super.jpoCallExecute(_paramCache, _file, _fileDate, _code, _create);
+        this.updateWithCreate = _updateWithCreate;
     }
 
-    @Override()
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final Policy_mxJPO _current)
+    @Override
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final Policy_mxJPO _current)
         throws UpdateException_mxJPO
     {
         // creates policy if done within update

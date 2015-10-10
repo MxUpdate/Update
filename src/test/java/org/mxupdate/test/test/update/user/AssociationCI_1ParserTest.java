@@ -83,10 +83,10 @@ public class AssociationCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected Association_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                               final String _name)
     {
-        return new Association_mxJPO(_paramCache.getMapping().getTypeDef(CI.USR_ASSOCIATION.updateType), _name);
+        return new Association_mxJPO(_name);
     }
 }

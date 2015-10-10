@@ -1,5 +1,5 @@
 /*
- *  This file is part of MxUpdate <http://www.mxupdate.org>.
+  *  This file is part of MxUpdate <http://www.mxupdate.org>.
  *
  *  MxUpdate is a deployment tool for a PLM platform to handle
  *  administration objects as single update files (configuration item).
@@ -41,7 +41,7 @@ public class AttributeBinaryCI_1ParserTest
                     "kind binary description \"\" !hidden !resetonclone !resetonrevision default \"\""},
             {"0b) simple w/o anything to test default values",
                     "kind binary description \"\" !hidden !resetonclone !resetonrevision default \"\"",
-                    ""},
+                    "kind binary"},
             // registered name
             {"1a) symbolic name",
                     "",
@@ -131,6 +131,6 @@ public class AttributeBinaryCI_1ParserTest
     protected AttributeCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                               final String _name)
     {
-        return new AttributeCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_BINARY.updateType), _name);
+        return new AttributeCI_mxJPO(_name);
     }
 }

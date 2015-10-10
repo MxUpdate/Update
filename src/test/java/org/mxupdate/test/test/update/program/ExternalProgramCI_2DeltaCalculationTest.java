@@ -34,12 +34,18 @@ public class ExternalProgramCI_2DeltaCalculationTest
     protected ProgramCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                             final String _name)
     {
-        return new ProgramCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_EXTERNAL.updateType), _name);
+        return new ProgramCI_mxJPO(_name);
     }
 
     @Override
     protected ExternalProgramData createNewTestData(final String _name)
     {
         return new ExternalProgramData(this, _name);
+    }
+
+    @Override
+    protected String getKind()
+    {
+        return "external";
     }
 }

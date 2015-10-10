@@ -24,7 +24,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
-import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -88,13 +87,11 @@ public class PathType_mxJPO
     /**
      * Constructor used to initialize the path type definition.
      *
-     * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the type object
      */
-    public PathType_mxJPO(final TypeDef_mxJPO _typeDef,
-                          final String _mxName)
+    public PathType_mxJPO(final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(EMxAdmin_mxJPO.PathType, _mxName);
     }
 
     @Override
@@ -205,9 +202,9 @@ public class PathType_mxJPO
     }
 
     @Override
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final PathType_mxJPO _current)
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final PathType_mxJPO _current)
         throws UpdateException_mxJPO
     {
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
@@ -231,8 +228,7 @@ public class PathType_mxJPO
                 ErrorKey.DM_PATHTYPE_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
                 ValueKeys.DMPathTypeAttrIgnore, ValueKeys.DMPathTypeAttrRemove,
                 this.globalAttributes, (_current != null) ? _current.globalAttributes : null);
-        this.localAttributes.calcDelta(_paramCache, _mql,
-                EMxAdmin_mxJPO.PathType, this.getName(),
+        this.localAttributes.calcDelta(_paramCache, _mql, this,
                 ErrorKey.DM_PATHTYPE_REMOVE_LOCAL_ATTRIBUTE,
                 (_current != null) ? _current.localAttributes : null);
     }

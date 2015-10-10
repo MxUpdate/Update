@@ -24,7 +24,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
-import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalPathTypeList_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -93,13 +92,11 @@ public class Type_mxJPO
     /**
      * Constructor used to initialize the type definition enumeration.
      *
-     * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the type object
      */
-    public Type_mxJPO(final TypeDef_mxJPO _typeDef,
-                      final String _mxName)
+    public Type_mxJPO(final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(EMxAdmin_mxJPO.Type, _mxName);
     }
 
     @Override
@@ -203,9 +200,9 @@ public class Type_mxJPO
     }
 
     @Override
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final Type_mxJPO _current)
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final Type_mxJPO _current)
         throws UpdateException_mxJPO
     {
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
@@ -217,7 +214,7 @@ public class Type_mxJPO
         DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql,    "attribute",
                 ErrorKey.DM_TYPE_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
                 ValueKeys.DMTypeAttrIgnore, ValueKeys.DMTypeAttrRemove,                 this.globalAttributes,  _current.globalAttributes);
-        this.localAttributes.calcDelta(_paramCache, _mql, EMxAdmin_mxJPO.Type, this.getName(),  ErrorKey.DM_TYPE_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
+        this.localAttributes.calcDelta(_paramCache, _mql, this,  ErrorKey.DM_TYPE_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
 
         this.localPathTypes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_TYPE_REMOVE_LOCAL_PATH_TYPE, _current.localPathTypes);
 

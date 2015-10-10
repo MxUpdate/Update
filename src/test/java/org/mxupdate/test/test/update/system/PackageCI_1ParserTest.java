@@ -134,10 +134,10 @@ public class PackageCI_1ParserTest
          };
     }
 
-    @Override()
+    @Override
     protected PackageCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                             final String _name)
     {
-        return new PackageCI_mxJPO(_paramCache.getMapping().getTypeDef("SystemPackage"), _name);
+        return new PackageCI_mxJPO(_name);
     }
 }

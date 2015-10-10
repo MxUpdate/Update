@@ -29,9 +29,15 @@ public class EKLProgramCI_3UpdateFileDateTest
     extends AbstractProgramCI_3UpdateFileDateTest
 {
     @Override
+    protected String getKind()
+    {
+        return "ekl";
+    }
+
+    @Override
     protected ProgramCI_mxJPO createNew(final ParameterCache_mxJPO _paramCache,
                                         final String _prgName)
     {
-        return new ProgramCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_EKL.updateType), _prgName);
+        return new ProgramCI_mxJPO(_prgName);
     }
 }

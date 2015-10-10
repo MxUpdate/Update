@@ -115,10 +115,10 @@ public class InquiryCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected Inquiry_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                           final String _name)
     {
-        return new Inquiry_mxJPO(_paramCache.getMapping().getTypeDef(CI.UI_INQUIRY.updateType), _name);
+        return new Inquiry_mxJPO(_name);
     }
 }

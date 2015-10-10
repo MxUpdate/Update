@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
@@ -68,13 +68,11 @@ public class Group_mxJPO
     /**
      * Constructor used to initialize the type definition enumeration.
      *
-     * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the group object
      */
-    public Group_mxJPO(final TypeDef_mxJPO _typeDef,
-                       final String _mxName)
+    public Group_mxJPO(final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(EMxAdmin_mxJPO.Group, _mxName);
     }
 
     @Override()
@@ -140,10 +138,10 @@ public class Group_mxJPO
         return ignore;
     }
 
-    @Override()
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final Group_mxJPO _current)
+    @Override
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final Group_mxJPO _current)
         throws UpdateException_mxJPO
     {
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);

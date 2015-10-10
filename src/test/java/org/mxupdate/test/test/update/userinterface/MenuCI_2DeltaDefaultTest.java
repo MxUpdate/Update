@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.test.update.userinterface;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.userinterface.MenuData;
 import org.mxupdate.test.test.update.AbstractDeltaNoChangeTest;
@@ -26,6 +24,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link Menu_mxJPO menu CI} delta calculation for default
@@ -63,10 +63,10 @@ public class MenuCI_2DeltaDefaultTest
         this.cleanup(AbstractTest.CI.UI_MENU);
     }
 
-    @Override()
+    @Override
     protected Menu_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                        final String _name)
     {
-        return new Menu_mxJPO(_paramCache.getMapping().getTypeDef(CI.UI_MENU.updateType), _name);
+        return new Menu_mxJPO(_name);
     }
 }

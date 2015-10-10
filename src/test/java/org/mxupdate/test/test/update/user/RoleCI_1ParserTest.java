@@ -106,10 +106,10 @@ public class RoleCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected Role_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                        final String _name)
     {
-        return new Role_mxJPO(_paramCache.getMapping().getTypeDef(CI.USR_ROLE.updateType), _name);
+        return new Role_mxJPO(_name);
     }
 }

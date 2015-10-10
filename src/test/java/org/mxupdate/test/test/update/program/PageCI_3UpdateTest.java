@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.test.update.program;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
@@ -26,6 +24,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Test cases for the export and update of page programs.
@@ -77,6 +77,8 @@ public class PageCI_3UpdateTest
     public void positiveTestCodeUpdate(final String _code)
         throws Exception
     {
+        this.mql("add page \"" + this.createNewData("Test").getName() + "\"");
+
         final PageData page = this.createNewData("Test").setValue("content", _code).update("");
 
         Assert.assertEquals(this.mql("print page " + page.getName() + " select content dump"), _code);

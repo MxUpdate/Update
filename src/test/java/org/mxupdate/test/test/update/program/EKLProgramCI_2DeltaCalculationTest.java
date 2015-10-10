@@ -34,12 +34,18 @@ public class EKLProgramCI_2DeltaCalculationTest
     protected ProgramCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                           final String _name)
     {
-        return new ProgramCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_EKL.updateType), _name);
+        return new ProgramCI_mxJPO(_name);
     }
 
     @Override
     protected EKLProgramData createNewTestData(final String _name)
     {
         return new EKLProgramData(this, _name);
+    }
+
+    @Override
+    protected String getKind()
+    {
+        return "ekl";
     }
 }

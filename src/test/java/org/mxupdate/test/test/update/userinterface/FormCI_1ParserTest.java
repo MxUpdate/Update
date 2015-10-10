@@ -139,11 +139,10 @@ public class FormCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected Form_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                        final String _name)
     {
-        return new Form_mxJPO(_paramCache.getMapping().getTypeDef("Form"), _name);
+        return new Form_mxJPO(_name);
     }
-
 }

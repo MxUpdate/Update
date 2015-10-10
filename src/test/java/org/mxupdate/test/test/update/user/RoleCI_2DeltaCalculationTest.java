@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.test.update.user;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.user.RoleData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -26,6 +24,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link Role_mxJPO role CI} delta calculation.
@@ -62,11 +62,10 @@ public class RoleCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.USR_ROLE);
     }
 
-    @Override()
+    @Override
     protected Role_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                              final String _name)
     {
-        return new Role_mxJPO(_paramCache.getMapping().getTypeDef(CI.USR_ROLE.updateType), _name);
+        return new Role_mxJPO(_name);
     }
-
 }

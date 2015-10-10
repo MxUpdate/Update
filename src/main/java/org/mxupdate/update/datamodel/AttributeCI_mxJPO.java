@@ -26,7 +26,7 @@ import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
 
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -152,19 +152,9 @@ public class AttributeCI_mxJPO
      * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the attribute object
      */
-    public AttributeCI_mxJPO(final TypeDef_mxJPO _typeDef,
-                             final String _mxName)
+    public AttributeCI_mxJPO(final String _mxName)
     {
-        super(_typeDef, _mxName);
-
-        if (_typeDef != null)  {
-            for (final Kind checkKind : Kind.values())  {
-                if (checkKind.name().toLowerCase().equals(_typeDef.getMxUpdateKind()))  {
-                    this.kind = checkKind;
-                    break;
-                }
-            }
-        }
+        super(EMxAdmin_mxJPO.Attribute, _mxName);
     }
 
     /**
@@ -356,10 +346,10 @@ public class AttributeCI_mxJPO
                 .exec(_paramCache);
     }
 
-    @Override()
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final AttributeCI_mxJPO _current)
+    @Override
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final AttributeCI_mxJPO _current)
         throws UpdateException_mxJPO
     {
         final AttributeCI_mxJPO current = _current;

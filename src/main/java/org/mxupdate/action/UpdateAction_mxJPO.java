@@ -198,7 +198,7 @@ public class UpdateAction_mxJPO
                    final Set<String> existings = _existingNames.get(clazz);
                    if (!existings.contains(fileEntry.getKey()))  {
                        final AbstractObject_mxJPO<?> instance = clazz.newTypeInstance(fileEntry.getKey());
-                       _paramCache.logInfo("create "+instance.getTypeDef().getLogging() + " '" + fileEntry.getKey() + "'");
+                       _paramCache.logInfo("create " + clazz.getLogging() + " '" + fileEntry.getKey() + "'");
                        instance.create(_paramCache);
                    }
                }
@@ -218,12 +218,10 @@ public class UpdateAction_mxJPO
        for (final AbstractObject_mxJPO<?> instance : _compiles)  {
            try  {
                if (instance.compile(_paramCache))  {
-                   _paramCache.logInfo("compile " + instance.getTypeDef().getLogging()
-                          + " '" + instance.getName() + "'");
+                   _paramCache.logInfo("compile program '" + instance.getName() + "'");
                }
            } catch (final Exception e)  {
-               _paramCache.logError("compile of " + instance.getTypeDef().getLogging()
-                      + " '" + instance.getName() + "' failed:\n" + e.toString());
+               _paramCache.logError("compile of program '" + instance.getName() + "' failed:\n" + e.toString());
            }
        }
    }

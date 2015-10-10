@@ -15,11 +15,11 @@
 
 package org.mxupdate.update.program;
 
-import matrix.util.MatrixException;
-
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+
+import matrix.util.MatrixException;
 
 /**
  * Common definition for the code of a program or page object.
@@ -76,13 +76,13 @@ public abstract class AbstractCode_mxJPO<CLASS extends AbstractCode_mxJPO<CLASS>
      * Constructor used to initialize the type definition enumeration and the
      * name.
      *
-     * @param _typeDef  type definition of the program
-     * @param _mxName   MX name of the program object
+     * @param _mxClassDef   MX class definition
+     * @param _mxName       MX name of the program object
      */
-    protected AbstractCode_mxJPO(final TypeDef_mxJPO _typeDef,
+    protected AbstractCode_mxJPO(final EMxAdmin_mxJPO _mxClassDef,
                                  final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(_mxClassDef, _mxName);
     }
 
     /**

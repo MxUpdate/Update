@@ -1014,10 +1014,10 @@ public class RelationshipCI_1ParserCommonTest
         };
     }
 
-    @Override()
+    @Override
     protected Relationship_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                                final String _name)
     {
-        return new Relationship_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_RELATIONSHIP.updateType), _name);
+        return new Relationship_mxJPO(_name);
     }
 }

@@ -135,10 +135,10 @@ public class ChannelCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected Channel_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                           final String _name)
     {
-        return new Channel_mxJPO(_paramCache.getMapping().getTypeDef(CI.UI_CHANNEL.updateType), _name);
+        return new Channel_mxJPO(_name);
     }
 }

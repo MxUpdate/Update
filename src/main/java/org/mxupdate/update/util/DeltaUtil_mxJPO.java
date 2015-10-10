@@ -64,10 +64,10 @@ public final class DeltaUtil_mxJPO
                     _paramCache.logTrace("    - remove symbolic name '" + oldSymbName + "'");
                     _mql.newLine().cmd("escape delete property ").arg(oldSymbName)
                             .cmd(" on program ").arg(symbProg)
-                            .cmd(" to ").cmd(_target.getTypeDef().getMxAdminName()).cmd(" ")
+                            .cmd(" to ").cmd(_target.mxClassDef().mxClass()).cmd(" ")
                             .arg(_target.getName());
-                    if ((_target.getTypeDef().getMxAdminSuffix() != null) && !_target.getTypeDef().getMxAdminSuffix().isEmpty())  {
-                        _mql.cmd(" ").cmd(_target.getTypeDef().getMxAdminSuffix());
+                    if (_target.mxClassDef().hasMxClassSuffix())  {
+                        _mql.cmd(" ").cmd(_target.mxClassDef().mxClassSuffix());
                     }
                 }
             }
@@ -77,10 +77,10 @@ public final class DeltaUtil_mxJPO
                 _paramCache.logTrace("    - register symbolic name '" + newSymbName + "'");
                 _mql.newLine().cmd("escape add property ").arg(newSymbName)
                         .cmd(" on program ").arg(symbProg)
-                        .cmd(" to ").cmd(_target.getTypeDef().getMxAdminName()).cmd(" ")
+                        .cmd(" to ").cmd(_target.mxClassDef().mxClass()).cmd(" ")
                         .arg(_target.getName());
-                if ((_target.getTypeDef().getMxAdminSuffix() != null) && !_target.getTypeDef().getMxAdminSuffix().isEmpty())  {
-                    _mql.cmd(" ").cmd(_target.getTypeDef().getMxAdminSuffix());
+                if (_target.mxClassDef().hasMxClassSuffix())  {
+                    _mql.cmd(" ").cmd(_target.mxClassDef().mxClassSuffix());
                 }
             }
         }

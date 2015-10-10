@@ -17,8 +17,6 @@ package org.mxupdate.test.test.update.userinterface;
 
 import java.io.File;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.userinterface.TableData;
 import org.mxupdate.test.test.update.AbstractDeltaNoChangeTest;
@@ -27,9 +25,12 @@ import org.mxupdate.update.userinterface.Table_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link Table_mxJPO table CI} delta calculation for default
@@ -76,12 +77,12 @@ public class TableCI_2DeltaDefaultTest
     {
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
-        final WrapperCIInstance<Table_mxJPO> currentWrapper = new WrapperCIInstance<Table_mxJPO>(this.createNewData(paramCache, AbstractTest.PREFIX + "Test"));
+        final WrapperCIInstance<Table_mxJPO> currentWrapper = new WrapperCIInstance<>(this.createNewData(paramCache, AbstractTest.PREFIX + "Test"));
         currentWrapper.parseUpdate(new TableData(this, "Test").newField("field").getFormTable());
         currentWrapper.create(paramCache);
         currentWrapper.store(null, paramCache);
 
-        final WrapperCIInstance<Table_mxJPO> previousWrapper = new WrapperCIInstance<Table_mxJPO>(this.createNewData(paramCache, AbstractTest.PREFIX + "Test"));
+        final WrapperCIInstance<Table_mxJPO> previousWrapper = new WrapperCIInstance<>(this.createNewData(paramCache, AbstractTest.PREFIX + "Test"));
         previousWrapper.parseUpdate(new TableData(this, "Test")
                 .newField("field")
                 .setValue("label", "")
@@ -96,19 +97,19 @@ public class TableCI_2DeltaDefaultTest
         Assert.assertFalse(mql.hasNewLines(), "no MQL update needed, but found:\n" + mql);
     }
 
-    @Override()
-    @BeforeMethod()
- //   @AfterClass(groups = "close" )
+    @Override
+    @BeforeMethod
+    @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.UI_TABLE);
     }
 
-    @Override()
+    @Override
     protected Table_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                        final String _name)
     {
-        return new Table_mxJPO(_paramCache.getMapping().getTypeDef(CI.UI_TABLE.updateType), _name);
+        return new Table_mxJPO(_name);
     }
 }

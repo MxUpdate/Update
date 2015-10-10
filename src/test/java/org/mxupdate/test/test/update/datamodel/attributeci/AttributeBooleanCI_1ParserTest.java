@@ -41,7 +41,7 @@ public class AttributeBooleanCI_1ParserTest
                     "kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\""},
             {"0b) simple w/o anything to test default values",
                     "kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"",
-                    ""},
+                    "kind boolean"},
             // registered name
             {"1a) symbolic name",
                     "",
@@ -150,6 +150,6 @@ public class AttributeBooleanCI_1ParserTest
     protected AttributeCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                               final String _name)
     {
-        return new AttributeCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_BOOLEAN.updateType), _name);
+        return new AttributeCI_mxJPO(_name);
     }
 }

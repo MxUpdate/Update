@@ -490,8 +490,14 @@ public final class TypeDef_mxJPO
     public AbstractObject_mxJPO<?> newTypeInstance(final String _mxName)
             throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
-        return this.jpoClass.getConstructor(TypeDef_mxJPO.class, String.class)
-                            .newInstance(this, _mxName);
+        final AbstractObject_mxJPO<?> ret;
+        final EMxAdmin_mxJPO mxClassDef = EMxAdmin_mxJPO.valueOfByClass(this.mxUpdateType);
+        if (mxClassDef == null)  {
+            ret = this.jpoClass.getConstructor(TypeDef_mxJPO.class, String.class).newInstance(this, _mxName);
+        } else  {
+            ret = mxClassDef.newTypeInstance(_mxName);
+        }
+        return ret;
     }
 
     /**

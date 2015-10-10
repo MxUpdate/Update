@@ -373,10 +373,10 @@ public class InterfaceCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected Interface_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                             final String _name)
     {
-        return new Interface_mxJPO(_paramCache.getMapping().getTypeDef("Interface"), _name);
+        return new Interface_mxJPO(_name);
     }
 }

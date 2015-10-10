@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
@@ -79,13 +79,11 @@ public class Role_mxJPO
      * Constructor used to initialize this role definition with related type
      * definition <code>_typeDef</code> for given <code>_name</code>.
      *
-     * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the administration object
      */
-    public Role_mxJPO(final TypeDef_mxJPO _typeDef,
-                      final String _mxName)
+    public Role_mxJPO(final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(EMxAdmin_mxJPO.Role, _mxName);
     }
 
     @Override()
@@ -177,10 +175,10 @@ public class Role_mxJPO
         return ignore;
     }
 
-    @Override()
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final Role_mxJPO _current)
+    @Override
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final Role_mxJPO _current)
         throws UpdateException_mxJPO
     {
         // kind at first (also needed for parent)

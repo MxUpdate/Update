@@ -49,59 +49,59 @@ public abstract class AbstractProgramCI_2DeltaCalculationTest<TESTDATA extends A
     {
         return new Object[][] {
             {"1a) symbolic name",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").setValue("symbolicname", "program_123")},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).setValue("symbolicname", "program_123")},
             {"1b) two symbolic name",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").setValue("symbolicname", "program_123").setValue("symbolicname", "program_345")},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).setValue("symbolicname", "program_123").setValue("symbolicname", "program_345")},
             {"2) descrption",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").setValue("description", "test")},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).setValue("description", "test")},
             {"3) hidden",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").setFlag("hidden", true)},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).setFlag("hidden", true)},
             {"4) needsbusinessobject",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").setFlag("needsbusinessobject", true)},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).setFlag("needsbusinessobject", true)},
             {"5) downloadable (and deferred)",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").setSingle("execute", "deferred").setFlag("downloadable", true)},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).setSingle("execute", "deferred").setFlag("downloadable", true)},
             {"6) pipe",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").setFlag("pipe", true)},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).setFlag("pipe", true)},
             {"7) pooled",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").setFlag("pooled", true)},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).setFlag("pooled", true)},
             {"8) rule",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").defData("rule", new RuleData(this, "Test"))},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).defData("rule", new RuleData(this, "Test"))},
             {"9a) execute immediate",
-                    this.createNewTestData("Test").setSingle("execute", "deferred"),
-                    this.createNewTestData("Test").setSingle("execute", null)},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).setSingle("execute", "deferred"),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).setSingle("execute", null)},
             {"9b) execute deferred",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").setSingle("execute", "deferred")},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).setSingle("execute", "deferred")},
             {"9c) execute user",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").defData("execute user", new PersonAdminData(this, "Test"))},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).defData("execute user", new PersonAdminData(this, "Test"))},
             {"9d) remove execute user",
-                    this.createNewTestData("Test").defData("execute user", new PersonAdminData(this, "Test")),
-                    this.createNewTestData("Test").setSingle("execute", null)},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).defData("execute user", new PersonAdminData(this, "Test")),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).setSingle("execute", null)},
             {"10) code",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").setValue("code", "abcdef")},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).setValue("code", "abcdef")},
             {"11a) property name",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").addProperty(new PropertyDef("property"))},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).addProperty(new PropertyDef("property"))},
             {"11b) property name and value",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").addProperty(new PropertyDef("property", "value"))},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).addProperty(new PropertyDef("property", "value"))},
             {"11c) property name and link",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").addProperty(new PropertyDef("property", this.createNewTestData("RefTest")))},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).addProperty(new PropertyDef("property", this.createNewTestData("RefTest")))},
             {"11d) property name, value and link",
-                    this.createNewTestData("Test"),
-                    this.createNewTestData("Test").addProperty(new PropertyDef("property", "value", this.createNewTestData("RefTest")))},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).addProperty(new PropertyDef("property", "value", this.createNewTestData("RefTest")))},
        };
     }
 
@@ -152,7 +152,7 @@ public abstract class AbstractProgramCI_2DeltaCalculationTest<TESTDATA extends A
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
         @SuppressWarnings("unchecked")
-        final TESTDATA prog = (TESTDATA) this.createNewTestData("Test").create().setValue("file", "program/mql/test.tcl");
+        final TESTDATA prog = (TESTDATA) this.createNewTestData("Test").create().setSingle("kind", this.getKind()).setValue("file", "program/mql/test.tcl");
 
         final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(this.createNewData(paramCache, prog.getName()));
         wrapper.parseUpdate(prog);
@@ -175,7 +175,7 @@ public abstract class AbstractProgramCI_2DeltaCalculationTest<TESTDATA extends A
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
         @SuppressWarnings("unchecked")
-        final TESTDATA prog = (TESTDATA) this.createNewTestData("Test").create().setValue("file", this.getResourcesDir() + "/program/mql/test.tcl");
+        final TESTDATA prog = (TESTDATA) this.createNewTestData("Test").create().setSingle("kind", this.getKind()).setValue("file", this.getResourcesDir() + "/program/mql/test.tcl");
 
         final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(this.createNewData(paramCache, prog.getName()));
         wrapper.parseUpdate(prog);
@@ -185,6 +185,13 @@ public abstract class AbstractProgramCI_2DeltaCalculationTest<TESTDATA extends A
                 this.mqlWOTrim("escape print prog \"" + AbstractTest.convertMql(prog.getName()) + "\" select code dump"),
                 FileUtils.readFileToString(new File(this.getResourcesDir(), "program/mql/test.tcl")) + "\n");
     }
+
+    /**
+     * Returns the kind of program to test.
+     *
+     * @return kind string
+     */
+    protected abstract String getKind();
 
     /**
      * Creates for given {@code _name} related test data instance.

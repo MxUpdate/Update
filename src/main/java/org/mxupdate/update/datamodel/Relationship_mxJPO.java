@@ -24,7 +24,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
-import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalPathTypeList_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -116,13 +115,11 @@ public class Relationship_mxJPO
     /**
      * Constructor used to initialize the type definition enumeration.
      *
-     * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the administration object
      */
-    public Relationship_mxJPO(final TypeDef_mxJPO _typeDef,
-                              final String _mxName)
+    public Relationship_mxJPO(final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(EMxAdmin_mxJPO.Relationship, _mxName);
     }
 
     @Override
@@ -284,9 +281,9 @@ public class Relationship_mxJPO
     }
 
     @Override
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final Relationship_mxJPO _current)
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final Relationship_mxJPO _current)
         throws UpdateException_mxJPO
     {
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
@@ -298,7 +295,7 @@ public class Relationship_mxJPO
         DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql,    "attribute",
                 ErrorKey.DM_RELATION_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
                 ValueKeys.DMRelationAttrIgnore, ValueKeys.DMRelationAttrRemove,         this.globalAttributes,        _current.globalAttributes);
-        this.localAttributes.calcDelta(_paramCache, _mql, EMxAdmin_mxJPO.Relationship, this.getName(), ErrorKey.DM_RELATION_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
+        this.localAttributes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_RELATION_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
 
         this.localPathTypes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_RELATION_REMOVE_LOCAL_PATH_TYPE, _current.localPathTypes);
 

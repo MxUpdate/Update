@@ -135,10 +135,10 @@ public class MenuCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected Menu_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                        final String _name)
     {
-        return new Menu_mxJPO(_paramCache.getMapping().getTypeDef(CI.UI_MENU.updateType), _name);
+        return new Menu_mxJPO(_name);
     }
 }

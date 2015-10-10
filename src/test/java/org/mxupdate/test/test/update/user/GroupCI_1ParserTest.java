@@ -96,10 +96,10 @@ public class GroupCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected Group_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                         final String _name)
     {
-        return new Group_mxJPO(_paramCache.getMapping().getTypeDef("Group"), _name);
+        return new Group_mxJPO(_name);
     }
 }

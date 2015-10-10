@@ -67,10 +67,10 @@ public abstract class AbstractParserTest<DATA extends AbstractObject_mxJPO<?>>
     {
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
-        final WrapperCIInstance<DATA> data = new WrapperCIInstance<DATA>(this.createNewData(paramCache, AbstractTest.PREFIX + "_Test"));
+        final WrapperCIInstance<DATA> data = new WrapperCIInstance<>(this.createNewData(paramCache, AbstractTest.PREFIX + "_Test"));
         data.parseUpdateWOStrip(_definition);
 
-        final String generated = data.write(paramCache);
+        final String generated = data.writeWOMxUpdateCall(paramCache);
 
         final StringBuilder oldDefBuilder = new StringBuilder();
         for (final String line : _toTest.isEmpty() ? _definition.split("\n") : _toTest.split("\n"))  {

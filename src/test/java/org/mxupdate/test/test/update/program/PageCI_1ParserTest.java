@@ -103,6 +103,6 @@ public class PageCI_1ParserTest
     protected Page_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                        final String _name)
     {
-        return new Page_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_PAGE.updateType), _name);
+        return new Page_mxJPO(_name);
     }
 }

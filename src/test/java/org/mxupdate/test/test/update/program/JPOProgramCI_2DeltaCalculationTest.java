@@ -34,12 +34,18 @@ public class JPOProgramCI_2DeltaCalculationTest
     protected ProgramCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                             final String _name)
     {
-        return new ProgramCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _name);
+        return new ProgramCI_mxJPO(_name);
     }
 
     @Override
     protected JPOProgramData createNewTestData(final String _name)
     {
         return new JPOProgramData(this, _name);
+    }
+
+    @Override
+    protected String getKind()
+    {
+        return "java";
     }
 }

@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.test.update.user;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.system.SiteData;
 import org.mxupdate.test.data.user.GroupData;
@@ -27,6 +25,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link Group_mxJPO group CI} delta calculation.
@@ -68,10 +68,10 @@ public class GroupCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.SYS_SITE);
     }
 
-    @Override()
+    @Override
     protected Group_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                              final String _name)
     {
-        return new Group_mxJPO(_paramCache.getMapping().getTypeDef(CI.USR_GROUP.updateType), _name);
+        return new Group_mxJPO(_name);
     }
 }

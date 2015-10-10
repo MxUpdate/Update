@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,13 +34,11 @@ import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
-import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateLine;
 import org.mxupdate.update.util.UpdateException_mxJPO;
@@ -92,6 +89,9 @@ public class BusObject_mxJPO
         }
     };
 
+    /** Defines the related type definition enumeration. */
+    private final TypeDef_mxJPO typeDef;
+
     /** Sorted set of attribute values.*/
     private final SortedMap<String,String> attrValues = new TreeMap<>(BusObject_mxJPO.COMP);
 
@@ -122,10 +122,11 @@ public class BusObject_mxJPO
     public BusObject_mxJPO(final TypeDef_mxJPO _typeDef,
                            final String _mxName)
     {
-        super(_typeDef,
-              (_typeDef.hasMxBusTypeDerived() && (_mxName != null) && !_mxName.contains(BusObject_mxJPO.SPLIT_TYPE))
+        super((_typeDef.hasMxBusTypeDerived() && (_mxName != null) && !_mxName.contains(BusObject_mxJPO.SPLIT_TYPE))
                       ? new StringBuilder().append(_typeDef.getMxBusType()).append(BusObject_mxJPO.SPLIT_TYPE).append(_mxName).toString()
                       : _mxName);
+
+        this.typeDef = _typeDef;
 
         if (_mxName != null)  {
             if (_typeDef.hasMxBusTypeDerived())  {
@@ -151,6 +152,57 @@ public class BusObject_mxJPO
             this.busName = null;
             this.busRevision = null;
         }
+    }
+
+    /**
+     * Constructor used to parse.
+     *
+     * @param _typeDef      type definition
+     * @param _busType      type of business object
+     * @param _busName      name of business object
+     * @param _busRevision  revision of business object
+     */
+    public BusObject_mxJPO(final TypeDef_mxJPO _typeDef,
+                           final String _busType,
+                           final String _busName,
+                           final String _busRevision)
+    {
+        super(BusObject_mxJPO.prepMxName(_typeDef, _busType, _busName, _busRevision));
+        this.typeDef = _typeDef;
+        this.busType = _busType;
+        this.busName = _busName;
+        this.busRevision = _busRevision;
+    }
+
+    /**
+     * Prepares the MX name for this business object.
+     *
+     * @param _typeDef      type definition
+     * @param _busType      type of business object
+     * @param _busName      name of business object
+     * @param _busRevision  revision of business object
+     * @return mx name
+     */
+    private static String prepMxName(final TypeDef_mxJPO _typeDef,
+                                     final String _busType,
+                                     final String _busName,
+                                     final String _busRevision)
+    {
+        final StringBuilder ret = new StringBuilder();
+        if (_typeDef.hasMxBusTypeDerived())  {
+            ret.append(_busType).append(BusObject_mxJPO.SPLIT_TYPE);
+        }
+        return ret.append(_busName).append(BusObject_mxJPO.SPLIT_NAME).append(_busRevision).toString();
+    }
+
+    /**
+     * Returns the {@link #typeDef type definition} instance.
+     *
+     * @return type definition enumeration
+     */
+    public final TypeDef_mxJPO getTypeDef()
+    {
+        return this.typeDef;
     }
 
     /**
@@ -358,7 +410,7 @@ public class BusObject_mxJPO
      *
      * @return value of instance variable {@link #attrValuesSorted}
      */
-    protected SortedMap<String,String> getAttrValues()
+    public SortedMap<String,String> getAttrValues()
     {
         return this.attrValues;
     }
@@ -419,78 +471,10 @@ public class BusObject_mxJPO
                 .list(this.connections);
     }
 
-    @Override()
-    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
-                               final String _file,
-                               final String _fileDate,
-                               final String _code,
-                               final boolean _create)
-        throws Exception
-    {
-        final BusObject_mxJPO clazz = (BusObject_mxJPO) this.getTypeDef().newTypeInstance(this.busName + BusObject_mxJPO.SPLIT_NAME + this.busRevision);
-        clazz.parseUpdate(new File(_file), _code);
-
-        this.busType = clazz.busType;
-        this.parse(_paramCache);
-
-        // MxUpdate File Date => must be always overwritten if newer!
-        final String attrFileDate = PropertyDef_mxJPO.FILEDATE.getAttrName(_paramCache);
-        if ((attrFileDate != null) && !attrFileDate.isEmpty())  {
-            clazz.attrValues.put(attrFileDate, _fileDate);
-        }
-
-        // installed date => reuse if already defined, new is not
-        final String attrInstDate = PropertyDef_mxJPO.INSTALLEDDATE.getAttrName(_paramCache);
-        if ((attrInstDate != null) && !attrInstDate.isEmpty())  {
-            final String curInstalledDate = this.attrValues.get(attrInstDate);
-            clazz.attrValues.put(
-                    attrInstDate,
-                    ((curInstalledDate != null) && !curInstalledDate.trim().isEmpty()) ? curInstalledDate : StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date()));
-        }
-
-        // installer
-        // => check if already defined
-        // => check if installed via parameter
-        // => use default installer
-        final String attrInstaller = PropertyDef_mxJPO.INSTALLER.getAttrName(_paramCache);
-        if ((attrInstaller != null) && !attrInstaller.isEmpty())  {
-            final String curInstaller = this.attrValues.get(attrInstaller);
-            clazz.attrValues.put(
-                    attrInstaller,
-                    _paramCache.contains(ValueKeys.Installer)
-                            ? _paramCache.getValueString(ValueKeys.Installer)
-                            : ((curInstaller != null) && !curInstaller.isEmpty())
-                                    ? curInstaller
-                                    : _paramCache.getValueString(ValueKeys.DefaultInstaller));
-        }
-
-        // calc sub path always
-        final String attrSubPath = PropertyDef_mxJPO.SUBPATH.getAttrName(_paramCache);
-        if ((attrSubPath != null) && !attrSubPath.isEmpty())  {
-            clazz.attrValues.put(
-                    attrSubPath,
-                    FileHandlingUtil_mxJPO.extraceSubPath(_file, this.getTypeDef().getFilePath()));
-        }
-
-        // attributes to ignore
-        for (final String attrName : this.getTypeDef().getMxBusIgnoredAttributes())  {
-            if ((this.attrValues.get(attrName) != null) && !this.attrValues.get(attrName).isEmpty())  {
-                clazz.attrValues.put(attrName, this.attrValues.get(attrName));
-            }
-        }
-
-        // initialize MQL builder
-        final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine(new File(_file), "escape mod bus $1 $2 $3", this.busType, this.busName, this.busRevision);
-
-        clazz.calcDelta(_paramCache, mql, this);
-
-        mql.exec(_paramCache);
-    }
-
-    @Override()
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final BusObject_mxJPO _current)
+    @Override
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final BusObject_mxJPO _current)
         throws UpdateException_mxJPO
     {
         _mql.newLine();

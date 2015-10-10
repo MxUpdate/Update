@@ -1,0 +1,100 @@
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+package org.mxupdate.test.test.script;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.mxupdate.script.ScriptHandler_mxJPO;
+import org.mxupdate.script.statement.AbstractStatement_mxJPO;
+import org.mxupdate.script.statement.MxUpdateStatement_mxJPO;
+import org.testng.Assert;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+
+/**
+ * Tests the {@link ScriptHandler_mxJPO script handler}.
+ *
+ * @author The MxUpdate Team
+ */
+public class ScriptHandlerTest
+{
+    /**
+     * Returns the test scripts to parse.
+     *
+     * @return test data
+     */
+    @DataProvider(name = "data")
+    public Object[][] getData()
+    {
+        return new Object[][] {
+            {"1)",
+                    "mxUpdate mxUpdateType HELLO{abc}\n",
+                    new MxUpdateStatement_mxJPO().setMxUpdateType("mxUpdateType").setName("HELLO").setCode("abc")},
+            {"2)",
+                    "mxUpdate mxUpdateType HELLO {abc}\n",
+                    new MxUpdateStatement_mxJPO().setMxUpdateType("mxUpdateType").setName("HELLO").setCode("abc")},
+            {"3)",
+                    "mxUpdate mxUpdateType HELLO\t{abc}\n",
+                    new MxUpdateStatement_mxJPO().setMxUpdateType("mxUpdateType").setName("HELLO").setCode("abc")},
+            {"4) aaaaaa",
+                    "mxUpdate mxUpdateType HELLO {  \nasdfasd asdf { } asdf asdf asdfasd fasdfasdf asdf\n}\n",
+                    new MxUpdateStatement_mxJPO().setMxUpdateType("mxUpdateType").setName("HELLO").setCode("  \nasdfasd asdf { } asdf asdf asdfasd fasdfasdf asdf\n")},
+            {"5)",
+                    "mxUpdate mxUpdateType \"HELLO Dummy\" {  \nasdfasd asdf { } asdf\n asdf asdfasd fasdfasdf asdf\n}\n",
+                    new MxUpdateStatement_mxJPO().setMxUpdateType("mxUpdateType").setName("HELLO Dummy").setCode("  \nasdfasd asdf { } asdf\n asdf asdfasd fasdfasdf asdf\n")},
+            {"6)",
+                    "mxUpdate mxUpdateType \"HELLO Dummy\" {asdfasd \"}\"}\n",
+                    new MxUpdateStatement_mxJPO().setMxUpdateType("mxUpdateType").setName("HELLO Dummy").setCode("asdfasd \"}\"")},
+            {"7)",
+                        "mxUpdate trigger \"HELLO Name\" \"Revision\" {asdfasd \"}\"}\n",
+                        new MxUpdateStatement_mxJPO().setMxUpdateType("trigger").setName("HELLO Name").setRevision("Revision").setCode("asdfasd \"}\"")},
+       };
+    }
+
+    /**
+     * Tests the parsing of scripts.
+     *
+     * @param _description  description
+     * @param _code         code to parse
+     * @param _statement    expected result statement
+     * @throws Exception if test failed
+     */
+    @Test(dataProvider = "data")
+    public void positiveTest(final String _description,
+                             final String _code,
+                             final MxUpdateStatement_mxJPO _statement)
+        throws Exception
+    {
+        final List<AbstractStatement_mxJPO> curStatements = new ArrayList<>();
+        final ScriptHandler_mxJPO scriptHandler = new ScriptHandler_mxJPO()  {
+            @Override
+            public ScriptHandler_mxJPO addStatement(final AbstractStatement_mxJPO _statement)
+            {
+                curStatements.add(_statement);
+                return this;
+            }
+        };
+        scriptHandler.parse(_code);
+
+        final List<AbstractStatement_mxJPO> expStatements = new ArrayList<>();
+        expStatements.add(_statement);
+
+        Assert.assertEquals(
+                curStatements,
+                expStatements);
+    }
+}

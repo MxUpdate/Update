@@ -183,10 +183,10 @@ public class RuleCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected Rule_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                        final String _name)
     {
-        return new Rule_mxJPO(_paramCache.getMapping().getTypeDef("Rule"), _name);
+        return new Rule_mxJPO(_name);
     }
 }

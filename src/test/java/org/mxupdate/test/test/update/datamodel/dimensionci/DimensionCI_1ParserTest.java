@@ -48,7 +48,7 @@ public class DimensionCI_1ParserTest
             // description
             {"2a) description",
                     "",
-                    "description \"abc def\""},
+                    "description \"abc def\" !hidden"},
             {"2b) description not defined",
                     "description \"\" !hidden",
                     "                 !hidden"},
@@ -356,10 +356,10 @@ public class DimensionCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected Dimension_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                             final String _name)
     {
-        return new Dimension_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_DIMENSION.updateType), _name);
+        return new Dimension_mxJPO(_name);
     }
 }

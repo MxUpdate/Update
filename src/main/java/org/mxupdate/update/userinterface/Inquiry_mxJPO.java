@@ -19,7 +19,7 @@ import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
@@ -58,13 +58,11 @@ public class Inquiry_mxJPO
     /**
      * Constructor used to initialize the inquiry instance.
      *
-     * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the administration object
      */
-    public Inquiry_mxJPO(final TypeDef_mxJPO _typeDef,
-                         final String _mxName)
+    public Inquiry_mxJPO(final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(EMxAdmin_mxJPO.Inquiry, _mxName);
         this.getProperties().setOtherPropTag("argument");
     }
 
@@ -113,10 +111,10 @@ public class Inquiry_mxJPO
                 .string(        "code",                    "\n" + ((this.code != null) ? this.code : "") + "\n");
     }
 
-    @Override()
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final Inquiry_mxJPO _current)
+    @Override
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final Inquiry_mxJPO _current)
         throws UpdateException_mxJPO
     {
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);

@@ -21,7 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
@@ -34,6 +34,8 @@ import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.util.FileUtil_mxJPO;
 import org.mxupdate.util.JPOUtil_mxJPO;
+
+import matrix.util.MatrixException;
 
 /**
  * Common definition for the code of a program.
@@ -90,21 +92,29 @@ public class ProgramCI_mxJPO
      * Constructor used to initialize the type definition enumeration and the
      * name.
      *
-     * @param _typeDef  type definition of the program
      * @param _mxName   MX name of the program object
      */
-    public ProgramCI_mxJPO(final TypeDef_mxJPO _typeDef,
-                           final String _mxName)
+    public ProgramCI_mxJPO(final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(EMxAdmin_mxJPO.Program, _mxName);
+    }
 
-        if (_typeDef != null)  {
-            for (final Kind checkKind : Kind.values())  {
-                if (checkKind.name().toLowerCase().equals(_typeDef.getMxUpdateKind()))  {
-                    this.kind = checkKind;
-                    break;
-                }
-            }
+    /**
+     * Parses a program and sets the default {@link #kind} value to
+     * {@link Kind#EXTERNAL}.
+     *
+     * @param _paramCache   parameter cache
+     * @throws MatrixException if XML export fails
+     * @throws ParseException if parsing fails
+     */
+    @Override
+    public void parse(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException, ParseException
+    {
+        super.parse(_paramCache);
+
+        if (this.kind == null)  {
+            this.kind = Kind.EXTERNAL;
         }
     }
 
@@ -235,10 +245,10 @@ public class ProgramCI_mxJPO
         MqlBuilder_mxJPO.mql().cmd("escape add program ").arg(this.getName()).cmd(" ").cmd(this.kind.name().toLowerCase()).exec(_paramCache);
     }
 
-    @Override()
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final ProgramCI_mxJPO _current)
+    @Override
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final ProgramCI_mxJPO _current)
         throws UpdateException_mxJPO
     {
         boolean update = true;

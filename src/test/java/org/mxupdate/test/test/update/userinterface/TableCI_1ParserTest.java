@@ -162,11 +162,10 @@ public class TableCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected Table_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                        final String _name)
     {
-        return new Table_mxJPO(_paramCache.getMapping().getTypeDef("Table"), _name);
+        return new Table_mxJPO(_name);
     }
-
 }

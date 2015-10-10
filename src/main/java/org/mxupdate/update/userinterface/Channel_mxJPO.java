@@ -21,7 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.WriteAppendChildSyntax;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -65,13 +65,11 @@ public class Channel_mxJPO
     /**
      * Constructor used to initialize the type definition enumeration.
      *
-     * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the administration object
      */
-    public Channel_mxJPO(final TypeDef_mxJPO _typeDef,
-                         final String _mxName)
+    public Channel_mxJPO(final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(EMxAdmin_mxJPO.Channel, _mxName);
         this.getProperties().setOtherPropTag("setting");
     }
 
@@ -146,10 +144,10 @@ public class Channel_mxJPO
                 .properties(this.getProperties());
     }
 
-    @Override()
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final Channel_mxJPO _current)
+    @Override
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final Channel_mxJPO _current)
         throws UpdateException_mxJPO
     {
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);

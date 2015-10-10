@@ -21,7 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -60,13 +60,11 @@ public class Rule_mxJPO
     /**
      * Constructor used to initialize the type definition enumeration.
      *
-     * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the rule object
      */
-    public Rule_mxJPO(final TypeDef_mxJPO _typeDef,
-                      final String _mxName)
+    public Rule_mxJPO(final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(EMxAdmin_mxJPO.Rule, _mxName);
     }
 
     @Override()
@@ -141,10 +139,10 @@ public class Rule_mxJPO
                 .properties(this.getProperties());
     }
 
-    @Override()
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final Rule_mxJPO _current)
+    @Override
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final Rule_mxJPO _current)
     {
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",        this.getDescription(),   _current.getDescription());

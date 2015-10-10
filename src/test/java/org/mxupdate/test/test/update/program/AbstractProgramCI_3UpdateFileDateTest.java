@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
+import org.mxupdate.script.ScriptContext_mxJPO;
+import org.mxupdate.script.statement.MxUpdateStatement_mxJPO;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
@@ -67,39 +69,43 @@ public abstract class AbstractProgramCI_3UpdateFileDateTest
 
         final String prgName = AbstractTest.PREFIX + "test";
 
-        final ProgramCI_mxJPO prg = this.createNew(paramCache, prgName);
-
-        prg.create(paramCache);
+        this.mql("escape add program \"" + prgName + "\" " + this.getKind());
 
         this.testJPO.getParentFile().getAbsoluteFile().mkdirs();
         this.testJPO.createNewFile();
+
+        final ScriptContext_mxJPO context = new ScriptContext_mxJPO(paramCache)
+                .defVar("NAME", prgName)
+                .defVar("FILENAME", "dummy.txt")
+                .defVar("FILEDATE", "2001-01-01");
 
         // first time
         // => code is updated
         FileUtils.write(this.testJPO, "A");
         this.testJPO.setLastModified(10000l);
-        prg.jpoCallExecute(paramCache, "dummy.txt", "2001-01-01", "file \"" + this.testJPO + "\"", true);
+
+        new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context);;
         Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "A");
 
         // other file content, but same modified date
         // => code is NOT updated
         FileUtils.write(this.testJPO, "B");
         this.testJPO.setLastModified(10000l);
-        prg.jpoCallExecute(paramCache, "dummy.txt", "2001-01-01", "file \"" + this.testJPO + "\"", true);
+        new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context);;
         Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "A");
 
         // other file content, other modified date
         // => code is updated
         FileUtils.write(this.testJPO, "C");
         this.testJPO.setLastModified(20000l);
-        prg.jpoCallExecute(paramCache, "dummy.txt", "2001-01-01", "file \"" + this.testJPO + "\"", true);
+        new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context);;
         Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "C");
 
         // other file content, other CI file fate
         // => code is updated
         FileUtils.write(this.testJPO, "D");
         this.testJPO.setLastModified(20000l);
-        prg.jpoCallExecute(paramCache, "dummy.txt", "9999-01-01", "file \"" + this.testJPO + "\"", true);
+        new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context.defVar("FILEDATE", "9999-01-01"));;
         Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "D");
     }
 
@@ -116,41 +122,51 @@ public abstract class AbstractProgramCI_3UpdateFileDateTest
 
         final String prgName = AbstractTest.PREFIX + "test";
 
-        final ProgramCI_mxJPO prg = this.createNew(paramCache, prgName);
-
-        prg.create(paramCache);
+        this.mql("escape add program \"" + prgName + "\" " + this.getKind());
 
         this.testJPO.getParentFile().getAbsoluteFile().mkdirs();
         this.testJPO.createNewFile();
+
+        final ScriptContext_mxJPO context = new ScriptContext_mxJPO(paramCache)
+                .defVar("NAME", prgName)
+                .defVar("FILENAME", "dummy.txt")
+                .defVar("FILEDATE", "2001-01-01");
 
         // first time
         // => code is updated
         FileUtils.write(this.testJPO, "A");
         this.testJPO.setLastModified(10000l);
-        prg.jpoCallExecute(paramCache, "dummy.txt", "2001-01-01", "file \"" + this.testJPO + "\"", true);
+        new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context);;
         Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "A");
 
         // other file content, but same modified date
         // => code is NOT updated
         FileUtils.write(this.testJPO, "B");
         this.testJPO.setLastModified(10000l);
-        prg.jpoCallExecute(paramCache, "dummy.txt", "2001-01-01", "file \"" + this.testJPO + "\"", true);
+        new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context);;
         Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "B");
 
         // other file content, other modified date
         // => code is updated
         FileUtils.write(this.testJPO, "C");
         this.testJPO.setLastModified(20000l);
-        prg.jpoCallExecute(paramCache, "dummy.txt", "2001-01-01", "file \"" + this.testJPO + "\"", true);
+        new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context);;
         Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "C");
 
         // other file content, other CI file fate
         // => code is updated
         FileUtils.write(this.testJPO, "D");
         this.testJPO.setLastModified(20000l);
-        prg.jpoCallExecute(paramCache, "dummy.txt", "9999-01-01", "file \"" + this.testJPO + "\"", true);
+        new MxUpdateStatement_mxJPO().setMxUpdateType("program").setCode("file \"" + this.testJPO + "\" kind " + this.getKind()).execute(context.defVar("FILEDATE", "9999-01-01"));;
         Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "D");
     }
+
+    /**
+     * Returns the kind of program to test.
+     *
+     * @return kind string
+     */
+    protected abstract String getKind();
 
     /**
      * Initializes new CI program instance.

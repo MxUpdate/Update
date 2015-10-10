@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.test.update.program;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.program.PageData;
 import org.mxupdate.test.data.util.PropertyDef;
@@ -28,16 +26,18 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import matrix.util.MatrixException;
+
 /**
  * Tests the {@link Page_mxJPO page CI} delta calculation.
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class PageCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<Page_mxJPO,PageData>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
@@ -55,7 +55,7 @@ public class PageCI_2DeltaCalculationTest
     }
 
     @Override
-    @BeforeMethod()
+    @BeforeMethod
     @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException
@@ -63,10 +63,10 @@ public class PageCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.PRG_PAGE);
     }
 
-    @Override()
+    @Override
     protected Page_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                        final String _name)
     {
-        return new Page_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_PAGE.updateType), _name);
+        return new Page_mxJPO(_name);
     }
 }

@@ -25,7 +25,7 @@ import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
 
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
@@ -71,13 +71,11 @@ public class PackageCI_mxJPO
     /**
      * Initializes this system package configuration item.
      *
-     * @param _typeDef  type definition of package
      * @param _mxName   name of package
      */
-    public PackageCI_mxJPO(final TypeDef_mxJPO _typeDef,
-                           final String _mxName)
+    public PackageCI_mxJPO(final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(EMxAdmin_mxJPO.Package, _mxName);
     }
 
     @Override()
@@ -146,10 +144,10 @@ public class PackageCI_mxJPO
                 .properties(this.getProperties());
     }
 
-    @Override()
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final PackageCI_mxJPO _current)
+    @Override
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final PackageCI_mxJPO _current)
         throws UpdateException_mxJPO
     {
         DeltaUtil_mxJPO.calcValueDelta(  _mql, "description",              this.getDescription(),   _current.getDescription());

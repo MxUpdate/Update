@@ -1315,10 +1315,10 @@ public class TypeCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected Type_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                        final String _name)
     {
-        return new Type_mxJPO(_paramCache.getMapping().getTypeDef("Type"), _name);
+        return new Type_mxJPO(_name);
     }
 }

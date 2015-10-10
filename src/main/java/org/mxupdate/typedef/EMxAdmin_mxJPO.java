@@ -15,6 +15,36 @@
 
 package org.mxupdate.typedef;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
+import org.mxupdate.update.datamodel.Dimension_mxJPO;
+import org.mxupdate.update.datamodel.Expression_mxJPO;
+import org.mxupdate.update.datamodel.Format_mxJPO;
+import org.mxupdate.update.datamodel.Interface_mxJPO;
+import org.mxupdate.update.datamodel.PathType_mxJPO;
+import org.mxupdate.update.datamodel.Policy_mxJPO;
+import org.mxupdate.update.datamodel.Relationship_mxJPO;
+import org.mxupdate.update.datamodel.Rule_mxJPO;
+import org.mxupdate.update.datamodel.Type_mxJPO;
+import org.mxupdate.update.program.Page_mxJPO;
+import org.mxupdate.update.program.ProgramCI_mxJPO;
+import org.mxupdate.update.system.PackageCI_mxJPO;
+import org.mxupdate.update.user.Association_mxJPO;
+import org.mxupdate.update.user.Group_mxJPO;
+import org.mxupdate.update.user.PersonAdmin_mxJPO;
+import org.mxupdate.update.user.Role_mxJPO;
+import org.mxupdate.update.userinterface.Channel_mxJPO;
+import org.mxupdate.update.userinterface.Command_mxJPO;
+import org.mxupdate.update.userinterface.Form_mxJPO;
+import org.mxupdate.update.userinterface.Inquiry_mxJPO;
+import org.mxupdate.update.userinterface.Menu_mxJPO;
+import org.mxupdate.update.userinterface.Portal_mxJPO;
+import org.mxupdate.update.userinterface.Table_mxJPO;
+
 /**
  * Enumeration for MX admin object used as work arround.
  *
@@ -22,11 +52,77 @@ package org.mxupdate.typedef;
  */
 public enum EMxAdmin_mxJPO
 {
-    Attribute,
-    Interface,
-    PathType,
-    Relationship,
-    Type;
+    Association(Association_mxJPO.class),
+    Attribute(AttributeCI_mxJPO.class),
+    Channel(Channel_mxJPO.class),
+    Command(Command_mxJPO.class),
+    Dimension(Dimension_mxJPO.class),
+    Expression(Expression_mxJPO.class),
+    Form(Form_mxJPO.class),
+    Format(Format_mxJPO.class),
+    Group(Group_mxJPO.class),
+    Inquiry(Inquiry_mxJPO.class),
+    Interface(Interface_mxJPO.class),
+    Menu(Menu_mxJPO.class),
+    Package(PackageCI_mxJPO.class),
+    Page(Page_mxJPO.class),
+    PathType(PathType_mxJPO.class),
+    Person(PersonAdmin_mxJPO.class),
+    Policy(Policy_mxJPO.class),
+    Portal(Portal_mxJPO.class),
+    Program(ProgramCI_mxJPO.class),
+    Relationship(Relationship_mxJPO.class),
+    Role(Role_mxJPO.class),
+    Rule(Rule_mxJPO.class),
+    Table(Table_mxJPO.class) {@Override public String mxClassSuffix() {return "system";} @Override public boolean hasMxClassSuffix() {return true;}},
+    Type(Type_mxJPO.class);
+
+    private static final Map<String,EMxAdmin_mxJPO> MAP_FROM_MXCLASS = new HashMap<>();
+    static  {
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Association.name().toLowerCase(),   Association);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Attribute.name().toLowerCase(),     Attribute);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Channel.name().toLowerCase(),       Channel);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Command.name().toLowerCase(),       Command);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Dimension.name().toLowerCase(),     Dimension);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Expression.name().toLowerCase(),    Expression);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Form.name().toLowerCase(),          Form);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Format.name().toLowerCase(),        Format);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Group.name().toLowerCase(),         Group);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Inquiry.name().toLowerCase(),       Inquiry);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Interface.name().toLowerCase(),     Interface);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Menu.name().toLowerCase(),          Menu);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Package.name().toLowerCase(),       Package);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Page.name().toLowerCase(),          Page);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(PathType.name().toLowerCase(),      PathType);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Person.name().toLowerCase(),        Person);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Policy.name().toLowerCase(),        Policy);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Portal.name().toLowerCase(),        Portal);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Program.name().toLowerCase(),       Program);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Relationship.name().toLowerCase(),  Relationship);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Role.name().toLowerCase(),          Role);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Rule.name().toLowerCase(),          Rule);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Table.name().toLowerCase(),         Table);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Type.name().toLowerCase(),          Type);
+    }
+
+    /** Depending class implementing this MX class definition. */
+    private final Class<? extends AbstractAdminObject_mxJPO<?>> clazzCI;
+
+    private EMxAdmin_mxJPO(final Class<? extends AbstractAdminObject_mxJPO<?>> _clazzCI)
+    {
+        this.clazzCI = _clazzCI;
+    }
+
+    /**
+     * Returns for given {@code _mxClass} name depending MX class definition.
+     *
+     * @param _mxClass  MX class name
+     * @return MX Class definition; {@code null} if not found
+     */
+    public static EMxAdmin_mxJPO valueOfByClass(final String _mxClass)
+    {
+        return EMxAdmin_mxJPO.MAP_FROM_MXCLASS.get(_mxClass);
+    }
 
     /**
      * Returns the MX class name for given MX admin object..
@@ -36,5 +132,47 @@ public enum EMxAdmin_mxJPO
     public String mxClass()
     {
         return this.name().toLowerCase();
+    }
+
+    /**
+     * Returns the suffix for MX class.
+     *
+     * @return suffix for this MX Class
+     */
+    public String mxClassSuffix()
+    {
+        return "";
+    }
+
+    /**
+     * Returns <i>true</i> if a suffix for MX class exists.
+     *
+     * @return <i>true</i> if suffix exists; otherwise <i>false</i>
+     */
+    public boolean hasMxClassSuffix()
+    {
+        return false;
+    }
+
+    /**
+     *
+     * @param _mxName   MX name of the new instance
+     * @return instance of the administration object used for create, update or
+     *                  delete
+     * @throws NoSuchMethodException        if the constructor with
+     *                                      {@link TypeDef_mxJPO} and
+     *                                      {@link String} does not exists
+     * @throws InstantiationException       if a new instance of the class
+     *                                      {@link #jpoClass} could not be
+     *                                      created
+     * @throws IllegalAccessException       if the constructor is not public
+     * @throws InvocationTargetException    if the constructor of the
+     *                                      {@link #jpoClass} itself throws an
+     *                                      exception
+     */
+    public AbstractAdminObject_mxJPO<?> newTypeInstance(final String _mxName)
+        throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+    {
+        return this.clazzCI.getConstructor(String.class).newInstance(_mxName);
     }
 }

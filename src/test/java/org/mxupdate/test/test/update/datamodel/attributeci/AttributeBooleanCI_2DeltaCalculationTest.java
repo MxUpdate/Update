@@ -60,10 +60,10 @@ public class AttributeBooleanCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BOOLEAN);
     }
 
-    @Override()
+    @Override
     protected AttributeCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                               final String _name)
     {
-        return new AttributeCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_BOOLEAN.updateType), _name);
+        return new AttributeCI_mxJPO(_name);
     }
 }

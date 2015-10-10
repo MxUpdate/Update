@@ -18,6 +18,7 @@ package org.mxupdate.update.datamodel.helper;
 import java.util.TreeSet;
 
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
+import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO.LocalAttribute;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
@@ -110,8 +111,7 @@ public class LocalAttributeList_mxJPO
      */
     public void calcDelta(final ParameterCache_mxJPO _paramCache,
                           final MultiLineMqlBuilder _mql,
-                          final EMxAdmin_mxJPO _ownerMxAdmin,
-                          final String _ownerName,
+                          final AbstractAdminObject_mxJPO<? extends AbstractAdminObject_mxJPO<?>> _owner,
                           final ErrorKey _errorKeyAttrRemoved,
                           final LocalAttributeList_mxJPO _current)
         throws UpdateException_mxJPO
@@ -127,7 +127,7 @@ public class LocalAttributeList_mxJPO
                     }
                 }
                 if (!found)  {
-                    throw new UpdateException_mxJPO(_errorKeyAttrRemoved, tmpAttr.getName(), _ownerName);
+                    throw new UpdateException_mxJPO(_errorKeyAttrRemoved, tmpAttr.getName(), _owner.getName());
                 }
             }
         }
@@ -146,16 +146,16 @@ public class LocalAttributeList_mxJPO
 
             // create if no current attribute exists
             if (curAttr == null)  {
-                _paramCache.logDebug("    - local attribute '" + targetAttr.getName() + "' is added (to '" + _ownerName + "')");
+                _paramCache.logDebug("    - local attribute '" + targetAttr.getName() + "' is added (to '" + _owner.getName() + "')");
                 _mql.pushPrefix("")
                     .newLine().cmd("escape add ").cmd(EMxAdmin_mxJPO.Attribute.mxClass()).cmd(" ").arg(targetAttr.getName())
                                         .cmd(" type ").arg(targetAttr.getKind().getAttrTypeCreate())
-                                        .cmd(" owner ").cmd(_ownerMxAdmin.mxClass()).cmd(" ").arg(_ownerName)
+                                        .cmd(" owner ").cmd(_owner.mxClassDef().mxClass()).cmd(" ").arg(_owner.getName())
                     .popPrefix();
             }
 
             // update attribute
-            _mql.pushPrefix("escape mod " + EMxAdmin_mxJPO.Attribute.mxClass() + " $1", _ownerName + "." + targetAttr.getName());
+            _mql.pushPrefix("escape mod " + EMxAdmin_mxJPO.Attribute.mxClass() + " $1", _owner.getName() + "." + targetAttr.getName());
             targetAttr.calcDelta(_paramCache, _mql, curAttr);
             _mql.popPrefix();
         }
@@ -175,7 +175,7 @@ public class LocalAttributeList_mxJPO
          */
         public LocalAttribute(final String _mxName)
         {
-            super(null, _mxName);
+            super(_mxName);
         }
 
         /**

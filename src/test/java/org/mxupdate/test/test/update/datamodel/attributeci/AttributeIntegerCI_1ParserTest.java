@@ -41,7 +41,7 @@ public class AttributeIntegerCI_1ParserTest
                     "kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
             {"0b) simple w/o anything to test default values",
                     "kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\"",
-                    ""},
+                    "kind integer"},
             // registered name
             {"1a) symbolic name",
                     "",
@@ -160,10 +160,10 @@ public class AttributeIntegerCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected AttributeCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                               final String _name)
     {
-        return new AttributeCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_INTEGER.updateType), _name);
+        return new AttributeCI_mxJPO(_name);
     }
 }

@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.test.update.datamodel.policyci;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.FormatData;
 import org.mxupdate.test.data.datamodel.PolicyData;
@@ -28,6 +26,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link Policy_mxJPO policy CI} delta calculation for default.
@@ -75,10 +75,10 @@ public class PolicyCI_2DeltaDefaultTest
         this.cleanup(AbstractTest.CI.DM_POLICY);
     }
 
-    @Override()
+    @Override
     protected Policy_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                          final String _name)
     {
-        return new Policy_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_POLICY.updateType), _name);
+        return new Policy_mxJPO(_name);
     }
 }

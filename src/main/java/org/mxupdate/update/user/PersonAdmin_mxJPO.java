@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
@@ -117,13 +117,11 @@ public class PersonAdmin_mxJPO
     /**
      * Constructor used to initialize the type definition enumeration.
      *
-     * @param _typeDef  person type definition
      * @param _mxName   MX name of the administration object
      */
-    public PersonAdmin_mxJPO(final TypeDef_mxJPO _typeDef,
-                             final String _mxName)
+    public PersonAdmin_mxJPO(final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(EMxAdmin_mxJPO.Person, _mxName);
         this.access.add("all");
         this.types.add(TypeItem.APPLICATION);
         this.types.add(TypeItem.FULL);
@@ -371,10 +369,10 @@ public class PersonAdmin_mxJPO
         return ret;
     }
 
-    @Override()
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final PersonAdmin_mxJPO _current)
+    @Override
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final PersonAdmin_mxJPO _current)
         throws UpdateException_mxJPO
     {
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);

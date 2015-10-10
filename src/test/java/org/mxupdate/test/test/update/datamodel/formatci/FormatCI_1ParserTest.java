@@ -118,10 +118,10 @@ public class FormatCI_1ParserTest
     .append("    version \"").append(StringUtil_mxJPO.convertUpdate(this.version)).append("\"\n");
 */
 
-    @Override()
+    @Override
     protected Format_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                          final String _name)
     {
-        return new Format_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_FORMAT.updateType), _name);
+        return new Format_mxJPO(_name);
     }
 }

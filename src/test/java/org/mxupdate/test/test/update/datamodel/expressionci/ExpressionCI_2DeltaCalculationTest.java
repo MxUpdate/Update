@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.test.update.datamodel.expressionci;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.ExpressionData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -26,6 +24,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link Expression_mxJPO expression CI} delta calculation.
@@ -62,11 +62,10 @@ public class ExpressionCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.DM_EXPRESSION);
     }
 
-    @Override()
+    @Override
     protected Expression_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                              final String _name)
     {
-        return new Expression_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_EXPRESSION.updateType), _name);
+        return new Expression_mxJPO(_name);
     }
-
 }

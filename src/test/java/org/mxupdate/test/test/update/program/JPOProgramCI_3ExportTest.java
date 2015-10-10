@@ -145,7 +145,7 @@ public class JPOProgramCI_3ExportTest
 
         // update values
         _progData.createDependings();
-        final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(new ProgramCI_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName()));
+        final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(new ProgramCI_mxJPO(_progData.getName()));
         wrapper.parseUpdate(_progData);
         wrapper.store((File) null, paramCache);
 
@@ -184,7 +184,7 @@ public class JPOProgramCI_3ExportTest
 
         // update values
         _progData.createDependings();
-        final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(new ProgramCI_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName()));
+        final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(new ProgramCI_mxJPO(_progData.getName()));
         wrapper.parseUpdate(_progData);
         wrapper.store((File) null, paramCache);
 
@@ -226,7 +226,7 @@ public class JPOProgramCI_3ExportTest
 
         // update values (and the code will be also null)
         _progData.createDependings();
-        final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(new ProgramCI_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName()));
+        final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(new ProgramCI_mxJPO(_progData.getName()));
         wrapper.parseUpdate(_progData);
         wrapper.store((File) null, paramCache);
 
@@ -265,7 +265,7 @@ public class JPOProgramCI_3ExportTest
 
         // update values (and the code will be also null)
         _progData.createDependings();
-        final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(new ProgramCI_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName()));
+        final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(new ProgramCI_mxJPO(_progData.getName()));
         wrapper.parseUpdate(_progData);
         wrapper.store((File) null, paramCache);
 

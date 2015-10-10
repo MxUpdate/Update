@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.test.update.userinterface;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.userinterface.ChannelData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -26,6 +24,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link Channel_mxJPO channel CI} delta calculation.
@@ -62,10 +62,10 @@ public class ChannelCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.UI_CHANNEL);
     }
 
-    @Override()
+    @Override
     protected Channel_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                              final String _name)
     {
-        return new Channel_mxJPO(_paramCache.getMapping().getTypeDef(CI.UI_CHANNEL.updateType), _name);
+        return new Channel_mxJPO(_name);
     }
 }

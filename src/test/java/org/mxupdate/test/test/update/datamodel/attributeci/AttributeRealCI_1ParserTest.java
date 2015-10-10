@@ -41,7 +41,7 @@ public class AttributeRealCI_1ParserTest
                     "kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
             {"0b) simple w/o anything to test default values",
                     "kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\"",
-                    ""},
+                    "kind real"},
             // registered name
             {"1a) symbolic name",
                     "",
@@ -164,6 +164,6 @@ public class AttributeRealCI_1ParserTest
     protected AttributeCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                               final String _name)
     {
-        return new AttributeCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_REAL.updateType), _name);
+        return new AttributeCI_mxJPO(_name);
     }
 }

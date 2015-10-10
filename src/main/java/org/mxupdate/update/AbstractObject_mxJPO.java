@@ -19,7 +19,6 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
-import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -37,9 +36,6 @@ import matrix.util.MatrixException;
  */
 public abstract class AbstractObject_mxJPO<CLASS extends AbstractObject_mxJPO<CLASS>>
 {
-    /** Defines the related type definition enumeration. */
-    private final TypeDef_mxJPO typeDef;
-
     /** MX Name of the administration object. */
     private String mxName;
 
@@ -49,24 +45,11 @@ public abstract class AbstractObject_mxJPO<CLASS extends AbstractObject_mxJPO<CL
     /**
      * Initialize the type definition enumeration.
      *
-     * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the administration object
      */
-    protected AbstractObject_mxJPO(final TypeDef_mxJPO _typeDef,
-                                   final String _mxName)
+    protected AbstractObject_mxJPO(final String _mxName)
     {
-        this.typeDef = _typeDef;
         this.mxName = _mxName;
-    }
-
-    /**
-     * Returns the {@link #typeDef type definition} instance.
-     *
-     * @return type definition enumeration
-     */
-    public final TypeDef_mxJPO getTypeDef()
-    {
-        return this.typeDef;
     }
 
     /**
@@ -123,23 +106,6 @@ public abstract class AbstractObject_mxJPO<CLASS extends AbstractObject_mxJPO<CL
         throws Exception;
 
     /**
-     * The method is called from the JPO caller interface.
-     *
-     * @param _paramCache   parameter cache
-     * @param _file         file
-     * @param _fileDate     date of file
-     * @param _code         code to update
-     * @param _create       first created
-     * @throws Exception never, only dummy
-     */
-    abstract public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
-                                        final String _file,
-                                        final String _fileDate,
-                                        final String _code,
-                                        final boolean _create)
-        throws Exception;
-
-    /**
      * Calculates the delta between given {@code _current} admin object
      * definition and this target admin object definition and appends the MQL
      * append commands to {@code _mql}.
@@ -150,9 +116,9 @@ public abstract class AbstractObject_mxJPO<CLASS extends AbstractObject_mxJPO<CL
      * @throws UpdateException_mxJPO if update is not allowed (e.g. if data can
      *                      be potentially lost)
      */
-    protected abstract void calcDelta(final ParameterCache_mxJPO _paramCache,
-                                      final MultiLineMqlBuilder _mql,
-                                      final CLASS _current)
+    public abstract void calcDelta(final ParameterCache_mxJPO _paramCache,
+                                   final MultiLineMqlBuilder _mql,
+                                   final CLASS _current)
         throws UpdateException_mxJPO;
 
     /**

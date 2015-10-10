@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.test.update.datamodel.dimensionci;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.DimensionData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -26,6 +24,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link Dimension_mxJPO dimension CI} delta calculation.
@@ -62,10 +62,10 @@ public class DimensionCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.DM_DIMENSION);
     }
 
-    @Override()
+    @Override
     protected Dimension_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                              final String _name)
     {
-        return new Dimension_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_DIMENSION.updateType), _name);
+        return new Dimension_mxJPO(_name);
     }
 }

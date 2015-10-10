@@ -470,10 +470,10 @@ public class PolicyCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected Policy_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                          final String _name)
     {
-        return new Policy_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_POLICY.updateType), _name);
+        return new Policy_mxJPO(_name);
     }
 }

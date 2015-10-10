@@ -15,9 +15,7 @@
 
 package org.mxupdate.update;
 
-import java.io.File;
 import java.io.StringReader;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
@@ -25,13 +23,11 @@ import java.util.Stack;
 import java.util.TreeSet;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
-import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MqlBuilder;
-import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
@@ -55,11 +51,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     extends AbstractObject_mxJPO<CLASS>
     implements AdminXMLExportObject_mxJPO
 {
-    /**
-     * Name of the parameter to suppress warnings for not parsed URLs.
-     *
-     * @see PadSaxHandler#evaluate()
-     */
+    /** Name of the parameter to suppress warnings for not parsed URLs. */
     private static final String PARAM_SUPPRESS_URL_WARNINGS = "SuppressUrlWarnings";
 
     /** Set of all ignored URLs from the XML definition for all admin objects. */
@@ -87,6 +79,9 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
         AbstractAdminObject_mxJPO.IGNORED_URLS.add("/adminProperties/historyList/history/string");
     }
 
+    /** MX class definition. */
+    private final EMxAdmin_mxJPO mxClassDef;
+
     /** Is the MX object hidden? */
     private boolean hidden = false;
 
@@ -99,13 +94,24 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     /**
      * Constructor used to initialize the type definition enumeration.
      *
-     * @param _typeDef  defines the related type definition enumeration
+     * @param _mxClass  defines the related MX class enumeration
      * @param _mxName   MX name of the administration object
      */
-    protected AbstractAdminObject_mxJPO(final TypeDef_mxJPO _typeDef,
+    protected AbstractAdminObject_mxJPO(final EMxAdmin_mxJPO _mxClassDef,
                                         final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(_mxName);
+        this.mxClassDef = _mxClassDef;
+    }
+
+    /**
+     * Returns depending {@link #mxClassDef MX class} enumeration.
+     *
+     * @return Mx class
+     */
+    public EMxAdmin_mxJPO mxClassDef()
+    {
+        return this.mxClassDef;
     }
 
     /**
@@ -118,9 +124,9 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
         throws MatrixException
     {
         final String tmp = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
-                .append("escape print ").append(this.getTypeDef().getMxAdminName())
+                .append("escape print ").append(this.mxClassDef().mxClass())
                 .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                .append(this.getTypeDef().getMxAdminSuffix())
+                .append(this.mxClassDef().mxClassSuffix())
                 .append(" select property[").append(_prop.getPropName(_paramCache)).append("] dump"));
         final int length = 7 + _prop.getPropName(_paramCache).length();
         return (tmp.length() >= length)
@@ -152,9 +158,9 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
         final String symbProgIdxOf = new StringBuilder().append(" on program ").append(symbProg).append(' ').toString();
         final String symbNames = MqlBuilder_mxJPO.mql()
                 .cmd("escape list property on program ").arg(symbProg)
-                .cmd(" to ").cmd(this.getTypeDef().getMxAdminName())
+                .cmd(" to ").cmd(this.mxClassDef().mxClass())
                 .cmd(" ").arg(this.getName())
-                .cmd(" ").cmd(this.getTypeDef().getMxAdminSuffix())
+                .cmd(" ").cmd(this.mxClassDef().mxClassSuffix())
                 .exec(_paramCache);
         if (!symbNames.isEmpty())  {
             for (final String symbName : symbNames.split("\n"))  {
@@ -175,7 +181,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     protected String execXMLExport(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        return MqlBuilder_mxJPO.mql().cmd("escape export ").cmd(this.getTypeDef().getMxAdminName()).cmd(" ").arg(this.getName()).cmd(" xml").exec(_paramCache);
+        return MqlBuilder_mxJPO.mql().cmd("escape export ").cmd(this.mxClassDef().mxClass()).cmd(" ").arg(this.getName()).cmd(" xml").exec(_paramCache);
     }
 
     /**
@@ -239,9 +245,9 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
         throws Exception
     {
         final StringBuilder cmd = new StringBuilder()
-                .append("escape delete ").append(this.getTypeDef().getMxAdminName())
+                .append("escape delete ").append(this.mxClassDef().mxClass())
                 .append(" \"").append(StringUtil_mxJPO.convertMql(this.getName())).append("\" ")
-                .append(this.getTypeDef().getMxAdminSuffix());
+                .append(this.mxClassDef().mxClassSuffix());
         MqlUtil_mxJPO.execMql(_paramCache, cmd);
     }
 
@@ -255,89 +261,10 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        final MqlBuilder mql = MqlBuilder_mxJPO.mql().cmd("escape add ").cmd(this.getTypeDef().getMxAdminName()).cmd(" ").arg(this.getName());
-        if ((this.getTypeDef().getMxAdminSuffix() != null) && !this.getTypeDef().getMxAdminSuffix().isEmpty())  {
-            mql.cmd(" ").cmd(this.getTypeDef().getMxAdminSuffix());
+        final MqlBuilder mql = MqlBuilder_mxJPO.mql().cmd("escape add ").cmd(this.mxClassDef().mxClass()).cmd(" ").arg(this.getName());
+        if (this.mxClassDef().hasMxClassSuffix())  {
+            mql.cmd(" ").cmd(this.mxClassDef().mxClassSuffix());
         }
-        mql.exec(_paramCache);
-    }
-
-    /**
-     * The method is called within the update of an administration object. The
-     * method is called directly within the update.
-     * <ul>
-     * <li>A delta MQL script generated to update the policy to the new target
-     *     definition.</li>
-     * <li>All symbolic names for states are defined (as property on the
-     *     policy).</li>
-     * <li>The delta MQL script is executed.</li>
-     * </ul>
-     *
-     * @param _paramCache   parameter cache
-     * @param _args         arguments from the TCL procedure
-     * @throws Exception if a state is not defined anymore or the policy could
-     *                   not be updated
-     * @see #TCL_PROCEDURE
-     */
-    @Override()
-    @SuppressWarnings("unchecked")
-    public void jpoCallExecute(final ParameterCache_mxJPO _paramCache,
-                               final String _file,
-                               final String _fileDate,
-                               final String _code,
-                               final boolean _create)
-        throws Exception
-    {
-        this.parse(_paramCache);
-
-        final File file = new File(_file);
-
-        final CLASS clazz = (CLASS) this.getTypeDef().newTypeInstance(this.getName());
-        clazz.parseUpdate(file, _code);
-
-        // MxUpdate File Date => must be always overwritten if newer!
-        clazz.getProperties().setValue4KeyValue(
-                _paramCache,
-                PropertyDef_mxJPO.FILEDATE,
-                _fileDate);
-
-        // installed date => reuse if already defined, new is not
-        final String curInstalledDate = this.getProperties().getValue4KeyValue(_paramCache, PropertyDef_mxJPO.INSTALLEDDATE);
-        clazz.getProperties().setValue4KeyValue(
-                _paramCache,
-                PropertyDef_mxJPO.INSTALLEDDATE,
-                ((curInstalledDate != null) && !curInstalledDate.isEmpty()) ? curInstalledDate : StringUtil_mxJPO.formatInstalledDate(_paramCache, new Date()));
-
-        // installer
-        // => check if already defined
-        // => check if installed via parameter
-        // => use default installer
-        final String curInstaller = this.getProperties().getValue4KeyValue(_paramCache, PropertyDef_mxJPO.INSTALLER);
-        clazz.getProperties().setValue4KeyValue(
-                _paramCache,
-                PropertyDef_mxJPO.INSTALLER,
-                _paramCache.contains(ValueKeys.Installer)
-                        ? _paramCache.getValueString(ValueKeys.Installer)
-                        : ((curInstaller != null) && !curInstaller.isEmpty())
-                                ? curInstaller
-                                : _paramCache.getValueString(ValueKeys.DefaultInstaller));
-
-        // calc sub path always
-        clazz.getProperties().setValue4KeyValue(
-                _paramCache,
-                PropertyDef_mxJPO.SUBPATH,
-                FileHandlingUtil_mxJPO.extraceSubPath(_file, this.getTypeDef().getFilePath()));
-
-        // initialize MQL builder (with or w/o suffix!)
-        final MultiLineMqlBuilder mql;
-        if ((this.getTypeDef().getMxAdminSuffix() != null) && !this.getTypeDef().getMxAdminSuffix().isEmpty())  {
-            mql = MqlBuilder_mxJPO.multiLine(file, "escape mod " + this.getTypeDef().getMxAdminName() + " $1 " + this.getTypeDef().getMxAdminSuffix(), this.getName());
-        } else  {
-            mql = MqlBuilder_mxJPO.multiLine(file, "escape mod " + this.getTypeDef().getMxAdminName() + " $1", this.getName());
-        }
-
-        clazz.calcDelta(_paramCache, mql, (CLASS) this);
-
         mql.exec(_paramCache);
     }
 
@@ -368,7 +295,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
      *
      * @return value of instance variable {@link #properties}.
      */
-    protected AdminPropertyList_mxJPO getProperties()
+    public AdminPropertyList_mxJPO getProperties()
     {
         return this.properties;
     }

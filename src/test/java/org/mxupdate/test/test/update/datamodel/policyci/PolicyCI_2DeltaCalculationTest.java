@@ -139,10 +139,10 @@ public class PolicyCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.DM_TYPE);
     }
 
-    @Override()
+    @Override
     protected Policy_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                          final String _name)
     {
-        return new Policy_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_POLICY.updateType), _name);
+        return new Policy_mxJPO(_name);
     }
 }

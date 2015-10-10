@@ -252,10 +252,10 @@ public class PathTypeCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.DM_RELATIONSHIP);
     }
 
-    @Override()
+    @Override
     protected PathType_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                            final String _name)
     {
-        return new PathType_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_PATHTYPE.updateType), _name);
+        return new PathType_mxJPO(_name);
     }
 }

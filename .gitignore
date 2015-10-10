@@ -1,6 +1,7 @@
-test-output
-target
-lib
-.classpath
-.project
-.settings
+/test-output
+/target
+/lib
+/.classpath
+/.project
+/.settings
+/src/main/java/org/mxupdate/script/.gitignore

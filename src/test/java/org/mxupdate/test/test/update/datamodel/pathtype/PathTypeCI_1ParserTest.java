@@ -666,6 +666,6 @@ public class PathTypeCI_1ParserTest
     protected PathType_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
             final String _name)
     {
-        return new PathType_mxJPO(_paramCache.getMapping().getTypeDef("DMPathType"), _name);
+        return new PathType_mxJPO(_name);
     }
 }

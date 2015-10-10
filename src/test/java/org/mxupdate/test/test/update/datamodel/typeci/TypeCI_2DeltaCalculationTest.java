@@ -171,10 +171,10 @@ public class TypeCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.DM_TYPE);
     }
 
-    @Override()
+    @Override
     protected Type_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                        final String _name)
     {
-        return new Type_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_TYPE.updateType), _name);
+        return new Type_mxJPO(_name);
     }
 }

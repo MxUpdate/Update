@@ -62,10 +62,10 @@ public class AttributeStringCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_STRING);
     }
 
-    @Override()
+    @Override
     protected AttributeCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                               final String _name)
     {
-        return new AttributeCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_STRING.updateType), _name);
+        return new AttributeCI_mxJPO(_name);
     }
 }

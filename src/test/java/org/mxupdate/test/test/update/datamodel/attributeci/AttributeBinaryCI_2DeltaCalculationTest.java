@@ -64,6 +64,6 @@ public class AttributeBinaryCI_2DeltaCalculationTest
     protected AttributeCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                               final String _name)
     {
-        return new AttributeCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_BINARY.updateType), _name);
+        return new AttributeCI_mxJPO(_name);
     }
 }

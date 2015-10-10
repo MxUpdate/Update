@@ -22,9 +22,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import matrix.util.MatrixException;
-
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.user.workspace.Cue_mxJPO;
 import org.mxupdate.update.user.workspace.Filter_mxJPO;
@@ -35,6 +33,8 @@ import org.mxupdate.update.user.workspace.ToolSet_mxJPO;
 import org.mxupdate.update.user.workspace.View_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+
+import matrix.util.MatrixException;
 
 /**
  * The class is used to export, create, delete and update common user
@@ -48,7 +48,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
     extends AbstractAdminObject_mxJPO<CLASS>
 {
     /** Set of all ignored URLs from the XML definition for common stuff of users. */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         AbstractUser_mxJPO.IGNORED_URLS.add("/homeSite");
         AbstractUser_mxJPO.IGNORED_URLS.add("/cueList");
@@ -82,7 +82,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
-    private final Map<String,Cue_mxJPO> cues = new TreeMap<String,Cue_mxJPO>();
+    private final Map<String,Cue_mxJPO> cues = new TreeMap<>();
 
     /**
      * Current cue which is read.
@@ -100,7 +100,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
-    private final Map<String,Filter_mxJPO> filters = new TreeMap<String,Filter_mxJPO>();
+    private final Map<String,Filter_mxJPO> filters = new TreeMap<>();
 
     /**
      * Current filter which is read.
@@ -118,7 +118,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
-    private final Map<String,Query_mxJPO> queries = new TreeMap<String,Query_mxJPO>();
+    private final Map<String,Query_mxJPO> queries = new TreeMap<>();
 
     /**
      * Current query which is read.
@@ -136,7 +136,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
-    private final Map<String,Table_mxJPO> tables = new TreeMap<String,Table_mxJPO>();
+    private final Map<String,Table_mxJPO> tables = new TreeMap<>();
 
     /**
      * Current table which is read.
@@ -154,7 +154,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
-    private final Map<String,Tip_mxJPO> tips = new TreeMap<String,Tip_mxJPO>();
+    private final Map<String,Tip_mxJPO> tips = new TreeMap<>();
 
     /**
      * Current tip which is read.
@@ -173,7 +173,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
-    private final Map<String,ToolSet_mxJPO> toolSets = new TreeMap<String,ToolSet_mxJPO>();
+    private final Map<String,ToolSet_mxJPO> toolSets = new TreeMap<>();
 
     /**
      * Current tip which is read.
@@ -191,7 +191,7 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * @see #writeEnd(ParameterCache_mxJPO, Appendable)
      * @see #update(ParameterCache_mxJPO, CharSequence, CharSequence, CharSequence, Map, File)
      */
-    private final Map<String,View_mxJPO> views = new TreeMap<String,View_mxJPO>();
+    private final Map<String,View_mxJPO> views = new TreeMap<>();
 
     /**
      * Current tip which is read.
@@ -204,13 +204,13 @@ public abstract class AbstractUser_mxJPO<CLASS extends AbstractAdminObject_mxJPO
      * Constructor used to initialize this user definition with related type
      * definition <code>_typeDef</code> for given <code>_name</code>.
      *
-     * @param _typeDef  defines the related type definition enumeration
-     * @param _mxName   MX name of the administration object
+     * @param _mxClassDef   MX class definition
+     * @param _mxName       MX name of the administration object
      */
-    protected AbstractUser_mxJPO(final TypeDef_mxJPO _typeDef,
+    protected AbstractUser_mxJPO(final EMxAdmin_mxJPO _mxClassDef,
                                  final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(_mxClassDef, _mxName);
     }
 
     /**

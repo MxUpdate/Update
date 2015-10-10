@@ -25,7 +25,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO;
@@ -69,13 +69,11 @@ public class Dimension_mxJPO
      * Constructor used to initialize the dimension instance with related type
      * definition and dimension name.
      *
-     * @param _typeDef  defines the related type definition enumeration
      * @param _mxName   MX name of the dimension object
      */
-    public Dimension_mxJPO(final TypeDef_mxJPO _typeDef,
-                           final String _mxName)
+    public Dimension_mxJPO(final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(EMxAdmin_mxJPO.Dimension, _mxName);
     }
 
     @Override()
@@ -210,10 +208,10 @@ public class Dimension_mxJPO
                 .properties(this.getProperties());
     }
 
-    @Override()
-    protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                             final MultiLineMqlBuilder _mql,
-                             final Dimension_mxJPO _current)
+    @Override
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final Dimension_mxJPO _current)
         throws UpdateException_mxJPO
     {
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);

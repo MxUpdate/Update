@@ -18,7 +18,7 @@ package org.mxupdate.update.userinterface;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
@@ -32,7 +32,7 @@ abstract class AbstractCommand_mxJPO<CLASS extends AbstractAdminObject_mxJPO<CLA
     extends AbstractAdminObject_mxJPO<CLASS>
 {
     /** Set of all ignored URLs from the XML definition for commands. */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         AbstractCommand_mxJPO.IGNORED_URLS.add("/input");
     }
@@ -47,13 +47,13 @@ abstract class AbstractCommand_mxJPO<CLASS extends AbstractAdminObject_mxJPO<CLA
     /**
      * Constructor used to initialize the type definition enumeration.
      *
-     * @param _typeDef  defines the related type definition enumeration
-     * @param _mxName   MX name of the administration object
+     * @param _mxClassDef   MX class definition
+     * @param _mxName       MX name of the administration object
      */
-    public AbstractCommand_mxJPO(final TypeDef_mxJPO _typeDef,
+    public AbstractCommand_mxJPO(final EMxAdmin_mxJPO _mxClassDef,
                                  final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(_mxClassDef, _mxName);
     }
 
     /**

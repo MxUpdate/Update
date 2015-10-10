@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.test.update.userinterface;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.data.userinterface.FormData;
@@ -27,6 +25,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link Form_mxJPO form CI} delta calculator.
@@ -176,10 +176,10 @@ public class FormCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.UI_FORM);
     }
 
-    @Override()
+    @Override
     protected Form_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                        final String _name)
     {
-        return new Form_mxJPO(_paramCache.getMapping().getTypeDef(CI.UI_FORM.updateType), _name);
+        return new Form_mxJPO(_name);
     }
 }

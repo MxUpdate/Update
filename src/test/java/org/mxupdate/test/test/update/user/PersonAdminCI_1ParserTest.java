@@ -256,10 +256,10 @@ public class PersonAdminCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected PersonAdmin_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                               final String _name)
     {
-        return new PersonAdmin_mxJPO(_paramCache.getMapping().getTypeDef(CI.USR_PERSONADMIN.updateType), _name);
+        return new PersonAdmin_mxJPO(_name);
     }
 }

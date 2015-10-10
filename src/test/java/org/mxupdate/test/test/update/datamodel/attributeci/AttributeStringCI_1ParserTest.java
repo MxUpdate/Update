@@ -41,7 +41,7 @@ public class AttributeStringCI_1ParserTest
                     "kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\""},
             {"0b) simple w/o anything to test default values",
                     "kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\"",
-                    ""},
+                    "kind string"},
             // registered name
             {"1a) symbolic name",
                     "",
@@ -164,6 +164,6 @@ public class AttributeStringCI_1ParserTest
     protected AttributeCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                               final String _name)
     {
-        return new AttributeCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_ATTRIBUTE_STRING.updateType), _name);
+        return new AttributeCI_mxJPO(_name);
     }
 }

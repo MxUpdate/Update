@@ -17,7 +17,6 @@ package org.mxupdate.update.datamodel.helper;
 
 import java.util.TreeSet;
 
-import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.PathType_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalPathTypeList_mxJPO.LocalPathType;
@@ -143,7 +142,7 @@ public class LocalPathTypeList_mxJPO
                 _paramCache.logDebug("    - local path type '" + targetLocalPathType.getName() + "' is added");
                 _mql.pushPrefix("")
                     .newLine().cmd("escape add pathtype ").arg(targetLocalPathType.getName())
-                                        .cmd(" owner ").cmd(_owner.getTypeDef().getMxAdminName()).cmd(" ").arg(_owner.getName())
+                                        .cmd(" owner ").cmd(_owner.mxClassDef().mxClass()).cmd(" ").arg(_owner.getName())
                     .popPrefix();
             }
 
@@ -173,7 +172,7 @@ public class LocalPathTypeList_mxJPO
          */
         public LocalPathType(final String _mxName)
         {
-            super((TypeDef_mxJPO) null, _mxName);
+            super(_mxName);
         }
 
         /**

@@ -128,10 +128,10 @@ public class PortalCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected Portal_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                          final String _name)
     {
-        return new Portal_mxJPO(_paramCache.getMapping().getTypeDef(CI.UI_PORTAL.updateType), _name);
+        return new Portal_mxJPO(_name);
     }
 }

@@ -213,6 +213,6 @@ public class InterfaceCI_2DeltaCalculationTest
     protected Interface_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                             final String _name)
     {
-        return new Interface_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_INTERFACE.updateType), _name);
+        return new Interface_mxJPO(_name);
     }
 }

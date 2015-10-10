@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.test.update.datamodel.ruleci;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -26,6 +24,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link Rule_mxJPO rule CI} delta calculation.
@@ -62,11 +62,10 @@ public class RuleCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.DM_RULE);
     }
 
-    @Override()
+    @Override
     protected Rule_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                        final String _name)
     {
-        return new Rule_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_RULE.updateType), _name);
+        return new Rule_mxJPO(_name);
     }
-
 }

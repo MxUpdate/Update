@@ -17,8 +17,6 @@ package org.mxupdate.test.test.update;
 
 import java.io.File;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractData;
@@ -30,6 +28,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Common definitions for delta calculation tests.
@@ -96,25 +96,25 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractObject_m
             _targetData.createDependings();
 
             // prepare the current
-            final WrapperCIInstance<DATA> currentWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
-            currentWrapper.create(paramCache);
+            final WrapperCIInstance<DATA> currentWrapper = new WrapperCIInstance<>(this.createNewData(paramCache, _currentData.getName()));
             currentWrapper.parseUpdate(_currentData);
-            final WrapperCIInstance<DATA> tmp = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _currentData.getName()));
+            currentWrapper.create(paramCache);
+            final WrapperCIInstance<DATA> tmp = new WrapperCIInstance<>(this.createNewData(paramCache, _currentData.getName()));
             tmp.parse(paramCache);
             currentWrapper.calcDelta(paramCache,  (File) null, tmp).exec(paramCache);
             _currentData.checkExport(new ExportParser(_currentData.getCI(), currentWrapper.write(paramCache), ""));
 
             // prepare the target form
-            final WrapperCIInstance<DATA> targetWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _targetData.getName()));
+            final WrapperCIInstance<DATA> targetWrapper = new WrapperCIInstance<>(this.createNewData(paramCache, _targetData.getName()));
             targetWrapper.parseUpdate(_targetData);
 
             // delta between current and target
-            final WrapperCIInstance<DATA> tmp2 = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _targetData.getName()));
+            final WrapperCIInstance<DATA> tmp2 = new WrapperCIInstance<>(this.createNewData(paramCache, _targetData.getName()));
             tmp2.parse(paramCache);
             targetWrapper.calcDelta(paramCache, (File) null, tmp2).exec(paramCache);
 
             // check result from MX defined from calculated delta
-            final WrapperCIInstance<DATA> resultWrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, _targetData.getName()));
+            final WrapperCIInstance<DATA> resultWrapper = new WrapperCIInstance<>(this.createNewData(paramCache, _targetData.getName()));
             resultWrapper.parse(paramCache);
             _targetData.checkExport(new ExportParser(_targetData.getCI(), resultWrapper.write(paramCache), ""));
         }

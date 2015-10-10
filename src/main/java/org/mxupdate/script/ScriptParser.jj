@@ -1,0 +1,124 @@
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+options {
+    JDK_VERSION = "1.6";
+    STATIC = false;
+    ERROR_REPORTING = true;
+    USER_TOKEN_MANAGER = false;
+    GENERATE_BOILERPLATE = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+    UNICODE_INPUT = true;
+}
+
+PARSER_BEGIN(ScriptParser)
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+package org.mxupdate.script;
+
+import java.lang.reflect.InvocationTargetException;
+import java.io.IOException;
+
+import org.mxupdate.script.statement.MxUpdateStatement_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
+import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
+import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
+
+/**
+ * Parser for the MxUpdate script.
+ *
+ * @author The MxUpdate Team
+ */
+@SuppressWarnings("unused")
+class ScriptParser
+    extends AbstractParser_mxJPO
+{
+}
+
+PARSER_END(ScriptParser)
+
+TOKEN_MGR_DECLS :{
+    static int mxUpdateCodeNesting = 0;
+}
+
+
+<DEFAULT> SKIP :
+{
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
+}
+
+<MXUPDATE_EXPECTED> SKIP :
+{
+  " " | "\t"
+}
+
+<DEFAULT> TOKEN :
+{
+    <MXUPDATE: "mxUpdate"> : MXUPDATE_EXPECTED
+}
+<MXUPDATE_EXPECTED> TOKEN :
+{
+      <MXUPDATE_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : MXUPDATE_EXPECTED
+    | <MXUPDATE_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>                                         : MXUPDATE_EXPECTED
+    | <MXUPDATE_CODE_START: "{"> {mxUpdateCodeNesting = 1;} : MXUPDATE_CODE_EXPECTED
+}
+
+<MXUPDATE_CODE_EXPECTED> TOKEN :
+{
+      <MXUPDATE_CODE_BRACE_START: ( "{"  )  > {mxUpdateCodeNesting++;} : MXUPDATE_CODE_EXPECTED
+    | <MXUPDATE_CODE_BRACE_END:   ( "}" ) > {mxUpdateCodeNesting--;if (mxUpdateCodeNesting == 0) {SwitchTo(DEFAULT);} else {SwitchTo(MXUPDATE_CODE_EXPECTED);};}
+    | <MXUPDATE_CODE_TEXT:        ( ( ~["{","}","\""] )+ ) > : MXUPDATE_CODE_EXPECTED
+    | <MXUPDATE_CODE_STRING:      ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\n" | "\\t" | "\\u" | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : MXUPDATE_CODE_EXPECTED
+}
+/******************************************************************************/
+
+void parse(final ScriptHandler_mxJPO _script)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException
+: {
+    Token tmp;
+    MxUpdateStatement_mxJPO mxUpdateStmt;
+    StringBuilder code;
+} {
+    (   ( <MXUPDATE>                                                                {mxUpdateStmt = new MxUpdateStatement_mxJPO();_script.addStatement(mxUpdateStmt);}
+               ( tmp = <MXUPDATE_STRING>                                            {mxUpdateStmt.setMxUpdateType(this.getString(tmp.image));}
+               | tmp = <MXUPDATE_SINGLE>                                            {mxUpdateStmt.setMxUpdateType(this.getSingle(tmp.image));} )
+                       ( tmp = <MXUPDATE_STRING>                                    {mxUpdateStmt.setName(this.getString(tmp.image));}
+                       | tmp = <MXUPDATE_SINGLE>                                    {mxUpdateStmt.setName(this.getSingle(tmp.image));} )
+                               ( tmp = <MXUPDATE_STRING>                            {mxUpdateStmt.setRevision(this.getString(tmp.image));}
+                               | tmp = <MXUPDATE_SINGLE>                            {mxUpdateStmt.setRevision(this.getSingle(tmp.image));} )?
+                                       ( <MXUPDATE_CODE_START>                      {code = new StringBuilder();}
+                                                ( tmp = <MXUPDATE_CODE_BRACE_START> {code.append(tmp.image);}
+                                                | tmp = <MXUPDATE_CODE_BRACE_END>   {code.append(tmp.image);}
+                                                | tmp = <MXUPDATE_CODE_TEXT>        {code.append(tmp.image);}
+                                                | tmp = <MXUPDATE_CODE_STRING>      {code.append(tmp.image);} )*
+                                                                                    {code.setLength(code.length() - 1);mxUpdateStmt.setCode(code.toString());} )
+
+        )
+    )*
+}

@@ -24,7 +24,7 @@ import java.util.Stack;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.userinterface.Form_mxJPO.Field;
 import org.mxupdate.update.userinterface.Table_mxJPO.Column;
@@ -45,7 +45,7 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
     extends AbstractAdminObject_mxJPO<CLASS>
 {
     /** Set of all ignored URLs from the XML definition for web forms / web  tables. */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         // web table
         AbstractUIWithFields_mxJPO.IGNORED_URLS.add("/columnList");
@@ -54,17 +54,18 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
     }
 
     /** Stores all fields / columns of this form  / table instance. */
-    private final Stack<AbstractField> fields = new Stack<AbstractField>();
+    private final Stack<AbstractField> fields = new Stack<>();
 
     /**
+     * Constructor.
      *
-     * @param _typeDef  defines the related type definition enumeration
-     * @param _mxName   MX name of the administration object
+     * @param _mxClassDef   MX class definition
+     * @param _mxName       MX name of the administration object
      */
-    protected AbstractUIWithFields_mxJPO(final TypeDef_mxJPO _typeDef,
+    protected AbstractUIWithFields_mxJPO(final EMxAdmin_mxJPO _mxClassDef,
                                          final String _mxName)
     {
-        super(_typeDef, _mxName);
+        super(_mxClassDef, _mxName);
     }
 
     /**
@@ -126,7 +127,7 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
         implements UpdateLine, Comparable<AbstractField>
     {
         /** Set of all ignored URLs from the XML definition for columns / fields. */
-        private static final Set<String> IGNORED_URLS = new HashSet<String>();
+        private static final Set<String> IGNORED_URLS = new HashSet<>();
         static  {
             // ignored, because the XML export is in correct order...
             AbstractUIWithFields_mxJPO.AbstractField.IGNORED_URLS.add("/fieldOrder");
@@ -160,10 +161,10 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
         private String sortProgram = "";
 
         /** All settings of the field / column.*/
-        private final Stack<Setting> settings = new Stack<Setting>();
+        private final Stack<Setting> settings = new Stack<>();
 
         /** Set of all users for this field.*/
-        private final SortedSet<String> users = new TreeSet<String>();
+        private final SortedSet<String> users = new TreeSet<>();
 
         /** Scale value for this field.*/
         private Double scale;
@@ -451,7 +452,7 @@ System.err.println("y location is not 0.0 and this is currently not supported");
             }
 
             // settings
-            final Map<String,String> tmpSettings  = new TreeMap<String,String>();
+            final Map<String,String> tmpSettings  = new TreeMap<>();
             for (final Setting setting : this.settings)  {
                 tmpSettings.put((setting.name == null) ? "" : setting.name,
                                 (setting.value == null) ? "" : setting.value);

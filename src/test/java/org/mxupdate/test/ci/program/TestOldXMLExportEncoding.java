@@ -23,7 +23,6 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
-import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -139,9 +138,7 @@ public class TestOldXMLExportEncoding
         }
 
         @Override
-        protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-                final MultiLineMqlBuilder _mql, final TestCode _current)
-                throws UpdateException_mxJPO
+        public void calcDelta(final ParameterCache_mxJPO _paramCache, final MultiLineMqlBuilder _mql, final TestCode _current)
         {
             // TODO Auto-generated method stub
         }

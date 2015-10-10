@@ -32,6 +32,12 @@ public class MQLProgramCI_3UpdateFileDateTest
     protected ProgramCI_mxJPO createNew(final ParameterCache_mxJPO _paramCache,
                                         final String _prgName)
     {
-        return new ProgramCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_MQL.updateType), _prgName);
+        return new ProgramCI_mxJPO(_prgName);
+    }
+
+    @Override
+    protected String getKind()
+    {
+        return "mql";
     }
 }

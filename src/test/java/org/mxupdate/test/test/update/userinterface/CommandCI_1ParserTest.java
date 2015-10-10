@@ -129,10 +129,10 @@ public class CommandCI_1ParserTest
         };
     }
 
-    @Override()
+    @Override
     protected Command_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                           final String _name)
     {
-        return new Command_mxJPO(_paramCache.getMapping().getTypeDef(CI.UI_COMMAND.updateType), _name);
+        return new Command_mxJPO(_name);
     }
 }

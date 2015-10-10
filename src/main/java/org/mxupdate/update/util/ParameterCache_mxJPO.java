@@ -217,37 +217,6 @@ public class ParameterCache_mxJPO
     }
 
     /**
-     * Creates a new parameter caches class used for the clone. The new
-     * parameter cache instance holds the new defined cache but all already
-     * defined value maps {@link #mapBoolean}, {@link #mapList} and
-     * {@link #mapString}. The writer {@link #stringWriter} and {@link #writer}
-     * are reused.
-     *
-     * @param _context      new matrix context
-     * @param _original     original parameter cache class
-     * @see #clone()
-     * @see #context
-     * @see #mapBoolean
-     * @see #mapList
-     * @see #mapMap
-     * @see #mapString
-     * @see #stringWriter
-     */
-    private ParameterCache_mxJPO(final Context _context,
-                                 final ParameterCache_mxJPO _original)
-    {
-        this.context = _context;
-        this.mapping = _original.mapping;
-        this.mapBoolean = _original.mapBoolean;
-        this.mapInteger = _original.mapInteger;
-        this.mapList = _original.mapList;
-        this.mapMap = _original.mapMap;
-        this.mapString = _original.mapString;
-        this.writer = _original.writer;
-        this.stringWriter = _original.stringWriter;
-    }
-
-    /**
      * Initializes the mapping for the parameter cache. The initialize is
      * defined in a own method so that the method could be overwritten for test
      * purposes.
@@ -260,21 +229,6 @@ public class ParameterCache_mxJPO
         throws Exception
     {
         return new Mapping_mxJPO(this);
-    }
-
-    /**
-     * Clones current parameter cache instance. A clone is needed if the MX
-     * context is changed (e.g. if the MxUpdate is called within the JPO
-     * called).
-     *
-     * @param _context  new matrix context for the cloned parameter cache
-     *                  instance
-     * @return new parameter cache instance
-     * @see #ParameterCache_mxJPO(Context, ParameterCache_mxJPO)
-     */
-    public ParameterCache_mxJPO clone(final Context _context)
-    {
-        return new ParameterCache_mxJPO(_context, this);
     }
 
     /**
