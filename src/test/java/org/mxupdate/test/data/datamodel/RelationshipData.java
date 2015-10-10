@@ -15,16 +15,19 @@
 
 package org.mxupdate.test.data.datamodel;
 
-import matrix.util.MatrixException;
+import java.util.Arrays;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
+import org.mxupdate.test.data.datamodel.helper.LocaleAttributeList;
 import org.mxupdate.test.data.util.DataList;
 import org.mxupdate.test.data.util.FlagList;
 import org.mxupdate.test.data.util.KeyNotDefinedList;
 import org.mxupdate.test.data.util.SingleValueList;
 import org.mxupdate.test.data.util.StringValueList;
+
+import matrix.util.MatrixException;
 
 /**
  * Used to define a relationship, create them and test the result.
@@ -39,7 +42,9 @@ public class RelationshipData
     /** Values for the to side. */
     private final FromTo to = new FromTo("to");
     /** All rule of this data with rule instances. */
-    private final DataList<RuleData> rules = new DataList<RuleData>();
+    private final DataList<RuleData> rules = new DataList<>();
+    /** Local attributes. */
+    private final LocaleAttributeList attributes = new LocaleAttributeList();
 
     /**
      * Initialize this relationship data with given <code>_name</code>.
@@ -90,6 +95,18 @@ public class RelationshipData
     }
 
     /**
+     * Appends given {@code _attributes}.
+     *
+     * @param _attributes    attributes list to append
+     * @return this type data instance
+     */
+    public RelationshipData addLocalAttribute(final AbstractAttributeData<?>... _attributes)
+    {
+        this.attributes.addAll(Arrays.asList(_attributes));
+        return this;
+    }
+
+    /**
      * Returns the TCL update file of this relationship data instance.
      *
      * @return TCL update file content
@@ -110,6 +127,7 @@ public class RelationshipData
         this.rules          .append4Update("    ", strg);
         this.from           .appendUpdate(strg);
         this.to             .appendUpdate(strg);
+        this.attributes     .append4Update("    ", strg);
         this.getProperties().append4Update("    ", strg);
 
         strg.append("}");
@@ -187,6 +205,7 @@ public class RelationshipData
         this.from       .checkExport(_exportParser);
         this.to         .checkExport(_exportParser);
         this.rules      .check4Export(_exportParser, "");
+        this.attributes .checkExport(_exportParser);
     }
 
     /**
@@ -227,7 +246,7 @@ public class RelationshipData
         /** String values of this data piece. */
         private final StringValueList strings = new StringValueList();
         /** All defined data elements. */
-        private final DataList<AbstractAdminData<?>> datas = new DataList<AbstractAdminData<?>>();
+        private final DataList<AbstractAdminData<?>> datas = new DataList<>();
         /** List of not defined keys. */
         private final KeyNotDefinedList keyNotDefineds = new KeyNotDefinedList();
 

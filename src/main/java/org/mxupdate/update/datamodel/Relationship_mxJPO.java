@@ -65,20 +65,6 @@ public class Relationship_mxJPO
         Relationship_mxJPO.IGNORED_URLS.add("/derivedFromRelationship/relationshipDefRefList");
         Relationship_mxJPO.IGNORED_URLS.add("/localAttributes");
         Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList");
-        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef");
-        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties");
-        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/creationInfo");
-        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/creationInfo/datetime");
-        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/modificationInfo");
-        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/modificationInfo/datetime");
-        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList");
-        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history");
-        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/agent");
-        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/datetime");
-        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/event");
-        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/order");
-        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/string");
-        Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/propertyList");
         Relationship_mxJPO.IGNORED_URLS.add("/fromSide");
         Relationship_mxJPO.IGNORED_URLS.add("/fromSide/allowAllRelationships");                     // to be ignored, because read within parse method
         Relationship_mxJPO.IGNORED_URLS.add("/fromSide/allowAllTypes");                             // to be ignored, because read within parse method
@@ -208,6 +194,9 @@ public class Relationship_mxJPO
             this.from.propagateConnection = true;
             parsed = true;
 
+        } else if (_url.startsWith("/localAttributes/attributeDefList/attributeDef"))  {
+            parsed = this.localAttributes.parseAdminXMLExportEvent(_paramCache, _url.substring(46), _content);
+
         } else if ("/preventDuplicates".equals(_url))  {
             this.preventDuplicates = true;
             parsed = true;
@@ -305,6 +294,7 @@ public class Relationship_mxJPO
         }
         DeltaUtil_mxJPO.calcListDelta( _mql, "rule",                     thisRules,              currentRules);
 
+        this.localAttributes.calcDelta(_paramCache, _mql, this, _current.localAttributes);
         this.from           .calcDelta(_mql,     _current.from);
         this.to             .calcDelta(_mql,     _current.to);
         this.getTriggers()  .calcDelta(_mql,     _current.getTriggers());

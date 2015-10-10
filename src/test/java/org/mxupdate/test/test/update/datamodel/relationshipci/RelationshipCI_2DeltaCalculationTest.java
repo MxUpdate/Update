@@ -15,11 +15,16 @@
 
 package org.mxupdate.test.test.update.datamodel.relationshipci;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.datamodel.AttributeBinaryData;
+import org.mxupdate.test.data.datamodel.AttributeBooleanData;
+import org.mxupdate.test.data.datamodel.AttributeDateData;
+import org.mxupdate.test.data.datamodel.AttributeIntegerData;
+import org.mxupdate.test.data.datamodel.AttributeRealData;
+import org.mxupdate.test.data.datamodel.AttributeStringData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
+import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.Relationship_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -27,6 +32,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link Relationship_mxJPO relationship CI} delta calculation.
@@ -41,7 +48,7 @@ public class RelationshipCI_2DeltaCalculationTest
     @DataProvider(name = "data")
     public Object[][] getData()
     {
-        return new Object[][] {/*
+        return new Object[][] {
             {"1a) symbolic name",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test").setValue("symbolicname", "expression_123")},
@@ -50,7 +57,7 @@ public class RelationshipCI_2DeltaCalculationTest
                     new RelationshipData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
             {"2) description",
                     new RelationshipData(this, "Test"),
-                    new RelationshipData(this, "Test").setValue("description", "abc def")},*/
+                    new RelationshipData(this, "Test").setValue("description", "abc def")},
             // derived
             {"5a) derived",
                     new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").from().defString("meaning", "abc")),
@@ -146,8 +153,7 @@ public class RelationshipCI_2DeltaCalculationTest
                     new RelationshipData(this, "Test").defData("derived", new RelationshipData(this, "Root").to().defSingle("type", "all")),
                     new RelationshipData(this, "Test").setValue("derived", AbstractTest.PREFIX + "Root").to().defData("type", new TypeData(this, "Type"))},
 
-
-   /*         // from propagatemodify flag
+            // from propagatemodify flag
             {"24a) relationship with from propagate modify true",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test").from().defFlag("propagatemodify", true)},
@@ -174,7 +180,84 @@ public class RelationshipCI_2DeltaCalculationTest
                     new RelationshipData(this, "Test").to().defFlag("propagateconnection", true)},
             {"35b) relationship with to propagate connection false",
                     new RelationshipData(this, "Test"),
-                    new RelationshipData(this, "Test").to().defFlag("propagateconnection", false)},*/
+                    new RelationshipData(this, "Test").to().defFlag("propagateconnection", false)},
+
+            {"101) binary attribute",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeBinaryData(this, "ATTR1")
+                                        .setSingle("kind", "binary")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
+            {"102) boolean attribute",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeBooleanData(this, "ATTR1")
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
+            {"103) date attribute",
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeDateData(this, "ATTR1")
+                                        .setSingle("kind", "date")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("rangevalue", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
+            {"104) integer attribute",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeIntegerData(this, "ATTR1")
+                                        .setSingle("kind", "integer")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("rangevalue", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
+            {"105) real attribute",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeRealData(this, "ATTR1")
+                                        .setSingle("kind", "real")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("rangevalue", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
+            {"106) string attribute",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeStringData(this, "ATTR1")
+                                        .setSingle("kind", "string")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("multiline", false, Create.ViaFlag)
+                                        .setSingle("maxlength", "0")
+                                        .setValue("default", "")) },
        };
     }
 
@@ -194,5 +277,4 @@ public class RelationshipCI_2DeltaCalculationTest
     {
         return new Relationship_mxJPO(_paramCache.getMapping().getTypeDef(CI.DM_RELATIONSHIP.updateType), _name);
     }
-
 }
