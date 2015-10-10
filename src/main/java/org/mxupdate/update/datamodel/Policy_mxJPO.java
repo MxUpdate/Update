@@ -359,7 +359,6 @@ public class Policy_mxJPO
                 || ((_current.delimiter != null) && !_current.delimiter.equals(this.delimiter)))  {
             throw new UpdateException_mxJPO(
                     ErrorKey.DM_POLICY_UPDATE_DELIMITER,
-                    this.getTypeDef().getLogging(),
                     this.getName(),
                     _current.delimiter,
                     this.delimiter);

@@ -245,7 +245,6 @@ public class UpdateException_mxJPO
          *
          * <p>Parameters:
          * <ol>
-         * <li>administration type (should be policy)</li>
          * <li>name of the policy</li>
          * <li>current delimiter</li>
          * <li>new delimiter (from the CI file)</li>
@@ -255,7 +254,7 @@ public class UpdateException_mxJPO
          * @see org.mxupdate.update.datamodel.Policy_mxJPO
          */
         DM_POLICY_UPDATE_DELIMITER(11101,
-                "The existing delimiter ''{2}'' of {0} ''{1}'' can be not updated to new delimiter ''{3}'' (limitation of MX)."),
+                "The existing delimiter ''{1}'' of policy ''{0}'' can be not updated to new delimiter ''{2}'' (limitation of MX)."),
 
         /**
          * <p>The given global attribute is not defined anymore but assigned to
