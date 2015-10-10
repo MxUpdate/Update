@@ -67,7 +67,7 @@ public class DimensionCI_1ParserTest
                     "description \"abc\ndef\" !hidden"},
             {"3d) tab's in description",
                     "",
-                    "description \"abc\tdef\" !hidden"},
+                    "description \"abc\\tdef\" !hidden"},
             // hidden
             {"4a) simple not hidden dimension",
                     "",

@@ -67,7 +67,7 @@ public class RuleCI_1ParserTest
                         "description \"abc\ndef\" !hidden !enforcereserveaccess"},
                 {"3d) tab's in description",
                         "",
-                        "description \"abc\tdef\" !hidden !enforcereserveaccess"},
+                        "description \"abc\\tdef\" !hidden !enforcereserveaccess"},
                 // hidden flag
                 {"4a) hidden",
                         "",

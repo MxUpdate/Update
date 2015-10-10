@@ -67,7 +67,7 @@ public class FormatCI_1ParserTest
                     "description \"abc\ndef\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
             {"3d) tab's in description",
                     "",
-                    "description \"abc\tdef\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
+                    "description \"abc\\tdef\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
             // hidden
             {"4a) not hidden",
                     "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\"",

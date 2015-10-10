@@ -79,7 +79,7 @@ public class ExpressionCI_1ParserTest
                     "description \"abc\ndef\" !hidden value \"\""},
             {"3d) tab's in description",
                     "",
-                    "description \"abc\tdef\" !hidden value \"\""},
+                    "description \"abc\\tdef\" !hidden value \"\""},
             {"3e) description with property (to check expression value is correct set)",
                     "                  description \"abcdef\"               !hidden value \"abc\" property \"prop\"",
                     "property \"prop\" description \"abcdef\" value \"abc\" !hidden"},

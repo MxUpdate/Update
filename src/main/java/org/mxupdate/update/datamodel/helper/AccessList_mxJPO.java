@@ -56,7 +56,7 @@ public class AccessList_mxJPO
         /** Key of the access filter. */
         private String key = "";
         /** Set holding the complete access. */
-        private final SortedSet<String> access = new TreeSet<String>();
+        private final SortedSet<String> access = new TreeSet<>();
         /** Organization of the access definition. */
         private String organization = "";
         /** Project of the access definition. */
@@ -163,7 +163,7 @@ public class AccessList_mxJPO
     }
 
     /** Stack used to hold the user access while parsing. */
-    private final Stack<Access> accessList = new Stack<Access>();
+    private final Stack<Access> accessList = new Stack<>();
 
     /**
      * Parses given access <code>_url</code>.
@@ -268,7 +268,7 @@ public class AccessList_mxJPO
      */
     public void sort()
     {
-        final List<Access> tmp = new ArrayList<Access>(this.accessList);
+        final List<Access> tmp = new ArrayList<>(this.accessList);
         Collections.sort(tmp);
         this.accessList.clear();
 

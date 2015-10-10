@@ -444,7 +444,7 @@ public class UpdateBuilder_mxJPO
         } else  {
             this.strg.append(' ');
         }
-        this.strg.append('\"').append(StringUtil_mxJPO.convertUpdate(_value)).append('\"');
+        this.strg.append('\"').append(UpdateUtils_mxJPO.encodeText(_value)).append('\"');
         return this;
     }
 

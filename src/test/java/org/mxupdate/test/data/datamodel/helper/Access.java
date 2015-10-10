@@ -19,11 +19,12 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.user.AbstractUserData;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateUtils_mxJPO;
+
+import matrix.util.MatrixException;
 
 /**
  * Holds the information about allowed access and filter.
@@ -41,7 +42,7 @@ public class Access
     /** Key. */
     private String key;
     /** Related access definitions. */
-    private final Set<String> accessList = new TreeSet<String>();
+    private final Set<String> accessList = new TreeSet<>();
     /** Organization. */
     private String organization;
     /** Project. */
@@ -242,11 +243,11 @@ public class Access
         _cmd.append(' ').append(this.kind);
 
         if (this.user != null)  {
-            _cmd.append(" \"").append(StringUtil_mxJPO.convertUpdate(this.user.getName())).append('\"');
+            _cmd.append(" \"").append(UpdateUtils_mxJPO.encodeText(this.user.getName())).append('\"');
         }
 
         if (this.key != null)  {
-            _cmd.append(" key \"").append(StringUtil_mxJPO.convertUpdate(this.key)).append('\"');
+            _cmd.append(" key \"").append(UpdateUtils_mxJPO.encodeText(this.key)).append('\"');
         }
 
         _cmd.append(" {").append(StringUtil_mxJPO.joinTcl(' ', false, this.accessList, "none")).append("}");
@@ -270,10 +271,10 @@ public class Access
             _cmd.append(' ').append(this.category).append(" category");
         }
         if (this.filter != null)  {
-            _cmd.append(" filter \"").append(StringUtil_mxJPO.convertUpdate(this.filter)).append('\"');
+            _cmd.append(" filter \"").append(UpdateUtils_mxJPO.encodeText(this.filter)).append('\"');
         }
         if (this.localfilter != null)  {
-            _cmd.append(" localfilter \"").append(StringUtil_mxJPO.convertUpdate(this.localfilter)).append('\"');
+            _cmd.append(" localfilter \"").append(UpdateUtils_mxJPO.encodeText(this.localfilter)).append('\"');
         }
 
         _cmd.append('\n');

@@ -38,6 +38,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateUtils_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
@@ -559,24 +560,24 @@ public class AttributeCI_mxJPO
             return ret;
         }
 
-        @Override()
+        @Override
         public String toString()
         {
             final StringBuilder ret = new StringBuilder("[range type=").append(this.type);
             // if the range is a program it is a 'global' attribute info
             if ("program".equals(this.type))  {
-                ret.append(", program=").append(StringUtil_mxJPO.convertUpdate(this.value1));
+                ret.append(", program=").append(UpdateUtils_mxJPO.encodeText(this.value1));
                 if (this.value2 != null)  {
-                    ret.append(", input=").append(StringUtil_mxJPO.convertUpdate(this.value2));
+                    ret.append(", input=").append(UpdateUtils_mxJPO.encodeText(this.value2));
                 }
             } else  {
                 if ("between".equals(this.type))  {
-                    ret.append(", value1=").append(StringUtil_mxJPO.convertUpdate(this.value1))
+                    ret.append(", value1=").append(UpdateUtils_mxJPO.encodeText(this.value1))
                         .append(' ').append(this.include1 ? "inclusive" : "exclusive")
-                        .append(", value2=").append(StringUtil_mxJPO.convertUpdate(this.value2))
+                        .append(", value2=").append(UpdateUtils_mxJPO.encodeText(this.value2))
                         .append(' ').append(this.include2 ? "inclusive" : "exclusive");
                 } else  {
-                    ret.append(", value=").append(StringUtil_mxJPO.convertUpdate(this.value1));
+                    ret.append(", value=").append(UpdateUtils_mxJPO.encodeText(this.value1));
                 }
             }
             return ret.append(']').toString();

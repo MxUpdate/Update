@@ -67,7 +67,7 @@ public class TypeCI_1Parser1Test
                     "description \"abc\ndef\" !hidden"},
             {"3d) tab's in description",
                     "",
-                    "description \"abc\tdef\" !hidden"},
+                    "description \"abc\\tdef\" !hidden"},
             // kind
             {"4a) basic kind",
                     "description \"\" !hidden",

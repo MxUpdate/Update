@@ -67,7 +67,7 @@ public class MenuCI_1ParserTest
                     "description \"abc\ndef\" label \"\" href \"\" alt \"\""},
             {"3d) tab's in description",
                     "",
-                    "description \"abc\tdef\" label \"\" href \"\" alt \"\""},
+                    "description \"abc\\tdef\" label \"\" href \"\" alt \"\""},
             // hidden
             {"4a) not hidden",
                     "description \"\"         label \"\" href \"\" alt \"\"",

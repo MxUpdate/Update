@@ -55,7 +55,7 @@ public class NotficationCI_1ParserTest
                     "description \"abc\ndef\" current \"Active\""},
             {"2d) tab's in description",
                     "",
-                    "description \"abc\tdef\" current \"Active\""},
+                    "description \"abc\\tdef\" current \"Active\""},
             // attribute
             {"4a) one attribute ",
                     "",

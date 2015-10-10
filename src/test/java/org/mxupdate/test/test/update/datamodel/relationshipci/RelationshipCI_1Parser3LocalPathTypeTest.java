@@ -156,7 +156,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local pathtype \"PathType\" { "
-                                    + "description \"abc\tdef\" !hidden "
+                                    + "description \"abc\\tdef\" !hidden "
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},

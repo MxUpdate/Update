@@ -129,7 +129,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
-                                    + "description \"abc\tdef\" !hidden "
+                                    + "description \"abc\\tdef\" !hidden "
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},

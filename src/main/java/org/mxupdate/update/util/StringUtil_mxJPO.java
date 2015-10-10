@@ -91,59 +91,6 @@ public final class StringUtil_mxJPO
     }
 
     /**
-     * Converts given string by escaping all special characters for the specific
-     * MxUpdate CI format.
-     *
-     * @param _text     character stream to convert
-     * @return converted string
-     */
-    public static String convertUpdate(final CharSequence _text)
-    {
-        final char[] text;
-        if (_text == null)  {
-            text = new char[0];
-        } else  {
-            text = _text.toString().toCharArray();
-        }
-        final StringBuilder ret = new StringBuilder(text.length + text.length);
-        int brace = 0;
-        for (final char ch : text)  {
-            switch (ch)  {
-                case '\"':
-                    ret.append("\\\"");
-                    break;
-                case '\\':
-                    ret.append("\\\\");
-                    break;
-                case '{':
-                    brace++;
-                    ret.append('{');
-                    break;
-                case '}':
-                    if (brace > 0)  {
-                        brace--;
-                    } else  {
-                        ret.append('\\');
-                    }
-                    ret.append('}');
-                    break;
-                default:
-                    ret.append(ch);
-            }
-        }
-        if (brace > 0)  {
-            for (int idx = ret.length() - 1; (idx >=0) && (brace > 0); idx--)  {
-                if (ret.charAt(idx) == '{')  {
-                    brace--;
-                    ret.insert(idx, '\\');
-                }
-            }
-        }
-
-        return ret.toString();
-    }
-
-    /**
      * A list of string is joined to one string. Between two string the
      * separator ' ' is set. If quotes parameter is defined each element of the
      * list is surrounded with quotes. Each element is
@@ -178,7 +125,7 @@ public final class StringUtil_mxJPO
                 if (_quotes)  {
                     ret.append('\"');
                 }
-                ret.append(StringUtil_mxJPO.convertUpdate(elem));
+                ret.append(UpdateUtils_mxJPO.encodeText(elem));
                 if (_quotes)  {
                     ret.append('\"');
                 }
@@ -651,7 +598,7 @@ public final class StringUtil_mxJPO
             boolean anyChars = false;
             int textIdx = 0;
             int wcsIdx = 0;
-            final Stack<int[]> backtrack = new Stack<int[]>();
+            final Stack<int[]> backtrack = new Stack<>();
 
             // loop around a backtrack stack, to handle complex * matching
             do {
@@ -738,7 +685,7 @@ public final class StringUtil_mxJPO
              ret = new String[] {_text };
          } else  {
              final char[] array = _text.toCharArray();
-             final ArrayList<String> list = new ArrayList<String>();
+             final ArrayList<String> list = new ArrayList<>();
              final StringBuilder buffer = new StringBuilder();
              for (int i = 0; i < array.length; i++) {
                  if ((array[i] == '?') || (array[i] == '*')) {

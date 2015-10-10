@@ -47,6 +47,7 @@ import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateLine;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
+import org.mxupdate.update.util.UpdateUtils_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MqlBuilder;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
@@ -723,11 +724,8 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
          */
         public void write(final UpdateBuilder_mxJPO _updateBuilder)
         {
-//            if (this.symbolicNames.isEmpty())  {
-   //             _out.append("        registeredName \"").append("state_").append(StringUtil_mxJPO.convertUpdate(this.name.replaceAll(" ", "_"))).append("\"\n");
-
             _updateBuilder
-                    .childStart("state \""+ StringUtil_mxJPO.convertUpdate(this.name) + "\"")
+                    .childStart("state \""+ UpdateUtils_mxJPO.encodeText(this.name) + "\"")
                     .list(          "registeredname",              this.symbolicNames)
                     .flagIfTrue(    "enforcereserveaccess", false, this.enforcereserveaccess,       _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMPolicyStateSupportsEnforceReserveAccess))
                     .flagIfTrue(    "majorrevision",        false, this.majorrevisionable,          _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMPolicySupportsMajorMinor))

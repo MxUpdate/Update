@@ -70,7 +70,7 @@ public class PolicyCI_1ParserTest
                         "description \"abc\ndef\" !hidden defaultformat \"\" sequence \"\" store \"\""},
                 {"3d) tab's in description",
                         "",
-                        "description \"abc\tdef\" !hidden defaultformat \"\" sequence \"\" store \"\""},
+                        "description \"abc\\tdef\" !hidden defaultformat \"\" sequence \"\" store \"\""},
                 // hidden flag
                 {"4a) simple not hidden policy",
                         "",

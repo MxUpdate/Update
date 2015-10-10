@@ -20,9 +20,9 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.util.TreeSet;
 
-import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
+import org.mxupdate.update.util.UpdateUtils_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 /**
@@ -37,7 +37,7 @@ public class ChildRefList_mxJPO
     /** Because not needed, the default serialize version ID is defined. */
     private static final long serialVersionUID = 1L;
     /** Holds all children of this references list. */
-    private final Stack<AbstractRef> childrenStack = new Stack<AbstractRef>();
+    private final Stack<AbstractRef> childrenStack = new Stack<>();
 
     /**
      * Parses the references.
@@ -115,7 +115,7 @@ public class ChildRefList_mxJPO
                     _out.append("    newrow\n");
                     row = ref.row;
                 }
-                _out.append("    ").append(ref.kind()).append(" \"").append(StringUtil_mxJPO.convertUpdate(ref.name)).append("\"\n");
+                _out.append("    ").append(ref.kind()).append(" \"").append(UpdateUtils_mxJPO.encodeText(ref.name)).append("\"\n");
             }
         }
     }

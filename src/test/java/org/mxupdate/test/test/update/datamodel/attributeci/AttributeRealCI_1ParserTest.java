@@ -71,7 +71,7 @@ public class AttributeRealCI_1ParserTest
                     "kind real description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
             {"3d) tab's in description",
                     "",
-                    "kind real description \"abc\tdef\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
+                    "kind real description \"abc\\tdef\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
             // hidden flag
             {"4a) hidden",
                     "",

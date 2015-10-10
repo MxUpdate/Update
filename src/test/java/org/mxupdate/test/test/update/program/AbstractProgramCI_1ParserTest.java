@@ -53,7 +53,7 @@ public abstract class AbstractProgramCI_1ParserTest
                     "",
                     "kind " + _kind + " description \"abc\ndef\""},
             {"2d) tab's in description",
-                    "",
+                    "kind " + _kind + " description \"abc\\tdef\"",
                     "kind " + _kind + " description \"abc\tdef\""},
             // hidden flag
             {"3a) hidden",
@@ -111,9 +111,12 @@ public abstract class AbstractProgramCI_1ParserTest
             {"10a) code",
                     "",
                     "kind " + _kind + " description \"\" code \" side \n second \""},
-            {"10b) empty definition",
-                    "kind " + _kind + " description \"\"              ",
+            {"10b) code empty definition",
+                    "kind " + _kind + " description \"\"           ",
                     "kind " + _kind + " description \"\" code \"\" "},
+            {"10c) code with tab converted must be converted",
+                    "",
+                    "kind " + _kind + " description \"\" code \"abc\\tdef\""},
             // property
             {"20a) property special characters",
                     "",

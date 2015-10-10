@@ -91,7 +91,7 @@ public class RelationshipCI_1Parser1Test
                             + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
             {"3d) tab's in description",
                     "",
-                    "description \"abc\tdef\" !hidden !preventduplicates "
+                    "description \"abc\\tdef\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
             // kind

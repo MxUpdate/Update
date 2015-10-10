@@ -55,7 +55,7 @@ public class ObjectGeneratorCI_1ParserTest
                     "description \"abc\ndef\" current \"\""},
             {"2d) tab's in description",
                     "",
-                    "description \"abc\tdef\" current \"\""},
+                    "description \"abc\\tdef\" current \"\""},
             // attribute
             {"4a) one attribute ",
                     "",

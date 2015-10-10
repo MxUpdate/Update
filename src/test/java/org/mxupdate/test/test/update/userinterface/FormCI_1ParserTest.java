@@ -67,7 +67,7 @@ public class FormCI_1ParserTest
                     "description \"abc\ndef\""},
             {"3d) tab's in description",
                     "",
-                    "description \"abc\tdef\""},
+                    "description \"abc\\tdef\""},
             // hidden
             {"4a) not hidden",
                     "description \"\"",

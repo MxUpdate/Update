@@ -71,7 +71,7 @@ public class AttributeBinaryCI_1ParserTest
                     "kind binary description \"abc\ndef\" !hidden !resetonclone !resetonrevision default \"\""},
             {"3d) tab's in description",
                     "",
-                    "kind binary description \"abc\tdef\" !hidden !resetonclone !resetonrevision default \"\""},
+                    "kind binary description \"abc\\tdef\" !hidden !resetonclone !resetonrevision default \"\""},
             // hidden flag
             {"4a) hidden",
                     "",

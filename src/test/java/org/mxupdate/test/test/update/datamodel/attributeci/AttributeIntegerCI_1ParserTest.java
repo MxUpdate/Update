@@ -71,7 +71,7 @@ public class AttributeIntegerCI_1ParserTest
                     "kind integer description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
             {"3d) tab's in description",
                     "",
-                    "kind integer description \"abc\tdef\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
+                    "kind integer description \"abc\\tdef\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
             // hidden flag
             {"4a) hidden",
                     "",

@@ -71,7 +71,7 @@ public class AttributeStringCI_1ParserTest
                     "kind string description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\""},
             {"3d) tab's in description",
                     "",
-                    "kind string description \"abc\tdef\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\""},
+                    "kind string description \"abc\\tdef\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\""},
             // hidden flag
             {"4a) hidden",
                     "",

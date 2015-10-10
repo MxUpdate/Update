@@ -67,7 +67,7 @@ public class CommandCI_1ParserTest
                     "description \"abc\ndef\" label \"\" href \"\" alt \"\""},
             {"3d) tab's in description",
                     "",
-                    "description \"abc\tdef\" label \"\" href \"\" alt \"\""},
+                    "description \"abc\\tdef\" label \"\" href \"\" alt \"\""},
             // hidden flag
             {"4a) hidden",
                     "",

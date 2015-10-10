@@ -67,7 +67,7 @@ public class InquiryCI_1ParserTest
                     "description \"abc\ndef\" pattern \"\" format \"\" code \" \""},
             {"3d) tab's in description",
                     "",
-                    "description \"abc\tdef\" pattern \"\" format \"\" code \" \""},
+                    "description \"abc\\tdef\" pattern \"\" format \"\" code \" \""},
             // hidden flag
             {"4a) hidden",
                     "",

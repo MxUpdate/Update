@@ -67,7 +67,7 @@ public class ChannelCI_1ParserTest
                     "description \"abc\ndef\" label \"\" href \"\" alt \"\" height 0"},
             {"3d) tab's in description",
                     "",
-                    "description \"abc\tdef\" label \"\" href \"\" alt \"\" height 0"},
+                    "description \"abc\\tdef\" label \"\" href \"\" alt \"\" height 0"},
             // hidden
             {"4a) not hidden",
                     "description \"\"         label \"\" href \"\" alt \"\" height 0",

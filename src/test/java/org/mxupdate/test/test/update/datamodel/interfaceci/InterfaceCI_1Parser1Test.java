@@ -67,7 +67,7 @@ public class InterfaceCI_1Parser1Test
                     "description \"abc\ndef\" !hidden"},
             {"3d) tab's in description",
                     "",
-                    "description \"abc\tdef\" !hidden"},
+                    "description \"abc\\tdef\" !hidden"},
             // abstract flag
             {"4a) not abstract",
                     "description \"\" !hidden",

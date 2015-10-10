@@ -71,7 +71,7 @@ public class AttributeDateCI_1ParserTest
                     "kind date description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
             {"3d) tab's in description",
                     "",
-                    "kind date description \"abc\tdef\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
+                    "kind date description \"abc\\tdef\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\""},
             // hidden flag
             {"4a) hidden",
                     "",

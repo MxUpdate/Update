@@ -262,26 +262,27 @@ public abstract class AbstractParser_mxJPO
      *
      * @param _token    string token
      * @return extracted string
+     * @throws IllegalArgumentException if decoding failed
      */
     protected String getCode(final String _token)
+        throws IllegalArgumentException
     {
         final char[] token = _token.toCharArray();
 
         // check for string embedded in apostrophe (must be removed)
         int idxStart = 0;
-        int idxEnd   = token.length;
-        if (token[idxStart] == '\"' && token[idxEnd - 1] == '\"')  {
+        int idxCount = token.length;
+        if (token[idxStart] == '\"' && token[idxCount - 1] == '\"')  {
             idxStart++;
-            idxEnd--;
+            idxCount -= 2;
 
             // check for new line at start and end
-            if (token[idxStart] == '\n' && token[idxEnd - 1] == '\n')  {
+            if (token[idxStart] == '\n' && token[idxCount - 1] == '\n')  {
                 idxStart++;
-                idxEnd--;
+                idxCount -= 2;
             }
         }
-
-        return this.decode(token, idxStart, idxEnd);
+        return UpdateUtils_mxJPO.decodeText(new String(token, idxStart, idxCount));
     }
 
     /**
@@ -341,42 +342,13 @@ public abstract class AbstractParser_mxJPO
 
         // check for string embedded in apostrophe (must be removed)
         int idxStart = 0;
-        int idxEnd   = token.length;
-        if (token[0] == '\"' && token[idxEnd - 1] == '\"')  {
+        int idxCount = token.length;
+        if (token[idxStart] == '\"' && token[idxCount - 1] == '\"')  {
             idxStart++;
-            idxEnd--;
+            idxCount -= 2;
         }
 
-        return this.decode(token, idxStart, idxEnd);
-    }
-
-    private String decode(final char[] _token, final int _startIdx, final int _endIdx)
-    {
-        final StringBuilder ret = new StringBuilder(_endIdx - _startIdx);
-        for (int idx = _startIdx; idx < _endIdx; )  {
-            final char ch = _token[idx++];
-            switch (ch)  {
-                case '\\':
-                    final char subCh = _token[idx++];
-                    switch (subCh)  {
-                        case 'n':
-                            ret.append('\n');
-                            break;
-                        case 't':
-                            ret.append('\t');
-                            break;
-                        default:
-                            ret.append(subCh);
-                            break;
-                    }
-                    break;
-                default:
-                    ret.append(ch);
-                    break;
-            }
-        }
-
-        return ret.toString();
+        return UpdateUtils_mxJPO.decodeText(new String(token, idxStart, idxCount));
     }
 
     /**

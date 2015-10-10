@@ -41,6 +41,7 @@ import org.apache.maven.settings.Profile;
 import org.apache.maven.settings.Settings;
 import org.mxupdate.test.util.Version;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateUtils_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -769,8 +770,9 @@ public abstract class AbstractTest
      * @see StringUtil_mxJPO#convertUpdate(CharSequence)
      */
     public static String convertUpdate(final CharSequence _text)
+        throws IllegalArgumentException
     {
-        return StringUtil_mxJPO.convertUpdate(_text);
+        return UpdateUtils_mxJPO.encodeText(_text);
     }
 
     /**

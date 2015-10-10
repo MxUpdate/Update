@@ -91,7 +91,7 @@ public class PathTypeCI_1Parser1Test
                             + "to   { }"},
             {"3d) tab's in description",
                     "",
-                    "description \"abc\tdef\" !hidden "
+                    "description \"abc\\tdef\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }"},
             // global attribute
