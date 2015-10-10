@@ -22,7 +22,23 @@ options {
     SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
     UNICODE_INPUT = true;
 }
-PARSER_BEGIN(InquiryParser)
+
+PARSER_BEGIN(InquiryParser)
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
 package org.mxupdate.update.userinterface;
 
 import java.lang.reflect.InvocationTargetException;
@@ -43,14 +59,20 @@ class InquiryParser
     extends AbstractParser_mxJPO
 {
 }
-PARSER_END(InquiryParser)<*> SKIP :
+
+PARSER_END(InquiryParser)
+
+<*> SKIP :
 {
   " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
 <DEFAULT> TOKEN :
 {
-      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+      <UUID:                                "uuid">                                         : STRING_EXPECTED
+
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
     | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <HIDDEN_TRUE:                         "hidden">
@@ -79,7 +101,8 @@ class InquiryParser
 
 /******************************************************************* Argument */
 <DEFAULT> TOKEN :
-{      <ARGUMENT:                            "argument">                                     : ARGUMENT_EXPECTED
+{
+      <ARGUMENT:                            "argument">                                     : ARGUMENT_EXPECTED
 }
 
 <ARGUMENT_EXPECTED> TOKEN :
@@ -103,7 +126,8 @@ class InquiryParser
 }
 
 /**************************************************************************** */
-/**
+
+/**
  * Parses one complete inquiry definition.
  *
  * @param _inquiry  target inquiry to update with parsed values
@@ -114,8 +138,13 @@ void parse(final Inquiry_mxJPO _inquiry)
     Token tmp;
     AdminProperty property;
 } {
-    (
-        ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_inquiry, "symbolicNames", this.getString(tmp.image));}
+    (   ( <UUID>                                                            {property = new AdminProperty();
+                                                                             this.appendValue(this.getValue(_inquiry, "properties"), "propertiesStack", property);
+                                                                             this.setValue(property, "name",  "UUID");}
+                                    ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+
+      | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_inquiry, "symbolicNames", this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(_inquiry, "symbolicNames", this.getSingle(tmp.image));} ) )
 
       | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_inquiry, "description",                         this.getString(tmp.image));}
