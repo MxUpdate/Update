@@ -24,6 +24,21 @@ options {
 }
 
 PARSER_BEGIN(ChannelParser)
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
 package org.mxupdate.update.userinterface;
 
 import java.lang.reflect.InvocationTargetException;
@@ -54,16 +69,26 @@ PARSER_END(ChannelParser)
 
 TOKEN : /** first level */
 {
-      <SYMBOLICNAME:            "symbolicname">                                 : STRING_EXPECTED
-    | <DESCRIPTION:             "description">                                  : MULTILINESTRING_EXPECTED
-    | <HIDDEN_TRUE:             "hidden">
-    | <HIDDEN_FALSE:            "!hidden">
-    | <LABEL:                   "label">                                        : STRING_EXPECTED
-    | <ALT:                     "alt">                                          : STRING_EXPECTED
-    | <HREF:                    "href">                                         : STRING_EXPECTED
-    | <HEIGHT:                  "height">                                       : INTEGER_EXPECTED
-    | <SETTING:                 ("add" ([" ","\t","\n","\r"])+ )? "setting">    : SETTING_EXPECTED
-    | <COMMAND:                 ("add" ([" ","\t","\n","\r"])+ )? "command">    : STRING_EXPECTED
+      <UUID:                                "uuid">                                         : STRING_EXPECTED
+
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+
+    | <HIDDEN_TRUE:                         "hidden">
+    | <HIDDEN_FALSE:                        "!hidden">
+
+    | <LABEL:                               "label">                                        : STRING_EXPECTED
+
+    | <ALT:                                 "alt">                                          : STRING_EXPECTED
+
+    | <HREF:                                "href">                                         : STRING_EXPECTED
+
+    | <HEIGHT:                              "height">                                       : INTEGER_EXPECTED
+
+    | <SETTING:                             ("add" ([" ","\t","\n","\r"])+ )? "setting">    : SETTING_EXPECTED
+
+    | <COMMAND:                             ("add" ([" ","\t","\n","\r"])+ )? "command">    : STRING_EXPECTED
 }
 
 /************************************************************** Common String */
@@ -122,7 +147,13 @@ void parse(Channel_mxJPO _channel)
     CommandRef ref;
     int refIdx = 0;
 } {
-    (   ( <SYMBOLICNAME>            ( tmp = <STRING>           {this.appendValue(_channel, "symbolicNames", this.getString(tmp.image));}
+    (   ( <UUID>                                               {property = new AdminProperty();
+                                                                this.appendValue(this.getValue(_channel, "properties"), "propertiesStack", property);
+                                                                this.setValue(property, "name",  "UUID");}
+                                    ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+
+      | ( <SYMBOLICNAME>            ( tmp = <STRING>           {this.appendValue(_channel, "symbolicNames", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.appendValue(_channel, "symbolicNames", this.getSingle(tmp.image));} ) )
 
       | (<DESCRIPTION>              ( tmp = <MULTILINESTRING>  {this.setValue(_channel, "description", this.getString(tmp.image));}
