@@ -141,10 +141,11 @@ public class LocalAttributeList_mxJPO
 
             // create if no current attribute exists
             if (curAttr == null)  {
+                _paramCache.logDebug("    - local attribute '" + targetAttr.getName() + "' is added");
                 _mql.pushPrefix("")
                     .newLine().cmd("escape add attribute ").arg(targetAttr.getName())
                                         .cmd(" type ").arg(targetAttr.getKind().getAttrTypeCreate())
-                                        .cmd(" owner ").cmd(_owner.getTypeDef().getMxUpdateType()).cmd(" ").arg(_owner.getName())
+                                        .cmd(" owner ").cmd(_owner.getTypeDef().getMxAdminName()).cmd(" ").arg(_owner.getName())
                     .popPrefix();
             }
 

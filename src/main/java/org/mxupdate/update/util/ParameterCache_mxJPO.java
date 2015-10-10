@@ -23,11 +23,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import matrix.db.Context;
-
 import org.mxupdate.mapping.Mapping_mxJPO;
 import org.mxupdate.mapping.ParameterDef_mxJPO;
 import org.mxupdate.mapping.ParameterDef_mxJPO.Type;
+
+import matrix.db.Context;
 
 /**
  * The class is used to stored the defined parameters from the console.
@@ -88,7 +88,7 @@ public class ParameterCache_mxJPO
     private final Mapping_mxJPO mapping;
 
     /** Session Cache. */
-    private final Map<CacheKey,Object> cache = new HashMap<CacheKey,Object>();
+    private final Map<CacheKey,Object> cache = new HashMap<>();
 
     /**
      * Creates a new instance of the parameter cache. All default values from
@@ -141,11 +141,11 @@ public class ParameterCache_mxJPO
 
         this.mapping = this.initMapping(_context);
 
-        this.mapBoolean = new HashMap<String,Boolean>();
-        this.mapInteger = new HashMap<String,Integer>();
-        this.mapList = new HashMap<String,Collection<String>>();
-        this.mapMap = new HashMap<String,Map<String,?>>();
-        this.mapString = new HashMap<String,String>();
+        this.mapBoolean = new HashMap<>();
+        this.mapInteger = new HashMap<>();
+        this.mapList = new HashMap<>();
+        this.mapMap = new HashMap<>();
+        this.mapString = new HashMap<>();
 
         // evaluate default parameter values
         for (final ParameterDef_mxJPO paramDef : this.mapping.getAllParameterDefs())  {
@@ -196,11 +196,11 @@ public class ParameterCache_mxJPO
                 this.mapList.put(_paramDef.getName(),
                                  _value.isEmpty()
                                          ? new ArrayList<String>()
-                                         : new ArrayList<String>(Arrays.asList(_value.split(","))));
+                                         : new ArrayList<>(Arrays.asList(_value.split(","))));
                 break;
             case MAP:
                 if ((_value != null) && !"".equals(_value))  {
-                    final Map<String,String> values = new HashMap<String,String>();
+                    final Map<String,String> values = new HashMap<>();
                     for (final String entry : _value.split(","))  {
                         final String[] entryArr = entry.split("=", 2);
                         values.put(entryArr[0], (entryArr.length > 1) ? entryArr[1] : null);
@@ -852,6 +852,11 @@ public class ParameterCache_mxJPO
         DMInterfaceParentIgnore,
         /** List of removed parent interfaces for interfaces to be removed. */
         DMInterfaceParentRemove,
+
+        /** List of removed attributes for path types to be ignored. */
+        DMPathTypeAttrIgnore,
+        /** List of removed attributes for path types to be removed. */
+        DMPathTypeAttrRemove,
 
         /** Boolean that the access of policies are sorted. */
         DMPolicyAllowExportAccessSorting,

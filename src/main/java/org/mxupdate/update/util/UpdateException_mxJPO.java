@@ -40,6 +40,7 @@ public class UpdateException_mxJPO
      *     <ul>
      *     <li>106: {@link org.mxupdate.update.datamodel.Dimension_mxJPO dimension}</li>
      *     <li>109: {@link org.mxupdate.update.datamodel.Interface_mxJPO interface}</li>
+     *     <li>123: {@link org.mxupdate.update.datamodel.PathType_mxJPO path type}</li>
      *     <li>111: {@link org.mxupdate.update.datamodel.Policy_mxJPO policy}</li>
      *     <li>114: {@link org.mxupdate.update.datamodel.Relationship_mxJPO relationship}</li>
      *     <li>116: {@link org.mxupdate.update.datamodel.Rule_mxJPO rule}</li>
@@ -208,6 +209,34 @@ public class UpdateException_mxJPO
          */
         DM_INTERFACE_REMOVE_LOCAL_ATTRIBUTE(10903,
                 "Current local attribute ''{0}'' is defined to be removed from interface ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
+
+        /**
+         * <p>The given global attribute is not defined anymore but assigned to
+         * the path type object. The global attribute is not automatically
+         * removed because otherwise potentially data could be lost.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>global attribute name</li>
+         * <li>path type which is tried to update</li>
+         * </ol>
+         * </p>
+         */
+        DM_PATHTYPE_REMOVE_GLOBAL_ATTRIBUTE(12301, "Current global attribute ''{0}'' is defined to be removed from path type ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
+
+        /**
+         * <p>The given local attribute is not defined anymore but assigned to
+         * the path type object. The local attribute is not automatically
+         * removed because otherwise potentially data could be lost.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>local attribute name</li>
+         * <li>path type which is tried to update</li>
+         * </ol>
+         * </p>
+         */
+        DM_PATHTYPE_REMOVE_LOCAL_ATTRIBUTE(12302, "Current global attribute ''{0}'' is defined to be removed from path type ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
 
         /**
          * <p>The delimiter of an existing policy is not equal to the new
