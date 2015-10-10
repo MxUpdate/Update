@@ -19,19 +19,23 @@ import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 /**
- * The class is used to export, create, delete and update pages within MX.
+ * The class is used to export, create, delete and update pages within MX. The
+ * handled properties are
  * <ul>
+ * <li>uuid</li>
+ * <li>symbolic names</li>
  * <li>description</li>
- * <li>hidden flag (only if hidden)</li>
+ * <li>hidden flag</li>
  * <li>{@link AbstractCode_mxJPO#getCode() content}</li>
  * <li>{@link #mimeType mime type}</li>
  * </ul>
@@ -55,7 +59,7 @@ public class Page_mxJPO
         super(EMxAdmin_mxJPO.Page, _mxName);
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -77,7 +81,7 @@ public class Page_mxJPO
      * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
      *         <i>false</i>
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -97,7 +101,8 @@ public class Page_mxJPO
     public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
-                //              tag             | default | value                              | write?
+                //              tag            | default | value                              | write?
+                .stringNotNull( "uuid",                    this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",            this.getSymbolicNames())
                 .string(        "description",             this.getDescription())
                 .flagIfTrue(    "hidden",           false, this.isHidden(),                     this.isHidden())

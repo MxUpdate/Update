@@ -26,61 +26,71 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class PageCI_1ParserTest
     extends AbstractParserTest<Page_mxJPO>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
         return new Object[][]  {
             {"0) simple",
                     "",
-                    "description \"\" mime \"\" "},
+                    "description \"\" mime \"\""},
+            // uuid
+            {"1a) uuid with minus separator",
+                    "",
+                    "uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" mime \"\""},
+            {"1b) uuid w/o minus separator",
+                    "",
+                    "uuid \"FDA75674979211E6AE2256B6B6499611\"     description \"\" mime \"\""},
+            {"1c) uuid convert from single to string",
+                    "uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" mime \"\"",
+                    "uuid   FDA7-5674979211-E6AE2256B6-B6499611    description \"\" mime \"\""},
             // registered name
-            {"1a) symbolic name",
+            {"2a) symbolic name",
                     "",
                     "symbolicname \"channel_abc\" description \"\" mime \"\""},
-            {"1b) two symbolic names",
+            {"2b) two symbolic names",
                     "symbolicname \"channel_abc\" symbolicname \"channel_def\" description \"\" mime \"\"",
                     "symbolicname \"channel_def\" symbolicname \"channel_abc\" description \"\" mime \"\""},
             // description
-            {"2a) description",
+            {"3a) description",
                     "",
                     "description \"abc def\" mime \"\" "},
-            {"2b) description not defined",
+            {"3b) description not defined",
                     "description \"\" mime \"\"",
                     "                 mime \"\" "},
-            {"2c) multi-line description",
+            {"3c) multi-line description",
                     "",
                     "description \"abc\ndef\" mime \"\""},
-            {"2d) tab's in description",
+            {"3d) tab's in description",
                     "",
                     "description \"abc\tdef\" mime \"\""},
             // hidden flag
-            {"3a) hidden",
+            {"4a) hidden",
                     "",
                     "description \"\" hidden mime \"\" "},
-            {"3b) not hidden (not defined)",
+            {"4b) not hidden (not defined)",
                     "description \"\"         mime \"\" ",
                     "description \"\" !hidden mime \"\" "},
             // mime
-            {"4a) mime",
+            {"5a) mime",
                     "",
                     "description \"\" mime \"side\""},
-            {"4b) empty definition",
+            {"5b) empty definition",
                     "description \"\" mime \"\" ",
                     "description \"\"           "},
             // content
-            {"5a) content",
+            {"6a) content",
                     "",
                     "description \"\" mime \"\" content \" side \""},
-            {"5b) empty definition",
+            {"6b) empty definition",
                     "description \"\" mime \"\"              ",
                     "description \"\" mime \"\" content \"\" "},
             // file
-            {"6a) file (as content)",
+            {"7) file (as content)",
                     "description \"\" mime \"\" content \"This is a page test.\"",
                     "file \"src/test/resources/program/page/test.page\""},
             // property

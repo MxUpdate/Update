@@ -42,10 +42,13 @@ public class PageCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1a) symbolic name",
+            {"1) uuid",
+                    new PageData(this, "Test"),
+                    new PageData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+            {"2a) symbolic name",
                     new PageData(this, "Test"),
                     new PageData(this, "Test").setValue("symbolicname", "interface_123")},
-            {"1b) two symbolic name",
+            {"2b) two symbolic name",
                     new PageData(this, "Test"),
                     new PageData(this, "Test").setValue("symbolicname", "interface_123").setValue("symbolicname", "interface_345")},
             {"3) with property",
