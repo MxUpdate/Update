@@ -15,6 +15,8 @@
 
 package org.mxupdate.update.datamodel.helper;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
@@ -51,6 +53,10 @@ public class LocalPathTypeList_mxJPO
         for (final LocalPathType localPathType : this)  {
             localPathType.prepare();
         }
+        // sort local path types (because name is set after parsing!)
+        final Set<LocalPathType> localPathTypes = new HashSet<>(this);
+        this.clear();
+        this.addAll(localPathTypes);
     }
 
     /**

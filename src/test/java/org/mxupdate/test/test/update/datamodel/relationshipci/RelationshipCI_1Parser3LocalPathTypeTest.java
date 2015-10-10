@@ -46,8 +46,45 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
+            {"1) local path type: check local path sorted",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local pathtype \"PathType 1\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "} "
+                            + "local pathtype \"PathType 2\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "} "
+                            + "local pathtype \"PathType 3\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "}",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local pathtype \"PathType 3\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "} "
+                            + "local pathtype \"PathType 2\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "} "
+                            + "local pathtype \"PathType 1\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "}"},
             // uuid
-            {"1a) local path type uuid with minus separator",
+            {"2a) local path type uuid with minus separator",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -57,7 +94,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"1b) local path type uuid w/o minus separator",
+            {"2b) local path type uuid w/o minus separator",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -67,7 +104,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"1c) local path type uuid convert from single to string",
+            {"2c) local path type uuid convert from single to string",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -85,7 +122,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                             + "}"},
             // registered name
-            {"2a) local path type: symbolic name",
+            {"3a) local path type: symbolic name",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -95,7 +132,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"2b) local path type: two symbolic names",
+            {"3b) local path type: two symbolic names",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -113,7 +150,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                             + "}"},
             // description
-            {"3a) local path type: description",
+            {"4a) local path type: description",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -123,7 +160,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"3b) local path type: description not defined",
+            {"4b) local path type: description not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -140,7 +177,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"3c) local path type: multi-line description ",
+            {"4c) local path type: multi-line description ",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -150,7 +187,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"3d) local path type: tab's in description",
+            {"4d) local path type: tab's in description",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "

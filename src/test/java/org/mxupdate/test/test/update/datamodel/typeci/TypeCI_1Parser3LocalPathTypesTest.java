@@ -43,8 +43,41 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
+            {"1) local path type: check local path sorted",
+                    "description \"\" !hidden "
+                            + "local pathtype \"PathType 1\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "} "
+                            + "local pathtype \"PathType 2\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "} "
+                            + "local pathtype \"PathType 3\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "}",
+                    "description \"\" !hidden "
+                            + "local pathtype \"PathType 3\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "} "
+                            + "local pathtype \"PathType 2\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "} "
+                            + "local pathtype \"PathType 1\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "}"},
             // uuid
-            {"1a) uuid with minus separator",
+            {"2a) uuid with minus separator",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -52,7 +85,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"1b) uuid w/o minus separator",
+            {"2b) uuid w/o minus separator",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -60,7 +93,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"1c) uuid convert from single to string",
+            {"2c) uuid convert from single to string",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" !hidden "
@@ -74,7 +107,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                             + "}"},
             // registered name
-            {"2a) local type path: symbolic name",
+            {"3a) local type path: symbolic name",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -82,7 +115,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"2b) local type path: two symbolic names",
+            {"3b) local type path: two symbolic names",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "symbolicname \"channel_abc\" symbolicname \"channel_def\" description \"\" !hidden "
@@ -96,7 +129,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                             + "}"},
             // description
-            {"3a) local type path: description",
+            {"4a) local type path: description",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -104,7 +137,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"3b) local type path: description not defined",
+            {"4b) local type path: description not defined",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -117,7 +150,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"3c) local type path: multi-line description ",
+            {"4c) local type path: multi-line description ",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -125,7 +158,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"3d) local type path: tab's in description",
+            {"4d) local type path: tab's in description",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
