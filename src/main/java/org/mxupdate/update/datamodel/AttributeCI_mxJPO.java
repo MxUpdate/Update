@@ -347,12 +347,12 @@ public class AttributeCI_mxJPO
      *                   created
      * @see #attrTypeCreate
      */
-    @Override()
+    @Override
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
         MqlBuilder_mxJPO.mql()
-                .cmd("escape add ").cmd(this.getTypeDef().getMxAdminName()).cmd(" ").arg(this.getName()).cmd(" type ").cmd(this.kind.attrTypeCreate)
+                .cmd("escape add attribute ").arg(this.getName()).cmd(" type ").cmd(this.kind.attrTypeCreate)
                 .exec(_paramCache);
     }
 
