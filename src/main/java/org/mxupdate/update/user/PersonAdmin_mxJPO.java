@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
@@ -39,6 +40,27 @@ import matrix.util.MatrixException;
 
 /**
  * The class is used to handle administration persons.
+ * Following properties are supported:
+ * <ul>
+ * <li>uuid</li>
+ * <li>symbolic names</li>
+ * <li>description</li>
+ * <li>hidden flag</li>
+ * <li>{@link #fullName full name}</li>
+ * <li>{@link #emailAddress email adress</li>
+ * <li>{@link #address}</li>
+ * <li>{@link #fax}</li>
+ * <li>{@link #phone}</li>
+ * <li>{@link #active} flag</li>
+ * <li>{@link #trusted} flag</li>
+ * <li>{@link #email} flag</li>
+ * <li>{@link #iconmail} flag</li>
+ * <li>{@link #access} settings</li>
+ * <li>{@link #admin} access settings</li>
+ * <li>{@link #application}</li>
+ * <li>{@link #products}</li>
+ * <li>{@link #type type access}</li>
+ * </li>
  *
  * @author The MxUpdate Team
  */
@@ -127,7 +149,7 @@ public class PersonAdmin_mxJPO
         this.types.add(TypeItem.FULL);
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -157,7 +179,7 @@ public class PersonAdmin_mxJPO
         this.prepare();
     }
 
-    @Override()
+    @Override
     public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
@@ -205,7 +227,7 @@ public class PersonAdmin_mxJPO
      * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
      *         <i>false</i>
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -293,7 +315,7 @@ public class PersonAdmin_mxJPO
      *
      * @return XML export of the person
      */
-    @Override()
+    @Override
     protected String execXMLExport(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
     {
@@ -311,7 +333,7 @@ public class PersonAdmin_mxJPO
      *         is ignored
      * @see #PARAM_IGNORE_WSO_PERSONS
      */
-    @Override()
+    @Override
     protected boolean ignoreWorkspaceObjects(final ParameterCache_mxJPO _paramCache)
     {
         boolean ignore = super.ignoreWorkspaceObjects(_paramCache);
@@ -329,7 +351,8 @@ public class PersonAdmin_mxJPO
     public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
-                //                  tag             | default | value                              | write?
+                //                  tag              | default | value                              | write?
+                .stringNotNull( "uuid",                          this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .single(                 "kind",                 "admin")
                 .list(                   "symbolicname",         this.getSymbolicNames())
                 .string(                 "comment",              this.getDescription())
