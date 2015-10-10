@@ -25,7 +25,7 @@ import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
-import org.mxupdate.util.FileUtil_mxJPO;
+import org.mxupdate.util.FileUtils_mxJPO;
 
 public class FileNamesAdminProgramJPO_mxJPO
     extends FileNamesAdmin_mxJPO
@@ -54,7 +54,7 @@ public class FileNamesAdminProgramJPO_mxJPO
             if (file.getName().endsWith(ProgramCI_mxJPO.JPO_NAME_SUFFIX_EXTENDSION))  {
                 // file identified as JPO
 
-                final String code = FileUtil_mxJPO.readFileToString(file);
+                final String code = FileUtils_mxJPO.readFileToString(file);
                 String mxName = file.getName().substring(0, file.getName().length() - ProgramCI_mxJPO.JPO_NAME_SUFFIX_EXTENDSION_LENGTH);
 
                 // prefix with package name

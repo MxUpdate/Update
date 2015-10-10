@@ -15,8 +15,16 @@
 
 package org.mxupdate.util;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 
 
 /**
@@ -92,5 +100,39 @@ public final class FileUtils_mxJPO
             ret.append(_typeDef.getFileSuffix());
         }
         return StringUtil_mxJPO.convertToFileName(ret.toString());
+    }
+
+    /**
+     * Reads for given file the content and returns them.
+     *
+     * @param _file     file used to read
+     * @return read content of the file
+     * @throws UpdateException_mxJPO if the file could not be opened or read
+     */
+    public static String readFileToString(final File _file)
+        throws UpdateException_mxJPO
+    {
+        // read code
+        final StringBuilder code = new StringBuilder();
+        try  {
+            BufferedReader reader = null;
+            try  {
+                reader = new BufferedReader(new FileReader(_file));
+            } catch (final FileNotFoundException e)  {
+                throw new UpdateException_mxJPO(ErrorKey.UTIL_FILEUTILS_READ_FILE_NOT_EXISTS, _file);
+            }
+            String line = reader.readLine();
+            while (line != null)  {
+                code.append(line).append('\n');
+                line = reader.readLine();
+            }
+            if (reader != null)  {
+                reader.close();
+            }
+        } catch (final IOException e)  {
+            throw new UpdateException_mxJPO(ErrorKey.UTIL_FILEUTILS_READ_FILE_UNEXPECTED, _file, e.getMessage());
+        }
+    
+        return code.toString();
     }
 }

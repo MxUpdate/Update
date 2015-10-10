@@ -25,7 +25,6 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.util.FileUtils_mxJPO;
-import org.mxupdate.util.FileUtil_mxJPO;
 
 /**
  * Updates given CI object.
@@ -100,7 +99,7 @@ public class UpdateObject_mxJPO
         }
 
         try {
-            script.parse(FileUtil_mxJPO.readFileToString(_file))
+            script.parse(FileUtils_mxJPO.readFileToString(_file))
                   .execute(_paramCache);
         } catch (final Exception e) {
             if (_paramCache.getValueBoolean(ValueKeys.ParamContinueOnError))  {

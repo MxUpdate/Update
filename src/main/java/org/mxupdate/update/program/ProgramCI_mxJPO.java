@@ -30,7 +30,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
-import org.mxupdate.util.FileUtil_mxJPO;
+import org.mxupdate.util.FileUtils_mxJPO;
 import org.mxupdate.util.JPOUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
@@ -328,10 +328,10 @@ public class ProgramCI_mxJPO
                 }
                 switch (this.kind)  {
                     case JAVA:
-                        newCode = JPOUtil_mxJPO.convertJavaToJPOCode(this.getName(), FileUtil_mxJPO.readFileToString(new File(tmpFile)));
+                        newCode = JPOUtil_mxJPO.convertJavaToJPOCode(this.getName(), FileUtils_mxJPO.readFileToString(new File(tmpFile)));
                         break;
                     default:
-                        newCode = FileUtil_mxJPO.readFileToString(new File(tmpFile));
+                        newCode = FileUtils_mxJPO.readFileToString(new File(tmpFile));
                         break;
                 }
             } else  {

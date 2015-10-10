@@ -424,10 +424,10 @@ public class UpdateException_mxJPO
                 90602, "the file name is not correct defined and could not be converted back to a configuration item name"),
 
         /** If the given file does not exists. */
-        UTIL_FILEUTIL_READ_FILE_NOT_EXISTS(
+        UTIL_FILEUTILS_READ_FILE_NOT_EXISTS(
                 90701, "File ''{0}'' does not exists and can't be read."),
         /** If an unexpected exception occurs within read of the file. */
-        UTIL_FILEUTIL_READ_FILE_UNEXPECTED(
+        UTIL_FILEUTILS_READ_FILE_UNEXPECTED(
                 90702, "File ''{0}'' can't be read because of {1}");
 
         /** Error code of this error enumeration. */

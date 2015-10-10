@@ -25,7 +25,7 @@ import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.FileUtil_mxJPO;
+import org.mxupdate.util.FileUtils_mxJPO;
 import org.mxupdate.util.JPOUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
@@ -84,7 +84,7 @@ public class UpdateAdminProgramJPO_mxJPO
                     .arg(propName).cmd(" value ").arg(StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified())));
 
             // insert program
-            mql.newLine().cmd("escape mod program ").arg(_name).cmd(" code ").arg(JPOUtil_mxJPO.convertJavaToJPOCode(_name, FileUtil_mxJPO.readFileToString(_file).toString()));
+            mql.newLine().cmd("escape mod program ").arg(_name).cmd(" code ").arg(JPOUtil_mxJPO.convertJavaToJPOCode(_name, FileUtils_mxJPO.readFileToString(_file).toString()));
 
             // and execute all
             mql.exec(_paramCache.getContext());

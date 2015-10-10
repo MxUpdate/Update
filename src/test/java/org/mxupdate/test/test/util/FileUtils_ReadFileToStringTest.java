@@ -20,7 +20,7 @@ import java.io.File;
 import org.apache.commons.io.FileUtils;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.update.util.UpdateException_mxJPO;
-import org.mxupdate.util.FileUtil_mxJPO;
+import org.mxupdate.util.FileUtils_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -29,7 +29,7 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-public class FileUtil_ReadFileToStringTest
+public class FileUtils_ReadFileToStringTest
     extends AbstractTest
 {
     /** Original files. */
@@ -38,7 +38,7 @@ public class FileUtil_ReadFileToStringTest
     /**
      * Initialize the file handlers.
      */
-    public FileUtil_ReadFileToStringTest()
+    public FileUtils_ReadFileToStringTest()
     {
         this.origDir         = new File(this.getResourcesDir(), "program/jpo");
         this.origJPO         = new File(this.origDir, "MXUPDATE_Test_mxJPO.java");
@@ -54,7 +54,7 @@ public class FileUtil_ReadFileToStringTest
         throws Exception
     {
         Assert.assertEquals(
-                FileUtil_mxJPO.readFileToString(this.origJPO),
+                FileUtils_mxJPO.readFileToString(this.origJPO),
                 FileUtils.readFileToString(this.origJPO).trim() + '\n');
     }
 
@@ -69,6 +69,6 @@ public class FileUtil_ReadFileToStringTest
     public void negativeTest90701FileNotExists()
         throws Exception
     {
-        FileUtil_mxJPO.readFileToString(new File(this.origDir, "NON-EXISTING-FILE"));
+        FileUtils_mxJPO.readFileToString(new File(this.origDir, "NON-EXISTING-FILE"));
     }
 }
