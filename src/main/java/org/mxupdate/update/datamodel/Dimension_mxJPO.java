@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -41,7 +42,13 @@ import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 /**
  * The class is used to export and import / update dimension administration
- * objects.
+ * objects. Following properties are handled:
+ * <ul>
+ * <li>uuid</li>
+ * <li>symbolic names</li>
+ * <li>description</li>
+ * <li>{@link #units}</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  */
@@ -76,7 +83,7 @@ public class Dimension_mxJPO
         super(EMxAdmin_mxJPO.Dimension, _mxName);
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -85,7 +92,7 @@ public class Dimension_mxJPO
         this.prepare();
     }
 
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -140,7 +147,7 @@ public class Dimension_mxJPO
      *     the values are written into {@link Unit#systemInfos}.</li>
      * </ul>
      */
-    @Override()
+    @Override
     protected void prepare()
     {
         if (this.currentUnit != null)  {
@@ -175,9 +182,10 @@ public class Dimension_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
-                .string(        "description",             this.getDescription())
-                .flag(          "hidden",           false, this.isHidden());
+                .string(        "description",              this.getDescription())
+                .flag(          "hidden",           false,  this.isHidden());
 
         for (final Unit unit : this.units)  {
             _updateBuilder
@@ -334,7 +342,7 @@ public class Dimension_mxJPO
          * @return &quot;0&quot; if both units are equal; &quot;1&quot; if
          *         greater; otherwise &quot;-1&quot;
          */
-        @Override()
+        @Override
         public int compareTo(final Unit _toCompare)
         {
             return CompareToUtil_mxJPO.compare(0, this.name, _toCompare.name);
@@ -451,7 +459,7 @@ public class Dimension_mxJPO
          *
          * @return string representation of this unit
          */
-        @Override()
+        @Override
         public String toString()
         {
             return "[dimension name = " + this.name + ", "

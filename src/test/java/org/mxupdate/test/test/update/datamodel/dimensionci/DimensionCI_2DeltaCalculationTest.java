@@ -32,29 +32,32 @@ import matrix.util.MatrixException;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class DimensionCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<Dimension_mxJPO,DimensionData>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1a) symbolic name",
+            {"1) uuid",
+                    new DimensionData(this, "Test"),
+                    new DimensionData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+            {"2a) symbolic name",
                     new DimensionData(this, "Test"),
                     new DimensionData(this, "Test").setValue("symbolicname", "dimension_123")},
-            {"1b) two symbolic name",
+            {"2b) two symbolic name",
                     new DimensionData(this, "Test"),
                     new DimensionData(this, "Test").setValue("symbolicname", "dimension_123").setValue("symbolicname", "dimension_345")},
-            {"2) description",
+            {"3) description",
                     new DimensionData(this, "Test"),
                     new DimensionData(this, "Test").setValue("description", "abc def")},
        };
     }
 
-    @Override()
-    @BeforeMethod()
+    @Override
+    @BeforeMethod
     @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException

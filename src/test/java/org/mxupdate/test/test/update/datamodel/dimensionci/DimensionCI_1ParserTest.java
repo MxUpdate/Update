@@ -38,47 +38,57 @@ public class DimensionCI_1ParserTest
             {"0) simple hidden dimension definition without units",
                     "",
                     "description \"\" hidden"},
+            // uuid
+            {"1a) uuid with minus separator",
+                    "",
+                    "uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" !hidden"},
+            {"1b) uuid w/o minus separator",
+                    "",
+                    "uuid \"FDA75674979211E6AE2256B6B6499611\"     description \"\" !hidden"},
+            {"1c) uuid convert from single to string",
+                    "uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" !hidden",
+                    "uuid   FDA7-5674979211-E6AE2256B6-B6499611    description \"\" !hidden"},
             // registered name
-            {"1a) symbolic name",
+            {"2a) symbolic name",
                     "",
                     "symbolicname \"channel_abc\" description \"\" !hidden "},
-            {"1b) two symbolic names",
+            {"2b) two symbolic names",
                     "symbolicname \"channel_abc\" symbolicname \"channel_def\" description \"\" !hidden",
                     "symbolicname \"channel_def\" symbolicname \"channel_abc\" description \"\" !hidden"},
             // description
-            {"2a) description",
+            {"3a) description",
                     "",
                     "description \"abc def\" !hidden"},
-            {"2b) description not defined",
+            {"3b) description not defined",
                     "description \"\" !hidden",
                     "                 !hidden"},
-            {"2c) multi-line description",
+            {"3c) multi-line description",
                     "",
                     "description \"abc\ndef\" !hidden"},
-            {"2d) tab's in description",
+            {"3d) tab's in description",
                     "",
                     "description \"abc\tdef\" !hidden"},
             // hidden
-            {"3a) simple not hidden dimension",
+            {"4a) simple not hidden dimension",
                     "",
                     "description \"\" !hidden"},
-            {"3b) simple not hidden dimension definition defined as value w/o apostrophe",
+            {"4b) simple not hidden dimension definition defined as value w/o apostrophe",
                     "description \"\" !hidden",
                     "description \"\" hidden FALSE"},
-            {"3c) simple not hidden dimension definition defined as value with apostrophe",
+            {"4c) simple not hidden dimension definition defined as value with apostrophe",
                     "description \"\" !hidden",
                     "description \"\" hidden \"false\""},
-            {"3d) simple hidden dimension definition",
+            {"4d) simple hidden dimension definition",
                     "",
                     "description \"\" hidden"},
-            {"3e) simple hidden dimension definition defined as value w/o apostrophe",
+            {"4e) simple hidden dimension definition defined as value w/o apostrophe",
                     "description \"\" hidden",
                     "description \"\" hidden TRUE"},
-            {"3f) simple hidden dimension definition defined as value with apostrophe",
+            {"4f) simple hidden dimension definition defined as value with apostrophe",
                     "description \"\" hidden",
                     "description \"\" hidden \"True\""},
             // unit
-            {"4a) dimension with simple default unit",
+            {"5a) dimension with simple default unit",
                       "",
                       "description \"\"\n"
                     + "!hidden\n"
@@ -96,7 +106,7 @@ public class DimensionCI_1ParserTest
                     + "  offset 20.0\n"
                     + "}",
             },
-            {"4b) dimension with simple default unit defined as value w/o apostrophe",
+            {"5b) dimension with simple default unit defined as value w/o apostrophe",
                     "description \"\"\n"
                   + "!hidden\n"
                   + "unit \"name1\" {\n"
@@ -128,7 +138,7 @@ public class DimensionCI_1ParserTest
                   + "  offset 20.0\n"
                   + "}",
             },
-            {"3c) dimension with simple default unit defined as value with apostrophe",
+            {"5c) dimension with simple default unit defined as value with apostrophe",
                     "description \"\"\n"
                   + "!hidden\n"
                   + "unit \"name1\" {\n"
@@ -160,7 +170,7 @@ public class DimensionCI_1ParserTest
                   + "  offset 20.0\n"
                   + "}",
             },
-            {"4d) dimension with simple default unit and not default",
+            {"5d) dimension with simple default unit and not default",
                     "description \"\"\n"
                   + "!hidden\n"
                   + "unit \"name1\" {\n"
@@ -193,7 +203,7 @@ public class DimensionCI_1ParserTest
                   + "  offset 20.0\n"
                   + "}",
             },
-            {"4e) dimension with simple default unit and not default as value w/o apostrophe",
+            {"5e) dimension with simple default unit and not default as value w/o apostrophe",
                     "description \"\"\n"
                   + "!hidden\n"
                   + "unit \"name1\" {\n"
@@ -226,7 +236,7 @@ public class DimensionCI_1ParserTest
                   + "  offset 20.0\n"
                   + "}",
             },
-            {"4f) dimension with simple default unit and not default as value with apostrophe",
+            {"5f) dimension with simple default unit and not default as value with apostrophe",
                     "description \"\"\n"
                   + "!hidden\n"
                   + "unit \"name1\" {\n"
@@ -259,7 +269,7 @@ public class DimensionCI_1ParserTest
                   + "  offset 20.0\n"
                   + "}",
             },
-            {"5) complex dimension definition",
+            {"6) complex dimension definition",
                     "",
                       "description \"ein test\"\n"
                     + "!hidden\n"
@@ -286,7 +296,7 @@ public class DimensionCI_1ParserTest
                     + "  system \"Duration Units\" to unit \"name2\"\n"
                     + "}",
             },
-            {"6) dimension with unit with negative offset",
+            {"7) dimension with unit with negative offset",
                     "",
                     "description \"ein test\"\n"
                     + "!hidden\n"
@@ -304,7 +314,7 @@ public class DimensionCI_1ParserTest
                     + "  offset -20.0\n"
                     + "}",
             },
-            {"7) dimension with unit with negative multiplier",
+            {"8) dimension with unit with negative multiplier",
                     "",
                     "description \"ein test\"\n"
                     + "!hidden\n"
@@ -322,7 +332,7 @@ public class DimensionCI_1ParserTest
                     + "  offset 20.0\n"
                     + "}",
             },
-            {"8) dimension with unit with integer number",
+            {"9) dimension with unit with integer number",
                     "description \"ein test\"\n"
                     + "!hidden\n"
                     + "unit \"name1\" {\n"
@@ -341,16 +351,16 @@ public class DimensionCI_1ParserTest
                     + "}"
             },
             // property
-            {"9a) property special characters",
+            {"10a) property special characters",
                 "",
                 "description \"\" !hidden property \"{}\\\"\""},
-            {"9b) property and value special characters",
+            {"10b) property and value special characters",
                 "",
                 "description \"\" !hidden property \"{}\\\"\" value \"{}\\\"\""},
-            {"9c) property link special characters",
+            {"10c) property link special characters",
                 "",
                 "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\""},
-            {"9d) property link and value special characters",
+            {"10d) property link and value special characters",
                 "",
                 "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\""},
         };

@@ -24,6 +24,21 @@ options {
 }
 
 PARSER_BEGIN(DimensionParser)
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
 package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
@@ -31,11 +46,9 @@ import java.io.StringReader;
 import java.util.Collection;
 import java.util.Set;
 
-import org.mxupdate.mapping.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO.Unit;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
-import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
@@ -60,8 +73,12 @@ PARSER_END(DimensionParser)
 
 <DEFAULT> TOKEN :
 {
-      <SYMBOLICNAME:                        "symbolicname">                                         : STRING_EXPECTED
+      <UUID:                                "uuid">                                         : STRING_EXPECTED
+
+    | <SYMBOLICNAME:                        "symbolicname">                                         : STRING_EXPECTED
+
     | <DESCRIPTION:                         "description">                                          : MULTILINESTRING_EXPECTED
+
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_TRUE_VIA_VALUE:               "hidden" ([" ","\t","\n","\r"])+ ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
     | <HIDDEN_TRUE_VIA_VALUE_APOSTROPHE:    "hidden" ([" ","\t","\n","\r"])+ "\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"">
@@ -192,10 +209,16 @@ void parse(final Dimension_mxJPO _dimension)
     String tmpStr;
     Token tmp;
     Set<String> set;
-    AdminProperty tmpProp;
+    AdminProperty property;
     Unit unit;
 } {
-    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                            {this.appendValue(_dimension, "symbolicNames", this.getString(tmp.image));}
+    (   ( <UUID>                                                                {property = new AdminProperty();
+                                                                                 this.appendValue(this.getValue(_dimension, "properties"), "propertiesStack", property);
+                                                                                 this.setValue(property, "name",  "UUID");}
+                                    ( tmp = <STRING>                            {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                            {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+
+      | ( <SYMBOLICNAME>            ( tmp = <STRING>                            {this.appendValue(_dimension, "symbolicNames", this.getString(tmp.image));}
                                     | tmp = <SINGLE>                            {this.appendValue(_dimension, "symbolicNames", this.getSingle(tmp.image));} ) )
 
       | (<DESCRIPTION>  ( tmp = <MULTILINESTRING>                               {this.setValue(_dimension, "description", this.getString(tmp.image));}
@@ -226,14 +249,14 @@ void parse(final Dimension_mxJPO _dimension)
                     | ( unitSystem(unit) ) )*
                             <UNITDEF_END>                                       {this.appendValue(_dimension, "units", unit);} )
 
-      | (<PROPERTY>                                                             {tmpProp = new AdminProperty();this.appendValue(_dimension, "properties", "propertiesStack", tmpProp);}
-                ( tmp = <PROPERTY_STRING_STRING>                                {this.setValue(tmpProp, "name", this.getString(tmp.image));}
-                | tmp = <PROPERTY_STRING_SINGLE>                                {this.setValue(tmpProp, "name", this.getSingle(tmp.image));} )
-              (   ( <PROPERTYTO>   tmp = <PROPERTYTOTYPE>                       {this.setValue(tmpProp, "refAdminType", this.getSingle(tmp.image));}
-                                  ( ( tmp = <PROPERTY_STRING_STRING>            {this.setValue(tmpProp, "refAdminName", this.getString(tmp.image));} )
-                                  | ( tmp = <PROPERTY_STRING_SINGLE>            {this.setValue(tmpProp, "refAdminName", this.getSingle(tmp.image));} ) ) )
-                | ( <PROPERTYVAL> ( ( tmp = <PROPERTY_STRING_STRING>            {this.setValue(tmpProp, "value", this.getString(tmp.image));} )
-                                  | ( tmp = <PROPERTY_STRING_SINGLE>            {this.setValue(tmpProp, "value", this.getSingle(tmp.image));} ) ) ) )* )
+      | (<PROPERTY>                                                             {property = new AdminProperty();this.appendValue(_dimension, "properties", "propertiesStack", property);}
+                ( tmp = <PROPERTY_STRING_STRING>                                {this.setValue(property, "name", this.getString(tmp.image));}
+                | tmp = <PROPERTY_STRING_SINGLE>                                {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYTO>   tmp = <PROPERTYTOTYPE>                       {this.setValue(property, "refAdminType", this.getSingle(tmp.image));}
+                                  ( ( tmp = <PROPERTY_STRING_STRING>            {this.setValue(property, "refAdminName", this.getString(tmp.image));} )
+                                  | ( tmp = <PROPERTY_STRING_SINGLE>            {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )
+                | ( <PROPERTYVAL> ( ( tmp = <PROPERTY_STRING_STRING>            {this.setValue(property, "value", this.getString(tmp.image));} )
+                                  | ( tmp = <PROPERTY_STRING_SINGLE>            {this.setValue(property, "value", this.getSingle(tmp.image));} ) ) ) )* )
     )*
 }
 
