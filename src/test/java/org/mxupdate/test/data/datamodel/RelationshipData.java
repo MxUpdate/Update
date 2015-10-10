@@ -151,21 +151,24 @@ public class RelationshipData
 
             this.createDependings();
 
-            final StringBuilder cmd = new StringBuilder();
-            cmd.append("escape add relationship \"").append(AbstractTest.convertMql(this.getName())).append('\"');
+            final StringBuilder cmd1 = new StringBuilder();
+            cmd1.append("escape add relationship \"").append(AbstractTest.convertMql(this.getName())).append('\"');
 
-            this.getFlags().append4Create(cmd);
+            this.getFlags().append4Create(cmd1);
 
-            this.from.append4Create(cmd);
-            this.to.append4Create(cmd);
+            this.from.append4Create(cmd1);
+            this.to.append4Create(cmd1);
 
-            this.append4Create(cmd);
+            this.append4Create(cmd1);
 
-            cmd.append(";escape mod relationship \"").append(AbstractTest.convertMql(this.getName())).append('\"');
+            this.getTest().mql(cmd1);
 
-            this.rules.append4CreateViaAdd(cmd);
+            final StringBuilder cmd2 = new StringBuilder()
+                        .append("escape mod relationship \"").append(AbstractTest.convertMql(this.getName())).append('\"');
+            this.rules.append4CreateViaAdd(cmd2);
 
-            this.getTest().mql(cmd);
+            this.getTest().mql(cmd2);
+
         }
 
         return this;

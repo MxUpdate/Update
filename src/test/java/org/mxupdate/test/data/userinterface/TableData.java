@@ -18,11 +18,11 @@ package org.mxupdate.test.data.userinterface;
 import java.util.ArrayList;
 import java.util.List;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
+
+import matrix.util.MatrixException;
 
 /**
  * Used to define a web table, create them and test the result.
@@ -33,7 +33,7 @@ public class TableData
     extends AbstractAdminData<TableData>
 {
     /** All fields of this table. */
-    private final List<FieldData<TableData>> fields = new ArrayList<FieldData<TableData>>();
+    private final List<FieldData<TableData>> fields = new ArrayList<>();
 
     /**
      * Constructor to initialize this table.
@@ -58,7 +58,7 @@ public class TableData
      */
     public FieldData<TableData> newField(final String _name)
     {
-        final FieldData<TableData> ret = new FieldData<TableData>(this.getTest(), this, _name);
+        final FieldData<TableData> ret = new FieldData<>(this.getTest(), this, _name);
         this.fields.add(ret);
         return ret;
     }
@@ -126,12 +126,13 @@ public class TableData
                 field.append4Create(cmd);
             }
 
-            cmd.append(";\n")
-               .append("escape add property ").append(this.getSymbolicName())
-               .append(" on program eServiceSchemaVariableMapping.tcl")
-               .append(" to table \"").append(AbstractTest.convertMql(this.getName())).append("\" system");
-
             this.getTest().mql(cmd);
+
+            this.getTest().mql(new StringBuilder()
+                    .append(";\n")
+                    .append("escape add property ").append(this.getSymbolicName())
+                    .append(" on program eServiceSchemaVariableMapping.tcl")
+                    .append(" to table \"").append(AbstractTest.convertMql(this.getName())).append("\" system"));
         }
 
         return this;

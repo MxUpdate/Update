@@ -18,13 +18,13 @@ package org.mxupdate.test.data.userinterface;
 import java.util.ArrayList;
 import java.util.List;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.ExportParser.Line;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.testng.Assert;
+
+import matrix.util.MatrixException;
 
 /**
  * Used to define a portal, create them and test the result.
@@ -35,7 +35,7 @@ public class PortalData
     extends AbstractAdminData<PortalData>
 {
     /** All channels of the portal. */
-    private final List<ChannelData> channels = new ArrayList<ChannelData>();
+    private final List<ChannelData> channels = new ArrayList<>();
 
     /**
      * Constructor to initialize this portal.
@@ -133,33 +133,30 @@ public class PortalData
 
             this.createDependings();
 
-            final StringBuilder cmd = new StringBuilder()
+            final StringBuilder cmd1 = new StringBuilder()
                     .append("escape add portal \"" + AbstractTest.convertMql(this.getName()) + "\"");
-
-            this.append4Create(cmd);
-
-            cmd.append(";\n");
+            this.append4Create(cmd1);
+            this.getTest().mql(cmd1);
 
             // append all channels after create (because of new rows!)
             if (!this.channels.isEmpty())  {
-                cmd.append("escape mod portal \"" + AbstractTest.convertMql(this.getName()) + "\"");
+                final StringBuilder cmd2 = new StringBuilder().append("escape mod portal \"" + AbstractTest.convertMql(this.getName()) + "\"");
                 boolean newRow = false;
                 for (final ChannelData child : this.channels)  {
                     if (child == null)  {
                         newRow = true;
                     } else  {
-                        cmd.append(" place \"").append(AbstractTest.convertMql(child.getName())).append("\" ").append(newRow ? "newrow" : "").append(" after \"\"");
+                        cmd2.append(" place \"").append(AbstractTest.convertMql(child.getName())).append("\" ").append(newRow ? "newrow" : "").append(" after \"\"");
                         newRow = false;
                     }
                 }
-                cmd.append(";\n");
+                this.getTest().mql(cmd2);
             }
 
-            cmd.append("escape add property ").append(this.getSymbolicName())
-               .append(" on program eServiceSchemaVariableMapping.tcl")
-               .append(" to portal \"").append(AbstractTest.convertMql(this.getName())).append("\"");
-
-            this.getTest().mql(cmd);
+            this.getTest().mql(new StringBuilder()
+                    .append("escape add property ").append(this.getSymbolicName())
+                    .append(" on program eServiceSchemaVariableMapping.tcl")
+                    .append(" to portal \"").append(AbstractTest.convertMql(this.getName())).append("\""));
         }
         return this;
     }
@@ -196,7 +193,7 @@ public class PortalData
         super.checkExport(_exportParser);
 
         // fetch child from export file
-        final List<String> childDefs = new ArrayList<String>();
+        final List<String> childDefs = new ArrayList<>();
         for (final Line line : _exportParser.getRootLines().get(0).getChildren())  {
             if ("channel".equals(line.getTag()))  {
                 childDefs.add(line.getTag() + " " + line.getValue());
@@ -206,7 +203,7 @@ public class PortalData
         }
 
         // fetch child from this definition
-        final List<String> thisDefs = new ArrayList<String>();
+        final List<String> thisDefs = new ArrayList<>();
         for (final ChannelData child : this.channels)  {
             if (child == null)  {
                 thisDefs.add("newrow");

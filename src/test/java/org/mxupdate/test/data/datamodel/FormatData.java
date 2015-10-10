@@ -15,13 +15,13 @@
 
 package org.mxupdate.test.data.datamodel;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.util.Version;
+
+import matrix.util.MatrixException;
 
 /**
  * Used to define a format, create them and test the result.
@@ -186,12 +186,12 @@ public class FormatData
                 cmd.append(" print \"").append(AbstractTest.convertMql(this.printProgram.getName())).append('\"');;
             }
 
-            cmd.append(";\n")
-               .append("escape add property ").append(this.getSymbolicName())
-               .append(" on program eServiceSchemaVariableMapping.tcl")
-               .append(" to format \"").append(AbstractTest.convertMql(this.getName())).append("\"");
-
             this.getTest().mql(cmd);
+
+            this.getTest().mql(new StringBuilder()
+                   .append("escape add property ").append(this.getSymbolicName())
+                   .append(" on program eServiceSchemaVariableMapping.tcl")
+                   .append(" to format \"").append(AbstractTest.convertMql(this.getName())).append("\""));
         }
         return this;
     }

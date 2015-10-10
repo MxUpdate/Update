@@ -18,12 +18,12 @@ package org.mxupdate.test.data.userinterface;
 import java.util.ArrayList;
 import java.util.List;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.ExportParser.Line;
 import org.testng.Assert;
+
+import matrix.util.MatrixException;
 
 /**
  * Used to define a menu, create them and test the result.
@@ -34,7 +34,7 @@ public class MenuData
     extends AbstractCommandData<MenuData>
 {
     /** List of all children commands / menus. */
-    private final List<AbstractCommandData<?>> children = new ArrayList<AbstractCommandData<?>>();
+    private final List<AbstractCommandData<?>> children = new ArrayList<>();
     /** Tree menu. */
     private Boolean treeMenu;
 
@@ -119,32 +119,29 @@ public class MenuData
 
             this.createDependings();
 
-            final StringBuilder cmd = new StringBuilder()
+            final StringBuilder cmd1 = new StringBuilder()
                     .append("escape add menu \"" + AbstractTest.convertMql(this.getName()) + "\"");
-
-            this.append4Create(cmd);
-            cmd.append(';');
+            this.append4Create(cmd1);
+            this.getTest().mql(cmd1);
 
             // append all child command / menus
             if (!this.children.isEmpty())  {
-                cmd.append("escape mod menu \"" + AbstractTest.convertMql(this.getName()) + "\"");
+                final StringBuilder cmd2 = new StringBuilder().append("escape mod menu \"" + AbstractTest.convertMql(this.getName()) + "\"");
                 for (final AbstractCommandData<?> child : this.children)  {
-                    cmd.append(" add ").append(child.getCI().getMxType())
+                    cmd2.append(" add ").append(child.getCI().getMxType())
                        .append(" \"").append(AbstractTest.convertMql(child.getName())).append('\"');
                 }
-                cmd.append(';');
+                this.getTest().mql(cmd2);
             }
 
-            cmd.append(";\n")
-               .append("escape add property ").append(this.getSymbolicName())
-               .append(" on program eServiceSchemaVariableMapping.tcl")
-               .append(" to menu \"").append(AbstractTest.convertMql(this.getName())).append("\";");
+            this.getTest().mql(new StringBuilder()
+                    .append("escape add property ").append(this.getSymbolicName())
+                    .append(" on program eServiceSchemaVariableMapping.tcl")
+                    .append(" to menu \"").append(AbstractTest.convertMql(this.getName())).append("\""));
 
             if ((this.treeMenu != null) && this.treeMenu)  {
-                cmd.append("escape mod menu Tree add menu \"").append(AbstractTest.convertMql(this.getName())).append("\";");
+                this.getTest().mql(new StringBuilder().append("escape mod menu Tree add menu \"").append(AbstractTest.convertMql(this.getName())).append("\""));
             }
-
-            this.getTest().mql(cmd);
         }
         return this;
     }
@@ -185,14 +182,14 @@ public class MenuData
         }
 
         // fetch child from export file
-        final List<String> childDefs = new ArrayList<String>();
+        final List<String> childDefs = new ArrayList<>();
         for (final Line line : _exportParser.getRootLines().get(0).getChildren())  {
             if ("menu".equals(line.getTag()) || "command".equals(line.getTag()))  {
                 childDefs.add(line.getTag() + " " + line.getValue());
             }
         }
         // fetch child from this definition
-        final List<String> thisDefs = new ArrayList<String>();
+        final List<String> thisDefs = new ArrayList<>();
         for (final AbstractCommandData<?> child : this.children)  {
             thisDefs.add(child.getCI().getMxType() + " \"" + AbstractTest.convertUpdate(child.getName()) + "\"");
         }

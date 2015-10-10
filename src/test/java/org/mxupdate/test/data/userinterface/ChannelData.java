@@ -18,13 +18,13 @@ package org.mxupdate.test.data.userinterface;
 import java.util.ArrayList;
 import java.util.List;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.testng.Assert;
+
+import matrix.util.MatrixException;
 
 /**
  * Used to define a channel, create them and test the result.
@@ -35,7 +35,7 @@ public class ChannelData
     extends AbstractAdminData<ChannelData>
 {
     /** All commands of the channel. */
-    private final List<CommandData> commands = new ArrayList<CommandData>();
+    private final List<CommandData> commands = new ArrayList<>();
 
     /**
      * Constructor to initialize this channel.
@@ -122,7 +122,7 @@ public class ChannelData
 
             // append all commands
             if (!this.commands.isEmpty())  {
-                final List<String> names = new ArrayList<String>();
+                final List<String> names = new ArrayList<>();
                 for (final CommandData command : this.commands)  {
                     names.add(command.getName());
                 }
@@ -130,12 +130,12 @@ public class ChannelData
             }
             this.append4Create(cmd);
 
-            cmd.append(";\n")
-               .append("escape add property ").append(this.getSymbolicName())
-               .append(" on program eServiceSchemaVariableMapping.tcl")
-               .append(" to channel \"").append(AbstractTest.convertMql(this.getName())).append("\"");
-
             this.getTest().mql(cmd);
+
+            this.getTest().mql(new StringBuilder()
+                    .append("escape add property ").append(this.getSymbolicName())
+                    .append(" on program eServiceSchemaVariableMapping.tcl")
+                    .append(" to channel \"").append(AbstractTest.convertMql(this.getName())).append("\""));
         }
         return this;
     }
@@ -170,9 +170,9 @@ public class ChannelData
         super.checkExport(_exportParser);
 
         // check for commands (in correct order!)
-        final List<String> childDefs = new ArrayList<String>(_exportParser.getLines("/mxUpdate/command/@value"));
+        final List<String> childDefs = new ArrayList<>(_exportParser.getLines("/mxUpdate/command/@value"));
         // fetch child from this definition
-        final List<String> thisDefs = new ArrayList<String>();
+        final List<String> thisDefs = new ArrayList<>();
         for (final CommandData  command : this.commands)  {
             thisDefs.add("\"" + AbstractTest.convertUpdate(command.getName()) + "\"");
         }

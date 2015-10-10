@@ -19,8 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.util.DataList;
@@ -28,6 +26,8 @@ import org.mxupdate.test.data.util.FlagList;
 import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.data.util.PropertyDefList;
+
+import matrix.util.MatrixException;
 
 /**
  * Defines common information from administration objects used to create,
@@ -54,12 +54,12 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
     /** Defines flags for this data piece. */
     private final FlagList flags = new FlagList();
     /** All defined data elements. */
-    private final DataList<AbstractAdminData<?>> datas = new DataList<AbstractAdminData<?>>();
+    private final DataList<AbstractAdminData<?>> datas = new DataList<>();
     /** All properties for this data piece. */
     private final PropertyDefList properties = new PropertyDefList();
 
     /** Update lines. */
-    private final List<String> ciLines = new ArrayList<String>();
+    private final List<String> ciLines = new ArrayList<>();
 
     /**
      * Constructor to initialize this data piece.
@@ -286,12 +286,12 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
 
             this.append4Create(cmd);
 
-            cmd.append(";\n")
+            this.getTest().mql(cmd);
+
+            this.getTest().mql(new  StringBuilder()
                .append("escape add property ").append(this.getSymbolicName())
                .append(" on program eServiceSchemaVariableMapping.tcl")
-               .append(" to " + this.getCI().getMxType() + " \"").append(AbstractTest.convertMql(this.getName())).append("\"");
-
-            this.getTest().mql(cmd);
+               .append(" to " + this.getCI().getMxType() + " \"").append(AbstractTest.convertMql(this.getName())).append("\""));
 
             this.setCreated(true);
         }

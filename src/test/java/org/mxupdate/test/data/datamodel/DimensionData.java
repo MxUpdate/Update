@@ -20,8 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
@@ -29,6 +27,8 @@ import org.mxupdate.test.data.util.FlagList;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.data.util.PropertyDefList;
 import org.testng.Assert;
+
+import matrix.util.MatrixException;
 
 /**
  * Used to define a dimension, create them and test the result.
@@ -39,7 +39,7 @@ public class DimensionData
     extends AbstractAdminData<DimensionData>
 {
     /** All units for this dimension. */
-    private final List<UnitData> units = new ArrayList<UnitData>();
+    private final List<UnitData> units = new ArrayList<>();
 
     /**
      * Initialize this expression data with given {@code _name}.
@@ -98,12 +98,12 @@ public class DimensionData
                 unit.append4Create(cmd);
             }
 
-            cmd.append(";\n")
-               .append("escape add property ").append(this.getSymbolicName())
-               .append(" on program eServiceSchemaVariableMapping.tcl")
-               .append(" to dimension \"").append(AbstractTest.convertMql(this.getName())).append("\"");
-
             this.getTest().mql(cmd);
+
+            this.getTest().mql(new StringBuilder()
+                    .append("escape add property ").append(this.getSymbolicName())
+                    .append(" on program eServiceSchemaVariableMapping.tcl")
+                    .append(" to dimension \"").append(AbstractTest.convertMql(this.getName())).append("\""));
         }
         return this;
     }
@@ -175,9 +175,9 @@ public class DimensionData
         /** Flags of the unit data. */
         private final FlagList flags = new FlagList();
         /** Values with quotations of this unit. */
-        private final Map<String,String> valuesWithQuots = new HashMap<String,String>();
+        private final Map<String,String> valuesWithQuots = new HashMap<>();
         /** Values w/o quotations of this unit. */
-        private final Map<String,String> valuesWOQuots = new HashMap<String,String>();
+        private final Map<String,String> valuesWOQuots = new HashMap<>();
         /** List of properties. */
         private final PropertyDefList properties = new PropertyDefList();
 

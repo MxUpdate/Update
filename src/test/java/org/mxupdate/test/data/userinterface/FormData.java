@@ -18,11 +18,11 @@ package org.mxupdate.test.data.userinterface;
 import java.util.ArrayList;
 import java.util.List;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
+
+import matrix.util.MatrixException;
 
 /**
  * Used to define a web form, create them and test the result.
@@ -33,7 +33,7 @@ public class FormData
     extends AbstractAdminData<FormData>
 {
     /** All fields of this form. */
-    private final List<FieldData<FormData>> fields = new ArrayList<FieldData<FormData>>();
+    private final List<FieldData<FormData>> fields = new ArrayList<>();
 
     /**
      * Constructor to initialize this form.
@@ -58,7 +58,7 @@ public class FormData
      */
     public FieldData<FormData> newField(final String _name)
     {
-        final FieldData<FormData> ret = new FieldData<FormData>(this.getTest(), this, _name);
+        final FieldData<FormData> ret = new FieldData<>(this.getTest(), this, _name);
         this.fields.add(ret);
         return ret;
     }
@@ -126,12 +126,12 @@ public class FormData
                 field.append4Create(cmd);
             }
 
-            cmd.append(";\n")
-               .append("escape add property ").append(this.getSymbolicName())
-               .append(" on program eServiceSchemaVariableMapping.tcl")
-               .append(" to form \"").append(AbstractTest.convertMql(this.getName())).append("\"");
-
             this.getTest().mql(cmd);
+
+            this.getTest().mql(new StringBuilder()
+                    .append("escape add property ").append(this.getSymbolicName())
+                    .append(" on program eServiceSchemaVariableMapping.tcl")
+                    .append(" to form \"").append(AbstractTest.convertMql(this.getName())).append("\""));
         }
         return this;
     }
