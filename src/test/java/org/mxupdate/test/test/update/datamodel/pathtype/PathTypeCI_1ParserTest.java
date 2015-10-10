@@ -26,7 +26,7 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class PathTypeCI_1ParserTest
     extends AbstractParserTest<PathType_mxJPO>
 {
@@ -40,13 +40,31 @@ public class PathTypeCI_1ParserTest
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }"},
+            // uuid
+            {"1a) uuid with minus separator",
+                    "",
+                    "uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" !hidden "
+                            + "from { cardinality many } "
+                            + "to   { }"},
+            {"1b) uuid w/o minus separator",
+                    "",
+                    "uuid \"FDA75674979211E6AE2256B6B6499611\"     description \"\" !hidden "
+                            + "from { cardinality many } "
+                            + "to   { }"},
+            {"1c) uuid convert from single to string",
+                    "uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" !hidden "
+                            + "from { cardinality many } "
+                            + "to   { }",
+                    "uuid   FDA7-5674979211-E6AE2256B6-B6499611    description \"\" !hidden "
+                            + "from { cardinality many } "
+                            + "to   { }"},
             // registered name
-            {"1a) symbolic name",
+            {"2a) symbolic name",
                     "",
                     "symbolicname \"channel_abc\" description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }"},
-            {"1b) two symbolic names",
+            {"2b) two symbolic names",
                     "symbolicname \"channel_abc\" symbolicname \"channel_def\" description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }",
@@ -54,24 +72,24 @@ public class PathTypeCI_1ParserTest
                             + "from { cardinality many } "
                             + "to   { }"},
             // description
-            {"2a) description",
+            {"3a) description",
                     "",
                     "description \"abc def\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }"},
-            {"2b) description not defined",
+            {"3b) description not defined",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }",
                     "!hidden "
                             + "from { cardinality many } "
                             + "to   { }"},
-            {"2c) multi-line description ",
+            {"3c) multi-line description ",
                     "",
                     "description \"abc\ndef\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }"},
-            {"2d) tab's in description",
+            {"3d) tab's in description",
                     "",
                     "description \"abc\tdef\" !hidden "
                             + "from { cardinality many } "

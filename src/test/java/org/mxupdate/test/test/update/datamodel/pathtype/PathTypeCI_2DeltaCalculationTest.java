@@ -26,6 +26,7 @@ import org.mxupdate.test.data.datamodel.PathTypeData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.util.FlagList.Create;
+import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.PathType_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -41,11 +42,11 @@ import matrix.util.MatrixException;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class PathTypeCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<PathType_mxJPO,PathTypeData>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
@@ -54,19 +55,28 @@ public class PathTypeCI_2DeltaCalculationTest
                     new PathTypeData(this, "Test"),
                     new PathTypeData(this, "Test")},
 
-            {"1a) symbolic name",
+            {"1) uuid",
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+
+            {"2a) symbolic name",
                     new PathTypeData(this, "Test"),
                     new PathTypeData(this, "Test").setValue("symbolicname", "expression_123")},
-            {"1b) two symbolic name",
+            {"2b) two symbolic name",
                     new PathTypeData(this, "Test"),
                     new PathTypeData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
-            {"2) description",
+
+            {"3) description",
                     new PathTypeData(this, "Test"),
                     new PathTypeData(this, "Test").setValue("description", "abc def")},
 
-            {"3) global attribute",
+            {"4) global attribute",
                     new PathTypeData(this, "Test"),
                     new PathTypeData(this, "Test").defData("attribute", new AttributeStringData(this, "Test Attribute"))},
+
+            {"5) with property",
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test").addProperty(new PropertyDef("property"))},
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // from / to direction
@@ -235,8 +245,8 @@ public class PathTypeCI_2DeltaCalculationTest
        };
     }
 
-    @Override()
-    @BeforeMethod()
+    @Override
+    @BeforeMethod
     @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException

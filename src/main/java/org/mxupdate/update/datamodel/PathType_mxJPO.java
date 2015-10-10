@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO;
@@ -39,6 +40,8 @@ import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
  * Data model type class.
  * The handled properties are:
  * <ul>
+ * <li>uuid</li>
+ * <li>symbolic names</li>
  * <li>description</li>
  * <li>hidden flag</li>
  * <li>{@link #globalAttributes global attributes}</li>
@@ -177,6 +180,7 @@ public class PathType_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flag(          "hidden",                   false, this.isHidden())
@@ -231,6 +235,8 @@ public class PathType_mxJPO
         this.localAttributes.calcDelta(_paramCache, _mql, this,
                 ErrorKey.DM_PATHTYPE_REMOVE_LOCAL_ATTRIBUTE,
                 (_current != null) ? _current.localAttributes : null);
+
+        this.getProperties().calcDelta(_mql, "", (_current != null) ? _current.getProperties() : null);
     }
 
     /**
