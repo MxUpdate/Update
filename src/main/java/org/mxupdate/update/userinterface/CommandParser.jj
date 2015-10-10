@@ -24,6 +24,21 @@ options {
 }
 
 PARSER_BEGIN(CommandParser)
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
 package org.mxupdate.update.userinterface;
 
 import java.lang.reflect.InvocationTargetException;
@@ -53,16 +68,26 @@ PARSER_END(CommandParser)
 
 TOKEN :
 {
-      <SYMBOLICNAME:            "symbolicname">                                 : STRING_EXPECTED
-    | <DESCRIPTION:             "description">                                  : MULTILINESTRING_EXPECTED
-    | <HIDDEN_TRUE:             "hidden">
-    | <HIDDEN_FALSE:            "!hidden">
-    | <ALT:                     "alt">                                          : STRING_EXPECTED
-    | <HREF:                    "href">                                         : STRING_EXPECTED
-    | <LABEL:                   "label">                                        : STRING_EXPECTED
-    | <USER:                    ("add" ([" ","\t","\n","\r"])+ )? "user">       : STRING_EXPECTED
-    | <SETTING:                 ("add" ([" ","\t","\n","\r"])+ )? "setting">    : SETTING_EXPECTED
-    | <CODE:                    "code">                                         : MULTILINESTRING_EXPECTED
+      <UUID:                                "uuid">                                         : STRING_EXPECTED
+
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+
+    | <HIDDEN_TRUE:                         "hidden">
+    | <HIDDEN_FALSE:                        "!hidden">
+
+    | <ALT:                                 "alt">                                          : STRING_EXPECTED
+
+    | <HREF:                                "href">                                         : STRING_EXPECTED
+
+    | <LABEL:                               "label">                                        : STRING_EXPECTED
+
+    | <USER:                                ("add" ([" ","\t","\n","\r"])+ )? "user">       : STRING_EXPECTED
+
+    | <SETTING:                             ("add" ([" ","\t","\n","\r"])+ )? "setting">    : SETTING_EXPECTED
+
+    | <CODE:                                "code">                                         : MULTILINESTRING_EXPECTED
 }
 
 /************************************************************** Common String */
@@ -88,7 +113,8 @@ TOKEN :
 
 /******************************************************************* Property */
 <DEFAULT> TOKEN :
-{      <PROPERTY:                "property">                                     : STRING_EXPECTED
+{
+      <PROPERTY:                "property">                                     : STRING_EXPECTED
     | <PROPERTYTO:              "to">                                           : ADMINREF_EXPECTED
     | <PROPERTYVAL:             "value">                                        : STRING_EXPECTED
 }
@@ -112,7 +138,13 @@ void parse(Command_mxJPO _command)
     Token tmp;
     AdminProperty property;
 } {
-    (   ( <SYMBOLICNAME>            ( tmp = <STRING>           {this.appendValue(_command, "symbolicNames", this.getString(tmp.image));}
+    (   ( <UUID>                                               {property = new AdminProperty();
+                                                                this.appendValue(this.getValue(_command, "properties"), "propertiesStack", property);
+                                                                this.setValue(property, "name",  "UUID");}
+                                    ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+
+      | ( <SYMBOLICNAME>            ( tmp = <STRING>           {this.appendValue(_command, "symbolicNames", this.getString(tmp.image));}
                                     | tmp = <SINGLE>           {this.appendValue(_command, "symbolicNames", this.getSingle(tmp.image));} ) )
 
       | (<DESCRIPTION>              ( tmp = <MULTILINESTRING>  {this.setValue(_command, "description", this.getString(tmp.image));}

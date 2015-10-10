@@ -23,18 +23,21 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 /**
  * The class is used to export and import / update command configuration items.
  * The command specific information are:
  * <ul>
+ * <li>uuid</li>
+ * <li>symbolic names</li>
  * <li>description</li>
  * <li>hidden flag (only if <i>true</i>)</li>
  * <li>label</li>
@@ -73,7 +76,7 @@ public class Command_mxJPO
         this.getProperties().setOtherPropTag("setting");
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -95,7 +98,7 @@ public class Command_mxJPO
      * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
      *         <i>false</i>
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -120,13 +123,14 @@ public class Command_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
-                .list(          "symbolicname",            this.getSymbolicNames())
-                .string(        "description",             this.getDescription())
-                .flagIfTrue(    "hidden",           false, this.isHidden(),                     this.isHidden())
-                .string(        "label",                   this.getLabel())
-                .string(        "href",                    this.getHref())
-                .string(        "alt",                     this.getAlt())
-                .list(          "user",                    this.users)
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
+                .list(          "symbolicname",             this.getSymbolicNames())
+                .string(        "description",              this.getDescription())
+                .flagIfTrue(    "hidden",           false,  this.isHidden(),                     this.isHidden())
+                .string(        "label",                    this.getLabel())
+                .string(        "href",                     this.getHref())
+                .string(        "alt",                      this.getAlt())
+                .list(          "user",                     this.users)
                 .otherProps(this.getProperties())
                 .properties(this.getProperties())
                 .stringIfTrue(   "code",                    "\n" + ((this.code != null) ? this.code : "") + "\n", (this.code != null) && !this.code.isEmpty());
