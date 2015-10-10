@@ -73,20 +73,33 @@ public class RelationshipCI_1Parser2LocalAttributeTest
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind string  description \"\" !hidden !multivalue !resetonclone !resetonrevision             !multiline maxlength 0 default \"\" }"},
 
+            // sort of multiple local attributes
+            {"1) local string attribute: sorting",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME 1\" { kind string  description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\" } "
+                            + "local attribute \"ATTRNAME 2\" { kind string  description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\" }",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME 2\" { kind string  description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\" } "
+                            + "local attribute \"ATTRNAME 1\" { kind string  description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\" }"},
+
             // uuid
-            {"1a) local attribute uuid with minus separator",
+            {"2a) local attribute uuid with minus separator",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind boolean uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
-            {"1b) local attribute uuid w/o minus separator",
+            {"2b) local attribute uuid w/o minus separator",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind boolean uuid \"FDA75674979211E6AE2256B6B6499611\"     description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
-            {"1c) local attribute uuid convert from single to string",
+            {"2c) local attribute uuid convert from single to string",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -97,13 +110,13 @@ public class RelationshipCI_1Parser2LocalAttributeTest
                             + "local attribute \"ATTRNAME\" { kind boolean uuid   FDA7-5674979211-E6AE2256B6-B6499611    description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
 
              // attribute registered name
-            {"2a) local attribute symbolic name",
+            {"3a) local attribute symbolic name",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind boolean symbolicname \"attribute_abc\"                                description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
-            {"2b) local attribute two symbolic names",
+            {"3b) local attribute two symbolic names",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -114,13 +127,13 @@ public class RelationshipCI_1Parser2LocalAttributeTest
                             + "local attribute \"ATTRNAME\" { kind boolean symbolicname \"attribute_def\" symbolicname \"attribute_abc\" description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
 
             // attribute description
-            {"3a) local attribute description",
+            {"4a) local attribute description",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"abc def\"  !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
-            {"3b) local attribute description not defined",
+            {"4b) local attribute description not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -129,7 +142,7 @@ public class RelationshipCI_1Parser2LocalAttributeTest
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind boolean                          !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
-            {"3c) local multi-line attribute description",
+            {"4c) local multi-line attribute description",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -137,13 +150,13 @@ public class RelationshipCI_1Parser2LocalAttributeTest
                             + "local attribute \"ATTRNAME\" { kind boolean description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
 
             // attribute hidden flag
-            {"4a) local attribute hidden",
+            {"5a) local attribute hidden",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" hidden  !multivalue !resetonclone !resetonrevision default \"\" }"},
-            {"4b) local attribute not hidden (not defined)",
+            {"5b) local attribute not hidden (not defined)",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -154,13 +167,13 @@ public class RelationshipCI_1Parser2LocalAttributeTest
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\"         !multivalue !resetonclone !resetonrevision default \"\" }"},
 
             // attribute multivalue flag
-            {"5a) attribute multivalue flag",
+            {"6a) attribute multivalue flag",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden multivalue  !resetonclone !resetonrevision default \"\" }"},
-            {"5b) attribute multivalue flag not defined",
+            {"6b) attribute multivalue flag not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -171,13 +184,13 @@ public class RelationshipCI_1Parser2LocalAttributeTest
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden             !resetonclone !resetonrevision default \"\" }"},
 
             // attribute resetonclone flag
-            {"6a) local attribute resetonclone flag",
+            {"7a) local attribute resetonclone flag",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue resetonclone  !resetonrevision default \"\" }"},
-            {"6b) local attribute resetonclone flag not defined",
+            {"7b) local attribute resetonclone flag not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -188,13 +201,13 @@ public class RelationshipCI_1Parser2LocalAttributeTest
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue               !resetonrevision default \"\" }"},
 
             // attribute resetonrevision flag
-            {"7a) local attribute resetonrevision flag",
+            {"8a) local attribute resetonrevision flag",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone resetonrevision  default \"\" }"},
-            {"7b) local attribute resetonrevision !preventduplicates flag not defined",
+            {"8b) local attribute resetonrevision !preventduplicates flag not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -205,13 +218,13 @@ public class RelationshipCI_1Parser2LocalAttributeTest
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone                  default \"\" }"},
 
             // attribute default value
-            {"8a) local attribute default value",
+            {"9a) local attribute default value",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc def\"  }"},
-            {"8b) local attribute default value not defined",
+            {"9b) local attribute default value not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -220,7 +233,7 @@ public class RelationshipCI_1Parser2LocalAttributeTest
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision                      }"},
-            {"8c) local multi-line attribute default value",
+            {"9c) local multi-line attribute default value",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -228,13 +241,13 @@ public class RelationshipCI_1Parser2LocalAttributeTest
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\ndef\" }"},
 
             // real attribute rangevalue flag
-            {"9a) local real attribute rangevalue flag",
+            {"10a) local real attribute rangevalue flag",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision rangevalue  default \"\" }"},
-            {"9b) local real attribute rangevalue flag not defined",
+            {"10b) local real attribute rangevalue flag not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -245,13 +258,13 @@ public class RelationshipCI_1Parser2LocalAttributeTest
                             + "local attribute \"ATTRNAME\" { kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision             default \"\" }"},
 
             // string attribute multiline flag
-            {"10a) local attribute multiline flag",
+            {"11a) local attribute multiline flag",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision multiline  maxlength 0 default \"\" }"},
-            {"10b) local attribute multiline flag not defined",
+            {"11b) local attribute multiline flag not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -262,13 +275,13 @@ public class RelationshipCI_1Parser2LocalAttributeTest
                             + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision            maxlength 0 default \"\" }"},
 
              // string attribute maxlength
-            {"11a) local attribute maxlength",
+            {"12a) local attribute maxlength",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision multiline  maxlength 125 default \"\" }"},
-            {"11b) local attribute maxlength not defined",
+            {"12b) local attribute maxlength not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -279,13 +292,13 @@ public class RelationshipCI_1Parser2LocalAttributeTest
                             + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline               default \"\" }"},
 
             // attribute rule
-            {"12a) local attribute rule",
+            {"13a) local attribute rule",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision rule \"A\"            default \"\"  }"},
-            {"12a) local attribute rule list (if more than one none)",
+            {"13a) local attribute rule list (if more than one none)",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -296,7 +309,7 @@ public class RelationshipCI_1Parser2LocalAttributeTest
                             + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision rule \"A\" rule \"B\" default \"\"  }"},
 
             // attribute dimension
-            {"13a) local real attribute dimension",
+            {"14) local real attribute dimension",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "

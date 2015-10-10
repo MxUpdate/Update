@@ -13,12 +13,11 @@
  *
  */
 
-package org.mxupdate.test.test.update.datamodel.relationshipci;
+package org.mxupdate.test.test.update.datamodel.pathtype;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.AttributeData;
 import org.mxupdate.test.data.datamodel.PathTypeData;
-import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.update.datamodel.Relationship_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -30,7 +29,7 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-public class RelationshipCI_5ExportTest
+public class PathTypeCI_5ExportTest
     extends AbstractTest
 {
     /**
@@ -42,7 +41,7 @@ public class RelationshipCI_5ExportTest
     public void positiveTestSortLocalAttributes()
         throws Exception
     {
-        final String code = new RelationshipData(this, "Test")
+        final String code = new PathTypeData(this, "Test")
                 .create()
                 .addLocalAttribute(new AttributeData(this, "Attribute 2").setSingle("kind", "string"))
                 .addLocalAttribute(new AttributeData(this, "Attribute 1").setSingle("kind", "string"))
@@ -51,27 +50,6 @@ public class RelationshipCI_5ExportTest
                 .getCode();
         Assert.assertTrue(
                 code.indexOf("Attribute 1") < code.indexOf("Attribute 2"),
-                "check correct order");
-    }
-
-    /**
-     * Positive test local path types.
-     *
-     * @throws Exception if test failed
-     */
-    @Test(description = "positive test local path types")
-    public void positiveTestSortLocalPathTypes()
-        throws Exception
-    {
-        final String code = new RelationshipData(this, "Test")
-                .create()
-                .addLocalPathType(new PathTypeData(this, "PathType 2"))
-                .addLocalPathType(new PathTypeData(this, "PathType 1"))
-                .update("")
-                .export()
-                .getCode();
-        Assert.assertTrue(
-                code.indexOf("PathType 1") < code.indexOf("PathType 2"),
                 "check correct order");
     }
 
@@ -85,8 +63,6 @@ public class RelationshipCI_5ExportTest
     public void cleanup()
         throws Exception
     {
-        this.cleanup(AbstractTest.CI.DM_PATHTYPE);  // as first, so that local attributes of path types are deleted!
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE);
-        this.cleanup(AbstractTest.CI.DM_RELATIONSHIP);
+        this.cleanup(AbstractTest.CI.DM_PATHTYPE);
     }
 }

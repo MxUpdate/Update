@@ -15,6 +15,8 @@
 
 package org.mxupdate.update.datamodel.helper;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
@@ -52,6 +54,10 @@ public class LocalAttributeList_mxJPO
         for (final LocalAttribute attr : this)  {
             attr.prepare();
         }
+        // sort local attributes (because name is set after parsing!)
+        final Set<LocalAttribute> localAttributes = new HashSet<>(this);
+        this.clear();
+        this.addAll(localAttributes);
     }
 
     /**

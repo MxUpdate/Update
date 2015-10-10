@@ -16,6 +16,7 @@
 package org.mxupdate.test.test.update.datamodel.typeci;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.datamodel.AttributeData;
 import org.mxupdate.test.data.datamodel.PathTypeData;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.update.datamodel.Type_mxJPO;
@@ -32,6 +33,27 @@ import org.testng.annotations.Test;
 public class TypeCI_5ExportTest
     extends AbstractTest
 {
+    /**
+     * Positive test local attributes.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test local attributes")
+    public void positiveTestSortLocalAttributes()
+        throws Exception
+    {
+        final String code = new TypeData(this, "Test")
+                .create()
+                .addLocalAttribute(new AttributeData(this, "Attribute 2").setSingle("kind", "string"))
+                .addLocalAttribute(new AttributeData(this, "Attribute 1").setSingle("kind", "string"))
+                .update("")
+                .export()
+                .getCode();
+        Assert.assertTrue(
+                code.indexOf("Attribute 1") < code.indexOf("Attribute 2"),
+                "check correct order");
+    }
+
     /**
      * Positive test local path types.
      *
@@ -54,7 +76,7 @@ public class TypeCI_5ExportTest
     }
 
     /**
-     * Removes the MxUpdate programs, attributes and types.
+     * Removes the created test data.
      *
      * @throws Exception if MQL execution failed
      */
@@ -64,6 +86,7 @@ public class TypeCI_5ExportTest
         throws Exception
     {
         this.cleanup(AbstractTest.CI.DM_PATHTYPE);  // as first, so that local attributes of path types are deleted!
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE);
         this.cleanup(AbstractTest.CI.DM_TYPE);
     }
 }
