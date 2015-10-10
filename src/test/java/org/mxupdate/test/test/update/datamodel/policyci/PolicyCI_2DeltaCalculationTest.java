@@ -86,6 +86,20 @@ public class PolicyCI_2DeltaCalculationTest
                             .addState(new State().setName("A").setValue("registeredname", "state_A").setValue("registeredname", "state_A1")),
                     new PolicyData(this, "Test")
                             .addState(new State().setName("A").setValue("registeredname", "state_A"))},
+            {"10d) registered state name moved from first state to second state",
+                    new PolicyData(this, "Test")
+                            .addState(new State().setName("A").setValue("registeredname", "state_A"))
+                            .addState(new State().setName("B").setValue("registeredname", "state_B")),
+                    new PolicyData(this, "Test")
+                            .addState(new State().setName("A").setValue("registeredname", "state_ABC"))
+                            .addState(new State().setName("B").setValue("registeredname", "state_A"))},
+            {"10e) registered state name moved from second state to first state",
+                    new PolicyData(this, "Test")
+                            .addState(new State().setName("A").setValue("registeredname", "state_A"))
+                            .addState(new State().setName("B").setValue("registeredname", "state_B")),
+                    new PolicyData(this, "Test")
+                            .addState(new State().setName("A").setValue("registeredname", "state_B"))
+                            .addState(new State().setName("B").setValue("registeredname", "state_BCD"))},
             // state
             {"20a) new state",
                     new PolicyData(this, "Test"),
@@ -99,18 +113,18 @@ public class PolicyCI_2DeltaCalculationTest
                     new PolicyData(this, "Test").addState(new State().setName("A")).addState(new State().setName("B")).addState(new State().setName("C"))},
 
             // allstate
-            {"20a) all state access: new public all",
-                        new PolicyData(this, "Test")
-                                .addState(new State().setName("A")),
-                        new PolicyData(this, "Test")
-                                .setAllState(new AllState().addAccess(new Access().setKind("public").addAccess("all")))
-                                .addState(new State().setName("A"))},
-            {"20b) all state access: remove public all",
-                                    new PolicyData(this, "Test")
-                                            .setAllState(new AllState().addAccess(new Access().setKind("public").addAccess("all")))
-                                            .addState(new State().setName("A")),
-                                    new PolicyData(this, "Test")
-                                            .addState(new State().setName("A"))},
+            {"21a) all state access: new public all",
+                    new PolicyData(this, "Test")
+                            .addState(new State().setName("A")),
+                    new PolicyData(this, "Test")
+                            .setAllState(new AllState().addAccess(new Access().setKind("public").addAccess("all")))
+                            .addState(new State().setName("A"))},
+            {"21b) all state access: remove public all",
+                    new PolicyData(this, "Test")
+                            .setAllState(new AllState().addAccess(new Access().setKind("public").addAccess("all")))
+                            .addState(new State().setName("A")),
+                    new PolicyData(this, "Test")
+                            .addState(new State().setName("A"))},
        };
     }
 

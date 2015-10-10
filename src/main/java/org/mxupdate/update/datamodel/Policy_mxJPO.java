@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.Stack;
@@ -58,7 +59,7 @@ public class Policy_mxJPO
     extends AbstractAdminObject_mxJPO<Policy_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for policies. */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         Policy_mxJPO.IGNORED_URLS.add("/defaultFormat");
         Policy_mxJPO.IGNORED_URLS.add("/formatRefList");
@@ -94,7 +95,7 @@ public class Policy_mxJPO
     /** Default format of this policy. */
     private String defaultFormat = null;
     /** All possible formats of this policy. */
-    private final SortedSet<String> formats = new TreeSet<String>();
+    private final SortedSet<String> formats = new TreeSet<>();
     /** Are all formats allowed of this policy? */
     private boolean allFormats = false;
     /** Locking enforced? */
@@ -111,7 +112,7 @@ public class Policy_mxJPO
     private String store;
 
     /** Set of all types of this policy. */
-    private final SortedSet<String> types = new TreeSet<String>();
+    private final SortedSet<String> types = new TreeSet<>();
     /** Are all types allowed of this policy? */
     private boolean allTypes = false;
 
@@ -121,7 +122,9 @@ public class Policy_mxJPO
     private final AccessList_mxJPO allStateAccess = new AccessList_mxJPO();
 
     /** Stack with all states of this policy. */
-    private final Stack<State> states = new Stack<State>();
+    private final Stack<State> states = new Stack<>();
+    /** Map with all state names and depending symbolic state names and  */
+    private final Map<String,Set<String>> symbStates = new HashMap<>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -260,7 +263,7 @@ public class Policy_mxJPO
         }
         super.prepare();
         // extract state symbolic names from properties
-        for (final AdminProperty property : new HashSet<AdminProperty>(this.getProperties().getProperties()))  {
+        for (final AdminProperty property : new HashSet<>(this.getProperties().getProperties()))  {
             if ((property.getName() != null) && property.getName().startsWith("state_"))  {
                 for (final State state : this.states)  {
                     if (state.name.equals(property.getValue()))  {
@@ -454,7 +457,7 @@ public class Policy_mxJPO
         // (first add new states because of references in branches)
         final Iterator<State> curStateIter = this.states.iterator();
         final Iterator<State> newStateIter = _newPolicy.states.iterator();
-        final Map<State,State> stateDeltaMap = new HashMap<State,State>();
+        final Map<State,State> stateDeltaMap = new HashMap<>();
         while (curStateIter.hasNext() && newStateIter.hasNext())  {
             final State curState = curStateIter.next();
             State newState = newStateIter.next();
@@ -482,10 +485,19 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
         }
 
         // now update state information itself
-        for (final Map.Entry<State, State> entry : stateDeltaMap.entrySet())  {
+        for (final Entry<State, State> entry : stateDeltaMap.entrySet())  {
             _mql.pushPrefixByAppending("state $2", entry.getKey().name);
             entry.getKey().calcDelta(_paramCache, _mql, entry.getValue());
             _mql.popPrefix();
+        }
+        // symbolic names for the states must be appended at least
+        // (so that state symbolic names can be moved from one state to another state)
+        for (final Entry<State, State> entry : stateDeltaMap.entrySet())  {
+            for (final String symbolicName : entry.getKey().symbolicNames)  {
+                if ((entry.getValue() == null) || !entry.getValue().symbolicNames.contains(symbolicName))  {
+                    _mql.newLine().cmd("add property ").arg(symbolicName).cmd(" value ").arg(entry.getKey().name);
+                }
+            }
         }
     }
 
@@ -497,7 +509,7 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
         /** Name of the state. */
         private String name;
         /** Symbolic Name of the state. */
-        private final Set<String> symbolicNames = new TreeSet<String>();
+        private final Set<String> symbolicNames = new TreeSet<>();
 
         /** Called action program for this state. */
         private String actionProgram = "";
@@ -535,7 +547,7 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
         /** Route message of this state. */
         private String routeMessage;
         /** Route users of this state. */
-        private final Set<String> routeUsers = new TreeSet<String>();
+        private final Set<String> routeUsers = new TreeSet<>();
 
         /** Handles the state depending properties. */
         private final AdminPropertyList_mxJPO properties = new AdminPropertyList_mxJPO();
@@ -544,7 +556,7 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
         private final TriggerList_mxJPO triggers = new TriggerList_mxJPO();
 
         /** Holds the signatures for this state. */
-        private final Stack<Signature> signatures = new Stack<Signature>();
+        private final Stack<Signature> signatures = new Stack<>();
 
         /**
          * {@inheritDoc}
@@ -637,10 +649,10 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
             // fix filters of signature
             if (!this.signatures.isEmpty())  {
                 // map between keys and access (key must be also equal signature)
-                final Map<String,Access> filterMap = new HashMap<String,Access>();
-                final Map<String,List<Access>> approveMap = new HashMap<String,List<Access>>();
-                final Map<String,List<Access>> ignoreMap = new HashMap<String,List<Access>>();
-                final Map<String,List<Access>> rejectMap = new HashMap<String,List<Access>>();
+                final Map<String,Access> filterMap = new HashMap<>();
+                final Map<String,List<Access>> approveMap = new HashMap<>();
+                final Map<String,List<Access>> ignoreMap = new HashMap<>();
+                final Map<String,List<Access>> rejectMap = new HashMap<>();
                 for (final Access oneAccess : this.access.getAccessList())  {
                     if ((oneAccess.getKey() != null) && !oneAccess.getKey().isEmpty() && oneAccess.getAccess().size() == 1)  {
                         final String accessStr = oneAccess.getAccess().iterator().next();
@@ -807,11 +819,11 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
             this.triggers.calcDelta(_mql, (_oldState != null) ? _oldState.triggers : null);
 
             // signatures
-            final Set<String> newSigs = new HashSet<String>();
+            final Set<String> newSigs = new HashSet<>();
             for (final Signature signature : this.signatures)  {
                 newSigs.add(signature.name);
             }
-            final Map<String,Signature> oldSigs = new HashMap<String,Signature>();
+            final Map<String,Signature> oldSigs = new HashMap<>();
             if (_oldState != null)  {
                 for (final Signature signature : _oldState.signatures)  {
                     if (newSigs.contains(signature.name))  {
@@ -846,11 +858,6 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
                     }
                 }
             }
-            for (final String symbolicName : this.symbolicNames)  {
-                if ((_oldState == null) || !_oldState.symbolicNames.contains(symbolicName))  {
-                    _mql.newLine().cmd("add property ").arg(symbolicName).cmd(" value ").arg(this.name);
-                }
-            }
         }
     }
 
@@ -869,11 +876,11 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
         private String filter;
 
         /** Set of users which could approve the signature. */
-        private final Set<String> approverUsers = new TreeSet<String>();
+        private final Set<String> approverUsers = new TreeSet<>();
         /** Set of users which could ignore the signature. */
-        private final Set<String> ignoreUsers = new TreeSet<String>();
+        private final Set<String> ignoreUsers = new TreeSet<>();
         /** Set of users which could reject the signature. */
-        private final Set<String> rejectUsers = new TreeSet<String>();
+        private final Set<String> rejectUsers = new TreeSet<>();
 
         /**
          * Appends the signature information including the branch, filter and
