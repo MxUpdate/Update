@@ -376,6 +376,21 @@ public class UpdateException_mxJPO
                 "Current local attribute ''{0}'' is defined to be removed from type ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
 
         /**
+         * <p>The given local path type is not defined anymore but assigned to
+         * the type object. The local path type is not automatically removed
+         * because otherwise potentially data could be lost.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>local path type</li>
+         * <li>type which is tried to update</li>
+         * </ol>
+         * </p>
+         */
+        DM_TYPE_REMOVE_LOCAL_PATH_TYPE(11805,
+                "Current local path type ''{0}'' is defined to be removed from type ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
+
+        /**
          * Kind of a role can not be changed if the current kind is not role.
          *
          * <p>Parameters:

@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalPathTypeList_mxJPO;
@@ -65,6 +66,8 @@ public class Type_mxJPO
         Type_mxJPO.IGNORED_URLS.add("/derivedFrom/typeRefList");
         Type_mxJPO.IGNORED_URLS.add("/localAttributes");
         Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList");
+        Type_mxJPO.IGNORED_URLS.add("/localPathTypes");
+        Type_mxJPO.IGNORED_URLS.add("/localPathTypes/pathDefList");
         Type_mxJPO.IGNORED_URLS.add("/methodList");
     }
 
@@ -147,6 +150,9 @@ public class Type_mxJPO
         } else if (_url.startsWith("/localAttributes/attributeDefList/attributeDef"))  {
             parsed = this.localAttributes.parseAdminXMLExportEvent(_paramCache, _url.substring(46), _content);
 
+        } else if (_url.startsWith("/localPathTypes/pathDefList/pathDef"))  {
+            parsed = this.localPathTypes.parseAdminXMLExportEvent(_paramCache, _url.substring(35), _content);
+
         } else if ("/methodList/programRef".equals(_url))  {
             this.methods.add(_content);
             parsed = true;
@@ -211,7 +217,9 @@ public class Type_mxJPO
         DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql,    "attribute",
                 ErrorKey.DM_TYPE_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
                 ValueKeys.DMTypeAttrIgnore, ValueKeys.DMTypeAttrRemove,                 this.globalAttributes,  _current.globalAttributes);
-        this.localAttributes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_TYPE_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
+        this.localAttributes.calcDelta(_paramCache, _mql, EMxAdmin_mxJPO.Type, this.getName(),  ErrorKey.DM_TYPE_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
+
+        this.localPathTypes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_TYPE_REMOVE_LOCAL_PATH_TYPE, _current.localPathTypes);
 
         this.getTriggers()  .calcDelta(_mql,     _current.getTriggers());
         this.getProperties().calcDelta(_mql, "", _current.getProperties());

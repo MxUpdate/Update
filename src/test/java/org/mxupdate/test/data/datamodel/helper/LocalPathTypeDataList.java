@@ -23,22 +23,22 @@ import java.util.TreeMap;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.ExportParser.Line;
-import org.mxupdate.test.data.datamodel.AbstractAttributeData;
+import org.mxupdate.test.data.datamodel.PathTypeData;
 import org.testng.Assert;
 
 /**
- * List of attributes used locally.
+ * List of path types used locally.
  *
  * @author The MxUpdate Team
  */
-public class LocaleAttributeList
-    extends ArrayList<AbstractAttributeData<?>>
+public class LocalPathTypeDataList
+    extends ArrayList<PathTypeData>
 {
     /** Required dummy serial version UID. */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Method to append all attributes to CI file.
+     * Method to append all local path types to CI file.
      *
      * @param _prefix   prefix
      * @param _cmd      string builder to append
@@ -46,9 +46,9 @@ public class LocaleAttributeList
     public void append4Update(final String _prefix,
                               final StringBuilder _cmd)
     {
-        for (final AbstractAttributeData<?> attribute : this)  {
-            _cmd.append(_prefix).append("local attribute \"").append(attribute.getName()).append("\" {\n");
-            attribute.append4Update(_prefix + "    ", _cmd);
+        for (final PathTypeData pathType : this)  {
+            _cmd.append(_prefix).append("local pathtype \"").append(pathType.getName()).append("\" {\n");
+            pathType.append4Update(_prefix + "    ", _cmd);
             _cmd.append(_prefix).append("}\n");
         }
     }
@@ -61,27 +61,27 @@ public class LocaleAttributeList
     public void checkExport(final ExportParser _exportParser)
     {
         // prepare list of defined attributes
-        final SortedMap<String,AbstractAttributeData<?>> defAttrs = new TreeMap<>();
-        for (final AbstractAttributeData<?> attribute : this)  {
-            defAttrs.put("attribute \"" + AbstractTest.convertUpdate(attribute.getName()) +  "\" {", attribute);
+        final SortedMap<String,PathTypeData> defPathTypes = new TreeMap<>();
+        for (final PathTypeData pathType : this)  {
+            defPathTypes.put("pathtype \"" + AbstractTest.convertUpdate(pathType.getName()) +  "\" {", pathType);
         }
         // prepare list of parsed attributes
-        final SortedMap<String,Line> lineAttrs = new TreeMap<>();
+        final SortedMap<String,Line> linePathTypes = new TreeMap<>();
         for (final Line line : _exportParser.getRootLines())  {
             for (final Line sub : line.getChildren())  {
-                if ("local".equals(sub.getTag()) && sub.getValue().startsWith("attribute"))  {
-                    lineAttrs.put(sub.getValue(), sub);
+                if ("local".equals(sub.getTag()) && sub.getValue().startsWith("pathtype"))  {
+                    linePathTypes.put(sub.getValue(), sub);
                 }
             }
         }
         // and check that both list are equal
-        Assert.assertEquals(lineAttrs.keySet(), defAttrs.keySet(), "check all attributes are defined");
-        final Iterator<AbstractAttributeData<?>> defIter = defAttrs.values().iterator();
-        final Iterator<Line> lineIter = lineAttrs.values().iterator();
+        Assert.assertEquals(linePathTypes.keySet(), defPathTypes.keySet(), "check all local path types are defined");
+        final Iterator<PathTypeData> defIter = defPathTypes.values().iterator();
+        final Iterator<Line> lineIter = linePathTypes.values().iterator();
         while (defIter.hasNext())  {
-            final AbstractAttributeData<?> defAttr = defIter.next();
+            final PathTypeData defAttr = defIter.next();
             final Line lineAttr = lineIter.next();
-            defAttr.checkExport(new ExportParser("attr", new Line[]{lineAttr}));
+            defAttr.checkExport(new ExportParser("pathtype", new Line[]{lineAttr}));
         }
     }
 }

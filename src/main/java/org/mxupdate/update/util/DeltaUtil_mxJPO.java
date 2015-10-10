@@ -314,7 +314,7 @@ public final class DeltaUtil_mxJPO
             removeElems.addAll(tmp2);
         }
 
-        boolean equal = (_new.size() == _current.size());
+        boolean equal = (_current != null) && (_new.size() == _current.size());
         if (equal)  {
             for (final String attribute : _current)  {
                 if (!_new.contains(attribute))  {
@@ -324,28 +324,30 @@ public final class DeltaUtil_mxJPO
             }
         }
         if (!equal)  {
-            for (final String curValue : _current)  {
-                if (!_new.contains(curValue))  {
-                    boolean ignore = false;
-                    for (final String ignoreAttr : ignoreElems)  {
-                        if (StringUtil_mxJPO.match(curValue, ignoreAttr))  {
-                            ignore = true;
-                            _paramCache.logDebug("    - " + _kind +" '" + curValue + "' is not assigned anymore and therefore ignored");
-                            break;
-                        }
-                    }
-                    if (!ignore)  {
-                        boolean remove = false;
-                        for (final String removeAttr : removeElems)  {
-                            if (StringUtil_mxJPO.match(curValue, removeAttr))  {
-                                remove = true;
-                                _paramCache.logDebug("    - " + _kind +" '" + curValue + "' is not assigned anymore and therefore removed");
-                                _mql.newLine().cmd("remove ").cmd(_kind).cmd(" ").arg(curValue);
+            if (_current != null)  {
+                for (final String curValue : _current)  {
+                    if (!_new.contains(curValue))  {
+                        boolean ignore = false;
+                        for (final String ignoreAttr : ignoreElems)  {
+                            if (StringUtil_mxJPO.match(curValue, ignoreAttr))  {
+                                ignore = true;
+                                _paramCache.logDebug("    - " + _kind +" '" + curValue + "' is not assigned anymore and therefore ignored");
                                 break;
                             }
                         }
-                        if (!remove)  {
-                            throw new UpdateException_mxJPO(_errorKey, curValue, _parentName);
+                        if (!ignore)  {
+                            boolean remove = false;
+                            for (final String removeAttr : removeElems)  {
+                                if (StringUtil_mxJPO.match(curValue, removeAttr))  {
+                                    remove = true;
+                                    _paramCache.logDebug("    - " + _kind +" '" + curValue + "' is not assigned anymore and therefore removed");
+                                    _mql.newLine().cmd("remove ").cmd(_kind).cmd(" ").arg(curValue);
+                                    break;
+                                }
+                            }
+                            if (!remove)  {
+                                throw new UpdateException_mxJPO(_errorKey, curValue, _parentName);
+                            }
                         }
                     }
                 }

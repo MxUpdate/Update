@@ -17,7 +17,7 @@ package org.mxupdate.update.datamodel.helper;
 
 import java.util.TreeSet;
 
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO.LocalAttribute;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
@@ -110,47 +110,52 @@ public class LocalAttributeList_mxJPO
      */
     public void calcDelta(final ParameterCache_mxJPO _paramCache,
                           final MultiLineMqlBuilder _mql,
-                          final AbstractAdminObject_mxJPO<? extends AbstractAdminObject_mxJPO<?>> _owner,
+                          final EMxAdmin_mxJPO _ownerMxAdmin,
+                          final String _ownerName,
                           final ErrorKey _errorKeyAttrRemoved,
                           final LocalAttributeList_mxJPO _current)
         throws UpdateException_mxJPO
     {
         // check for removed attributes
-        for (final LocalAttribute tmpAttr : _current) {
-            boolean found = false;
-            for (final LocalAttribute targetAttr : this)  {
-                if (tmpAttr.getName().equals(targetAttr.getName())) {
-                    found = true;
-                    break;
+        if (_current != null)  {
+            for (final LocalAttribute tmpAttr : _current) {
+                boolean found = false;
+                for (final LocalAttribute targetAttr : this)  {
+                    if (tmpAttr.getName().equals(targetAttr.getName())) {
+                        found = true;
+                        break;
+                    }
                 }
-            }
-            if (!found)  {
-                throw new UpdateException_mxJPO(_errorKeyAttrRemoved, tmpAttr.getName(), _owner.getName());
+                if (!found)  {
+                    throw new UpdateException_mxJPO(_errorKeyAttrRemoved, tmpAttr.getName(), _ownerName);
+                }
             }
         }
 
         // delta calculation for added / updated attributes
         for (final LocalAttribute targetAttr : this)  {
             LocalAttribute curAttr = null;
-            for (final LocalAttribute tmpAttr : _current) {
-                if (tmpAttr.getName().equals(targetAttr.getName())) {
-                    curAttr = tmpAttr;
-                    break;
+            if (_current != null)  {
+                for (final LocalAttribute tmpAttr : _current) {
+                    if (tmpAttr.getName().equals(targetAttr.getName())) {
+                        curAttr = tmpAttr;
+                        break;
+                    }
                 }
             }
 
             // create if no current attribute exists
             if (curAttr == null)  {
-                _paramCache.logDebug("    - local attribute '" + targetAttr.getName() + "' is added");
+                _paramCache.logDebug("    - local attribute '" + targetAttr.getName() + "' is added (to '" + _ownerName + "')");
                 _mql.pushPrefix("")
-                    .newLine().cmd("escape add attribute ").arg(targetAttr.getName())
+                    .newLine().cmd("escape add ").cmd(EMxAdmin_mxJPO.Attribute.mxClass()).cmd(" ").arg(targetAttr.getName())
                                         .cmd(" type ").arg(targetAttr.getKind().getAttrTypeCreate())
-                                        .cmd(" owner ").cmd(_owner.getTypeDef().getMxAdminName()).cmd(" ").arg(_owner.getName())
+                                        .cmd(" owner ").cmd(_ownerMxAdmin.mxClass()).cmd(" ").arg(_ownerName)
                     .popPrefix();
             }
 
             // update attribute
-            _mql.pushPrefix("escape mod attribute $1", _owner.getName() + "." + targetAttr.getName());
+            _mql.pushPrefix("escape mod " + EMxAdmin_mxJPO.Attribute.mxClass() + " $1", _ownerName + "." + targetAttr.getName());
             targetAttr.calcDelta(_paramCache, _mql, curAttr);
             _mql.popPrefix();
         }

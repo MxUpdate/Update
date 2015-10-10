@@ -19,6 +19,7 @@ import java.util.Arrays;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
+import org.mxupdate.test.data.datamodel.helper.LocalPathTypeDataList;
 import org.mxupdate.test.data.datamodel.helper.LocaleAttributeList;
 
 /**
@@ -30,7 +31,9 @@ public class TypeData
     extends AbstractDataWithTrigger<TypeData>
 {
     /** Local attributes. */
-    private final LocaleAttributeList attributes = new LocaleAttributeList();
+    private final LocaleAttributeList localAttributes = new LocaleAttributeList();
+    /** Local path types. */
+    private final LocalPathTypeDataList localPathTypes = new LocalPathTypeDataList();
 
     /**
      * Initialize this type data with given <code>_name</code>.
@@ -51,13 +54,25 @@ public class TypeData
      * @param _attributes    attributes list to append
      * @return this type data instance
      */
-    public TypeData addLocalAttribute(final AbstractAttributeData<?>... _attributes)
+    public TypeData addLocalAttribute(final AbstractAttributeData<?>... _localAttributes)
     {
-        this.attributes.addAll(Arrays.asList(_attributes));
+        this.localAttributes.addAll(Arrays.asList(_localAttributes));
         return this;
     }
 
-    @Override()
+    /**
+     * Appends given {@code _localPathTypes}.
+     *
+     * @param _localPathTypes       local path types to append
+     * @return this type data instance
+     */
+    public TypeData addLocalPathType(final PathTypeData... _localPathTypes)
+    {
+        this.localPathTypes.addAll(Arrays.asList(_localPathTypes));
+        return this;
+    }
+
+    @Override
     public String ciFile()
     {
         final StringBuilder strg = new StringBuilder();
@@ -69,7 +84,8 @@ public class TypeData
         this.getSingles()   .append4Update("    ", strg);
         this.getKeyValues() .append4Update("    ", strg);
         this.getDatas()     .append4Update("    ", strg);
-        this.attributes     .append4Update("    ", strg);
+        this.localAttributes.append4Update("    ", strg);
+        this.localPathTypes .append4Update("    ", strg);
         this.getTriggers()  .append4Update("    ", strg);
         this.getProperties().append4Update("    ", strg);
 
@@ -78,11 +94,12 @@ public class TypeData
         return strg.toString();
     }
 
-    @Override()
+    @Override
     public void checkExport(final ExportParser _exportParser)
     {
         super.checkExport(_exportParser);
 
-        this.attributes.checkExport(_exportParser);
+        this.localAttributes.checkExport(_exportParser);
+        this.localPathTypes .checkExport(_exportParser);
     }
 }

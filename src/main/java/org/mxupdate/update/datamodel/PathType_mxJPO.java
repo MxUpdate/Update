@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO;
@@ -205,36 +206,35 @@ public class PathType_mxJPO
 
     @Override
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
-            final MultiLineMqlBuilder _mql, final PathType_mxJPO _current)
-            throws UpdateException_mxJPO
+                             final MultiLineMqlBuilder _mql,
+                             final PathType_mxJPO _current)
+        throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
-        DeltaUtil_mxJPO.calcValueDelta(  _mql,              "description",              this.getDescription(),  _current.getDescription());
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), (_current != null) ? _current.getSymbolicNames() : null);
+        DeltaUtil_mxJPO.calcValueDelta(  _mql,              "description",              this.getDescription(),  (_current != null) ? _current.getDescription() : null);
 
         // from
         _mql.pushPrefixByAppending("from");
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "cardinality",  this.fromCardinality.name().toLowerCase(), _current.fromCardinality.name().toLowerCase());
-        DeltaUtil_mxJPO.calcListDelta( _mql, "type",         this.fromTypeAll,     this.fromTypes,      _current.fromTypeAll,     _current.fromTypes);
-        DeltaUtil_mxJPO.calcListDelta( _mql, "relationship", this.fromRelationAll, this.fromRelations,  _current.fromRelationAll, _current.fromRelations);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "cardinality",  this.fromCardinality.name().toLowerCase(), (_current != null) ? _current.fromCardinality.name().toLowerCase() : null);
+        DeltaUtil_mxJPO.calcListDelta( _mql, "type",         this.fromTypeAll,     this.fromTypes,      (_current != null) ? _current.fromTypeAll : false,     (_current != null) ? _current.fromTypes : null);
+        DeltaUtil_mxJPO.calcListDelta( _mql, "relationship", this.fromRelationAll, this.fromRelations,  (_current != null) ? _current.fromRelationAll : false, (_current != null) ? _current.fromRelations : null);
         _mql.popPrefix();
 
         // to
         _mql.pushPrefixByAppending("to");
-        DeltaUtil_mxJPO.calcListDelta( _mql, "type",         this.toTypeAll,       this.toTypes,        _current.toTypeAll,       _current.toTypes);
-        DeltaUtil_mxJPO.calcListDelta( _mql, "relationship", this.toRelationAll,   this.toRelations,    _current.toRelationAll,   _current.toRelations);
+        DeltaUtil_mxJPO.calcListDelta( _mql, "type",         this.toTypeAll,       this.toTypes,        (_current != null) ? _current.toTypeAll : false,       (_current != null) ? _current.toTypes : null);
+        DeltaUtil_mxJPO.calcListDelta( _mql, "relationship", this.toRelationAll,   this.toRelations,    (_current != null) ? _current.toRelationAll : false,   (_current != null) ? _current.toRelations : null);
         _mql.popPrefix();
-
 
         DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql,
                 "attribute",
                 ErrorKey.DM_PATHTYPE_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
                 ValueKeys.DMPathTypeAttrIgnore, ValueKeys.DMPathTypeAttrRemove,
-                this.globalAttributes, _current.globalAttributes);
+                this.globalAttributes, (_current != null) ? _current.globalAttributes : null);
         this.localAttributes.calcDelta(_paramCache, _mql,
-                this,
+                EMxAdmin_mxJPO.PathType, this.getName(),
                 ErrorKey.DM_PATHTYPE_REMOVE_LOCAL_ATTRIBUTE,
-                _current.localAttributes);
-
+                (_current != null) ? _current.localAttributes : null);
     }
 
     /**

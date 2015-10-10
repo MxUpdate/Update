@@ -22,6 +22,7 @@ import org.mxupdate.test.data.datamodel.AttributeDateData;
 import org.mxupdate.test.data.datamodel.AttributeIntegerData;
 import org.mxupdate.test.data.datamodel.AttributeRealData;
 import org.mxupdate.test.data.datamodel.AttributeStringData;
+import org.mxupdate.test.data.datamodel.PathTypeData;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -57,6 +58,9 @@ public class TypeCI_2DeltaCalculationTest
             {"2) description",
                     new TypeData(this, "Test"),
                     new TypeData(this, "Test").setValue("description", "abc def")},
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // local attribute
 
             {"101) binary attribute",
                 new TypeData(this, "Test"),
@@ -134,6 +138,20 @@ public class TypeCI_2DeltaCalculationTest
                                     .setFlag("multiline", false, Create.ViaFlag)
                                     .setSingle("maxlength", "0")
                                     .setValue("default", "")) },
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // local path type
+
+            {"301) simple local path type",
+                new TypeData(this, "Test"),
+                new TypeData(this, "Test")
+                        .addLocalPathType(new PathTypeData(this, "PathType").def4FromSingle("cardinality", "many")) },
+            {"302) local path type with embedded local attribute",
+                new TypeData(this, "Test"),
+                new TypeData(this, "Test")
+                        .addLocalPathType(new PathTypeData(this, "PathType")
+                                .def4FromSingle("cardinality", "many")
+                                .addLocalAttribute(new AttributeStringData(this, "PathType Attribute").setSingle("kind", "string"))) },
        };
     }
 
@@ -143,6 +161,13 @@ public class TypeCI_2DeltaCalculationTest
     public void cleanup()
         throws MatrixException
     {
+        this.cleanup(AbstractTest.CI.DM_PATHTYPE);  // as first, so that local attributes of path types are deleted!
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BINARY);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BOOLEAN);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_DATE);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_INTEGER);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_REAL);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_STRING);
         this.cleanup(AbstractTest.CI.DM_TYPE);
     }
 

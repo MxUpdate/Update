@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO;
@@ -202,7 +203,7 @@ public class Interface_mxJPO
         DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql, "attribute",
                 ErrorKey.DM_INTERFACE_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
                 ValueKeys.DMInterfaceAttrIgnore, ValueKeys.DMInterfaceAttrRemove,       this.attributes,                    _current.attributes);
-        this.localAttributes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_INTERFACE_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
+        this.localAttributes.calcDelta(_paramCache, _mql, EMxAdmin_mxJPO.Interface, this.getName(), ErrorKey.DM_INTERFACE_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
 
         DeltaUtil_mxJPO.calcLstOneCallDelta(_paramCache, _mql, "derived",
                 ErrorKey.DM_INTERFACE_REMOVE_PARENT, this.getName(),

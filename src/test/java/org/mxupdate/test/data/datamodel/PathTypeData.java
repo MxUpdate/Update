@@ -89,7 +89,7 @@ public class PathTypeData
      * @return this path type data instance
      */
     public PathTypeData def4FromData(final String _key,
-                                    final AbstractAdminData<?> _data)
+                                     final AbstractAdminData<?> _data)
     {
         this.fromDatas.add(_key, _data);
         return this;
@@ -141,31 +141,41 @@ public class PathTypeData
         final StringBuilder strg = new StringBuilder();
         this.append4CIFileHeader(strg);
         strg.append("mxUpdate " + this.getCI().getMxType() + " \"${NAME}\" {\n");
-
-        this.getFlags()     .append4Update("    ", strg);
-        this.getValues()    .append4Update("    ", strg);
-        this.getSingles()   .append4Update("    ", strg);
-        this.getKeyValues() .append4Update("    ", strg);
-        this.getDatas()     .append4Update("    ", strg);
-
-        // from
-        strg.append("    from {\n");
-        this.fromSingles    .append4Update("        ", strg);
-        this.fromDatas      .append4Update("        ", strg);
-        strg.append("    }\n");
-
-        // to
-        strg.append("    to {\n");
-        this.toSingles      .append4Update("        ", strg);
-        this.toDatas        .append4Update("        ", strg);
-        strg.append("    }\n");
-
-        this.attributes     .append4Update("    ", strg);
-        this.getProperties().append4Update("    ", strg);
-
+        this.append4Update("    ", strg);
         strg.append("}");
 
         return strg.toString();
+    }
+
+    /**
+     * Method to append all data for the path type CI file.
+     *
+     * @param _prefix   prefix
+     * @param _strg     string builder to append
+     */
+    public void append4Update(final String _prefix,
+                              final StringBuilder _strg)
+    {
+        this.getFlags()     .append4Update(_prefix, _strg);
+        this.getValues()    .append4Update(_prefix, _strg);
+        this.getSingles()   .append4Update(_prefix, _strg);
+        this.getKeyValues() .append4Update(_prefix, _strg);
+        this.getDatas()     .append4Update(_prefix, _strg);
+
+        // from
+        _strg.append("    from {\n");
+        this.fromSingles    .append4Update(_prefix + "    ", _strg);
+        this.fromDatas      .append4Update(_prefix + "    ", _strg);
+        _strg.append("    }\n");
+
+        // to
+        _strg.append("    to {\n");
+        this.toSingles      .append4Update(_prefix + "    ", _strg);
+        this.toDatas        .append4Update(_prefix + "    ", _strg);
+        _strg.append("    }\n");
+
+        this.attributes     .append4Update(_prefix, _strg);
+        this.getProperties().append4Update(_prefix, _strg);
     }
 
     @Override()

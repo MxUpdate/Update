@@ -348,7 +348,27 @@ public class TypeCI_3UpdateTest
                 .checkExport();
     }
 
-    @Override()
+    /**
+     * Negative test if an local path type is removed.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test if an local path type is removed")
+    public void t9_negativeTestLocalPathTypeRemoved()
+        throws Exception
+    {
+        final TypeData typeDef = this.createNewData("Test").create();
+        this.mql("escape add pathtype \"MXUPDATE_Test\" owner type \"" + AbstractTest.convertMql(typeDef.getName()) + "\"");
+        typeDef.failureUpdate(ErrorKey.DM_TYPE_REMOVE_LOCAL_PATH_TYPE);
+    }
+
+    /**
+     * Creates for given {@code _name} related type data instance.
+     *
+     * @param _name     name of the type
+     * @return new created data instance
+     */
+    @Override
     protected TypeData createNewData(final String _name)
     {
         return new TypeData(this, _name);
@@ -359,12 +379,13 @@ public class TypeCI_3UpdateTest
     public void cleanup()
         throws Exception
     {
+        this.cleanup(AbstractTest.CI.DM_PATHTYPE);  // as first, so that local attributes of path types are deleted!
         this.cleanup(AbstractTest.CI.PRG_MQL);
+        this.cleanup(AbstractTest.CI.DM_TYPE);
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BOOLEAN);
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_DATE);
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_INTEGER);
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_REAL);
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_STRING);
-        this.cleanup(AbstractTest.CI.DM_TYPE);
     }
 }
