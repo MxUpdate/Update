@@ -134,7 +134,7 @@ public class PersonAdmin_mxJPO
     private final SortedSet<String> products = new TreeSet<>();
 
     /** All assigned types of the person. */
-    private final Set<TypeItem> types = new TreeSet<>();
+    private final SortedSet<TypeItem> types = new TreeSet<>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -351,7 +351,7 @@ public class PersonAdmin_mxJPO
     public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
-                //                  tag              | default | value                              | write?
+                //                  tag              | default | value                     | write?
                 .stringNotNull( "uuid",                          this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(                   "symbolicname",         this.getSymbolicNames())
                 .string(                 "comment",              this.getDescription())
@@ -370,7 +370,7 @@ public class PersonAdmin_mxJPO
                 .string(                 "fullname",             this.fullName)
                 .string(                 "phone",                this.phone)
                 .listOneLineSingle(      "product",              this.products)
-                .listOneLineSingleIfTrue("type",                 this.getTypes(),          !this.types.isEmpty())
+                .listOneLineSingle(      "type",                 this.getTypes())
                 .stringIfTrue(           "vault",                this.vault,               this.vault != null && !this.vault.isEmpty())
                 .stringIfTrue(           "application",          this.application,         this.application != null && !this.application.isEmpty())
                 .stringIfTrue(           "site",                 this.getSite(),           this.getSite() != null && !this.getSite().isEmpty())
