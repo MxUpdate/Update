@@ -23,23 +23,25 @@ interface PageParserConstants_mxJPO {
   /** RegularExpression Id. */
   int CONTENT = 10;
   /** RegularExpression Id. */
-  int STRING = 11;
+  int FILE = 11;
   /** RegularExpression Id. */
-  int SINGLE = 12;
+  int STRING = 12;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 13;
+  int SINGLE = 13;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 14;
+  int MULTILINESTRING = 14;
   /** RegularExpression Id. */
-  int PROPERTY = 15;
+  int MULTILINESINGLE = 15;
   /** RegularExpression Id. */
-  int PROPERTYTO = 16;
+  int PROPERTY = 16;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 17;
+  int PROPERTYTO = 17;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 18;
+  int PROPERTYVAL = 18;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 19;
+  int ADMINTYPE_STRING = 19;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 20;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -63,6 +65,7 @@ interface PageParserConstants_mxJPO {
     "\"!hidden\"",
     "\"mime\"",
     "\"content\"",
+    "\"file\"",
     "<STRING>",
     "<SINGLE>",
     "<MULTILINESTRING>",

@@ -62,7 +62,7 @@ public class Page_mxJPO
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-        new PageParser_mxJPO(new StringReader(_code)).parse(this);
+        new PageParser_mxJPO(new StringReader(_code)).parse(_file, this);
         this.prepare();
     }
 

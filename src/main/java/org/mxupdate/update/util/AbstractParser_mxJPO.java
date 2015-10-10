@@ -15,6 +15,9 @@
 
 package org.mxupdate.update.util;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
@@ -279,6 +282,50 @@ public abstract class AbstractParser_mxJPO
         }
 
         return this.decode(token, idxStart, idxEnd);
+    }
+
+    /**
+     * Reads the content from file.
+     *
+     * @param _parseFile    parsed file
+     * @param _fileToRead   file to read content
+     * @return content
+     * @throws ParseException if file read failed
+     */
+    protected String getFileFromCode(final File _parseFile,
+                                     final String _fileToRead)
+        throws ParseException
+    {
+        // eval file name
+        final String fileName = this.getString(_fileToRead);
+
+        // code via file
+        final File tmpFile;
+        // absolute path?
+        if (fileName.startsWith("/"))  {
+            tmpFile = new File(fileName);
+        } else  {
+            tmpFile = new File(_parseFile.getParent(), fileName);
+        }
+
+        // read file content
+        final StringBuilder ret = new StringBuilder();
+        try  {
+            int len;
+            final char[] chr = new char[4096];
+            final FileReader reader = new FileReader(tmpFile);
+            try {
+                while ((len = reader.read(chr)) > 0) {
+                    ret.append(chr, 0, len);
+                }
+            } finally {
+                reader.close();
+            }
+        } catch (final IOException e)  {
+            throw new ParseException("unknown file " + _fileToRead);
+        }
+
+        return ret.toString();
     }
 
     /**
