@@ -197,40 +197,37 @@ public final class TypeDef_mxJPO
                                           final String _jpoName)
         throws Exception
     {
-        @SuppressWarnings("unchecked")
-        Map<String,String> jpos = (Map<String,String>) _paramCache.getCache(CacheKey.TypeDefJPOs);
+        Class<?> ret;
+        try  {
+            // evaluate as standard Java class
+            ret = Class.forName(_jpoName + "_mxJPO");
+        } catch (final ClassNotFoundException e)  {
+            // evaluate as JPO
+            @SuppressWarnings("unchecked")
+            Map<String,String> jpos = (Map<String,String>) _paramCache.getCache(CacheKey.TypeDefJPOs);
 
-        if (jpos == null)  {
-            jpos = new HashMap<>();
-            _paramCache.setCache(CacheKey.TypeDefJPOs, jpos);
+            if (jpos == null)  {
+                jpos = new HashMap<>();
+                _paramCache.setCache(CacheKey.TypeDefJPOs, jpos);
 
-            final String tmp = MqlBuilder_mxJPO.mql()
-                    .cmd("escape list program ").arg("org.mxupdate.*")
-                    .cmd(" select ").arg("name").cmd(" ").arg("classname")
-                    .cmd(" dump ").arg("\t").exec(_paramCache);
+                final String tmp = MqlBuilder_mxJPO.mql()
+                        .cmd("escape list program ").arg("org.mxupdate.*")
+                        .cmd(" select ").arg("name").cmd(" ").arg("classname")
+                        .cmd(" dump ").arg("\t").exec(_paramCache);
 
-            for (final String line : tmp.split("\n"))  {
-                final String[] arr = line.split("\t");
-                if (arr.length > 1)  {
-                    jpos.put(arr[0], arr[1]);
+                for (final String line : tmp.split("\n"))  {
+                    final String[] arr = line.split("\t");
+                    if (arr.length > 1)  {
+                        jpos.put(arr[0], arr[1]);
+                    }
                 }
             }
-        }
-        final String jpoClassName = jpos.get(_jpoName);
-        if (jpoClassName == null)  {
-            throw new Exception("unknown jpo class definition for " + _jpoName);
-        }
+            final String jpoClassName = jpos.get(_jpoName);
+            if (jpoClassName == null)  {
+                throw new Exception("unknown jpo class definition for " + _jpoName);
+            }
 
-        Class<?> ret;
-        try
-        {
-            // directly in MX
             ret = Class.forName(jpoClassName);
-        }
-        catch (final ClassNotFoundException e)
-        {
-            // run separately
-            ret = Class.forName(_jpoName + "_mxJPO");
         }
         return ret;
     }
