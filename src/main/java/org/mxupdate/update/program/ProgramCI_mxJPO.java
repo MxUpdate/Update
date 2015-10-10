@@ -254,7 +254,7 @@ public class ProgramCI_mxJPO
      * @throws Exception if create of JPO failed
      */
     @Override
-    public void create(final ParameterCache_mxJPO _paramCache)
+    public void createOld(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
         MqlBuilderUtil_mxJPO.mql().cmd("escape add program ").arg(this.getName()).cmd(" ").cmd(this.kind.name().toLowerCase()).exec(_paramCache.getContext());

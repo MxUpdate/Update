@@ -144,7 +144,7 @@ public class Form_mxJPO
      * @throws Exception if the web form could not be created within MX
      */
     @Override()
-    public void create(final ParameterCache_mxJPO _paramCache)
+    public void createOld(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
         MqlBuilderUtil_mxJPO.mql().cmd("escape add form ").arg(this.getName()).cmd(" web; ").exec(_paramCache.getContext());

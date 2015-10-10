@@ -199,7 +199,7 @@ public class UpdateAction_mxJPO
                    if (!existings.contains(fileEntry.getKey()))  {
                        final AbstractObject_mxJPO<?> instance = clazz.newTypeInstance(fileEntry.getKey());
                        _paramCache.logInfo("create " + clazz.getLogging() + " '" + fileEntry.getKey() + "'");
-                       instance.create(_paramCache);
+                       instance.createOld(_paramCache);
                    }
                }
            }

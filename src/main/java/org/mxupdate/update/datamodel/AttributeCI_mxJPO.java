@@ -341,7 +341,7 @@ public class AttributeCI_mxJPO
      * @see #attrTypeCreate
      */
     @Override
-    public void create(final ParameterCache_mxJPO _paramCache)
+    public void createOld(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
         MqlBuilderUtil_mxJPO.mql()

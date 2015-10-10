@@ -365,7 +365,7 @@ public class BusObject_mxJPO
      * @throws Exception if the business object could not be created
      */
     @Override()
-    public void create(final ParameterCache_mxJPO _paramCache)
+    public void createOld(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
         final BusinessObject bus = new BusinessObject(this.busType, this.busName, this.busRevision, this.getTypeDef().getMxBusVault());

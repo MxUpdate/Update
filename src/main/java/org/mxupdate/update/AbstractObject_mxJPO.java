@@ -102,7 +102,7 @@ public abstract class AbstractObject_mxJPO<CLASS extends AbstractObject_mxJPO<CL
      * @param _paramCache   parameter cache
      * @throws Exception if create failed
      */
-    public abstract void create(final ParameterCache_mxJPO _paramCache)
+    public abstract void createOld(final ParameterCache_mxJPO _paramCache)
         throws Exception;
 
     /**

@@ -258,7 +258,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
      * @throws Exception if the new administration object could not be created
      */
     @Override()
-    public void create(final ParameterCache_mxJPO _paramCache)
+    public void createOld(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
         final MqlBuilder mql = MqlBuilderUtil_mxJPO.mql().cmd("escape add ").cmd(this.mxClassDef().mxClass()).cmd(" ").arg(this.getName());

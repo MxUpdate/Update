@@ -130,7 +130,7 @@ public class WrapperCIInstance<DATA extends AbstractObject_mxJPO<?>>
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        this.data.create(_paramCache);
+        this.data.createOld(_paramCache);
     }
 
     /**
