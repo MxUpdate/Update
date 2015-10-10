@@ -55,9 +55,6 @@ public class Dispatcher_mxJPO
     /** Name of the &quot;Execute&quot; method within the parameters map. */
     private static final String METHOD_EXECUTE = "Execute"; //$NON-NLS-1$
 
-    /** Name of the &quot;Export&quot; method within the parameters map. */
-    private static final String METHOD_EXPORT = "Export"; //$NON-NLS-1$
-
     /** Name of the &quot;GetVersion&quot; method within the parameters map. */
     private static final String METHOD_GET_VERSION = "GetVersion"; //$NON-NLS-1$
 
@@ -130,8 +127,6 @@ public class Dispatcher_mxJPO
                 final Object bck;
                 if (Dispatcher_mxJPO.METHOD_EXECUTE.equals(method))  {
                     bck = new Execute_mxJPO().execute(paramCache, arguments);
-                } else if (Dispatcher_mxJPO.METHOD_EXPORT.equals(method))  {
-                    bck = new Export_mxJPO().execute(paramCache, arguments);
                 } else if (Dispatcher_mxJPO.METHOD_GET_VERSION.equals(method))  {
                     bck = new GetVersion_mxJPO().execute(paramCache, arguments);
                 } else if (Dispatcher_mxJPO.METHOD_SEARCH.equals(method))  {

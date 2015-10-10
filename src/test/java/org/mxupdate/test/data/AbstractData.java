@@ -29,7 +29,11 @@ import org.mxupdate.test.data.util.KeyNotDefinedList;
 import org.mxupdate.test.data.util.KeyValueList;
 import org.mxupdate.test.data.util.SingleValueList;
 import org.mxupdate.test.data.util.StringValueList;
+import org.mxupdate.test.test.update.WrapperCIInstance;
 import org.mxupdate.test.util.Version;
+import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.update.AbstractObject_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.Assert;
 
@@ -492,96 +496,29 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     }
 
     /**
-     * Exports this data piece from MX. The returned values from the export are
-     * checked for:
-     * <ul>
-     * <li>value is returned</li>
-     * <li>returned export value includes exact one export for given
-     *     {@link #ci configuration item type}</li>
-     * <li>name of the exported object is equal {@link #name}</li>
-     * <li>path of the exported object is equal {@link #ciFile()}</li>
-     * <li>file name of the export object is equal returned value from
-     *     {@link #getCIFileName()}</li>
-     * </ul>
+     * Exports this data piece from MX.
      *
      * @param _params       parameters
      * @return parsed export
      * @throws Exception if export failed
      */
-    public ExportParser export(final String... _params)
+    public ExportParser export(final Object... _params)
         throws Exception
     {
-        final Map<String,Collection<String>> files = new HashMap<>(1);
-        files.put(this.ci.updateType, Arrays.asList(new String[]{this.getName()}));
-
         final Map<String,String> params = new HashMap<>();
         if (_params != null)  {
             for (int idx = 0; idx < _params.length; idx += 2)  {
-                params.put(_params[idx], _params[idx + 1]);
+                params.put(_params[idx].toString(), _params[idx + 1].toString());
             }
         }
 
-        final Map<?,?> bck = this.test.executeEncoded("Export",
-                                                      params,
-                                                      "TypeDef", this.ci.updateType,
-                                                      "Name", this.getName());
+        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getTest().getContext(), false);
+        final TypeDef_mxJPO typeDef = paramCache.getMapping().getTypeDef(this.getCI().updateType);
 
-        // check for no exception
-        if (bck.get("exception") != null)  {
-            throw new MatrixException((Exception) bck.get("exception"));
-        }
+        final WrapperCIInstance<AbstractObject_mxJPO<?>> resultWrapper = new WrapperCIInstance<AbstractObject_mxJPO<?>>(typeDef.newTypeInstance(this.getName()));
+        resultWrapper.parse(paramCache);
 
-        // extract values
-        final Map<?,?> values = (Map<?,?>) bck.get("values");
-
-        // check existence and element is defined
-        Assert.assertNotNull(values);
-        Assert.assertEquals((String) values.get("TypeDef"),
-                            this.ci.updateType,
-                            "check correct type definition");
-
-        // parse first element
-        final ExportParser ret = this.parseExport(
-                this.ci,
-                (String) values.get("Code"),
-                (String) bck.get("log"));
-
-        // check no error occurred in the export
-        Assert.assertFalse(
-                ret.getLog().contains("[ERROR]"),
-                "check that no error occured (have " + ret.getLog() + ")");
-
-        // check returned configuration item name
-        Assert.assertEquals(
-                (String) values.get("Name"),
-                this.name,
-                "returned name is equal to given name");
-        if (this.ci != AbstractTest.CI.PRG_JPO)  {
-            // check path of the configuration item update file
-            Assert.assertEquals(
-                    (String) values.get("FilePath"),
-                    this.getCI().filePath,
-                    "check path where the configuration item update file is located is correct");
-        } else  {
-            // check path for JPOs (because of packages...)
-            final String path;
-            if (this.name.indexOf('.') < 0)  {
-                path = this.ci.filePath;
-            } else  {
-                path = this.ci.filePath + "/" + this.name.replaceAll("\\.[^.]*$", "").replaceAll("\\.", "/");
-            }
-            Assert.assertEquals(
-                    (String) values.get("FilePath"),
-                    path,
-                    "check path where the configuration item update file is located is correct");
-        }
-        // check file name of the configuration item update file
-        Assert.assertEquals(
-                (String) values.get("FileName"),
-                this.getCIFileNameFromExport(),
-                "check that the correct configuration item file name is returned");
-
-        return ret;
+        return new ExportParser(this.getCI(), resultWrapper.write(paramCache), "");
     }
 
     /**
@@ -609,7 +546,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @see #export(String...)
      */
     @SuppressWarnings("unchecked")
-    public DATA checkExport(final String... _params)
+    public DATA checkExport(final Object... _params)
         throws Exception
     {
         this.checkExport(this.export(_params));
