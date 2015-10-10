@@ -20,12 +20,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.testng.Assert;
+
+import matrix.util.MatrixException;
 
 /**
  * The class is used to define all types of attributes, to create them and test
@@ -47,7 +47,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     private DimensionData dimension;
 
     /** Ranges of this attribute. */
-    private final Set<AbstractRange> ranges = new HashSet<AbstractRange>();
+    private final Set<AbstractRange> ranges = new HashSet<>();
 
     /**
      *
@@ -202,34 +202,45 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         this.append4CIFileHeader(strg);
 
         strg.append("mxUpdate attribute \"${NAME}\" {\n");
+        this.append4CIFile("", strg);
+        strg.append("}");
 
-        this.getFlags()     .append4Update("    ", strg);
-        this.getValues()    .append4Update("    ", strg);
-        this.getSingles()   .append4Update("    ", strg);
-        this.getTriggers()  .append4Update("    ", strg);
-        this.getProperties().append4Update("    ", strg);
+        return strg.toString();
+    }
+
+    /**
+     * Method to append all data for the attribute CI file.
+     *
+     * @param _prefix   prefix in front of the values
+     * @param _cmd cmd to append to
+     */
+    public void append4CIFile(final String _prefix,
+                              final StringBuilder _cmd)
+    {
+        this.getFlags()     .append4Update(_prefix + "    ", _cmd);
+        this.getValues()    .append4Update(_prefix + "    ", _cmd);
+        this.getSingles()   .append4Update(_prefix + "    ", _cmd);
+        this.getTriggers()  .append4Update(_prefix + "    ", _cmd);
+        this.getProperties().append4Update(_prefix + "    ", _cmd);
 
         // append rule
         if (this.rule != null) {
-            strg.append("   rule \"").append(AbstractTest.convertUpdate(this.rule.getName())).append("\"\n");
+            _cmd.append(_prefix).append("   rule \"").append(AbstractTest.convertUpdate(this.rule.getName())).append("\"\n");
         }
 
         // append dimension
         if (this.dimension != null) {
-            strg.append("     dimension \"").append(AbstractTest.convertUpdate(this.dimension.getName())).append("\"\n");
+            _cmd.append(_prefix).append("     dimension \"").append(AbstractTest.convertUpdate(this.dimension.getName())).append("\"\n");
         }
 
         // append 'adds' ranges
-        final Set<String> needAdds = new HashSet<String>();
+        final Set<String> needAdds = new HashSet<>();
         for (final AbstractRange range : this.ranges)  {
             range.evalAdds4CheckExport(needAdds);
         }
         for (final String needAdd : needAdds)  {
-            strg.append("    ").append(needAdd).append('\n');
+            _cmd.append(_prefix).append("    ").append(needAdd).append('\n');
         }
-
-        strg.append("}");
-        return strg.toString();
     }
 
     /**
@@ -255,11 +266,11 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
             _exportParser.checkValue("dimension", "\"" + AbstractTest.convertUpdate(this.dimension.getName()) + "\"");
         }
         // check for ranges
-        final Set<String> needAdds = new HashSet<String>();
+        final Set<String> needAdds = new HashSet<>();
         for (final AbstractRange range : this.ranges)  {
             range.evalAdds4CheckExport(needAdds);
         }
-        final List<String> foundAdds = new ArrayList<String>();
+        final List<String> foundAdds = new ArrayList<>();
         for (final String trigLine : _exportParser.getLines("/mxUpdate/range/@value"))  {
             foundAdds.add("range " + trigLine);
         }

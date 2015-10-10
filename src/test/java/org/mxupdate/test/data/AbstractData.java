@@ -22,8 +22,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.ExportParser;
@@ -34,6 +32,8 @@ import org.mxupdate.test.data.util.StringValueList;
 import org.mxupdate.test.util.Version;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.Assert;
+
+import matrix.util.MatrixException;
 
 /**
  * Defines common information from administration objects used to create,
@@ -70,7 +70,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     /** Maximum version. */
     private Version versionMin;
     /** Set of versions where this definition is NOT supported. */
-    private final Set<Version> versionsNotSupported = new HashSet<Version>();
+    private final Set<Version> versionsNotSupported = new HashSet<>();
 
     /**
      * Constructor to initialize this data piece.
@@ -433,9 +433,9 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
                                final String... _params)
         throws Exception
     {
-        final Map<String,String> files = new HashMap<String,String>();
+        final Map<String,String> files = new HashMap<>();
         files.put(this.getCIFileName(), _code);
-        final Map<String,String> params = new HashMap<String,String>();
+        final Map<String,String> params = new HashMap<>();
         if (_params != null)  {
             for (int idx = 0; idx < _params.length; idx += 2)  {
                 params.put(_params[idx], _params[idx + 1]);
@@ -469,9 +469,9 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
                                      final String... _params)
         throws Exception
     {
-        final Map<String,String> files = new HashMap<String,String>();
+        final Map<String,String> files = new HashMap<>();
         files.put(this.getCIFileName(), _code);
-        final Map<String,String> params = new HashMap<String,String>();
+        final Map<String,String> params = new HashMap<>();
         if (_params != null)  {
             for (int idx = 0; idx < _params.length; idx += 2)  {
                 params.put(_params[idx], _params[idx + 1]);
@@ -511,10 +511,10 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     public ExportParser export(final String... _params)
         throws Exception
     {
-        final Map<String,Collection<String>> files = new HashMap<String,Collection<String>>(1);
+        final Map<String,Collection<String>> files = new HashMap<>(1);
         files.put(this.ci.updateType, Arrays.asList(new String[]{this.getName()}));
 
-        final Map<String,String> params = new HashMap<String,String>();
+        final Map<String,String> params = new HashMap<>();
         if (_params != null)  {
             for (int idx = 0; idx < _params.length; idx += 2)  {
                 params.put(_params[idx], _params[idx + 1]);

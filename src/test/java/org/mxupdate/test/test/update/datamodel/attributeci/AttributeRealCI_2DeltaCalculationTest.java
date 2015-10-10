@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.test.update.datamodel.attributeci;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.AttributeRealData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -26,6 +24,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link AttributeCI_mxJPO real attribute CI} delta
@@ -43,11 +43,11 @@ public class AttributeRealCI_2DeltaCalculationTest
     {
         return new Object[][] {
             {"1a) symbolic name",
-                    new AttributeRealData(this, "Test"),
-                    new AttributeRealData(this, "Test").setValue("symbolicname", "attribute_123")},
+                    new AttributeRealData(this, "Test").setSingle("kind", "real"),
+                    new AttributeRealData(this, "Test").setSingle("kind", "real").setValue("symbolicname", "attribute_123")},
             {"1b) two symbolic name",
-                    new AttributeRealData(this, "Test"),
-                    new AttributeRealData(this, "Test").setValue("symbolicname", "attribute_123").setValue("symbolicname", "attribute_345")},
+                    new AttributeRealData(this, "Test").setSingle("kind", "real"),
+                    new AttributeRealData(this, "Test").setSingle("kind", "real").setValue("symbolicname", "attribute_123").setValue("symbolicname", "attribute_345")},
        };
     }
 

@@ -60,19 +60,6 @@ public class Type_mxJPO
         Type_mxJPO.IGNORED_URLS.add("/derivedFrom/typeRefList");
         Type_mxJPO.IGNORED_URLS.add("/localAttributes");
         Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList");
-        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties");
-        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/creationInfo");
-        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/creationInfo/datetime");
-        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/modificationInfo");
-        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/modificationInfo/datetime");
-        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList");
-        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history");
-        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/agent");
-        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/datetime");
-        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/event");
-        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/order");
-        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/string");
-        Type_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/propertyList");
         Type_mxJPO.IGNORED_URLS.add("/methodList");
     }
 
@@ -150,6 +137,8 @@ public class Type_mxJPO
         } else if ("/derivedFrom/typeRefList/typeRef".equals(_url))  {
             this.derived = _content;
             parsed = true;
+        } else if (_url.startsWith("/localAttributes/attributeDefList/attributeDef"))  {
+            parsed = this.localAttributes.parseAdminXMLExportEvent(_paramCache, _url.substring(46), _content);
         } else if ("/methodList/programRef".equals(_url))  {
             this.methods.add(_content);
             parsed = true;
@@ -211,6 +200,8 @@ public class Type_mxJPO
         DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql,    "attribute",
                 ErrorKey.DM_TYPE_REMOVE_ATTRIBUTE, this.getName(),
                 ValueKeys.DMTypeAttrIgnore, ValueKeys.DMTypeAttrRemove,                 this.attributes,        _current.attributes);
+
+        this.localAttributes.calcDelta(_paramCache, _mql, this, _current.localAttributes);
 
         this.getTriggers()  .calcDelta(_mql,     _current.getTriggers());
         this.getProperties().calcDelta(_mql, "", _current.getProperties());

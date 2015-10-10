@@ -167,6 +167,16 @@ public class AttributeCI_mxJPO
         }
     }
 
+    /**
+     * Returns the {@link #kind} of the attribute.
+     *
+     * @return kind of attribute
+     */
+    public Kind getKind()
+    {
+        return this.kind;
+    }
+
     @Override()
     public void parseUpdate(final File _file,
                             final String _code)
@@ -217,7 +227,7 @@ public class AttributeCI_mxJPO
 
         } else if ("/primitiveType".equals(_url))  {
             for (final Kind checkKind : Kind.values())  {
-                if (checkKind.attrTypeCreate.equals(_content))  {
+                if (checkKind.attrTypeParse.equals(_content))  {
                     this.kind = checkKind;
                     break;
                 }
@@ -354,22 +364,22 @@ public class AttributeCI_mxJPO
     {
         final AttributeCI_mxJPO current = _current;
 
-        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), current.getSymbolicNames());
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(), current.getDescription());
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "default",             this.defaultValue,     current.defaultValue);
-        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),       current.isHidden());
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), (current != null) ? current.getSymbolicNames() : null);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(), (current != null) ? current.getDescription() : null);
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "default",             this.defaultValue,     (current != null) ? current.defaultValue : null);
+        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),       (current != null) ? current.isHidden() : null);
 
         switch (this.kind)  {
             case String:
-                DeltaUtil_mxJPO.calcFlagDelta(_mql, "multiline", false, this.multiline, current.multiline);
+                DeltaUtil_mxJPO.calcFlagDelta(_mql, "multiline", false, this.multiline, (current != null) ? current.multiline : null);
                 if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsPropMaxLength))  {
-                    DeltaUtil_mxJPO.calcValueDelta(_mql, "maxlength", this.maxLength, current.maxLength);
+                    DeltaUtil_mxJPO.calcValueDelta(_mql, "maxlength", this.maxLength, (current != null) ? current.maxLength : null);
                 }
                 break;
             case Integer:
             case Real:
                 if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsDimension))  {
-                    if ((current.dimension == null) || current.dimension.isEmpty()) {
+                    if ((current == null) || (current.dimension == null) || current.dimension.isEmpty()) {
                         if ((this.dimension != null) && !this.dimension.isEmpty())  {
                             _paramCache.logDebug("    - set dimension '" + this.dimension + "'");
                             _mql.newLine().cmd("dimension ").arg(this.dimension);
@@ -385,8 +395,8 @@ public class AttributeCI_mxJPO
                 // no break, because range value is also for integer / real!
             case Date:
                 if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue))  {
-                    if (!current.rangeValue)  {
-                        DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", false, this.rangeValue, current.rangeValue);
+                    if ((current == null) || !current.rangeValue)  {
+                        DeltaUtil_mxJPO.calcFlagDelta(_mql, "rangevalue", false, this.rangeValue, (current != null) ? current.rangeValue : null);
                     } else if (!this.rangeValue)  {
                         throw new UpdateException_mxJPO(
                                 UpdateException_mxJPO.ErrorKey.ABSTRACTATTRIBUTE_UPDATE_RANGEVALUEFLAG_UPDATED,
@@ -399,8 +409,8 @@ public class AttributeCI_mxJPO
         }
 
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))  {
-            if (!current.multiValue)  {
-                DeltaUtil_mxJPO.calcFlagDelta(_mql, "multivalue", false, this.multiValue, current.multiValue);
+            if ((current == null) || !current.multiValue)  {
+                DeltaUtil_mxJPO.calcFlagDelta(_mql, "multivalue", false, this.multiValue, (current != null) ? current.multiValue : null);
             } else if (!this.multiValue)  {
                 throw new UpdateException_mxJPO(
                         UpdateException_mxJPO.ErrorKey.ABSTRACTATTRIBUTE_UPDATE_MULTIVALUEFLAG_UPDATED,
@@ -408,16 +418,16 @@ public class AttributeCI_mxJPO
             }
         }
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnClone))  {
-            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "resetonclone", false, this.resetOnClone,     current.resetOnClone);
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "resetonclone", false, this.resetOnClone, (current != null) ? current.resetOnClone : null);
         }
         if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnRevision))  {
-            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "resetonrevision", false, this.resetOnRevision,  current.resetOnRevision);
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "resetonrevision", false, this.resetOnRevision, (current != null) ? current.resetOnRevision : null);
         }
-        DeltaUtil_mxJPO.calcListDelta(_mql, "rule", this.rules, current.rules);
+        DeltaUtil_mxJPO.calcListDelta(_mql, "rule", this.rules, (current != null) ? current.rules : null);
 
-        this.triggers       .calcDelta(_mql, current.triggers);
-        this.rangesSorted   .calcDelta(_mql, current.rangesSorted);
-        this.getProperties().calcDelta(_mql, "", _current.getProperties());
+        this.triggers       .calcDelta(_mql, (current != null) ? current.triggers : null);
+        this.rangesSorted   .calcDelta(_mql, (current != null) ? current.rangesSorted : null);
+        this.getProperties().calcDelta(_mql, "", (current != null) ? _current.getProperties() : null);
     }
 
     /**
@@ -426,25 +436,37 @@ public class AttributeCI_mxJPO
     public enum Kind
     {
         /** Binary attribute. */
-        Binary("binary"),
+        Binary("binary", "binary"),
         /** Boolean attribute. */
-        Boolean("boolean"),
+        Boolean("boolean", "boolean"),
         /** Date attribute. */
-        Date("date"),
+        Date("date", "datetime"),
         /** Integer attribute. */
-        Integer("integer"),
+        Integer("integer", "integer"),
         /** Real attribute. */
-        Real("real"),
+        Real("real", "real"),
         /** String attribute. */
-        String("string");
+        String("string", "string");
 
-        Kind(final String _attrTypeCreate)
+        /** Holds the attribute type used to create and parse for a new attribute. */
+        private final String attrTypeCreate, attrTypeParse;
+
+        Kind(final String _attrTypeCreate,
+             final String _attrTypeParse)
         {
             this.attrTypeCreate = _attrTypeCreate;
+            this.attrTypeParse = _attrTypeParse;
         }
 
-        /** Holds the attribute type used to create a new attribute. */
-        private final String attrTypeCreate;
+        /**
+         * Returns the name of the attribute type used within create.
+         *
+         * @return name of attribute used within create
+         */
+        public String getAttrTypeCreate()
+        {
+            return this.attrTypeCreate;
+        }
     }
 
     /**
@@ -598,30 +620,34 @@ public class AttributeCI_mxJPO
                                  final Ranges _currents)
         {
             // remove obsolete ranges
-            for (final Range current : _currents)  {
-                boolean found = false;
-                for (final Range target : this)  {
-                    if (current.compareTo(target) == 0)  {
-                        found = true;
-                        break;
+            if (_currents != null)  {
+                for (final Range current : _currents)  {
+                    boolean found = false;
+                    for (final Range target : this)  {
+                        if (current.compareTo(target) == 0)  {
+                            found = true;
+                            break;
+                        }
                     }
-                }
-                if (!found)  {
-                    _mql.newLine()
-                        .cmd("remove range ").cmd(current.type).cmd(" ").arg(current.value1);
-                    if ("between".equals(current.type))  {
-                        _mql.cmd(" ").cmd(current.include1 ? "inclusive" : "exclusive")
-                            .cmd(" ").arg(current.value2).cmd(" ").cmd(current.include2 ? "inclusive" : "exclusive");
+                    if (!found)  {
+                        _mql.newLine()
+                            .cmd("remove range ").cmd(current.type).cmd(" ").arg(current.value1);
+                        if ("between".equals(current.type))  {
+                            _mql.cmd(" ").cmd(current.include1 ? "inclusive" : "exclusive")
+                                .cmd(" ").arg(current.value2).cmd(" ").cmd(current.include2 ? "inclusive" : "exclusive");
+                        }
                     }
                 }
             }
             // append new ranges
             for (final Range target : this)  {
                 boolean found = false;
-                for (final Range current : _currents)  {
-                    if (current.compareTo(target) == 0)  {
-                        found = true;
-                        break;
+                if (_currents != null)  {
+                    for (final Range current : _currents)  {
+                        if (current.compareTo(target) == 0)  {
+                            found = true;
+                            break;
+                        }
                     }
                 }
                 if (!found)  {

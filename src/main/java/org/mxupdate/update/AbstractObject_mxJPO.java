@@ -19,8 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -29,6 +27,8 @@ import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+
+import matrix.util.MatrixException;
 
 /**
  * Abstract class from which must be derived for exporting and importing all
@@ -43,7 +43,7 @@ public abstract class AbstractObject_mxJPO<CLASS extends AbstractObject_mxJPO<CL
     private final TypeDef_mxJPO typeDef;
 
     /** MX Name of the administration object. */
-    private final String mxName;
+    private String mxName;
 
     /** Description of the C object. */
     private String description = "";
@@ -209,6 +209,16 @@ public abstract class AbstractObject_mxJPO<CLASS extends AbstractObject_mxJPO<CL
     public abstract String getPropValue(final ParameterCache_mxJPO _paramCache,
                                         final PropertyDef_mxJPO _prop)
         throws MatrixException;
+
+    /**
+     * Defines the {@link #mxName} of this data piece.
+     *
+     * @param _mxName   new MX name of the data piece
+     */
+    protected void setName(final String _mxName)
+    {
+        this.mxName = _mxName;
+    }
 
     /**
      * Getter method for instance variable {@link #mxName}.

@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.test.update.datamodel.attributeci;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.AttributeStringData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -26,6 +24,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link AttributeCI_mxJPO attribute} delta calculation.
@@ -42,14 +42,14 @@ public class AttributeStringCI_2DeltaCalculationTest
     {
         return new Object[][] {
             {"1a) symbolic name",
-                    new AttributeStringData(this, "Test"),
-                    new AttributeStringData(this, "Test").setValue("symbolicname", "attribute_123")},
+                    new AttributeStringData(this, "Test").setSingle("kind", "string"),
+                    new AttributeStringData(this, "Test").setSingle("kind", "string").setValue("symbolicname", "attribute_123")},
             {"1b) two symbolic name",
-                    new AttributeStringData(this, "Test"),
-                    new AttributeStringData(this, "Test").setValue("symbolicname", "attribute_123").setValue("symbolicname", "attribute_345")},
+                    new AttributeStringData(this, "Test").setSingle("kind", "string"),
+                    new AttributeStringData(this, "Test").setSingle("kind", "string").setValue("symbolicname", "attribute_123").setValue("symbolicname", "attribute_345")},
             {"2) with maxlength",
-                    new AttributeStringData(this, "Test"),
-                    new AttributeStringData(this, "Test").setSingle("maxlength", "5")},
+                    new AttributeStringData(this, "Test").setSingle("kind", "string"),
+                    new AttributeStringData(this, "Test").setSingle("kind", "string").setSingle("maxlength", "5")},
        };
     }
 

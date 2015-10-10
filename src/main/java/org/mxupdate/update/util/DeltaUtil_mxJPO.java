@@ -59,15 +59,17 @@ public final class DeltaUtil_mxJPO
 
         _mql.pushPrefix("");
 
-        for (final String oldSymbName : _oldSymbNames)  {
-            if (!_newSymbNames.contains(oldSymbName))  {
-                _paramCache.logTrace("    - remove symbolic name '" + oldSymbName + "'");
-                _mql.newLine().cmd("escape delete property ").arg(oldSymbName)
-                        .cmd(" on program ").arg(symbProg)
-                        .cmd(" to ").cmd(_typeDef.getMxAdminName()).cmd(" ")
-                        .arg(_name);
-                if ((_typeDef.getMxAdminSuffix() != null) && !_typeDef.getMxAdminSuffix().isEmpty())  {
-                    _mql.cmd(" ").cmd(_typeDef.getMxAdminSuffix());
+        if (_oldSymbNames != null)  {
+            for (final String oldSymbName : _oldSymbNames)  {
+                if (!_newSymbNames.contains(oldSymbName))  {
+                    _paramCache.logTrace("    - remove symbolic name '" + oldSymbName + "'");
+                    _mql.newLine().cmd("escape delete property ").arg(oldSymbName)
+                            .cmd(" on program ").arg(symbProg)
+                            .cmd(" to ").cmd(_typeDef.getMxAdminName()).cmd(" ")
+                            .arg(_name);
+                    if ((_typeDef.getMxAdminSuffix() != null) && !_typeDef.getMxAdminSuffix().isEmpty())  {
+                        _mql.cmd(" ").cmd(_typeDef.getMxAdminSuffix());
+                    }
                 }
             }
         }
@@ -171,7 +173,7 @@ public final class DeltaUtil_mxJPO
                                      final SortedSet<String> _new,
                                      final SortedSet<String> _current)
     {
-        boolean equal = (_current.size() == _new.size());
+        boolean equal = (_current != null) && (_current.size() == _new.size());
         if (equal)  {
             for (final String format : _current)  {
                 if (!_new.contains(format))  {
@@ -181,14 +183,16 @@ public final class DeltaUtil_mxJPO
             }
         }
         if (!equal)  {
-            for (final String curValue : _current)  {
-                if (!_new.contains(curValue))  {
-                    _mql.newLine()
-                        .cmd("remove ").cmd(_kind).cmd(" ").arg(curValue);
+            if (_current != null)  {
+                for (final String curValue : _current)  {
+                    if (!_new.contains(curValue))  {
+                        _mql.newLine()
+                            .cmd("remove ").cmd(_kind).cmd(" ").arg(curValue);
+                    }
                 }
             }
             for (final String newValue : _new)  {
-                if (!_current.contains(newValue))  {
+                if ((_current == null) || !_current.contains(newValue))  {
                     _mql.newLine()
                         .cmd("add ").cmd(_kind).cmd(" ").arg(newValue);
                 }
@@ -298,13 +302,13 @@ public final class DeltaUtil_mxJPO
                                      final SortedSet<String> _current)
         throws UpdateException_mxJPO
     {
-        final Set<String> ignoreElems = new HashSet<String>();
+        final Set<String> ignoreElems = new HashSet<>();
         final Collection<String> tmp1 = _paramCache.getValueList(_keyIgnore);
         if (tmp1 != null)  {
             ignoreElems.addAll(tmp1);
         }
 
-        final Set<String> removeElems = new HashSet<String>();
+        final Set<String> removeElems = new HashSet<>();
         final Collection<String> tmp2 = _paramCache.getValueList(_keyRemove);
         if (tmp2 != null)  {
             removeElems.addAll(tmp2);
@@ -378,13 +382,13 @@ public final class DeltaUtil_mxJPO
                                            final SortedSet<String> _current)
         throws UpdateException_mxJPO
     {
-        final Set<String> ignoreElems = new HashSet<String>();
+        final Set<String> ignoreElems = new HashSet<>();
         final Collection<String> tmp1 = _paramCache.getValueList(_keyIgnore);
         if (tmp1 != null)  {
             ignoreElems.addAll(tmp1);
         }
 
-        final Set<String> removeElems = new HashSet<String>();
+        final Set<String> removeElems = new HashSet<>();
         final Collection<String> tmp2 = _paramCache.getValueList(_keyRemove);
         if (tmp2 != null)  {
             removeElems.addAll(tmp2);
@@ -400,7 +404,7 @@ public final class DeltaUtil_mxJPO
             }
         }
         if (!equal)  {
-            final SortedSet<String> newComplVals = new TreeSet<String>(_new);
+            final SortedSet<String> newComplVals = new TreeSet<>(_new);
 
             for (final String curValue : _current)  {
                 if (!_new.contains(curValue))  {
