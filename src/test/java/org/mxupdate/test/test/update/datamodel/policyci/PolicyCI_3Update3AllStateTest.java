@@ -27,8 +27,8 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-public class PolicyCI_5AllState_Test
-    extends AbstractPolicyTest
+public class PolicyCI_3Update3AllStateTest
+    extends Abstract_3UpdateTest
 {
     /**
      * Data provider for test policies.

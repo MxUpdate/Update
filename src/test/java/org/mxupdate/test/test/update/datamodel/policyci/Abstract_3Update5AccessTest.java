@@ -26,8 +26,8 @@ import org.testng.annotations.DataProvider;
  *
  * @author The MxUpdate Team
  */
-public abstract class AbstractPolicy_AccessTest
-    extends AbstractPolicyTest
+public abstract class Abstract_3Update5AccessTest
+    extends Abstract_3UpdateTest
     implements IAccessTest
 {
     /**

@@ -27,8 +27,8 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class PolicyCI_5AllStateAccessTest
-    extends AbstractPolicy_AccessTest
+public class PolicyCI_3Update4AllStateAccessTest
+    extends Abstract_3Update5AccessTest
 {
     /**
      * Returns text string &quot;policy with allstate&quot;.

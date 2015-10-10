@@ -28,7 +28,7 @@ import org.testng.annotations.BeforeMethod;
  *
  * @author The MxUpdate Team
  */
-public abstract class AbstractPolicyTest
+public abstract class Abstract_3UpdateTest
     extends AbstractDataExportUpdate<PolicyData>
 {
     /**

@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-public class PolicyCI_6StateAccessPublicTest
+public class PolicyCI_3Update5StateAccessPublicTest
     extends AbstractTest
 {
     /**

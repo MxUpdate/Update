@@ -40,8 +40,8 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-public class PolicyCI_3UpdateTest
-    extends AbstractPolicyTest
+public class PolicyCI_3Update1Test
+    extends Abstract_3UpdateTest
 {
     /** Name of test policy. */
     private static final String POLICY_NAME = AbstractTest.PREFIX + "Test";
@@ -51,11 +51,11 @@ public class PolicyCI_3UpdateTest
               "################################################################################\n"
             + "# POLICY:\n"
             + "# ~~~~~~~\n"
-            + "# " + PolicyCI_3UpdateTest.POLICY_NAME + "\n"
+            + "# " + PolicyCI_3Update1Test.POLICY_NAME + "\n"
             + "#\n"
             + "# SYMBOLIC NAME:\n"
             + "# ~~~~~~~~~~~~~~\n"
-            + "# policy_" + PolicyCI_3UpdateTest.POLICY_NAME + "\n"
+            + "# policy_" + PolicyCI_3Update1Test.POLICY_NAME + "\n"
             + "#\n"
             + "# DESCRIPTION:\n"
             + "# ~~~~~~~~~~~~\n"
@@ -406,14 +406,14 @@ public class PolicyCI_3UpdateTest
     public void positiveTestExportNoPropertyDefinitionForStateSymbolicName()
         throws Exception
     {
-        this.mql("add policy " + PolicyCI_3UpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyCI_3Update1Test.POLICY_NAME
                 + " state create property state_create value create");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyCI_3UpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyCI_3Update1Test.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyCI_3UpdateTest.POLICY_NAME + ".mxu",
+                            "POLICY_" + PolicyCI_3Update1Test.POLICY_NAME + ".mxu",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(code.indexOf("mql add property \"state_create\"") < 0,
@@ -431,14 +431,14 @@ public class PolicyCI_3UpdateTest
     public void positiveTestExportAllSymbolicNamesForStatesDefined()
         throws Exception
     {
-        this.mql("add policy " + PolicyCI_3UpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyCI_3Update1Test.POLICY_NAME
                 + " state create property state_create value create property state_exists value create");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyCI_3UpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyCI_3Update1Test.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyCI_3UpdateTest.POLICY_NAME + ".mxu",
+                            "POLICY_" + PolicyCI_3Update1Test.POLICY_NAME + ".mxu",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(code.indexOf("registeredname \"state_create\"") >= 0,
@@ -458,14 +458,14 @@ public class PolicyCI_3UpdateTest
     public void positiveTestExportStateSymbolicNameExportedIfNotDefined()
         throws Exception
     {
-        this.mql("add policy " + PolicyCI_3UpdateTest.POLICY_NAME
+        this.mql("add policy " + PolicyCI_3Update1Test.POLICY_NAME
                 + " state create");
 
-        final Export export = this.export(CI.DM_POLICY, PolicyCI_3UpdateTest.POLICY_NAME);
+        final Export export = this.export(CI.DM_POLICY, PolicyCI_3Update1Test.POLICY_NAME);
 
         Assert.assertEquals(export.getPath(), "datamodel/policy", "path is not correct");
         Assert.assertEquals(export.getFileName(),
-                            "POLICY_" + PolicyCI_3UpdateTest.POLICY_NAME + ".mxu",
+                            "POLICY_" + PolicyCI_3Update1Test.POLICY_NAME + ".mxu",
                             "check that the correct file name is returned");
         final String code = export.getCode();
         Assert.assertTrue(code.indexOf("registeredname \"state_create\"") >= 0,
@@ -482,7 +482,7 @@ public class PolicyCI_3UpdateTest
     public void positiveTestUpdateFormatAllWithBraces()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, PolicyCI_3Update1Test.POLICY_NAME);
 
         final String updateCode =
             "mxUpdate policy \"${NAME}\" {\n"
@@ -507,7 +507,7 @@ public class PolicyCI_3UpdateTest
     public void positiveTestUpdateFormatAllWithoutBraces()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, PolicyCI_3Update1Test.POLICY_NAME);
 
         final String updateCode =
             "mxUpdate policy \"${NAME}\" {\n"
@@ -532,7 +532,7 @@ public class PolicyCI_3UpdateTest
     public void positiveTestUpdateMultipleStateSymbolicNames()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, PolicyCI_3Update1Test.POLICY_NAME);
 
         policy.updateWithCode(
                     "mxUpdate policy \"${NAME}\" {"
@@ -567,11 +567,11 @@ public class PolicyCI_3UpdateTest
     public void positiveTestUpdateNullProperties()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, PolicyCI_3Update1Test.POLICY_NAME);
 
         this.mql("add policy " + policy.getName() + " state Pending property \"\" value Test");
 
-        policy.updateWithCode(PolicyCI_3UpdateTest.POLICY_UPDATE_CODE, (String) null);
+        policy.updateWithCode(PolicyCI_3Update1Test.POLICY_UPDATE_CODE, (String) null);
 
         // check that only 11 properties are defined....
         // 4 state properties + installer + installed date + original name +
@@ -598,9 +598,9 @@ public class PolicyCI_3UpdateTest
     public void positiveTestUpdateProperties()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, PolicyCI_3Update1Test.POLICY_NAME);
 
-        policy.updateWithCode(PolicyCI_3UpdateTest.POLICY_UPDATE_CODE, (String) null);
+        policy.updateWithCode(PolicyCI_3Update1Test.POLICY_UPDATE_CODE, (String) null);
 
         Assert.assertTrue(!"".equals(this.mql("list policy " + policy.getName())),
                           "policy was not created!");
@@ -628,7 +628,7 @@ public class PolicyCI_3UpdateTest
     public void positiveTestUpdateTypeAllWithBraces()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, PolicyCI_3Update1Test.POLICY_NAME);
 
         final String updateCode =
               "mxUpdate policy \"${NAME}\" {\n"
@@ -653,7 +653,7 @@ public class PolicyCI_3UpdateTest
     public void positiveTestUpdateTypeAllWithoutBraces()
         throws Exception
     {
-        final PolicyData policy = new PolicyData(this, PolicyCI_3UpdateTest.POLICY_NAME);
+        final PolicyData policy = new PolicyData(this, PolicyCI_3Update1Test.POLICY_NAME);
 
         final String updateCode =
             "mxUpdate policy \"${NAME}\" {\n"

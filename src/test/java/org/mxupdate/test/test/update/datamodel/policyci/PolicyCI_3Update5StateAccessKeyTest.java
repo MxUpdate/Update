@@ -31,8 +31,8 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class PolicyCI_6StateAccessKeyTest
-    extends AbstractPolicyTest
+public class PolicyCI_3Update5StateAccessKeyTest
+    extends Abstract_3UpdateTest
 {
     /**
      * Data provider for test policies.
@@ -316,7 +316,7 @@ public class PolicyCI_6StateAccessKeyTest
                                 .defNotSupported(Version.V6R2011x)
                                 .addState(new State() {
                                     {
-                                        final PersonAdminData user = new PersonAdminData(PolicyCI_6StateAccessKeyTest.this, "creator");
+                                        final PersonAdminData user = new PersonAdminData(PolicyCI_3Update5StateAccessKeyTest.this, "creator");
                                         this.setName("create")
                                             .addAccess(
                                                     new Access()
@@ -365,7 +365,7 @@ public class PolicyCI_6StateAccessKeyTest
                                 .defNotSupported(Version.V6R2011x)
                                 .addState(new State() {
                                     {
-                                        final PersonAdminData user = new PersonAdminData(PolicyCI_6StateAccessKeyTest.this, "creator");
+                                        final PersonAdminData user = new PersonAdminData(PolicyCI_3Update5StateAccessKeyTest.this, "creator");
                                         this.setName("create")
                                             .addAccess(
                                                     new Access()
@@ -417,7 +417,7 @@ public class PolicyCI_6StateAccessKeyTest
                                 .defNotSupported(Version.V6R2011x)
                                 .addState(new State()  {
                                     {
-                                        final PersonAdminData user = new PersonAdminData(PolicyCI_6StateAccessKeyTest.this, "creator");
+                                        final PersonAdminData user = new PersonAdminData(PolicyCI_3Update5StateAccessKeyTest.this, "creator");
                                         this.setName("create")
                                             .addAccess(
                                                     new Access()
