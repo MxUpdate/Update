@@ -109,7 +109,7 @@ public class InterfaceData
      * @param _attributes    attributes list to append
      * @return this interface data instance
      */
-    public InterfaceData addLocalAttribute(final AbstractAttributeData<?>... _attributes)
+    public InterfaceData addLocalAttribute(final AttributeData... _attributes)
     {
         this.attributes.addAll(Arrays.asList(_attributes));
         return this;

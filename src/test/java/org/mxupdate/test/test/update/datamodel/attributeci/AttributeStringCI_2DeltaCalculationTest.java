@@ -16,7 +16,7 @@
 package org.mxupdate.test.test.update.datamodel.attributeci;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.datamodel.AttributeStringData;
+import org.mxupdate.test.data.datamodel.AttributeData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -34,7 +34,7 @@ import matrix.util.MatrixException;
  */
 @Test
 public class AttributeStringCI_2DeltaCalculationTest
-    extends AbstractDeltaCalculationTest<AttributeCI_mxJPO,AttributeStringData>
+    extends AbstractDeltaCalculationTest<AttributeCI_mxJPO,AttributeData>
 {
     @Override
     @DataProvider(name = "data")
@@ -42,17 +42,17 @@ public class AttributeStringCI_2DeltaCalculationTest
     {
         return new Object[][] {
             {"1) uuid",
-                    new AttributeStringData(this, "Test").setSingle("kind", "binary"),
-                    new AttributeStringData(this, "Test").setSingle("kind", "binary").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+                    new AttributeData(this, "Test").setSingle("kind", "binary"),
+                    new AttributeData(this, "Test").setSingle("kind", "binary").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
             {"2a) symbolic name",
-                    new AttributeStringData(this, "Test").setSingle("kind", "string"),
-                    new AttributeStringData(this, "Test").setSingle("kind", "string").setValue("symbolicname", "attribute_123")},
+                    new AttributeData(this, "Test").setSingle("kind", "string"),
+                    new AttributeData(this, "Test").setSingle("kind", "string").setValue("symbolicname", "attribute_123")},
             {"2b) two symbolic name",
-                    new AttributeStringData(this, "Test").setSingle("kind", "string"),
-                    new AttributeStringData(this, "Test").setSingle("kind", "string").setValue("symbolicname", "attribute_123").setValue("symbolicname", "attribute_345")},
+                    new AttributeData(this, "Test").setSingle("kind", "string"),
+                    new AttributeData(this, "Test").setSingle("kind", "string").setValue("symbolicname", "attribute_123").setValue("symbolicname", "attribute_345")},
             {"3) with maxlength",
-                    new AttributeStringData(this, "Test").setSingle("kind", "string"),
-                    new AttributeStringData(this, "Test").setSingle("kind", "string").setSingle("maxlength", "5")},
+                    new AttributeData(this, "Test").setSingle("kind", "string"),
+                    new AttributeData(this, "Test").setSingle("kind", "string").setSingle("maxlength", "5")},
        };
     }
 
@@ -62,7 +62,7 @@ public class AttributeStringCI_2DeltaCalculationTest
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE);
     }
 
     @Override

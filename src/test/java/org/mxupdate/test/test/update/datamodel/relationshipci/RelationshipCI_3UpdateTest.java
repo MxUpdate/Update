@@ -18,7 +18,7 @@ package org.mxupdate.test.test.update.datamodel.relationshipci;
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger;
-import org.mxupdate.test.data.datamodel.AttributeStringData;
+import org.mxupdate.test.data.datamodel.AttributeData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.data.datamodel.TypeData;
@@ -380,7 +380,7 @@ public class RelationshipCI_3UpdateTest
         throws Exception
     {
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeData(this, "Test Attribute").setSingle("kind", "string"))
                 .create()
                 .checkExport()
                 .update("")
@@ -397,9 +397,9 @@ public class RelationshipCI_3UpdateTest
         throws Exception
     {
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute 1"))
+                .defData("attribute", new AttributeData(this, "Test Attribute 1").setSingle("kind", "string"))
                 .create()
-                .defData("attribute", new AttributeStringData(this, "Test Attribute 2"))
+                .defData("attribute", new AttributeData(this, "Test Attribute 2").setSingle("kind", "string"))
                 .createDependings()
                 .update("")
                 .checkExport();
@@ -415,7 +415,7 @@ public class RelationshipCI_3UpdateTest
         throws Exception
     {
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeData(this, "Test Attribute").setSingle("kind", "string"))
                 .create();
         this.createNewData("Test")
                 .failureUpdate(ErrorKey.DM_RELATION_REMOVE_GLOBAL_ATTRIBUTE);
@@ -432,12 +432,12 @@ public class RelationshipCI_3UpdateTest
         throws Exception
     {
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeData(this, "Test Attribute").setSingle("kind", "string"))
                 .create();
         this.createNewData("Test")
                 .update("", ValueKeys.DMRelationAttrIgnore.name(), "*");
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeData(this, "Test Attribute").setSingle("kind", "string"))
                 .checkExport();
     }
 
@@ -451,7 +451,7 @@ public class RelationshipCI_3UpdateTest
         throws Exception
     {
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeData(this, "Test Attribute").setSingle("kind", "string"))
                 .create();
         this.createNewData("Test")
                 .update("", ValueKeys.DMRelationAttrRemove.name(), "*")
@@ -611,11 +611,7 @@ public class RelationshipCI_3UpdateTest
     {
         this.cleanup(AbstractTest.CI.DM_PATHTYPE);  // as first, so that local attributes of path types are deleted!
         this.cleanup(AbstractTest.CI.PRG_MQL);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BOOLEAN);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_DATE);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_INTEGER);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_REAL);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE);
         this.cleanup(AbstractTest.CI.DM_RELATIONSHIP);
         this.cleanup(AbstractTest.CI.DM_RULE);
         this.cleanup(AbstractTest.CI.DM_TYPE);

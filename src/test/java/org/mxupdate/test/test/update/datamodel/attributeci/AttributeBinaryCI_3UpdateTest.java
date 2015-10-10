@@ -15,7 +15,6 @@
 
 package org.mxupdate.test.test.update.datamodel.attributeci;
 
-import org.mxupdate.test.data.datamodel.AttributeBinaryData;
 import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -27,7 +26,7 @@ import org.testng.annotations.Test;
  */
 @Test
 public class AttributeBinaryCI_3UpdateTest
-    extends Abstract_3UpdateTest<AttributeBinaryData>
+    extends Abstract_3UpdateTest
 {
     /**
      * Data provider for test binary attributes.
@@ -48,12 +47,6 @@ public class AttributeBinaryCI_3UpdateTest
     @Test(enabled = false)
     public void negativeTestUpdateMultiValueFlag()
     {
-    }
-
-    @Override
-    protected AttributeBinaryData createNewData(final String _name)
-    {
-        return new AttributeBinaryData(this, _name).setSingle("kind", this.getKind());
     }
 
     @Override

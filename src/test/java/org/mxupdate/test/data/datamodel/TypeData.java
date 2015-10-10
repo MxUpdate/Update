@@ -54,7 +54,7 @@ public class TypeData
      * @param _attributes    attributes list to append
      * @return this type data instance
      */
-    public TypeData addLocalAttribute(final AbstractAttributeData<?>... _localAttributes)
+    public TypeData addLocalAttribute(final AttributeData... _localAttributes)
     {
         this.localAttributes.addAll(Arrays.asList(_localAttributes));
         return this;

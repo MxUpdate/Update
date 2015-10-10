@@ -20,7 +20,7 @@ import java.util.Set;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.datamodel.AttributeStringData;
+import org.mxupdate.test.data.datamodel.AttributeData;
 import org.mxupdate.test.data.datamodel.InterfaceData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
@@ -63,7 +63,7 @@ public class InterfaceCI_3UpdateTest
         throws Exception
     {
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeData(this, "Test Attribute").setSingle("kind", "string"))
                 .create()
                 .checkExport()
                 .update("")
@@ -80,9 +80,9 @@ public class InterfaceCI_3UpdateTest
         throws Exception
     {
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute 1"))
+                .defData("attribute", new AttributeData(this, "Test Attribute 1").setSingle("kind", "string"))
                 .create()
-                .defData("attribute", new AttributeStringData(this, "Test Attribute 2"))
+                .defData("attribute", new AttributeData(this, "Test Attribute 2").setSingle("kind", "string"))
                 .createDependings()
                 .update("")
                 .checkExport();
@@ -98,7 +98,7 @@ public class InterfaceCI_3UpdateTest
         throws Exception
     {
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeData(this, "Test Attribute").setSingle("kind", "string"))
                 .create();
         this.createNewData("Test")
                 .failureUpdate(UpdateException_mxJPO.ErrorKey.DM_INTERFACE_REMOVE_GLOBAL_ATTRIBUTE);
@@ -115,12 +115,12 @@ public class InterfaceCI_3UpdateTest
         throws Exception
     {
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeData(this, "Test Attribute").setSingle("kind", "string"))
                 .create();
         this.createNewData("Test")
                 .update("", ValueKeys.DMInterfaceAttrIgnore.name(), "*");
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeData(this, "Test Attribute").setSingle("kind", "string"))
                 .checkExport();
     }
 
@@ -134,7 +134,7 @@ public class InterfaceCI_3UpdateTest
         throws Exception
     {
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeData(this, "Test Attribute").setSingle("kind", "string"))
                 .create();
         this.createNewData("Test")
                 .update("", ValueKeys.DMInterfaceAttrRemove.name(), "*")
@@ -272,8 +272,8 @@ public class InterfaceCI_3UpdateTest
     {
         final InterfaceData parent1 = new InterfaceData(this, "TestInterfaceParent \" 1").create();
         final InterfaceData parent2 = new InterfaceData(this, "TestInterfaceParent \" 2").create();
-        final AttributeStringData attr1 = new AttributeStringData(this, "Attribute \" 1").create();
-        final AttributeStringData attr2 = new AttributeStringData(this, "Attribute \" 2").create();
+        final AttributeData attr1 = new AttributeData(this, "Attribute \" 1").setSingle("kind", "string").create();
+        final AttributeData attr2 = new AttributeData(this, "Attribute \" 2").setSingle("kind", "string").create();
         final TypeData type1 = new TypeData(this, "TestType \" 1").create();
         final TypeData type2 = new TypeData(this, "TestType \" 2").create();
         final RelationshipData rel1 = new RelationshipData(this, "TestRel \" 1").create();
@@ -331,7 +331,7 @@ public class InterfaceCI_3UpdateTest
     public void cleanup()
         throws Exception
     {
-        this.cleanup(CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(CI.DM_ATTRIBUTE);
         this.cleanup(CI.DM_INTERFACE);
         this.cleanup(CI.DM_TYPE);
         this.cleanup(CI.DM_RELATIONSHIP);

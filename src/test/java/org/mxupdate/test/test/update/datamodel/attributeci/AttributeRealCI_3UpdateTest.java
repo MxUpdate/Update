@@ -18,7 +18,6 @@ package org.mxupdate.test.test.update.datamodel.attributeci;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mxupdate.test.data.datamodel.AttributeRealData;
 import org.mxupdate.test.data.datamodel.DimensionData;
 import org.mxupdate.test.data.datamodel.DimensionData.UnitData;
 import org.mxupdate.test.util.IssueLink;
@@ -35,7 +34,7 @@ import org.testng.annotations.Test;
  */
 @Test
 public class AttributeRealCI_3UpdateTest
-    extends Abstract_3UpdateWithRangesAndMultiValuesTest<AttributeRealData>
+    extends Abstract_3UpdateWithRangesAndMultiValuesTest
 {
     /**
      * Data provider for test real attributes.
@@ -121,12 +120,6 @@ public class AttributeRealCI_3UpdateTest
                 .checkExport()
                 .setDimension((DimensionData) null)
                 .failureUpdate(ErrorKey.ABSTRACTATTRIBUTE_UPDATE_DIMENSION_UPDATED);
-    }
-
-    @Override
-    protected AttributeRealData createNewData(final String _name)
-    {
-        return new AttributeRealData(this, _name).setSingle("kind", this.getKind());
     }
 
     @Override

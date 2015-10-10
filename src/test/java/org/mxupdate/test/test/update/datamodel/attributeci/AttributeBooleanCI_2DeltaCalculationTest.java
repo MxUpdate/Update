@@ -16,7 +16,7 @@
 package org.mxupdate.test.test.update.datamodel.attributeci;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.datamodel.AttributeBooleanData;
+import org.mxupdate.test.data.datamodel.AttributeData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -35,7 +35,7 @@ import matrix.util.MatrixException;
  */
 @Test
 public class AttributeBooleanCI_2DeltaCalculationTest
-    extends AbstractDeltaCalculationTest<AttributeCI_mxJPO,AttributeBooleanData>
+    extends AbstractDeltaCalculationTest<AttributeCI_mxJPO,AttributeData>
 {
     @Override
     @DataProvider(name = "data")
@@ -43,14 +43,14 @@ public class AttributeBooleanCI_2DeltaCalculationTest
     {
         return new Object[][] {
             {"1) uuid",
-                    new AttributeBooleanData(this, "Test").setSingle("kind", "binary"),
-                    new AttributeBooleanData(this, "Test").setSingle("kind", "binary").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+                    new AttributeData(this, "Test").setSingle("kind", "binary"),
+                    new AttributeData(this, "Test").setSingle("kind", "binary").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
             {"2a) symbolic name",
-                    new AttributeBooleanData(this, "Test").setSingle("kind", "boolean"),
-                    new AttributeBooleanData(this, "Test").setSingle("kind", "boolean").setValue("symbolicname", "attribute_123")},
+                    new AttributeData(this, "Test").setSingle("kind", "boolean"),
+                    new AttributeData(this, "Test").setSingle("kind", "boolean").setValue("symbolicname", "attribute_123")},
             {"2b) two symbolic name",
-                    new AttributeBooleanData(this, "Test").setSingle("kind", "boolean"),
-                    new AttributeBooleanData(this, "Test").setSingle("kind", "boolean").setValue("symbolicname", "attribute_123").setValue("symbolicname", "attribute_345")},
+                    new AttributeData(this, "Test").setSingle("kind", "boolean"),
+                    new AttributeData(this, "Test").setSingle("kind", "boolean").setValue("symbolicname", "attribute_123").setValue("symbolicname", "attribute_345")},
        };
     }
 
@@ -60,7 +60,7 @@ public class AttributeBooleanCI_2DeltaCalculationTest
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BOOLEAN);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE);
     }
 
     @Override

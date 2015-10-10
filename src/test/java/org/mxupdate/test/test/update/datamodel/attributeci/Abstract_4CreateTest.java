@@ -18,7 +18,7 @@ package org.mxupdate.test.test.update.datamodel.attributeci;
 import org.mxupdate.script.ScriptContext_mxJPO;
 import org.mxupdate.script.statement.MxUpdateStatement_mxJPO;
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.datamodel.AttributeBinaryData;
+import org.mxupdate.test.data.datamodel.AttributeData;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -49,7 +49,7 @@ public abstract class Abstract_4CreateTest
 
         new MxUpdateStatement_mxJPO().setMxUpdateType("attribute").setCode("kind "+ this.getKind()).execute(context);
 
-        new AttributeBinaryData(this, "Test").setSingle("kind", this.getKind()).checkExport();
+        new AttributeData(this, "Test").setSingle("kind", this.getKind()).checkExport();
     }
 
     /**
@@ -62,11 +62,7 @@ public abstract class Abstract_4CreateTest
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(CI.DM_ATTRIBUTE_BOOLEAN);
-        this.cleanup(CI.DM_ATTRIBUTE_DATE);
-        this.cleanup(CI.DM_ATTRIBUTE_INTEGER);
-        this.cleanup(CI.DM_ATTRIBUTE_REAL);
-        this.cleanup(CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(CI.DM_ATTRIBUTE);
     }
 
     /**

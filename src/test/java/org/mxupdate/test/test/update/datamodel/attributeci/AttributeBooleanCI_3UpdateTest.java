@@ -15,7 +15,6 @@
 
 package org.mxupdate.test.test.update.datamodel.attributeci;
 
-import org.mxupdate.test.data.datamodel.AttributeBooleanData;
 import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -28,14 +27,8 @@ import org.testng.annotations.Test;
  */
 @Test
 public class AttributeBooleanCI_3UpdateTest
-    extends Abstract_3UpdateWithRangesAndMultiValuesTest<AttributeBooleanData>
+    extends Abstract_3UpdateWithRangesAndMultiValuesTest
 {
-    @Override
-    protected AttributeBooleanData createNewData(final String _name)
-    {
-        return new AttributeBooleanData(this, _name).setSingle("kind", this.getKind());
-    }
-
     @DataProvider(name = "data")
     public Object[][] getAttributes()
     {

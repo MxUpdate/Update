@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.testng.Assert;
@@ -34,12 +35,9 @@ import matrix.util.MatrixException;
  * @author The MxUpdate Team
  * @param <T>   defines the class which is derived from this class
  */
-public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
-    extends AbstractDataWithTrigger<T>
+public class AttributeData
+    extends AbstractDataWithTrigger<AttributeData>
 {
-    /** Attribute type of the attribute (string, integer, ....). */
-    private final String attrType;
-
     /** Rule of this attribute. */
     private RuleData rule;
 
@@ -50,19 +48,17 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     private final Set<AbstractRange> ranges = new HashSet<>();
 
     /**
+     * Constructor.
      *
      * @param _test         related test instance
      * @param _ci           related configuration type of this attribute
      * @param _name         name of this attribute
      * @param _attrType     type of this attribute
      */
-    protected AbstractAttributeData(final AbstractTest _test,
-                                    final AbstractTest.CI _ci,
-                                    final String _name,
-                                    final String _attrType)
+    public AttributeData(final AbstractTest _test,
+                         final String _name)
     {
-        super(_test, _ci, _name);
-        this.attrType = _attrType;
+        super(_test, CI.DM_ATTRIBUTE, _name);
     }
 
     /**
@@ -71,11 +67,10 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * @param _rule    rule instances to append
      * @return this instance
      */
-    @SuppressWarnings("unchecked")
-    public T setRule(final RuleData _rule)
+    public AttributeData setRule(final RuleData _rule)
     {
         this.rule = _rule;
-        return (T) this;
+        return this;
     }
 
     /**
@@ -84,11 +79,10 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * @param _dimension    new dimension instance
      * @return this instance
      */
-    @SuppressWarnings("unchecked")
-    public T setDimension(final DimensionData _dimension)
+    public AttributeData setDimension(final DimensionData _dimension)
     {
         this.dimension = _dimension;
-        return (T) this;
+        return this;
     }
 
     /**
@@ -108,11 +102,10 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * @return this instance
      * @see #ranges
      */
-    @SuppressWarnings("unchecked")
-    public T addRange(final AbstractRange _range)
+    public AttributeData addRange(final AbstractRange _range)
     {
         this.ranges.add(_range);
-        return (T) this;
+        return this;
     }
 
     /**
@@ -122,8 +115,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * @throws MatrixException if create failed
      */
     @Override
-    @SuppressWarnings("unchecked")
-    public T create()
+    public AttributeData create()
         throws MatrixException
     {
         if (!this.isCreated())  {
@@ -158,7 +150,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
 
             this.setSingle("kind", kind);
         }
-        return (T) this;
+        return this;
     }
 
     /**
@@ -166,8 +158,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * Creates depending range programs.
      */
     @Override
-    @SuppressWarnings("unchecked")
-    public T createDependings()
+    public AttributeData createDependings()
         throws MatrixException
     {
         super.createDependings();
@@ -184,12 +175,12 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
 
         // create range programs
         for (final AbstractRange range : this.ranges)  {
-            if (range instanceof AbstractAttributeData.RangeProgram)  {
-                ((AbstractAttributeData.RangeProgram) range).program.create();
+            if (range instanceof AttributeData.RangeProgram)  {
+                ((AttributeData.RangeProgram) range).program.create();
             }
         }
 
-        return (T) this;
+        return this;
     }
 
     /**
@@ -343,7 +334,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * Equal range definition.
      */
     public static class RangeEqual
-        extends AbstractAttributeData.AbstractRange
+        extends AttributeData.AbstractRange
     {
         /**
          * Equal range constructor with the value.
@@ -360,7 +351,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * Not equal range definition.
      */
     public static class RangeNotEqual
-        extends AbstractAttributeData.AbstractRange
+        extends AttributeData.AbstractRange
     {
         /**
          * Not equal range constructor with the value.
@@ -377,7 +368,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * Less than range definition.
      */
     public static class RangeLessThan
-        extends AbstractAttributeData.AbstractRange
+        extends AttributeData.AbstractRange
     {
         /**
          * Less than range constructor with the value.
@@ -394,7 +385,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * Greater than range definition.
      */
     public static class RangeGreaterThan
-        extends AbstractAttributeData.AbstractRange
+        extends AttributeData.AbstractRange
     {
         /**
          * Greater than range constructor with the value.
@@ -411,7 +402,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * Less equal than range definition.
      */
     public static class RangeLessEqualThan
-        extends AbstractAttributeData.AbstractRange
+        extends AttributeData.AbstractRange
     {
         /**
          * Less equal than range constructor with the value.
@@ -428,7 +419,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * Greater equal than range definition.
      */
     public static class RangeGreaterEqualThan
-        extends AbstractAttributeData.AbstractRange
+        extends AttributeData.AbstractRange
     {
         /**
          * Greater equal than range constructor with the value.
@@ -445,7 +436,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * SMatch range definition.
      */
     public static class RangeSMatch
-        extends AbstractAttributeData.AbstractRange
+        extends AttributeData.AbstractRange
     {
         /**
          * SMatch range constructor with the value.
@@ -462,7 +453,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * Not smatch range definition.
      */
     public static class RangeNotSMatch
-        extends AbstractAttributeData.AbstractRange
+        extends AttributeData.AbstractRange
     {
         /**
          * Not smatch range constructor with the value.
@@ -479,7 +470,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * Match range definition.
      */
     public static class RangeMatch
-        extends AbstractAttributeData.AbstractRange
+        extends AttributeData.AbstractRange
     {
         /**
          * Match range constructor with the value.
@@ -496,7 +487,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * Not match range definition.
      */
     public static class RangeNotMatch
-        extends AbstractAttributeData.AbstractRange
+        extends AttributeData.AbstractRange
     {
         /**
          * Not match range constructor with the value.
@@ -569,7 +560,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
      * Between range definition.
      */
     public static class RangeBetween
-        extends AbstractAttributeData.AbstractRange
+        extends AttributeData.AbstractRange
     {
         /** Inclusive first value? */
         private final boolean inclusive1;

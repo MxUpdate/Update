@@ -103,7 +103,7 @@ public class RelationshipData
      * @param _attributes    attributes list to append
      * @return this type data instance
      */
-    public RelationshipData addLocalAttribute(final AbstractAttributeData<?>... _attributes)
+    public RelationshipData addLocalAttribute(final AttributeData... _attributes)
     {
         this.localAttributes.addAll(Arrays.asList(_attributes));
         return this;

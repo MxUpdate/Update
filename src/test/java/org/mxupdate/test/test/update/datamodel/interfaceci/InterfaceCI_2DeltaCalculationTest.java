@@ -16,12 +16,7 @@
 package org.mxupdate.test.test.update.datamodel.interfaceci;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.datamodel.AttributeBinaryData;
-import org.mxupdate.test.data.datamodel.AttributeBooleanData;
-import org.mxupdate.test.data.datamodel.AttributeDateData;
-import org.mxupdate.test.data.datamodel.AttributeIntegerData;
-import org.mxupdate.test.data.datamodel.AttributeRealData;
-import org.mxupdate.test.data.datamodel.AttributeStringData;
+import org.mxupdate.test.data.datamodel.AttributeData;
 import org.mxupdate.test.data.datamodel.InterfaceData;
 import org.mxupdate.test.data.datamodel.PathTypeData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
@@ -116,7 +111,7 @@ public class InterfaceCI_2DeltaCalculationTest
                 new InterfaceData(this, "Test"),
                 new InterfaceData(this, "Test")
                         .addLocalAttribute(
-                                new AttributeBinaryData(this, "ATTR1")
+                                new AttributeData(this, "ATTR1")
                                     .setSingle("kind", "binary")
                                     .setValue("description", "abc def")
                                     .setFlag("hidden", false, Create.ViaFlag)
@@ -127,7 +122,7 @@ public class InterfaceCI_2DeltaCalculationTest
                 new InterfaceData(this, "Test"),
                 new InterfaceData(this, "Test")
                         .addLocalAttribute(
-                                new AttributeBooleanData(this, "ATTR1")
+                                new AttributeData(this, "ATTR1")
                                     .setSingle("kind", "boolean")
                                     .setValue("description", "abc def")
                                     .setFlag("hidden", false, Create.ViaFlag)
@@ -139,7 +134,7 @@ public class InterfaceCI_2DeltaCalculationTest
                 new InterfaceData(this, "Test"),
                 new InterfaceData(this, "Test")
                         .addLocalAttribute(
-                                new AttributeDateData(this, "ATTR1")
+                                new AttributeData(this, "ATTR1")
                                     .setSingle("kind", "date")
                                     .setValue("description", "abc def")
                                     .setFlag("hidden", false, Create.ViaFlag)
@@ -152,7 +147,7 @@ public class InterfaceCI_2DeltaCalculationTest
                 new InterfaceData(this, "Test"),
                 new InterfaceData(this, "Test")
                         .addLocalAttribute(
-                                new AttributeIntegerData(this, "ATTR1")
+                                new AttributeData(this, "ATTR1")
                                     .setSingle("kind", "integer")
                                     .setValue("description", "abc def")
                                     .setFlag("hidden", false, Create.ViaFlag)
@@ -165,7 +160,7 @@ public class InterfaceCI_2DeltaCalculationTest
                 new InterfaceData(this, "Test"),
                 new InterfaceData(this, "Test")
                         .addLocalAttribute(
-                                new AttributeRealData(this, "ATTR1")
+                                new AttributeData(this, "ATTR1")
                                     .setSingle("kind", "real")
                                     .setValue("description", "abc def")
                                     .setFlag("hidden", false, Create.ViaFlag)
@@ -178,7 +173,7 @@ public class InterfaceCI_2DeltaCalculationTest
                 new InterfaceData(this, "Test"),
                 new InterfaceData(this, "Test")
                         .addLocalAttribute(
-                                new AttributeStringData(this, "ATTR1")
+                                new AttributeData(this, "ATTR1")
                                     .setSingle("kind", "string")
                                     .setValue("description", "abc def")
                                     .setFlag("hidden", false, Create.ViaFlag)
@@ -192,7 +187,7 @@ public class InterfaceCI_2DeltaCalculationTest
                 new InterfaceData(this, "Test"),
                 new InterfaceData(this, "Test")
                         .addLocalAttribute(
-                                new AttributeBooleanData(this, "ATTR1")
+                                new AttributeData(this, "ATTR1")
                                     .setSingle("kind", "boolean")
                                     .setValue("uuid", "UUID")
                                     .setValue("description", "")
@@ -211,12 +206,7 @@ public class InterfaceCI_2DeltaCalculationTest
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.DM_INTERFACE);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BINARY);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BOOLEAN);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_DATE);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_INTEGER);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_REAL);
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE);
         this.cleanup(AbstractTest.CI.DM_PATHTYPE);
         this.cleanup(AbstractTest.CI.DM_RELATIONSHIP);
         this.cleanup(AbstractTest.CI.DM_TYPE);

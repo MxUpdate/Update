@@ -17,7 +17,7 @@ package org.mxupdate.test.test.update.datamodel.pathtype;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.datamodel.AttributeStringData;
+import org.mxupdate.test.data.datamodel.AttributeData;
 import org.mxupdate.test.data.datamodel.PathTypeData;
 import org.mxupdate.update.datamodel.PathType_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
@@ -56,7 +56,7 @@ public class PathTypeCI_3UpdateTest
         throws Exception
     {
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeData(this, "Test Attribute").setSingle("kind", "string"))
                 .create();
         this.createNewData("Test")
                 .failureUpdate(ErrorKey.DM_PATHTYPE_REMOVE_GLOBAL_ATTRIBUTE);
@@ -73,12 +73,12 @@ public class PathTypeCI_3UpdateTest
         throws Exception
     {
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeData(this, "Test Attribute").setSingle("kind", "string"))
                 .create();
         this.createNewData("Test")
                 .update("", ValueKeys.DMPathTypeAttrIgnore.name(), "*");
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeData(this, "Test Attribute").setSingle("kind", "string"))
                 .checkExport();
     }
 
@@ -92,7 +92,7 @@ public class PathTypeCI_3UpdateTest
         throws Exception
     {
         this.createNewData("Test")
-                .defData("attribute", new AttributeStringData(this, "Test Attribute"))
+                .defData("attribute", new AttributeData(this, "Test Attribute").setSingle("kind", "string"))
                 .create();
         this.createNewData("Test")
                 .update("", ValueKeys.DMPathTypeAttrRemove.name(), "*")
@@ -118,7 +118,7 @@ public class PathTypeCI_3UpdateTest
     public void cleanup()
         throws Exception
     {
-        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE);
         this.cleanup(AbstractTest.CI.DM_PATHTYPE);
     }
 

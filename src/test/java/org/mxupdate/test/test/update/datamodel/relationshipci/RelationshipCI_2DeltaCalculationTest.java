@@ -16,12 +16,7 @@
 package org.mxupdate.test.test.update.datamodel.relationshipci;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.datamodel.AttributeBinaryData;
-import org.mxupdate.test.data.datamodel.AttributeBooleanData;
-import org.mxupdate.test.data.datamodel.AttributeDateData;
-import org.mxupdate.test.data.datamodel.AttributeIntegerData;
-import org.mxupdate.test.data.datamodel.AttributeRealData;
-import org.mxupdate.test.data.datamodel.AttributeStringData;
+import org.mxupdate.test.data.datamodel.AttributeData;
 import org.mxupdate.test.data.datamodel.PathTypeData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
@@ -190,7 +185,7 @@ public class RelationshipCI_2DeltaCalculationTest
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalAttribute(
-                                    new AttributeBinaryData(this, "ATTR1")
+                                    new AttributeData(this, "ATTR1")
                                         .setSingle("kind", "binary")
                                         .setValue("description", "abc def")
                                         .setFlag("hidden", false, Create.ViaFlag)
@@ -201,7 +196,7 @@ public class RelationshipCI_2DeltaCalculationTest
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalAttribute(
-                                    new AttributeBooleanData(this, "ATTR1")
+                                    new AttributeData(this, "ATTR1")
                                         .setSingle("kind", "boolean")
                                         .setValue("description", "abc def")
                                         .setFlag("hidden", false, Create.ViaFlag)
@@ -213,7 +208,7 @@ public class RelationshipCI_2DeltaCalculationTest
                     new TypeData(this, "Test"),
                     new TypeData(this, "Test")
                             .addLocalAttribute(
-                                    new AttributeDateData(this, "ATTR1")
+                                    new AttributeData(this, "ATTR1")
                                         .setSingle("kind", "date")
                                         .setValue("description", "abc def")
                                         .setFlag("hidden", false, Create.ViaFlag)
@@ -226,7 +221,7 @@ public class RelationshipCI_2DeltaCalculationTest
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalAttribute(
-                                    new AttributeIntegerData(this, "ATTR1")
+                                    new AttributeData(this, "ATTR1")
                                         .setSingle("kind", "integer")
                                         .setValue("description", "abc def")
                                         .setFlag("hidden", false, Create.ViaFlag)
@@ -239,7 +234,7 @@ public class RelationshipCI_2DeltaCalculationTest
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalAttribute(
-                                    new AttributeRealData(this, "ATTR1")
+                                    new AttributeData(this, "ATTR1")
                                         .setSingle("kind", "real")
                                         .setValue("description", "abc def")
                                         .setFlag("hidden", false, Create.ViaFlag)
@@ -252,7 +247,7 @@ public class RelationshipCI_2DeltaCalculationTest
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalAttribute(
-                                    new AttributeStringData(this, "ATTR1")
+                                    new AttributeData(this, "ATTR1")
                                         .setSingle("kind", "string")
                                         .setValue("description", "abc def")
                                         .setFlag("hidden", false, Create.ViaFlag)
@@ -266,7 +261,7 @@ public class RelationshipCI_2DeltaCalculationTest
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalAttribute(
-                                    new AttributeBooleanData(this, "ATTR1")
+                                    new AttributeData(this, "ATTR1")
                                         .setSingle("kind", "boolean")
                                         .setValue("uuid", "UUID")
                                         .setValue("description", "")
@@ -292,13 +287,13 @@ public class RelationshipCI_2DeltaCalculationTest
                     new RelationshipData(this, "Test")
                             .addLocalPathType(new PathTypeData(this, "PathType")
                                     .def4FromSingle("cardinality", "many")
-                                    .addLocalAttribute(new AttributeStringData(this, "PathType Attribute").setSingle("kind", "string"))) },
+                                    .addLocalAttribute(new AttributeData(this, "PathType Attribute").setSingle("kind", "string"))) },
             {"303b) local path type with embedded local attribute with uuid",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalPathType(new PathTypeData(this, "PathType")
                                     .def4FromSingle("cardinality", "many")
-                                    .addLocalAttribute(new AttributeStringData(this, "PathType Attribute").setValue("uuid", "UUID").setSingle("kind", "string"))) },
+                                    .addLocalAttribute(new AttributeData(this, "PathType Attribute").setValue("uuid", "UUID").setSingle("kind", "string"))) },
        };
     }
 

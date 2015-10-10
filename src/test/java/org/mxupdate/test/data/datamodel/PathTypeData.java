@@ -61,7 +61,7 @@ public class PathTypeData
      * @param _attributes    attributes list to append
      * @return this type data instance
      */
-    public PathTypeData addLocalAttribute(final AbstractAttributeData<?>... _attributes)
+    public PathTypeData addLocalAttribute(final AttributeData... _attributes)
     {
         this.attributes.addAll(Arrays.asList(_attributes));
         return this;

@@ -23,7 +23,7 @@ import java.util.TreeMap;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.ExportParser.Line;
-import org.mxupdate.test.data.datamodel.AbstractAttributeData;
+import org.mxupdate.test.data.datamodel.AttributeData;
 import org.testng.Assert;
 
 /**
@@ -32,7 +32,7 @@ import org.testng.Assert;
  * @author The MxUpdate Team
  */
 public class LocaleAttributeList
-    extends ArrayList<AbstractAttributeData<?>>
+    extends ArrayList<AttributeData>
 {
     /** Required dummy serial version UID. */
     private static final long serialVersionUID = 1L;
@@ -46,7 +46,7 @@ public class LocaleAttributeList
     public void append4Update(final String _prefix,
                               final StringBuilder _cmd)
     {
-        for (final AbstractAttributeData<?> attribute : this)  {
+        for (final AttributeData attribute : this)  {
             _cmd.append(_prefix).append("local attribute \"").append(attribute.getName()).append("\" {\n");
             attribute.append4Update(_prefix + "    ", _cmd);
             _cmd.append(_prefix).append("}\n");
@@ -61,8 +61,8 @@ public class LocaleAttributeList
     public void checkExport(final ExportParser _exportParser)
     {
         // prepare list of defined attributes
-        final SortedMap<String,AbstractAttributeData<?>> defAttrs = new TreeMap<>();
-        for (final AbstractAttributeData<?> attribute : this)  {
+        final SortedMap<String,AttributeData> defAttrs = new TreeMap<>();
+        for (final AttributeData attribute : this)  {
             defAttrs.put("attribute \"" + AbstractTest.convertUpdate(attribute.getName()) +  "\" {", attribute);
         }
         // prepare list of parsed attributes
@@ -76,10 +76,10 @@ public class LocaleAttributeList
         }
         // and check that both list are equal
         Assert.assertEquals(lineAttrs.keySet(), defAttrs.keySet(), "check all attributes are defined");
-        final Iterator<AbstractAttributeData<?>> defIter = defAttrs.values().iterator();
+        final Iterator<AttributeData> defIter = defAttrs.values().iterator();
         final Iterator<Line> lineIter = lineAttrs.values().iterator();
         while (defIter.hasNext())  {
-            final AbstractAttributeData<?> defAttr = defIter.next();
+            final AttributeData defAttr = defIter.next();
             final Line lineAttr = lineIter.next();
             defAttr.checkExport(new ExportParser("attr", new Line[]{lineAttr}));
         }

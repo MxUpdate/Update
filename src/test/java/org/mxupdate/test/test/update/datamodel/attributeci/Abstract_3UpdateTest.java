@@ -20,10 +20,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
-import org.mxupdate.test.data.datamodel.AbstractAttributeData;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerAction;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerCheck;
 import org.mxupdate.test.data.datamodel.AbstractDataWithTrigger.TriggerOverride;
+import org.mxupdate.test.data.datamodel.AttributeData;
 import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.data.program.MQLProgramData;
 import org.mxupdate.test.util.IssueLink;
@@ -40,8 +40,8 @@ import matrix.util.MatrixException;
  * @author The MxUpdate Team
  * @param <ATTRIBUTEDATA>   attribute data class
  */
-public abstract class Abstract_3UpdateTest<ATTRIBUTEDATA extends AbstractAttributeData<?>>
-    extends AbstractDataExportUpdate<ATTRIBUTEDATA>
+public abstract class Abstract_3UpdateTest
+    extends AbstractDataExportUpdate<AttributeData>
 {
     /**
      * Returns the kind of attribute.
@@ -49,6 +49,13 @@ public abstract class Abstract_3UpdateTest<ATTRIBUTEDATA extends AbstractAttribu
      * @return kind of attribute
      */
     protected abstract String getKind();
+
+    @Override
+    protected AttributeData createNewData(final String _name)
+    {
+        return new AttributeData(this, _name).setSingle("kind", this.getKind());
+    }
+
 
     /**
      * Prepares the test data.
@@ -139,16 +146,12 @@ public abstract class Abstract_3UpdateTest<ATTRIBUTEDATA extends AbstractAttribu
      *
      * @throws MatrixException if cleanup failed
      */
-    @BeforeMethod()
-    @AfterClass()
+    @BeforeMethod
+    @AfterClass
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(CI.DM_ATTRIBUTE_BOOLEAN);
-        this.cleanup(CI.DM_ATTRIBUTE_DATE);
-        this.cleanup(CI.DM_ATTRIBUTE_INTEGER);
-        this.cleanup(CI.DM_ATTRIBUTE_REAL);
-        this.cleanup(CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(CI.DM_ATTRIBUTE);
         this.cleanup(CI.DM_DIMENSION);
         this.cleanup(CI.DM_RULE);
         this.cleanup(CI.PRG_MQL);
@@ -160,10 +163,10 @@ public abstract class Abstract_3UpdateTest<ATTRIBUTEDATA extends AbstractAttribu
      * @param _original     original data instance
      * @return new data instance (where all original data is cleaned)
      */
-    @Override()
-    protected ATTRIBUTEDATA createCleanNewData(final ATTRIBUTEDATA _original)
+    @Override
+    protected AttributeData createCleanNewData(final AttributeData _original)
     {
-        final ATTRIBUTEDATA ret = super.createCleanNewData(_original);
+        final AttributeData ret = super.createCleanNewData(_original);
 
         ret.setSingle("kind", this.getKind());
 
