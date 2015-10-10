@@ -361,7 +361,7 @@ public abstract class AbstractTest
         this.context.resetContext(user, password, null);
         this.context.connect();
 
-        this.version = Version.valueOf(this.mql("version").replaceAll("\\..*", "").replaceAll("^3DEXPERIENCE ", "").replaceAll("^R", "V6R"));
+        this.version = Version.valueOf(this.mql("version").replaceAll("\\..*", "").replaceAll(" HotFix.*", "").replaceAll("^3DEXPERIENCE ", "").replaceAll("^R", "V6R"));
     }
 
     /**
@@ -456,9 +456,9 @@ public abstract class AbstractTest
         final String bck = this.mql(_cmd);
         final Set<String> ret;
         if ("".equals(bck))  {
-            ret = new HashSet<String>(0);
+            ret = new HashSet<>(0);
         } else  {
-            ret = new HashSet<String>(Arrays.asList(bck.split("\n")));
+            ret = new HashSet<>(Arrays.asList(bck.split("\n")));
         }
         return ret;
     }
@@ -598,7 +598,7 @@ public abstract class AbstractTest
             paramStrings[idx++] = new String(Base64.encodeBase64(out.toByteArray()));
         }
 
-        return new JPOReturn<T>(JPO.invoke(this.context,
+        return new JPOReturn<>(JPO.invoke(this.context,
                                            _jpo,
                                            null,
                                            _method,
@@ -635,7 +635,7 @@ public abstract class AbstractTest
         if ((_arguments == null) || (_arguments.length == 0))  {
             arguments = null;
         } else  {
-            arguments = new HashMap<String,Object>();
+            arguments = new HashMap<>();
             for (int idx = 0; idx < _arguments.length; )  {
                 arguments.put((String) _arguments[idx++], _arguments[idx++]);
             }
@@ -868,7 +868,7 @@ public abstract class AbstractTest
         private JPOReturn(final Object _jpoReturn)
         {
             if (_jpoReturn instanceof String)  {
-                this.jpoReturn = new HashMap<String,Object>();
+                this.jpoReturn = new HashMap<>();
                 ((Map<String,Object>) this.jpoReturn).put("values", _jpoReturn);
             } else  {
                 this.jpoReturn = (Map<String,?>) _jpoReturn;
