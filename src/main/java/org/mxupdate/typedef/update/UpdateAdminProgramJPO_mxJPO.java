@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.program.JPOProgram_mxJPO;
+import org.mxupdate.update.program.AbstractProgram_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -57,7 +57,7 @@ public class UpdateAdminProgramJPO_mxJPO
                        final File _file)
         throws Exception
     {
-        if (_file.getName().endsWith(JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION))  {
+        if (_file.getName().endsWith(AbstractProgram_mxJPO.JPO_NAME_SUFFIX_EXTENDSION))  {
             final String propName = PropertyDef_mxJPO.FILEDATE.getPropName(_paramCache);
 
             final MultiLineMqlBuilder mql = MqlBuilder_mxJPO.multiLine(_file, "");

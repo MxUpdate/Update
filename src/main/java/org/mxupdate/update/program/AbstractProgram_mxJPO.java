@@ -33,6 +33,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.util.FileUtil_mxJPO;
+import org.mxupdate.util.JPOUtil_mxJPO;
 
 /**
  * Common definition for the code of a program.
@@ -43,6 +44,13 @@ import org.mxupdate.util.FileUtil_mxJPO;
 public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLASS>>
     extends AbstractCode_mxJPO<CLASS>
 {
+    /** String with name suffix (used also from the extract routine from Matrix). */
+    public static final String JPO_NAME_SUFFIX_EXTENDSION = AbstractProgram_mxJPO.JPO_NAME_SUFFIX + ".java";
+    /** String length of {@link #JPO_NAME_SUFFIX_EXTENDSION}. */
+    public static final int JPO_NAME_SUFFIX_EXTENDSION_LENGTH = AbstractProgram_mxJPO.JPO_NAME_SUFFIX_EXTENDSION.length();
+    /** String with name suffix (used also from the extract routine from Matrix). */
+    public static final String JPO_NAME_SUFFIX = "_" + "mxJPO";
+
     /** Program kind. */
     private Kind kind = null;
 
@@ -270,6 +278,7 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
             DeltaUtil_mxJPO.calcFlagDelta(_mql,  "pipe",                false,  this.pipe,                          current.pipe);
             DeltaUtil_mxJPO.calcFlagDelta(_mql,  "pooled",              false,  this.pooled,                        current.pooled);
 
+            final String newCode;
             if ((this.file != null) && !this.file.isEmpty())  {
                 // code via file
                 final String tmpFile;
@@ -279,11 +288,20 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
                 } else  {
                     tmpFile = _mql.getFile().getParent() + "/" + this.file;
                 }
-                DeltaUtil_mxJPO.calcValueDelta(_mql, "code", this.readCode(new File(tmpFile)),   current.getCode());
+                switch (this.kind)  {
+                    case JAVA:
+                        newCode = JPOUtil_mxJPO.convertJavaToJPOCode(this.getName(), FileUtil_mxJPO.readFileToString(new File(tmpFile)));
+                        break;
+                    default:
+                        newCode = FileUtil_mxJPO.readFileToString(new File(tmpFile));
+                        break;
+                }
             } else  {
                 // code via code
-                DeltaUtil_mxJPO.calcValueDelta(_mql, "code", this.getCode(),                     current.getCode());
+                newCode = this.getCode();
             }
+
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "code", newCode, current.getCode());
 
             // rule
             if (CompareToUtil_mxJPO.compare(0, this.rule, current.rule) != 0)  {
@@ -305,16 +323,20 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
     }
 
     /**
-     * Reads code from given file.
+     * Compile this program if the program is a JPO.
      *
-     * @param _file     file
-     * @return read code
-     * @throws UpdateException_mxJPO if read failed
+     * @param _paramCache   parameter cache
+     * @return always <i>true</i>
+     * @throws Exception if the compile of the JPO failed
      */
-    protected String readCode(final File _file)
-        throws UpdateException_mxJPO
+    @Override
+    public boolean compile(final ParameterCache_mxJPO _paramCache)
+        throws Exception
     {
-        return FileUtil_mxJPO.readFileToString(_file);
+        if (this.kind == Kind.JAVA)  {
+            MqlBuilder_mxJPO.mql().cmd("escape compile prog ").arg(this.getName()).exec(_paramCache);
+        }
+        return true;
     }
 
     /**

@@ -21,15 +21,14 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.program.AbstractProgram_mxJPO;
-import org.mxupdate.update.program.JPOProgram_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+
+import matrix.util.MatrixException;
 
 /**
  * Exports admin program JPO as single CI file with separate java file.
@@ -85,7 +84,7 @@ public class ExportAdminProgramJPO_mxJPO
                 final int index = clazz.getName().lastIndexOf('.');
                 final String fileName = new StringBuilder()
                         .append((index >= 0) ? clazz.getName().substring(index + 1) : clazz.getName())
-                        .append(JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION)
+                        .append(AbstractProgram_mxJPO.JPO_NAME_SUFFIX_EXTENDSION)
                         .toString();
                 // prepare path
                 final StringBuilder pathStr = new StringBuilder().append(path);
@@ -151,10 +150,10 @@ public class ExportAdminProgramJPO_mxJPO
         }
 
         // replace class names and references to other JPOs
-        final String name = _clazz.getName() + JPOProgram_mxJPO.NAME_SUFFIX;
+        final String name = _clazz.getName() + AbstractProgram_mxJPO.JPO_NAME_SUFFIX;
         final String code = _clazz.getCode()
                                 .replaceAll("\\" + "$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
-                                .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", JPOProgram_mxJPO.NAME_SUFFIX)
+                                .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", AbstractProgram_mxJPO.JPO_NAME_SUFFIX)
                                 .replaceAll("\\" + "$\\{CLASS\\:", "")
                                 .trim();
 
