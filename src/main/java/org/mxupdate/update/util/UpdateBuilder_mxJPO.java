@@ -95,6 +95,20 @@ public class UpdateBuilder_mxJPO
     }
 
     /**
+     * Appends given {@code _value} string surrounded with apostrophe if
+     * {@code _value} is not {@code NULL}.
+     *
+     * @param _tag      tag
+     * @param _value    value
+     * @return this update builder instance
+     */
+    public UpdateBuilder_mxJPO stringNotNull(final String _tag,
+                                             final String _value)
+    {
+        return this.stringIfTrue(_tag, _value, (_value != null));
+    }
+
+    /**
      * Appends given {@code _value} string surrounded with apostrophes if
      * {@code _write} is <i>true</i>.
      *

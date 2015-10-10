@@ -31,20 +31,14 @@ public enum PropertyDef_mxJPO
     /** Admin property to store the installer. */
     INSTALLER,
     /** Property to store the sub path. */
-    SUBPATH;
+    SUBPATH,
+    /** Property to store the UUID. */
+    UUID;
 
-    /**
-     * Used property name within the property file.
-     *
-     * @see #defineValue(Mapping_mxJPO, String, String)
-     */
+    /** Used property name within the property file.*/
     private static final String PREFIX_PROPERTY_NAME = "PropertyName";
 
-    /**
-     * Used attribute name within the property file.
-     *
-     * @see #defineValue(Mapping_mxJPO, String, String)
-     */
+    /** Used attribute name within the property file. */
     private static final String PREFIX_ATTRIBUTE_NAME = "AttributeName";
 
     /**

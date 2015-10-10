@@ -32,29 +32,32 @@ import matrix.util.MatrixException;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class AttributeStringCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<AttributeCI_mxJPO,AttributeStringData>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1a) symbolic name",
+            {"1) uuid",
+                    new AttributeStringData(this, "Test").setSingle("kind", "binary"),
+                    new AttributeStringData(this, "Test").setSingle("kind", "binary").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+            {"2a) symbolic name",
                     new AttributeStringData(this, "Test").setSingle("kind", "string"),
                     new AttributeStringData(this, "Test").setSingle("kind", "string").setValue("symbolicname", "attribute_123")},
-            {"1b) two symbolic name",
+            {"2b) two symbolic name",
                     new AttributeStringData(this, "Test").setSingle("kind", "string"),
                     new AttributeStringData(this, "Test").setSingle("kind", "string").setValue("symbolicname", "attribute_123").setValue("symbolicname", "attribute_345")},
-            {"2) with maxlength",
+            {"3) with maxlength",
                     new AttributeStringData(this, "Test").setSingle("kind", "string"),
                     new AttributeStringData(this, "Test").setSingle("kind", "string").setSingle("maxlength", "5")},
        };
     }
 
     @Override
-    @BeforeMethod()
+    @BeforeMethod
     @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException

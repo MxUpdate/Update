@@ -26,6 +26,7 @@ import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO;
@@ -45,6 +46,7 @@ import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
  * export, delete and update an attribute. Following properties are handled:
  * <ul>
  * <li>{@link #kind}</li>
+ * <li>uuid</li>
  * <li>symbolic names</li>
  * <li>flag &quot;{@link #multiValue multiple value}&quot; (if parameter
  *     {@link ValueKeys#DMAttrSupportsFlagMultiValue} is defined)</li>
@@ -167,7 +169,7 @@ public class AttributeCI_mxJPO
         return this.kind;
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -176,7 +178,7 @@ public class AttributeCI_mxJPO
         this.prepare();
     }
 
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -275,7 +277,7 @@ public class AttributeCI_mxJPO
      * {@link Range#value1} as {@link #rangeProgramRef} and
      * {@link Range#value2} as {@link #rangeProgramInputArguments}).
      */
-    @Override()
+    @Override
     protected void prepare()
     {
         // sort all triggers
@@ -310,6 +312,7 @@ public class AttributeCI_mxJPO
         _updateBuilder
                 //              tag             | default | value                              | write?
                 .single(        "kind",                     this.kind.name().toLowerCase())
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flag(          "hidden",                   false, this.isHidden())

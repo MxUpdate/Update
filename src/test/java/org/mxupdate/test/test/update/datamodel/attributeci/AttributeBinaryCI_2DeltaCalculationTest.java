@@ -33,26 +33,29 @@ import matrix.util.MatrixException;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class AttributeBinaryCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<AttributeCI_mxJPO,AttributeBinaryData>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1a) symbolic name",
+            {"1) uuid",
+                    new AttributeBinaryData(this, "Test").setSingle("kind", "binary"),
+                    new AttributeBinaryData(this, "Test").setSingle("kind", "binary").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+            {"2a) symbolic name",
                     new AttributeBinaryData(this, "Test").setSingle("kind", "binary"),
                     new AttributeBinaryData(this, "Test").setSingle("kind", "binary").setValue("symbolicname", "attribute_123")},
-            {"1b) two symbolic name",
+            {"2b) two symbolic name",
                     new AttributeBinaryData(this, "Test").setSingle("kind", "binary"),
                     new AttributeBinaryData(this, "Test").setSingle("kind", "binary").setValue("symbolicname", "attribute_123").setValue("symbolicname", "attribute_345")},
        };
     }
 
     @Override
-    @BeforeMethod()
+    @BeforeMethod
     @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException
@@ -60,7 +63,7 @@ public class AttributeBinaryCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BINARY);
     }
 
-    @Override()
+    @Override
     protected AttributeCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                               final String _name)
     {

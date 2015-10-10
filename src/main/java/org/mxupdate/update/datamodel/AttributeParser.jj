@@ -22,7 +22,24 @@ options {
     SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
     UNICODE_INPUT = true;
 }
-PARSER_BEGIN(AttributeParser)package org.mxupdate.update.datamodel;
+
+PARSER_BEGIN(AttributeParser)
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
@@ -47,14 +64,19 @@ class AttributeParser
     extends AbstractParser_mxJPO
 {
 }
-PARSER_END(AttributeParser)<*> SKIP :
+
+PARSER_END(AttributeParser)
+
+<*> SKIP :
 {
   " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
 TOKEN : /** first level */
 {
-      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+      <UUID:                                "uuid">                                         : STRING_EXPECTED
+
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
     | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
@@ -146,7 +168,8 @@ TOKEN : /** first level */
 /********************************************************************* Ranges */
 
 <DEFAULT> TOKEN:
-{      <RANGE_EQUAL:                         "range" ([" ","\t","\n","\r"])+ "=">            : STRING_EXPECTED
+{
+      <RANGE_EQUAL:                         "range" ([" ","\t","\n","\r"])+ "=">            : STRING_EXPECTED
     | <RANGE_GREATERTHAN:                   "range" ([" ","\t","\n","\r"])+ ">">            : STRING_EXPECTED
     | <RANGE_GREATERTHANEQUAL:              "range" ([" ","\t","\n","\r"])+ ">=">           : STRING_EXPECTED
     | <RANGE_LESSTHAN:                      "range" ([" ","\t","\n","\r"])+ "< ">           : STRING_EXPECTED
@@ -203,7 +226,8 @@ TOKEN : /** first level */
 }
 
 /**************************************************************************** */
-/**
+
+/**
  * Parses one complete attribute definition.
  *
  * @param _attribute    target attribute to update with parsed values
@@ -222,6 +246,12 @@ void parse(final AttributeCI_mxJPO _attr)
                                     | <KIND_INTEGER>                        {this.setValue(_attr, "kind",                   Kind.Integer);}
                                     | <KIND_REAL>                           {this.setValue(_attr, "kind",                   Kind.Real);}
                                     | <KIND_STRING>                         {this.setValue(_attr, "kind",                   Kind.String);} ) )
+
+      | ( <UUID>                                                            {property = new AdminProperty();
+                                                                             this.appendValue(this.getValue(_attr, "properties"), "propertiesStack", property);
+                                                                             this.setValue(property, "name",  "UUID");}
+                                    ( tmp = <STRING>                        {this.setValue(property, "value",               this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value",               this.getSingle(tmp.image));} ) )
 
       | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_attr, "symbolicNames",       this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(_attr, "symbolicNames",       this.getSingle(tmp.image));} ) )
