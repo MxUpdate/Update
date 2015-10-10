@@ -22,34 +22,55 @@ options {
     SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
     UNICODE_INPUT = true;
 }
-PARSER_BEGIN(PackageParser)
+
+PARSER_BEGIN(PackageParser)
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
 package org.mxupdate.update.system;
 
 import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.update.system.PackageCI_mxJPO.MemberRef;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
-import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 
 /**
- * Parses the update format for {@link PackageCI_mxJPO}. */
+ * Parses the update format for {@link PackageCI_mxJPO}.
+ */
 @SuppressWarnings("unused")
 class PackageParser
     extends AbstractParser_mxJPO
 {
 }
-PARSER_END(PackageParser)<*> SKIP :
+
+PARSER_END(PackageParser)
+
+<*> SKIP :
 {
   " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
 <DEFAULT> TOKEN :
 {
-      <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+      <UUID:                                "uuid">                                         : STRING_EXPECTED
+
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
@@ -58,7 +79,6 @@ class PackageParser
     | <CUSTOM_FALSE:                        "!custom">
 
     | <USESPACKAGE:                         "usespackage">                                  : STRING_EXPECTED
-
 }
 
 /************************************************************** Common String */
@@ -102,7 +122,8 @@ class PackageParser
 }
 
 /**************************************************************************** */
-/**
+
+/**
  * Parses one complete package definition.
  *
  * @param _package      target package to update with parsed values
@@ -114,7 +135,13 @@ void parse(final PackageCI_mxJPO _package)
     MemberRef member;
     AdminProperty property;
 } {
-    (   ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_package, "description",                    this.getString(tmp.image));}
+    (   ( <UUID>                                                            {property = new AdminProperty();
+                                                                             this.appendValue(this.getValue(_package, "properties"), "propertiesStack", property);
+                                                                             this.setValue(property, "name",  "UUID");}
+                                    ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+
+      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_package, "description",                    this.getString(tmp.image));}
                                     | tmp = <MULTILINESINGLE>               {this.setValue(_package, "description",                    this.getSingle(tmp.image));} ) )
 
       | ( <HIDDEN_TRUE>                                                     {this.setValue(_package, "hidden",                         true);} )

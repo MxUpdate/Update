@@ -26,19 +26,29 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class PackageCI_1ParserTest
     extends AbstractParserTest<PackageCI_mxJPO>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
         return new Object[][]
         {
-            {"1) simple",
+            {"0) simple",
                 "",
                 "description \"\" !hidden !custom"},
+            // uuid
+            {"1a) uuid with minus separator",
+                    "",
+                    "uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" !hidden !custom"},
+            {"1b) uuid w/o minus separator",
+                    "",
+                    "uuid \"FDA75674979211E6AE2256B6B6499611\"     description \"\" !hidden !custom"},
+            {"1c) uuid convert from single to string",
+                    "uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" !hidden !custom",
+                    "uuid   FDA7-5674979211-E6AE2256B6-B6499611    description \"\" !hidden !custom"},
             // description
             {"2a) description",
                 "",

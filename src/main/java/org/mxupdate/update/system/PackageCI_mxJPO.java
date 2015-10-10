@@ -25,6 +25,7 @@ import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -33,13 +34,14 @@ import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateLine;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 /**
  * Handles the export and update of &quot;system packages&quot;.
  * The handled properties are:
  * <ul>
+ * <li>uuid</li>
  * <li>description</li>
  * <li>hidden flag</li>
  * <li>{@link #custom} flag</li>
@@ -78,7 +80,7 @@ public class PackageCI_mxJPO
         super(EMxAdmin_mxJPO.Package, _mxName);
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -87,7 +89,7 @@ public class PackageCI_mxJPO
         this.prepare();
     }
 
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -124,7 +126,7 @@ public class PackageCI_mxJPO
      * {@inheritDoc}
      * All {@link #members} are sorted.
      */
-    @Override()
+    @Override
     protected void prepare()
     {
         super.prepare();
@@ -136,10 +138,12 @@ public class PackageCI_mxJPO
     public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
-                .string("description", this.getDescription())
-                .flag("hidden", false, this.isHidden())
-                .flag("custom", false, this.custom)
-                .list("usespackage", this.usesPackages)
+                //              tag            | default | value                              | write?
+                .stringNotNull( "uuid",                    this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
+                .string(        "description",             this.getDescription())
+                .flag(          "hidden",           false, this.isHidden())
+                .flag(          "custom",           false, this.custom)
+                .list(          "usespackage",             this.usesPackages)
                 .list(this.members)
                 .properties(this.getProperties());
     }

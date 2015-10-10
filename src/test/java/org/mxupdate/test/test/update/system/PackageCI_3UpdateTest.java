@@ -32,11 +32,11 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
-public class PackageCI_2UpdateTest
+@Test
+public class PackageCI_3UpdateTest
     extends AbstractDataExportUpdate<PackageData>
 {
-    @Override()
+    @Override
     protected PackageData createNewData(final String _name)
     {
         return new PackageData(this, _name);
@@ -47,7 +47,7 @@ public class PackageCI_2UpdateTest
      *
      * @throws Exception if MQL execution failed
      */
-    @BeforeMethod()
+    @BeforeMethod
     @AfterClass(groups = "close")
     public void cleanup()
         throws Exception
