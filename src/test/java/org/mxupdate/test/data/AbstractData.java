@@ -15,8 +15,9 @@
 
 package org.mxupdate.test.data;
 
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -34,6 +35,7 @@ import org.mxupdate.test.util.Version;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.Assert;
 
@@ -399,7 +401,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @throws Exception if update failed
      */
     public DATA update(final String _expLogText,
-                       final String... _params)
+                       final Object... _params)
         throws Exception
     {
         return this.updateWithCode(this.ciFile(), _expLogText, _params);
@@ -415,7 +417,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
      * @throws Exception if update failed
      */
     public DATA failureUpdate(final ErrorKey _error,
-                              final String... _params)
+                              final Object... _params)
         throws Exception
     {
         return this.failedUpdateWithCode(this.ciFile(), _error, _params);
@@ -434,26 +436,32 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     @SuppressWarnings("unchecked")
     public DATA updateWithCode(final String _code,
                                final String _expLogText,
-                               final String... _params)
+                               final Object... _params)
         throws Exception
     {
-        final Map<String,String> files = new HashMap<>();
-        files.put(this.getCIFileName(), _code);
         final Map<String,String> params = new HashMap<>();
         if (_params != null)  {
             for (int idx = 0; idx < _params.length; idx += 2)  {
-                params.put(_params[idx], _params[idx + 1]);
+                params.put(_params[idx].toString(), _params[idx + 1].toString());
             }
         }
-        final Map<?,?> bck = this.getTest().executeEncoded("Update", params, "FileContents", files);
 
-        if (_expLogText != null)  {
-            Assert.assertTrue(((String) bck.get("log")).contains(_expLogText), "Log message not contained: " + _expLogText + ", have log " + (String) bck.get("log"));
-        }
+        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getTest().getContext(), false, params);
 
-        if (bck.get("exception") != null)  {
-            throw new Exception((Exception) bck.get("exception"));
-        }
+        final TypeDef_mxJPO typeDef = paramCache.getMapping().getTypeDef(this.getCI().updateType);
+
+        // prepare the current
+        final WrapperCIInstance<AbstractObject_mxJPO<?>> cur = new WrapperCIInstance<AbstractObject_mxJPO<?>>(typeDef.newTypeInstance(this.getName()));
+        cur.parseUpdate(_code);
+        final WrapperCIInstance<AbstractObject_mxJPO<?>> tmp = new WrapperCIInstance<AbstractObject_mxJPO<?>>(typeDef.newTypeInstance(this.getName()));
+        tmp.parse(paramCache);
+        cur.calcDelta(paramCache,  (File) null, tmp).exec(paramCache);
+
+// TODO: check log messages
+//        if (_expLogText != null)  {
+//            Assert.assertTrue(((String) bck.get("log")).contains(_expLogText), "Log message not contained: " + _expLogText + ", have log " + (String) bck.get("log"));
+//        }
+
         return (DATA) this;
     }
 
@@ -470,27 +478,25 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     @SuppressWarnings("unchecked")
     public DATA failedUpdateWithCode(final String _code,
                                      final ErrorKey _error,
-                                     final String... _params)
+                                     final Object... _params)
         throws Exception
     {
-        final Map<String,String> files = new HashMap<>();
-        files.put(this.getCIFileName(), _code);
-        final Map<String,String> params = new HashMap<>();
-        if (_params != null)  {
-            for (int idx = 0; idx < _params.length; idx += 2)  {
-                params.put(_params[idx], _params[idx + 1]);
-            }
+        InvocationTargetException ex = null;
+        try {
+            this.update((String) null, _params);
+        } catch (final InvocationTargetException e)  {
+            ex = e;
         }
-        final Map<?,?> bck = this.getTest().executeEncoded("Update", params, "FileContents", files);
-        Assert.assertTrue(
-                bck.containsKey("exception"),
-                "check exception exists");
+
         Assert.assertNotNull(
-                bck.get("exception"),
-                "check exception is not null");
+                ex,
+                "check exception is thrown");
         Assert.assertTrue(
-                ((Exception) bck.get("exception")).getMessage().indexOf("UpdateError #" + _error.getCode() + ":") >= 0,
-                "check for correct error code #" + _error.getCode() + " (have: " + ((Exception) bck.get("exception")).getMessage() + ")");
+                ex.getCause() instanceof UpdateException_mxJPO,
+                "check update exception is thrown");
+        Assert.assertTrue(
+                ex.getCause().getMessage().indexOf("UpdateError #" + _error.getCode() + ":") >= 0,
+                "check for correct error code #" + _error.getCode() + " (have: " + ex.getCause().getMessage() + ")");
 
         return (DATA) this;
     }

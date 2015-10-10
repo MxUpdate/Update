@@ -15,15 +15,17 @@
 
 package org.mxupdate.test.test.update;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractBusData;
+import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Common methods to test business object updates.
@@ -97,6 +99,14 @@ public abstract class AbstractBusUpdateTest<BUSDATA extends AbstractBusData<?>>
                              final BUSDATA _busData)
         throws Exception
     {
+        // create object
+        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
+        final TypeDef_mxJPO typeDef = paramCache.getMapping().getTypeDef(_busData.getCI().updateType);
+        final WrapperCIInstance<?> currentWrapper = new WrapperCIInstance<>(typeDef.newTypeInstance(_busData.getName()));
+        currentWrapper.create(paramCache);
+        // create the depending objects to be able to connect to them
+        _busData.createDependings();
+
         // first update with original content
         _busData.update((String) null);
 

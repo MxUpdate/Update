@@ -61,9 +61,6 @@ public class Dispatcher_mxJPO
     /** Name of the &quot;Search&quot; method within the parameters map. */
     private static final String METHOD_SEARCH = "Search"; //$NON-NLS-1$
 
-    /** Name of the &quot;Update&quot; method within the parameters map. */
-    private static final String METHOD_UPDATE = "Update"; //$NON-NLS-1$
-
     /**
      * Main method to dispatch between different plug-in methods.
      *
@@ -131,8 +128,6 @@ public class Dispatcher_mxJPO
                     bck = new GetVersion_mxJPO().execute(paramCache, arguments);
                 } else if (Dispatcher_mxJPO.METHOD_SEARCH.equals(method))  {
                     bck = new Search_mxJPO().execute(paramCache, arguments);
-                } else if (Dispatcher_mxJPO.METHOD_UPDATE.equals(method))  {
-                    bck = new Update_mxJPO().execute(paramCache, arguments);
                 } else  {
                     throw new Exception("unknown plug-in method '" + method + "'");
                 }

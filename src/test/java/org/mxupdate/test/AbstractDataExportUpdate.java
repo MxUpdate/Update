@@ -20,7 +20,11 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.mxupdate.test.data.AbstractAdminData;
+import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.test.data.util.PropertyDef;
+import org.mxupdate.test.test.update.WrapperCIInstance;
+import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.Test;
 
 /**
@@ -42,7 +46,7 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
     protected Object[][] prepareData(final String _logText,
                                      final Object[]... _datas)
     {
-        final List<Object[]> tmp = new ArrayList<Object[]>();
+        final List<Object[]> tmp = new ArrayList<>();
         tmp.addAll(Arrays.asList(_datas));
         if (_logText != null)  {
             tmp.add(new Object[]{
@@ -78,7 +82,7 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
                     this.createNewData("hello \" test")});
         }
 
-        final List<Object[]> ret = new ArrayList<Object[]>();
+        final List<Object[]> ret = new ArrayList<>();
         for (final Object[] data : tmp)
         {
             @SuppressWarnings("unchecked")
@@ -138,6 +142,16 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
                                      final String _expUpdateLog)
         throws Exception
     {
+        // work around for policies...
+        if (_orgData instanceof PolicyData)  {
+            new PolicyData(this, _orgData.getName().substring(AbstractTest.PREFIX.length())).create();
+        }
+        // create object
+        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
+        final TypeDef_mxJPO typeDef = paramCache.getMapping().getTypeDef(_orgData.getCI().updateType);
+        final WrapperCIInstance<?> currentWrapper = new WrapperCIInstance<>(typeDef.newTypeInstance(_orgData.getName()));
+        currentWrapper.create(paramCache);
+        // create the depending objects to be able to connect to them
         _orgData.createDependings();
 
         // first update with original content
@@ -167,6 +181,16 @@ public abstract class AbstractDataExportUpdate<DATA extends AbstractAdminData<?>
                                     final String _expUpdateLog)
         throws Exception
     {
+        // work around for policies...
+        if (_orgData instanceof PolicyData)  {
+            new PolicyData(this, _orgData.getName().substring(AbstractTest.PREFIX.length())).create();
+        }
+        // create object
+        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
+        final TypeDef_mxJPO typeDef = paramCache.getMapping().getTypeDef(_orgData.getCI().updateType);
+        final WrapperCIInstance<?> currentWrapper = new WrapperCIInstance<>(typeDef.newTypeInstance(_orgData.getName()));
+        currentWrapper.create(paramCache);
+        // create the depending objects to be able to connect to them
         _orgData.createDependings();
 
         // first update with original content
