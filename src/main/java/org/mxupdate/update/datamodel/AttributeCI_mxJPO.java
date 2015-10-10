@@ -323,7 +323,7 @@ public class AttributeCI_mxJPO
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flag(          "hidden",                   false, this.isHidden())
-                .flagIfTrue(    "multivalue",        false, this.multiValue,                    _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))
+                .flagIfTrue(    "multivalue",        false, this.multiValue,                    (this.kind != Kind.Binary) && _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))
                 .flagIfTrue(    "resetonclone",      false, this.resetOnClone,                  _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnClone))
                 .flagIfTrue(    "resetonrevision",   false, this.resetOnRevision,               _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnRevision))
                 .flagIfTrue(    "multiline",         false, this.multiline,                     (this.kind == Kind.String))
@@ -408,7 +408,7 @@ public class AttributeCI_mxJPO
                 break;
         }
 
-        if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))  {
+        if ((this.kind != Kind.Binary) && _paramCache.getValueBoolean(ValueKeys.DMAttrSupportsFlagMultiValue))  {
             if ((current == null) || !current.multiValue)  {
                 DeltaUtil_mxJPO.calcFlagDelta(_mql, "multivalue", false, this.multiValue, (current != null) ? current.multiValue : null);
             } else if (!this.multiValue)  {

@@ -66,7 +66,6 @@ public class TypeCI_2DeltaCalculationTest
                                     .setSingle("kind", "binary")
                                     .setValue("description", "abc def")
                                     .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
                                     .setFlag("resetonclone", false, Create.ViaFlag)
                                     .setFlag("resetonrevision", false, Create.ViaFlag)
                                     .setValue("default", "")) },

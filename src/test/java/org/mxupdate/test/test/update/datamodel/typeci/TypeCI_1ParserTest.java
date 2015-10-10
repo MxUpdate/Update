@@ -146,7 +146,7 @@ public class TypeCI_1ParserTest
             // general attribute definition
             {"100a) local binary attribute",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary  description \"\" !hidden !multivalue !resetonclone !resetonrevision                                    default \"\" } "},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary  description \"\" !hidden             !resetonclone !resetonrevision                                    default \"\" } "},
             {"100b) local boolean attribute",
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision                                    default \"\" } "},
@@ -166,64 +166,64 @@ public class TypeCI_1ParserTest
              // attribute registered name
             {"101a) attribute symbolic name",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary symbolicname \"attribute_abc\"                                description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean symbolicname \"attribute_abc\"                                description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
             {"101b) attribute two symbolic names",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary symbolicname \"attribute_abc\" symbolicname \"attribute_def\" description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary symbolicname \"attribute_def\" symbolicname \"attribute_abc\" description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean symbolicname \"attribute_abc\" symbolicname \"attribute_def\" description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean symbolicname \"attribute_def\" symbolicname \"attribute_abc\" description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
 
             // attribute description
             {"102a) attribute description",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"abc def\"  !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"abc def\"  !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
             {"102b) attribute description not defined",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\"         !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary                          !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\"         !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean                          !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
             {"102c) multi-line attribute description",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
 
             // attribute hidden flag
             {"103a) attribute hidden",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" hidden  !multivalue !resetonclone !resetonrevision default \"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" hidden  !multivalue !resetonclone !resetonrevision default \"\" }"},
             {"103b) attribute not hidden (not defined)",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\"         !multivalue !resetonclone !resetonrevision default \"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\"         !multivalue !resetonclone !resetonrevision default \"\" }"},
 
             // attribute multivalue flag
             {"104a) attribute multivalue flag",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden multivalue  !resetonclone !resetonrevision default \"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden multivalue  !resetonclone !resetonrevision default \"\" }"},
             {"104b) attribute multivalue flag not defined",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden             !resetonclone !resetonrevision default \"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden             !resetonclone !resetonrevision default \"\" }"},
 
             // attribute resetonclone flag
             {"105a) attribute resetonclone flag",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue resetonclone  !resetonrevision default \"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue resetonclone  !resetonrevision default \"\" }"},
             {"105b) attribute resetonclone flag not defined",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue               !resetonrevision default \"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue               !resetonrevision default \"\" }"},
 
             // attribute resetonrevision flag
             {"106a) attribute resetonrevision flag",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone resetonrevision  default \"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone resetonrevision  default \"\" }"},
             {"106b) attribute resetonrevision flag not defined",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone                  default \"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone                  default \"\" }"},
 
             // attribute default value
             {"107a) attribute default value",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc def\"  }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc def\"  }"},
             {"107b) attribute default value not defined",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"         }",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision                      }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"         }",
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision                      }"},
             {"107c) multi-line attribute default value",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\ndef\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\ndef\" }"},
 
             // real attribute rangevalue flag
             {"108a) real attribute rangevalue flag",
@@ -252,10 +252,10 @@ public class TypeCI_1ParserTest
             // attribute rule
             {"111a) attribute rule",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision rule \"A\"            default \"\"  }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision rule \"A\"            default \"\"  }"},
             {"111a) attribute rule list (if more than one none)",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision                       default \"\"  }",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision rule \"A\" rule \"B\" default \"\"  }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision                       default \"\"  }",
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision rule \"A\" rule \"B\" default \"\"  }"},
 
             // attribute dimension
             {"112a) real attribute dimension",
@@ -265,24 +265,24 @@ public class TypeCI_1ParserTest
             // attribute action trigger
             {"120a) action trigger with input",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\" input \"{}\\\"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\" input \"{}\\\"\" }"},
             {"120b) action trigger w/o input",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\" input \"\" }",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\" input \"\" }",
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\" }"},
             //  attribute check trigger
             {"121a) check trigger with input",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\" input \"{}\\\"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\" input \"{}\\\"\" }"},
             {"121b) check trigger w/o input",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\" input \"\" }",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\" input \"\" }",
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\" }"},
             //  attribute override trigger
             {"122a) override trigger with input",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify override \"{}\\\"\" input \"{}\\\"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify override \"{}\\\"\" input \"{}\\\"\" }"},
             {"122b) override trigger w/o input",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify override \"{}\\\"\" input \"\" }",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify override \"{}\\\"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify override \"{}\\\"\" input \"\" }",
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify override \"{}\\\"\" }"},
 
             // attribute ranges
             {"130a) attribute range",
@@ -334,16 +334,16 @@ public class TypeCI_1ParserTest
             // attribute property
             {"140a) attribute property special characters",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" }"},
             {"140b) attribute property and value special characters",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" value \"{}\\\"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" value \"{}\\\"\" }"},
             {"140c) attribute property link special characters",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" to type \"{}\\\"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" to type \"{}\\\"\" }"},
             {"140d) attribute property link and value special characters",
                     "",
-                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind binary description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\" }"},
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\" }"},
         };
     }
 
