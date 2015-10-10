@@ -18,7 +18,9 @@ package org.mxupdate.update.program;
 import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
@@ -26,6 +28,8 @@ import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.util.FileUtil_mxJPO;
@@ -225,19 +229,10 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
     {
         final AbstractProgram_mxJPO<?> current = (AbstractProgram_mxJPO<?>) _current;
 
-        // execute must be defined before downloadable...
-        if (this.execute != current.execute)  {
-            _mql.newLine().cmd("execute ").cmd(this.execute.name().toLowerCase());
-        }
+        boolean update = true;
 
-        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), current.getSymbolicNames());
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "description",                 this.getDescription(),              current.getDescription());
-        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",              false,  this.isHidden(),                    current.isHidden());
-        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "needsbusinessobject", false,  this.needsBusinessObjectContext,    current.needsBusinessObjectContext);
-        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "downloadable",        false,  this.downloadable,                  current.downloadable);
-        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "pipe",                false,  this.pipe,                          current.pipe);
-        DeltaUtil_mxJPO.calcFlagDelta(_mql,  "pooled",              false,  this.pooled,                        current.pooled);
-
+        // evaluate file incl. path (if a file in the CI is defined)
+        File realFile = null;
         if ((this.file != null) && !this.file.isEmpty())  {
             // code via file
             final String tmpFile;
@@ -247,28 +242,66 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
             } else  {
                 tmpFile = _mql.getFile().getParent() + "/" + this.file;
             }
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "code", this.readCode(new File(tmpFile)),   current.getCode());
-        } else  {
-            // code via code
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "code", this.getCode(),                     current.getCode());
+            realFile = new File(tmpFile);
         }
 
-        // rule
-        if (CompareToUtil_mxJPO.compare(0, this.rule, current.rule) != 0)  {
-            if ((current.rule != null) && !current.rule.isEmpty())  {
-                _mql.newLine().cmd("remove rule ").arg(current.rule);
+        // check file date
+        if (_paramCache.getValueBoolean(ValueKeys.UpdateCheckFileDate) && (realFile != null))  {
+            final String fileDate = this.getProperties().getValue4KeyValue(_paramCache, PropertyDef_mxJPO.FILEDATE)
+                                    + " ___ "
+                                    + StringUtil_mxJPO.formatFileDate(_paramCache, new Date(realFile.lastModified()));
+            this.getProperties().setValue4KeyValue(_paramCache, PropertyDef_mxJPO.FILEDATE, fileDate);
+
+            update = !fileDate.equals(current.getProperties().getValue4KeyValue(_paramCache, PropertyDef_mxJPO.FILEDATE));
+        }
+
+        if (update)  {
+
+            // execute must be defined before downloadable...
+            if (this.execute != current.execute)  {
+                _mql.newLine().cmd("execute ").cmd(this.execute.name().toLowerCase());
             }
-            if ((this.rule != null) && !this.rule.isEmpty())  {
-                _mql.newLine().cmd("add rule ").arg(this.rule);
+
+            DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), current.getSymbolicNames());
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "description",                 this.getDescription(),              current.getDescription());
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",              false,  this.isHidden(),                    current.isHidden());
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "needsbusinessobject", false,  this.needsBusinessObjectContext,    current.needsBusinessObjectContext);
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "downloadable",        false,  this.downloadable,                  current.downloadable);
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "pipe",                false,  this.pipe,                          current.pipe);
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "pooled",              false,  this.pooled,                        current.pooled);
+
+            if ((this.file != null) && !this.file.isEmpty())  {
+                // code via file
+                final String tmpFile;
+                // absolute path?
+                if (this.file.startsWith("/"))  {
+                    tmpFile = this.file;
+                } else  {
+                    tmpFile = _mql.getFile().getParent() + "/" + this.file;
+                }
+                DeltaUtil_mxJPO.calcValueDelta(_mql, "code", this.readCode(new File(tmpFile)),   current.getCode());
+            } else  {
+                // code via code
+                DeltaUtil_mxJPO.calcValueDelta(_mql, "code", this.getCode(),                     current.getCode());
             }
-        }
 
-        // execute user
-        if (CompareToUtil_mxJPO.compare(0, this.user, current.user) != 0)  {
-            _mql.newLine().cmd("execute user ").arg(this.user);
-        }
+            // rule
+            if (CompareToUtil_mxJPO.compare(0, this.rule, current.rule) != 0)  {
+                if ((current.rule != null) && !current.rule.isEmpty())  {
+                    _mql.newLine().cmd("remove rule ").arg(current.rule);
+                }
+                if ((this.rule != null) && !this.rule.isEmpty())  {
+                    _mql.newLine().cmd("add rule ").arg(this.rule);
+                }
+            }
 
-        this.getProperties().calcDelta(_mql, "", current.getProperties());
+            // execute user
+            if (CompareToUtil_mxJPO.compare(0, this.user, current.user) != 0)  {
+                _mql.newLine().cmd("execute user ").arg(this.user);
+            }
+
+            this.getProperties().calcDelta(_mql, "", current.getProperties());
+        }
     }
 
     /**
