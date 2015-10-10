@@ -16,9 +16,11 @@
 package org.mxupdate.test.test.update.datamodel.policyci;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.datamodel.FormatData;
 import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.test.data.datamodel.PolicyData.AllState;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
+import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.datamodel.helper.Access;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
@@ -50,12 +52,27 @@ public class PolicyCI_2DeltaCalculationTest
             {"1b) two symbolic name",
                     new PolicyData(this, "Test"),
                     new PolicyData(this, "Test").setValue("symbolicname", "policy_123").setValue("symbolicname", "policy_345")},
-            {"4) with all types",
+
+            {"4a) with all types",
                     new PolicyData(this, "Test"),
                     new PolicyData(this, "Test").defDataAll("type")},
-            {"5) with all formats",
+            {"4b) with specific type from all types",
+                    new PolicyData(this, "Test").defDataAll("type"),
+                    new PolicyData(this, "Test").defData("type", new TypeData(this, "Type"))},
+            {"4c) with specific type from another type",
+                    new PolicyData(this, "Test").defData("type", new TypeData(this, "TypeOld")),
+                    new PolicyData(this, "Test").defData("type", new TypeData(this, "TypeNew"))},
+
+            {"5a) with all formats",
                     new PolicyData(this, "Test"),
                     new PolicyData(this, "Test").defDataAll("format")},
+            {"5b) with specific format from all format",
+                    new PolicyData(this, "Test").defDataAll("format"),
+                    new PolicyData(this, "Test").defData("format", new FormatData(this, "Format"))},
+            {"5c) with specific format from another specific format",
+                    new PolicyData(this, "Test").defData("format", new FormatData(this, "FormatOld")),
+                    new PolicyData(this, "Test").defData("format", new FormatData(this, "FormatNew"))},
+
             {"10a) with two registered state names",
                     new PolicyData(this, "Test"),
                     new PolicyData(this, "Test").addState(new State().setName("A").setValue("registeredname", "state_A").setValue("registeredname", "state_A1"))},
@@ -104,6 +121,8 @@ public class PolicyCI_2DeltaCalculationTest
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.DM_POLICY);
+        this.cleanup(AbstractTest.CI.DM_FORMAT);
+        this.cleanup(AbstractTest.CI.DM_TYPE);
     }
 
     @Override()

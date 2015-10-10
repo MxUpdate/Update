@@ -364,9 +364,20 @@ public class Policy_mxJPO
 
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",                  this.getDescription(),                      _current.getDescription());
         DeltaUtil_mxJPO.calcListDelta( _mql, "type",        this.allTypes,   this.types,            _current.allTypes,   _current.types);
-        // work-arround because if all format is defined, formats contains  in MX list of all formats!
-        if (!this.allFormats || !_current.allFormats)  {
-            DeltaUtil_mxJPO.calcListDelta( _mql, "format",      this.allFormats, this.formats,          _current.allFormats, _current.formats);
+        // if previous was defined all formats, but now not:
+        // - format all must be removed
+        // - to be sure, all other formats must be also removed...
+        // - assign new defined formats
+        if (!this.allFormats && _current.allFormats)  {
+            _mql.newLine().cmd("remove format ").arg("all");
+            for (final String format : _current.formats)  {
+                _mql.newLine().cmd("remove format ").arg(format);
+            }
+            for (final String format : this.formats)  {
+                _mql.newLine().cmd("add format ").arg(format);
+            }
+        } else  {
+            DeltaUtil_mxJPO.calcListDelta( _mql, "format",  this.allFormats, this.formats,          _current.allFormats, _current.formats);
         }
 
         // if not default format => ADMINISTRATION must be default format
