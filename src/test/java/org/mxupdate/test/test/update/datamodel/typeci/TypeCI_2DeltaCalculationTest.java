@@ -40,22 +40,25 @@ import matrix.util.MatrixException;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class TypeCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<Type_mxJPO,TypeData>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1a) symbolic name",
+            {"1) uuid",
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+            {"2a) symbolic name",
                     new TypeData(this, "Test"),
                     new TypeData(this, "Test").setValue("symbolicname", "expression_123")},
-            {"1b) two symbolic name",
+            {"2b) two symbolic name",
                     new TypeData(this, "Test"),
                     new TypeData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
-            {"2) description",
+            {"3) description",
                     new TypeData(this, "Test"),
                     new TypeData(this, "Test").setValue("description", "abc def")},
 
@@ -155,8 +158,8 @@ public class TypeCI_2DeltaCalculationTest
        };
     }
 
-    @Override()
-    @BeforeMethod()
+    @Override
+    @BeforeMethod
     @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException

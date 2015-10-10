@@ -24,6 +24,21 @@ options {
 }
 
 PARSER_BEGIN(TypeParser)
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
 package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
@@ -36,7 +51,6 @@ import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO.LocalAttrib
 import org.mxupdate.update.datamodel.helper.LocalPathTypeList_mxJPO.LocalPathType;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
-import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
@@ -60,7 +74,9 @@ PARSER_END(TypeParser)
 
 <DEFAULT> TOKEN : /** first level */
 {
-      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+      <UUID:                                "uuid">                                         : STRING_EXPECTED
+
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
     | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
@@ -265,7 +281,13 @@ void parse(final Type_mxJPO _type)
     Range range;
     LocalPathType localPathType;
 } {
-    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                                          {this.appendValue(_type, "symbolicNames", this.getString(tmp.image));}
+    (   ( <UUID>                                                                              {property = new AdminProperty();
+                                                                                               this.appendValue(this.getValue(_type, "properties"), "propertiesStack", property);
+                                                                                               this.setValue(property, "name",  "UUID");}
+                                    ( tmp = <STRING>                                          {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                                          {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+
+      | ( <SYMBOLICNAME>            ( tmp = <STRING>                                          {this.appendValue(_type, "symbolicNames", this.getString(tmp.image));}
                                     | tmp = <SINGLE>                                          {this.appendValue(_type, "symbolicNames", this.getSingle(tmp.image));} ) )
 
       | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>                                 {this.setValue(_type, "description",                            this.getString(tmp.image));}
