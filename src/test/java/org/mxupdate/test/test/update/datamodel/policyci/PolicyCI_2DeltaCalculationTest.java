@@ -37,19 +37,24 @@ import matrix.util.MatrixException;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class PolicyCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<Policy_mxJPO,PolicyData>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1a) symbolic name",
+
+            {"1) uuid",
+                    new PolicyData(this, "Test"),
+                    new PolicyData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+
+            {"2a) symbolic name",
                     new PolicyData(this, "Test"),
                     new PolicyData(this, "Test").setValue("symbolicname", "policy_123")},
-            {"1b) two symbolic name",
+            {"2b) two symbolic name",
                     new PolicyData(this, "Test"),
                     new PolicyData(this, "Test").setValue("symbolicname", "policy_123").setValue("symbolicname", "policy_345")},
 
@@ -128,8 +133,8 @@ public class PolicyCI_2DeltaCalculationTest
        };
     }
 
-    @Override()
-    @BeforeMethod()
+    @Override
+    @BeforeMethod
     @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException

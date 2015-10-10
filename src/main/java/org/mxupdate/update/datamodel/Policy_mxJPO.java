@@ -30,6 +30,7 @@ import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
@@ -52,6 +53,21 @@ import matrix.util.MatrixException;
 
 /**
  * The class is used to export and import / update policy configuration items.
+ * The handled properties are:
+ * <ul>
+ * <li>uuid</li>
+ * <li>symbolic names</li>
+ * <li>description</li>
+ * <li>hidden flag</li>
+ * <li>{@link #formats} and {@link #defaultFormat default format}</li>
+ * <li>{@link #enforce} flag</li>
+ * <li>{@link #minorsequence minor} and {@link #majorsequence major sequence}
+ *     with {@link #delimiter}</li>
+ * <li>{@link #store}</li>
+ * <li>{@link #types}</li>
+ * <li>{@link #states}</li>
+ * <li>properties</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  */
@@ -134,7 +150,7 @@ public class Policy_mxJPO
         super(EMxAdmin_mxJPO.Policy, _mxName);
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -150,7 +166,7 @@ public class Policy_mxJPO
      * {@link #allStateAccess all state access} and
      * {@link State#access state access} statements are sorted if defined.
      */
-    @Override()
+    @Override
     public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
@@ -184,7 +200,7 @@ public class Policy_mxJPO
      *         <i>false</i>
      * @see #IGNORED_URLS
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -251,7 +267,7 @@ public class Policy_mxJPO
      * related symbolic name of the state is updated and removed from the
      * property list.
      */
-    @Override()
+    @Override
     protected void prepare()
     {
         for (final State state : this.states)  {
@@ -277,7 +293,7 @@ public class Policy_mxJPO
      *
      * @param _paramCache       not used
      */
-    @Override()
+    @Override
     public void create(final ParameterCache_mxJPO _paramCache)
     {
     }
@@ -287,6 +303,7 @@ public class Policy_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                                                                 | write?
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flag(          "hidden",            false, this.isHidden())

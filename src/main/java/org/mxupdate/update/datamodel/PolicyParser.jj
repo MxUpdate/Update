@@ -24,6 +24,20 @@ options {
 }
 
 PARSER_BEGIN(PolicyParser)
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
 
 package org.mxupdate.update.datamodel;
 
@@ -37,7 +51,6 @@ import org.mxupdate.update.datamodel.Policy_mxJPO.Signature;
 import org.mxupdate.update.datamodel.Policy_mxJPO.State;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
-import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
@@ -51,6 +64,7 @@ class PolicyParser
     extends AbstractParser_mxJPO
 {
 }
+
 PARSER_END(PolicyParser)
 
 <*> SKIP :
@@ -60,7 +74,9 @@ PARSER_END(PolicyParser)
 
 <DEFAULT> TOKEN :
 {
-      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+      <UUID:                                "uuid">                                         : STRING_EXPECTED
+
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
     | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
@@ -193,7 +209,8 @@ PARSER_END(PolicyParser)
 
 /************************************************************ Legacy Triggers */
 <DEFAULT> TOKEN :
-{      <LEGACYACTION:                        "action">                                       : STRING_EXPECTED
+{
+      <LEGACYACTION:                        "action">                                       : STRING_EXPECTED
     | <LEGACYCHECK:                         "check">                                        : STRING_EXPECTED
 }
 
@@ -233,7 +250,8 @@ PARSER_END(PolicyParser)
 
 /** After access definition back to default */
 <DEFAULT> TOKEN:
-{      <FILTER:                              "filter">                                               : STRING_EXPECTED
+{
+      <FILTER:                              "filter">                                               : STRING_EXPECTED
     | <LOCALFILTER:                         "localfilter">                                          : STRING_EXPECTED
     | <ORGANIZATION_ANY:                    "any"         ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
     | <ORGANIZATION_SINGLE:                 "single"      ([" ","\t","\n","\r"])+ "organization">   : DEFAULT
@@ -283,7 +301,8 @@ PARSER_END(PolicyParser)
 
 /******************************************************** Delimiter Character */
 <DEFAULT> TOKEN:
-{      <DELIMITER:                           "delimiter">                                    : DELIMITER_EXPECTED
+{
+      <DELIMITER:                           "delimiter">                                    : DELIMITER_EXPECTED
 }
 
 <DELIMITER_EXPECTED> TOKEN :
@@ -295,7 +314,8 @@ PARSER_END(PolicyParser)
 
 /********************************************************************** Route */
 <DEFAULT> TOKEN :
-{      <ROUTE:                               "route" ([" ","\t","\n"])+ "{">                 : ROUTEUSER_EXPECTED
+{
+      <ROUTE:                               "route" ([" ","\t","\n"])+ "{">                 : ROUTEUSER_EXPECTED
 }
 
 <ROUTEUSER_EXPECTED> TOKEN :
@@ -319,7 +339,13 @@ void parse(final Policy_mxJPO _policy)
     AdminProperty property;
     Access access = new Access();
 } {
-    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_policy, "symbolicNames",                     this.getString(tmp.image));}
+    (   ( <UUID>                                                            {property = new AdminProperty();
+                                                                             this.appendValue(this.getValue(_policy, "properties"), "propertiesStack", property);
+                                                                             this.setValue(property, "name",  "UUID");}
+                                    ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+
+      | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_policy, "symbolicNames",                     this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(_policy, "symbolicNames",                     this.getSingle(tmp.image));} ) )
 
       | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_policy, "description",                          this.getString(tmp.image));}
