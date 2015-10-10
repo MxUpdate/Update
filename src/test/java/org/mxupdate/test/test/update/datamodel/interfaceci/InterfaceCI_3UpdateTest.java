@@ -29,6 +29,7 @@ import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.update.datamodel.Interface_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -99,12 +100,12 @@ public class InterfaceCI_3UpdateTest
     }
 
     /**
-     * Positive test with one attribute.
+     * Positive test with one global attribute.
      *
      * @throws Exception if test failed
      */
-    @Test(description = "positive test with one attribute")
-    public void t6a_positiveTestWithAttribute()
+    @Test(description = "positive test with one global attribute")
+    public void t6a_positiveTestWithGlobalAttribute()
         throws Exception
     {
         this.createNewData("Test")
@@ -116,12 +117,12 @@ public class InterfaceCI_3UpdateTest
     }
 
     /**
-     * Positive test with add of an attribute.
+     * Positive test with add of an global attribute.
      *
      * @throws Exception if test failed
      */
-    @Test(description = "positive test with add of an attribute")
-    public void t6b_positiveTestAttributeAdded()
+    @Test(description = "positive test with add of an global attribute")
+    public void t6b_positiveTestGlobalAttributeAdded()
         throws Exception
     {
         this.createNewData("Test")
@@ -134,28 +135,29 @@ public class InterfaceCI_3UpdateTest
     }
 
     /**
-     * Negative test if an attribute is removed.
+     * Negative test if an global attribute is removed.
      *
      * @throws Exception if test failed
      */
-    @Test(description = "negative test if an attribute is removed")
-    public void t6c_negativeTestAttributesRemoved()
+    @Test(description = "negative test if an global attribute is removed")
+    public void t6c_negativeTestGlobalAttributesRemoved()
         throws Exception
     {
         this.createNewData("Test")
                 .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .create();
         this.createNewData("Test")
-                .failureUpdate(UpdateException_mxJPO.ErrorKey.DM_INTERFACE_REMOVE_ATTRIBUTE);
+                .failureUpdate(UpdateException_mxJPO.ErrorKey.DM_INTERFACE_REMOVE_GLOBAL_ATTRIBUTE);
     }
 
     /**
-     * Positive test if an ignored attribute is removed.
+     * Positive test if an ignored global attribute is not removed (because
+     * ignored).
      *
      * @throws Exception if test failed
      */
-    @Test(description = "positive test if an ignored attribute is removed")
-    public void t6d_positiveTestIgnoredAttributesRemoved()
+    @Test(description = "positive test if an ignored global attribute is not removed (because ignored)")
+    public void t6d_positiveTestIgnoredGlobalAttributesRemoved()
         throws Exception
     {
         this.createNewData("Test")
@@ -169,12 +171,12 @@ public class InterfaceCI_3UpdateTest
     }
 
     /**
-     * Positive test if an attribute is removed.
+     * Positive test if an global attribute is removed.
      *
      * @throws Exception if test failed
      */
-    @Test(description = "positive test if an attribute is removed")
-    public void t6e_positiveTestAttributesRemoved()
+    @Test(description = "positive test if an global attribute is removed")
+    public void t6e_positiveTestGlobalAttributesRemoved()
         throws Exception
     {
         this.createNewData("Test")
@@ -186,12 +188,26 @@ public class InterfaceCI_3UpdateTest
     }
 
     /**
+     * Negative test if an local attribute is removed.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test if an local attribute is removed")
+    public void t7_negativeTestLocalAttributesRemoved()
+        throws Exception
+    {
+        final InterfaceData interfaceDef = this.createNewData("Test").create();
+        this.mql("escape add attribute \"MXUPDATE_Test\" type string owner interface \"" + AbstractTest.convertMql(interfaceDef.getName()) + "\"");
+        interfaceDef.failureUpdate(ErrorKey.DM_INTERFACE_REMOVE_LOCAL_ATTRIBUTE);
+    }
+
+    /**
      * Positive test with one parent.
      *
      * @throws Exception if test failed
      */
     @Test(description = "positive test with one parent")
-    public void t7a_positiveTestWithParent()
+    public void t8a_positiveTestWithParent()
         throws Exception
     {
         this.createNewData("Test")
@@ -208,7 +224,7 @@ public class InterfaceCI_3UpdateTest
      * @throws Exception if test failed
      */
     @Test(description = "positive test with add of a parent")
-    public void t7b_positiveTestParentAdded()
+    public void t8b_positiveTestParentAdded()
         throws Exception
     {
         this.createNewData("Test")
@@ -226,7 +242,7 @@ public class InterfaceCI_3UpdateTest
      * @throws Exception if test failed
      */
     @Test(description = "negative test for interface update to check if removing of parent does not work")
-    public void t7c_negativeTestParentRemoved()
+    public void t8c_negativeTestParentRemoved()
         throws Exception
     {
         this.createNewData("Test")
@@ -242,7 +258,7 @@ public class InterfaceCI_3UpdateTest
      * @throws Exception if test failed
      */
     @Test(description = "positive test if an ignored parent is removed")
-    public void t7d_positiveTestIgnoredParentRemoved()
+    public void t8d_positiveTestIgnoredParentRemoved()
         throws Exception
     {
         this.createNewData("Test")
@@ -261,7 +277,7 @@ public class InterfaceCI_3UpdateTest
      * @throws Exception if test failed
      */
     @Test(description = "positive test if an parent is removed")
-    public void t7e_positiveTestParentRemoved()
+    public void t8e_positiveTestParentRemoved()
         throws Exception
     {
         this.createNewData("Test")
@@ -280,7 +296,7 @@ public class InterfaceCI_3UpdateTest
      * @throws Exception if test failed
      */
     @Test(description = "positive test if all parents are removed")
-    public void t7f_positiveTestAllParentsRemoved()
+    public void t8f_positiveTestAllParentsRemoved()
         throws Exception
     {
         this.createNewData("Test")
@@ -297,7 +313,7 @@ public class InterfaceCI_3UpdateTest
      * @throws Exception if test failed
      */
     @Test(description = "update interface with special characters")
-    public void t8_updateWithSpecialCharacters()
+    public void t9_updateWithSpecialCharacters()
         throws Exception
     {
         final InterfaceData parent1 = new InterfaceData(this, "TestInterfaceParent \" 1").create();
@@ -320,7 +336,7 @@ public class InterfaceCI_3UpdateTest
                 .addRelationship(rel2)
                 .update((String) null);
 
-        final Set<String> resultParent = new HashSet<String>();
+        final Set<String> resultParent = new HashSet<>();
         resultParent.add(parent1.getName());
         resultParent.add(parent2.getName());
         Assert.assertEquals(
@@ -328,7 +344,7 @@ public class InterfaceCI_3UpdateTest
                 resultParent,
                 "check that all parent interfaces are defined");
 
-        final Set<String> resultAttrs = new HashSet<String>();
+        final Set<String> resultAttrs = new HashSet<>();
         resultAttrs.add(attr1.getName());
         resultAttrs.add(attr2.getName());
         Assert.assertEquals(
@@ -337,7 +353,7 @@ public class InterfaceCI_3UpdateTest
                 resultAttrs,
                 "check that all types are defined");
 
-        final Set<String> resultTypes = new HashSet<String>();
+        final Set<String> resultTypes = new HashSet<>();
         resultTypes.add(type1.getName());
         resultTypes.add(type2.getName());
         Assert.assertEquals(
@@ -346,7 +362,7 @@ public class InterfaceCI_3UpdateTest
                 resultTypes,
                 "check that all types are defined");
 
-        final Set<String> resultRels = new HashSet<String>();
+        final Set<String> resultRels = new HashSet<>();
         resultRels.add(rel1.getName());
         resultRels.add(rel2.getName());
         Assert.assertEquals(

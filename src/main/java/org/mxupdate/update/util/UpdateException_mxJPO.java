@@ -162,19 +162,19 @@ public class UpdateException_mxJPO
                 "Attribute ''{0}'' is defined with multiple values and must be removed, but not possible because some information could be lost!"),
 
         /**
-         * <p>The given attribute is not defined anymore but assigned to the
-         * interface object. The attribute is not automatically removed
-         * because otherwise potentially data could be lost.</p>
+         * <p>The given global attribute is not defined anymore but assigned to
+         * the interface object. The global attribute is not automatically
+         * removed because otherwise potentially data could be lost.</p>
          *
          * <p>Parameters:
          * <ol>
-         * <li>attribute name</li>
+         * <li>global attribute name</li>
          * <li>interface which is tried to update</li>
          * </ol>
          * </p>
          */
-        DM_INTERFACE_REMOVE_ATTRIBUTE(10901,
-                "Current attribute ''{0}'' is defined to be removed from interface ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
+        DM_INTERFACE_REMOVE_GLOBAL_ATTRIBUTE(10901,
+                "Current global attribute ''{0}'' is defined to be removed from interface ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
 
         /**
          * <p>An interface is already derived from another interface, but
@@ -193,6 +193,21 @@ public class UpdateException_mxJPO
          */
         DM_INTERFACE_REMOVE_PARENT(10902,
                 "Current parent interface ''{0}'' must be removed from interface ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
+
+        /**
+         * <p>The given local attribute is not defined anymore but assigned to
+         * the interface object. The local attribute is not automatically
+         * removed because otherwise potentially data could be lost.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>local attribute name</li>
+         * <li>interface which is tried to update</li>
+         * </ol>
+         * </p>
+         */
+        DM_INTERFACE_REMOVE_LOCAL_ATTRIBUTE(10903,
+                "Current local attribute ''{0}'' is defined to be removed from interface ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
 
         /**
          * <p>The delimiter of an existing policy is not equal to the new
@@ -243,34 +258,49 @@ public class UpdateException_mxJPO
                 "The new derived ''{2}'' can not be set for relationship ''{0}'', because derived ''{1}'' is already set and potentially some data can be lost."),
 
         /**
-         * <p>The given attribute is not defined anymore but assigned to the
-         * interface object. The attribute is not automatically removed
-         * because otherwise potentially data could be lost.</p>
+         * <p>The given global attribute is not defined anymore but assigned to
+         * the interface object. The global attribute is not automatically
+         * removed because otherwise potentially data could be lost.</p>
          *
          * <p>Parameters:
          * <ol>
-         * <li>attribute name</li>
+         * <li>global attribute name</li>
          * <li>relationship which is tried to update</li>
          * </ol>
          * </p>
          */
-        DM_RELATION_REMOVE_ATTRIBUTE(11401,
-                "Current attribute ''{0}'' is defined to be removed from relationship ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
+        DM_RELATION_REMOVE_GLOBAL_ATTRIBUTE(11401,
+                "Current global attribute ''{0}'' is defined to be removed from relationship ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
 
         /**
-         * <p>The given attribute is not defined anymore but assigned to the
-         * type object. The attribute is not automatically removed
+         * <p>The given local attribute is not defined anymore but assigned to
+         * the interface object. The local attribute is not automatically
+         * removed because otherwise potentially data could be lost.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>local attribute name</li>
+         * <li>relationship which is tried to update</li>
+         * </ol>
+         * </p>
+         */
+        DM_RELATION_REMOVE_LOCAL_ATTRIBUTE(11402,
+                "Current local attribute ''{0}'' is defined to be removed from relationship ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
+
+        /**
+         * <p>The given global attribute is not defined anymore but assigned to
+         * the type object. The global attribute is not automatically removed
          * because otherwise potentially data could be lost.</p>
          *
          * <p>Parameters:
          * <ol>
-         * <li>attribute name</li>
+         * <li>global attribute name</li>
          * <li>type which is tried to update</li>
          * </ol>
          * </p>
          */
-        DM_TYPE_REMOVE_ATTRIBUTE(11801,
-                "Current attribute ''{0}'' is defined to be removed from type ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
+        DM_TYPE_REMOVE_GLOBAL_ATTRIBUTE(11801,
+                "Current global attribute ''{0}'' is defined to be removed from type ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
 
         /**
          * Kind of a type can not be changed if the current kind is not basic.
@@ -300,6 +330,21 @@ public class UpdateException_mxJPO
          */
         DM_TYPE_UPDATE_DERIVED(11803,
                 "The new derived ''{2}'' can not be set for type ''{0}'', because derived ''{1}'' is already set and potentially some data can be lost."),
+
+        /**
+         * <p>The given local attribute is not defined anymore but assigned to
+         * the type object. The local attribute is not automatically removed
+         * because otherwise potentially data could be lost.</p>
+         *
+         * <p>Parameters:
+         * <ol>
+         * <li>local attribute name</li>
+         * <li>type which is tried to update</li>
+         * </ol>
+         * </p>
+         */
+        DM_TYPE_REMOVE_LOCAL_ATTRIBUTE(11804,
+                "Current local attribute ''{0}'' is defined to be removed from type ''{1}'', but not allowed (because this could potentially meant to loose data)!"),
 
         /**
          * Kind of a role can not be changed if the current kind is not role.

@@ -26,6 +26,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 
 /**
  * Handles list of local attribute definitions.
@@ -99,18 +100,36 @@ public class LocalAttributeList_mxJPO
      * Calculates the delta between current LocalAttributeList and
      * LocalAttributeList.
      *
-     * @param _paramCache   parameter cache
-     * @param _mql          MQL builder to append the delta
-     * @param _owner        owner of the attributes
-     * @param _current      current properties
+     * @param _paramCache           parameter cache
+     * @param _mql                  MQL builder to append the delta
+     * @param _owner                owner of the attributes
+     * @param _errorKeyAttrRemoved  error key for the case that an attribute is
+     *                              removed
+     * @param _current              current properties
      * @throws Exception
      */
     public void calcDelta(final ParameterCache_mxJPO _paramCache,
                           final MultiLineMqlBuilder _mql,
                           final AbstractAdminObject_mxJPO<? extends AbstractAdminObject_mxJPO<?>> _owner,
+                          final ErrorKey _errorKeyAttrRemoved,
                           final LocalAttributeList_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        // check for removed attributes
+        for (final LocalAttribute tmpAttr : _current) {
+            boolean found = false;
+            for (final LocalAttribute targetAttr : this)  {
+                if (tmpAttr.getName().equals(targetAttr.getName())) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found)  {
+                throw new UpdateException_mxJPO(_errorKeyAttrRemoved, tmpAttr.getName(), _owner.getName());
+            }
+        }
+
+        // delta calculation for added / updated attributes
         for (final LocalAttribute targetAttr : this)  {
             LocalAttribute curAttr = null;
             for (final LocalAttribute tmpAttr : _current) {
@@ -129,6 +148,7 @@ public class LocalAttributeList_mxJPO
                     .popPrefix();
             }
 
+            // update attribute
             _mql.pushPrefix("escape mod attribute $1", _owner.getName() + "." + targetAttr.getName());
             targetAttr.calcDelta(_paramCache, _mql, curAttr);
             _mql.popPrefix();

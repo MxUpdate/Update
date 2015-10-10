@@ -371,12 +371,12 @@ public class RelationshipCI_3UpdateTest
     }
 
     /**
-     * Positive test with one attribute.
+     * Positive test with one global attribute.
      *
      * @throws Exception if test failed
      */
-    @Test(description = "positive test with one attribute")
-    public void t20a_positiveTestWithAttribute()
+    @Test(description = "positive test with one global attribute")
+    public void t20a_positiveTestWithGlobalAttribute()
         throws Exception
     {
         this.createNewData("Test")
@@ -388,12 +388,12 @@ public class RelationshipCI_3UpdateTest
     }
 
     /**
-     * Positive test with add of an attribute.
+     * Positive test with add of an global attribute.
      *
      * @throws Exception if test failed
      */
-    @Test(description = "positive test with add of an attribute")
-    public void t20b_positiveTestAttributeAdded()
+    @Test(description = "positive test with add of an global attribute")
+    public void t20b_positiveTestGlobalAttributeAdded()
         throws Exception
     {
         this.createNewData("Test")
@@ -406,28 +406,29 @@ public class RelationshipCI_3UpdateTest
     }
 
     /**
-     * Negative test if an attribute is removed.
+     * Negative test if an global attribute is removed.
      *
      * @throws Exception if test failed
      */
-    @Test(description = "negative test if an attribute is removed")
-    public void t20c_negativeTestAttributesRemoved()
+    @Test(description = "negative test if an global attribute is removed")
+    public void t20c_negativeTestGlobalAttributesRemoved()
         throws Exception
     {
         this.createNewData("Test")
                 .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .create();
         this.createNewData("Test")
-                .failureUpdate(ErrorKey.DM_RELATION_REMOVE_ATTRIBUTE);
+                .failureUpdate(ErrorKey.DM_RELATION_REMOVE_GLOBAL_ATTRIBUTE);
     }
 
     /**
-     * Positive test if an ignored attribute is removed.
+     * Positive test if an ignored global attribute is not removed (because
+     * ignored).
      *
      * @throws Exception if test failed
      */
-    @Test(description = "positive test if an ignored attribute is removed")
-    public void t20d_positiveTestIgnoredAttributesRemoved()
+    @Test(description = "positive test if an ignored global attribute is not removed (because ignored)")
+    public void t20d_positiveTestIgnoredGlobalAttributesRemoved()
         throws Exception
     {
         this.createNewData("Test")
@@ -441,12 +442,12 @@ public class RelationshipCI_3UpdateTest
     }
 
     /**
-     * Positive test if an attribute is removed.
+     * Positive test if an global attribute is removed.
      *
      * @throws Exception if test failed
      */
-    @Test(description = "positive test if an attribute is removed")
-    public void t20e_positiveTestAttributesRemoved()
+    @Test(description = "positive test if an global attribute is removed")
+    public void t20e_positiveTestGlobalAttributesRemoved()
         throws Exception
     {
         this.createNewData("Test")
@@ -458,12 +459,26 @@ public class RelationshipCI_3UpdateTest
     }
 
     /**
+     * Negative test if an local attribute is removed.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test if an local attribute is removed")
+    public void t21_negativeTestLocalAttributesRemoved()
+        throws Exception
+    {
+        final RelationshipData relationDef = this.createNewData("Test").create();
+        this.mql("escape add attribute \"MXUPDATE_Test\" type string owner relationship \"" + AbstractTest.convertMql(relationDef.getName()) + "\"");
+        relationDef.failureUpdate(ErrorKey.DM_RELATION_REMOVE_LOCAL_ATTRIBUTE);
+    }
+
+    /**
      * Positive test for kind compositional.
      *
      * @throws Exception if test failed
      */
     @Test(description = "positive test for kind compositional")
-    public void t21a_positiveTestKindCompositional()
+    public void t22a_positiveTestKindCompositional()
         throws Exception
     {
         this.createNewData("Test")
@@ -485,7 +500,7 @@ public class RelationshipCI_3UpdateTest
      * @throws Exception if test failed
      */
     @Test(description = "negative test if the kind is changed back to basic")
-    public void t21b_negativeTestChangeKindBackToBasic()
+    public void t22b_negativeTestChangeKindBackToBasic()
         throws Exception
     {
         this.createNewData("Test")
@@ -532,7 +547,7 @@ public class RelationshipCI_3UpdateTest
      * @throws Exception if test failed
      */
     @Test(description = "positive test that a derived relationship is defined")
-    public void t22a_positiveTestDerived()
+    public void t23a_positiveTestDerived()
         throws Exception
     {
         this.createNewData("Parent")
@@ -551,7 +566,7 @@ public class RelationshipCI_3UpdateTest
      * @throws Exception if test failed
      */
     @Test(description = "negative test that derived relationship is changed")
-    public void t22b_negativeTestDerivedChanged()
+    public void t23b_negativeTestDerivedChanged()
         throws Exception
     {
         this.createNewData("Parent1")

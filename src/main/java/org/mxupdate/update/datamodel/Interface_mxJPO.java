@@ -187,14 +187,16 @@ public class Interface_mxJPO
         DeltaUtil_mxJPO.calcValFlgDelta(           _mql, "abstract",            false,  this.abstractFlag,                  _current.abstractFlag);
         DeltaUtil_mxJPO.calcListDelta(             _mql, "type",                        this.typeAll, this.types,           _current.typeAll, _current.types);
         DeltaUtil_mxJPO.calcListDelta(             _mql, "relationship",                this.relationAll, this.relations,   _current.relationAll, _current.relations);
+
         DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql, "attribute",
-                ErrorKey.DM_INTERFACE_REMOVE_ATTRIBUTE, this.getName(),
+                ErrorKey.DM_INTERFACE_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
                 ValueKeys.DMInterfaceAttrIgnore, ValueKeys.DMInterfaceAttrRemove,       this.attributes,                    _current.attributes);
+        this.localAttributes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_INTERFACE_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
+
         DeltaUtil_mxJPO.calcLstOneCallDelta(_paramCache, _mql, "derived",
                 ErrorKey.DM_INTERFACE_REMOVE_PARENT, this.getName(),
                 ValueKeys.DMInterfaceParentIgnore, ValueKeys.DMInterfaceParentRemove,   this.derived,                       _current.derived);
 
-        this.localAttributes.calcDelta(_paramCache, _mql, this, _current.localAttributes);
         this.getProperties().calcDelta(_mql, "", _current.getProperties());
     }
 }

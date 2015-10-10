@@ -166,12 +166,12 @@ public class TypeCI_3UpdateTest
     }
 
     /**
-     * Positive test with one attribute.
+     * Positive test with one global attribute.
      *
      * @throws Exception if test failed
      */
-    @Test(description = "positive test with one attribute")
-    public void t5a_positiveTestWithAttribute()
+    @Test(description = "positive test with one global attribute")
+    public void t5a_positiveTestWithGlobalAttribute()
         throws Exception
     {
         this.createNewData("Test")
@@ -183,12 +183,12 @@ public class TypeCI_3UpdateTest
     }
 
     /**
-     * Positive test with add of an attribute.
+     * Positive test with add of an global attribute.
      *
      * @throws Exception if test failed
      */
-    @Test(description = "positive test with add of an attribute")
-    public void t5b_positiveTestAttributeAdded()
+    @Test(description = "positive test with add of an global attribute")
+    public void t5b_positiveTestGlobalAttributeAdded()
         throws Exception
     {
         this.createNewData("Test")
@@ -201,28 +201,28 @@ public class TypeCI_3UpdateTest
     }
 
     /**
-     * Negative test if an attribute is removed.
+     * Negative test if an global attribute is removed.
      *
      * @throws Exception if test failed
      */
-    @Test(description = "negative test if an attribute is removed")
-    public void t5c_negativeTestAttributesRemoved()
+    @Test(description = "negative test if an global attribute is removed")
+    public void t5c_negativeTestGlobalAttributesRemoved()
         throws Exception
     {
         this.createNewData("Test")
                 .defData("attribute", new AttributeStringData(this, "Test Attribute"))
                 .create();
         this.createNewData("Test")
-                .failureUpdate(ErrorKey.DM_TYPE_REMOVE_ATTRIBUTE);
+                .failureUpdate(ErrorKey.DM_TYPE_REMOVE_GLOBAL_ATTRIBUTE);
     }
 
     /**
-     * Positive test if an ignored attribute is removed.
+     * Positive test if an ignored global attribute is removed.
      *
      * @throws Exception if test failed
      */
-    @Test(description = "positive test if an ignored attribute is removed")
-    public void t5d_positiveTestIgnoredAttributesRemoved()
+    @Test(description = "positive test if an ignored global attribute is removed")
+    public void t5d_positiveTestIgnoredGlobalAttributesRemoved()
         throws Exception
     {
         this.createNewData("Test")
@@ -236,12 +236,12 @@ public class TypeCI_3UpdateTest
     }
 
     /**
-     * Positive test if an attribute is removed.
+     * Positive test if an global attribute is removed.
      *
      * @throws Exception if test failed
      */
-    @Test(description = "positive test if an attribute is removed")
-    public void t5e_positiveTestAttributesRemoved()
+    @Test(description = "positive test if an global attribute is removed")
+    public void t5e_positiveTestGlobalAttributesRemoved()
         throws Exception
     {
         this.createNewData("Test")
@@ -253,12 +253,26 @@ public class TypeCI_3UpdateTest
     }
 
     /**
+     * Negative test if an local attribute is removed.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test if an local attribute is removed")
+    public void t6_negativeTestLocalAttributesRemoved()
+        throws Exception
+    {
+        final TypeData typeDef = this.createNewData("Test").create();
+        this.mql("escape add attribute \"MXUPDATE_Test\" type string owner type \"" + AbstractTest.convertMql(typeDef.getName()) + "\"");
+        typeDef.failureUpdate(ErrorKey.DM_TYPE_REMOVE_LOCAL_ATTRIBUTE);
+    }
+
+    /**
      * Positive test that a derived type is defined.
      *
      * @throws Exception if test failed
      */
     @Test(description = "positive test that a derived type is defined")
-    public void t6a_positiveTestDerived()
+    public void t7a_positiveTestDerived()
         throws Exception
     {
         this.createNewData("Parent")
@@ -277,7 +291,7 @@ public class TypeCI_3UpdateTest
      * @throws Exception if test failed
      */
     @Test(description = "negative test that derived type is changed")
-    public void t6b_negativeTestDerivedChanged()
+    public void t7b_negativeTestDerivedChanged()
         throws Exception
     {
         this.createNewData("Parent1")
@@ -302,7 +316,7 @@ public class TypeCI_3UpdateTest
      * @throws Exception if test failed
      */
     @Test(description = "positive test for kind composed")
-    public void t7a_positiveTestKindComposed()
+    public void t8a_positiveTestKindComposed()
         throws Exception
     {
         this.createNewData("Test")
@@ -318,7 +332,7 @@ public class TypeCI_3UpdateTest
      * @throws Exception if test failed
      */
     @Test(description = "negative test if the kind is changed back to basic")
-    public void t7b_negativeTestChangeKindBackToBasic()
+    public void t8b_negativeTestChangeKindBackToBasic()
         throws Exception
     {
         this.createNewData("Test")

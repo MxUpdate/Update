@@ -44,8 +44,11 @@ import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
  * <li>{@link #abstractFlag information about is the type abstract}</li>
  * <li>{@link #derived from information from which type this type is
  *     derived}</li>
- * <li>{@link #attributes}</li>
+ * <li>{@link #attributes global attributes}</li>
+ * <li>{@link #localAttributes local attributes}</li>
  * <li>{@link #methods type methods}</li>
+ * <li>properties</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  */
@@ -196,11 +199,11 @@ public class Type_mxJPO
         DeltaUtil_mxJPO.calcValFlgDelta( _mql,              "abstract",          false, this.abstractFlag,      _current.abstractFlag);
         DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "hidden",            false, this.isHidden(),        _current.isHidden());
         DeltaUtil_mxJPO.calcListDelta(   _mql,              "method",                   this.methods,           _current.methods);
-        DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql,    "attribute",
-                ErrorKey.DM_TYPE_REMOVE_ATTRIBUTE, this.getName(),
-                ValueKeys.DMTypeAttrIgnore, ValueKeys.DMTypeAttrRemove,                 this.attributes,        _current.attributes);
 
-        this.localAttributes.calcDelta(_paramCache, _mql, this, _current.localAttributes);
+        DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql,    "attribute",
+                ErrorKey.DM_TYPE_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
+                ValueKeys.DMTypeAttrIgnore, ValueKeys.DMTypeAttrRemove,                 this.attributes,        _current.attributes);
+        this.localAttributes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_TYPE_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
 
         this.getTriggers()  .calcDelta(_mql,     _current.getTriggers());
         this.getProperties().calcDelta(_mql, "", _current.getProperties());

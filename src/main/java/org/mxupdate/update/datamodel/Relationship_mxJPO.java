@@ -49,7 +49,9 @@ import matrix.util.MatrixException;
  * <li>hidden flag</li>
  * <li>{@link #preventDuplicates prevent duplicates} flag</li>
  * <li>{@link #from} and {@link #to} side informations</li>
- * <li>{@link #attributes}</li>
+ * <li>{@link #attributes global attributes}</li>
+ * <li>{@link #localAttributes local attributes}</li>
+ * <li>properties</li>
  * </ul>
  *
  * @author The MxUpdate Team
@@ -279,9 +281,11 @@ public class Relationship_mxJPO
         DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "hidden",            false, this.isHidden(),        _current.isHidden());
         DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "preventduplicates", false, this.preventDuplicates, _current.preventDuplicates);
         DeltaUtil_mxJPO.calcValFlgDelta( _mql,              "abstract",          false, this.abstractFlag,      _current.abstractFlag);
+
         DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql,    "attribute",
-                ErrorKey.DM_RELATION_REMOVE_ATTRIBUTE, this.getName(),
+                ErrorKey.DM_RELATION_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
                 ValueKeys.DMRelationAttrIgnore, ValueKeys.DMRelationAttrRemove,         this.attributes,        _current.attributes);
+        this.localAttributes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_RELATION_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
 
         // only one rule can exists maximum, but they must be technically handled like as list
         final SortedSet<String> thisRules = new TreeSet<>();
@@ -294,7 +298,6 @@ public class Relationship_mxJPO
         }
         DeltaUtil_mxJPO.calcListDelta( _mql, "rule",                     thisRules,              currentRules);
 
-        this.localAttributes.calcDelta(_paramCache, _mql, this, _current.localAttributes);
         this.from           .calcDelta(_mql,     _current.from);
         this.to             .calcDelta(_mql,     _current.to);
         this.getTriggers()  .calcDelta(_mql,     _current.getTriggers());
