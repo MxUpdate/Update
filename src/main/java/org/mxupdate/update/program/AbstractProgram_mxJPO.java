@@ -280,8 +280,10 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
     /** Enumeration for programs. */
     enum Kind
     {
-        /** MQL program. */
+        /** EKL program. */
         EKL,
+        /** External program. */
+        EXTERNAL,
         /** Java program. */
         JAVA,
         /** MQL program. */

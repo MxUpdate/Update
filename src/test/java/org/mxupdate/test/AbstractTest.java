@@ -28,11 +28,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import matrix.db.Context;
-import matrix.db.JPO;
-import matrix.db.MQLCommand;
-import matrix.util.MatrixException;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.maven.settings.DefaultMavenSettingsBuilder;
 import org.apache.maven.settings.Profile;
@@ -44,6 +39,11 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Optional;
 import org.testng.annotations.Parameters;
+
+import matrix.db.Context;
+import matrix.db.JPO;
+import matrix.db.MQLCommand;
+import matrix.util.MatrixException;
 
 /**
  * Abstract test class to connect to MX and disconnect incl. some helper
@@ -106,10 +106,11 @@ public abstract class AbstractTest
         IEF_MASS_PROMOTE_CONFIG("masspromoteconfig",        null,               "IEF-MassPromoteConfig",                true,  "MCADInteg-ConfigObjectPolicy",      "eService Administration",  "IEFMassPromoteConfig",     "integration/masspromoteconfig",    "IEFMASSPROMOTECONFIG_",    ".mxu", true),
         IEF_UNASSIGNED_REGISTRY("unassignedregistry",       null,               "IEF-UnassignedIntegRegistry",          true,  "MCADInteg-ConfigObjectPolicy",      "eService Administration",  "IEFUnassignedRegistry",    "integration/unassignedregistry",   "IEFUNASSIGNEDREGISTRY_",   ".mxu", true),
 
-        PRG_EKL(                "program",                  "program",          null,                                   false, null,                                null,                       "ProgramEKL",               "program/ekl",                      "",                         ".ekl.mxu",     true),
-        PRG_JPO(                "program",                  "program",          null,                                   false, null,                                null,                       "JPO",                      "program/jpo",                      "",                         ".java.mxu",    true),
-        PRG_MQL(                "program",                  "program",          null,                                   false, null,                                null,                       "Program",                  "program/mql",                      "",                         ".mql.mxu",     true),
-        PRG_PAGE(               "page",                     "page",             null,                                   false, null,                                null,                       "Page",                     "program/page",                     "PAGE_",                    ".mxu",         true),
+        PRG_EKL(                "program",                  "program",          null,                                   false, null,                                null,                       "ProgramEKL",               "program/ekl",                      "",                         ".ekl.mxu",         true),
+        PRG_JPO(                "program",                  "program",          null,                                   false, null,                                null,                       "JPO",                      "program/jpo",                      "",                         ".java.mxu",        true),
+        PRG_MQL(                "program",                  "program",          null,                                   false, null,                                null,                       "Program",                  "program/mql",                      "",                         ".mql.mxu",         true),
+        PRG_EXTERNAL(           "program",                  "program",          null,                                   false, null,                                null,                       "Program",                  "program/mql",                      "",                         ".external.mxu",    true),
+        PRG_PAGE(               "page",                     "page",             null,                                   false, null,                                null,                       "Page",                     "program/page",                     "PAGE_",                    ".mxu",             true),
 
         USR_ASSOCIATION(        "association",              "association",      null,                                   false, null,                                null,                       "Association",              "user/association",                 "ASSOCIATION_",             ".mxu", false),
         USR_GROUP(              "group",                    "group",            null,                                   false, null,                                null,                       "Group",                    "user/group",                       "GROUP_",                   ".mxu", true),

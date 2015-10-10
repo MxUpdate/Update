@@ -66,6 +66,11 @@ class ProgramParser_mxJPO
 this.setValue(_prog, "kind",                       Kind.EKL);
           break;
           }
+        case EXTERNAL:{
+          jj_consume_token(EXTERNAL);
+this.setValue(_prog, "kind",                       Kind.EXTERNAL);
+          break;
+          }
         case MQL:{
           jj_consume_token(MQL);
 this.setValue(_prog, "kind",                       Kind.MQL);
@@ -394,10 +399,10 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0xc7ffe20,0x1c0,0x30000000,0xc0000000,0x30000000,0x30000000,0x3800000,0xc0000000,0x30000000,0x30000000,0x0,0x30000000,0x0,0x30000000,0x0,0xc7ffe20,};
+      jj_la1_0 = new int[] {0x18fffc20,0x3c0,0x60000000,0x80000000,0x60000000,0x60000000,0x7000000,0x80000000,0x60000000,0x60000000,0x0,0x60000000,0x0,0x60000000,0x0,0x18fffc20,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x6,0x0,0x18,0x0,0x6,0x1,};
+      jj_la1_1 = new int[] {0x2,0x0,0x0,0x1,0x0,0x0,0x0,0x1,0x0,0x0,0xc,0x0,0x30,0x0,0xc,0x2,};
    }
 
   /** Constructor with InputStream. */
@@ -522,7 +527,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[37];
+    boolean[] la1tokens = new boolean[38];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -539,7 +544,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
         }
       }
     }
-    for (int i = 0; i < 37; i++) {
+    for (int i = 0; i < 38; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

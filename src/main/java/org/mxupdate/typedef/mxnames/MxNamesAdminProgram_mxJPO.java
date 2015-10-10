@@ -21,14 +21,14 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+
+import matrix.util.MatrixException;
 
 /**
  * Searches for all programs objects depending on the program kind.
@@ -61,9 +61,10 @@ public class MxNamesAdminProgram_mxJPO
 
             // prepare list of programs
             progs = new HashMap<String,SortedSet<String>>();
-            progs.put("java", new TreeSet<String>());
-            progs.put("ekl",  new TreeSet<String>());
-            progs.put("mql",  new TreeSet<String>());
+            progs.put("java",       new TreeSet<String>());
+            progs.put("ekl",        new TreeSet<String>());
+            progs.put("external",   new TreeSet<String>());
+            progs.put("mql",        new TreeSet<String>());
 
             // evaluate list of programs
             for (final String lineStr : mql.exec(_paramCache).split("\n"))  {
@@ -74,6 +75,8 @@ public class MxNamesAdminProgram_mxJPO
                     progs.get("ekl").add(lineArr[0]);
                 } else if ("TRUE".equals(lineArr[3]))  {
                     progs.get("mql").add(lineArr[0]);
+                } else  {
+                    progs.get("external").add(lineArr[0]);
                 }
             }
             _paramCache.setCache(CacheKey.Programs, progs);
