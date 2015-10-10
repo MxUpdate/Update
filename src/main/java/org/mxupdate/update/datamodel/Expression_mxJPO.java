@@ -21,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -37,6 +38,8 @@ import matrix.util.MatrixException;
  * Handles the export and the update of the expression configuration item.
  * The handled properties are:
  * <ul>
+ * <li>uuid</li>
+ * <li>symbolic name</li>
  * <li>description</li>
  * <li>hidden flag (only if hidden)</li>
  * <li>{@link #value}</li>
@@ -69,7 +72,7 @@ public class Expression_mxJPO
         super(EMxAdmin_mxJPO.Expression, _mxName);
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -82,7 +85,7 @@ public class Expression_mxJPO
      * {@inheritDoc}
      * Also the value of the expression is extracted from MX
      */
-    @Override()
+    @Override
     public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
@@ -103,7 +106,7 @@ public class Expression_mxJPO
      *         <i>false</i>
      * @see #IGNORED_URLS
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -122,6 +125,7 @@ public class Expression_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flag(          "hidden",           false,  this.isHidden())
