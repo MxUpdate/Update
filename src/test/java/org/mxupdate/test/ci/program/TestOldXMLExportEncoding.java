@@ -15,6 +15,7 @@
 
 package org.mxupdate.test.ci.program;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.update.program.AbstractCode_mxJPO;
@@ -129,11 +130,10 @@ public class TestOldXMLExportEncoding
             return this.encodeXMLExport(_xml);
         }
 
-        @Override
-        public void parseUpdate(final String _code) throws SecurityException,
-                IllegalArgumentException, NoSuchMethodException,
-                InstantiationException, IllegalAccessException,
-                InvocationTargetException, ParseException
+        @Override()
+        public void parseUpdate(final File _file,
+                                final String _code)
+            throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
         {
             // TODO Auto-generated method stub
         }
@@ -150,7 +150,6 @@ public class TestOldXMLExportEncoding
         protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
         {
             // TODO Auto-generated method stub
-
         }
     }
 }

@@ -285,8 +285,10 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     {
         this.parse(_paramCache);
 
+        final File file = new File(_file);
+
         final CLASS clazz = (CLASS) this.getTypeDef().newTypeInstance(this.getName());
-        clazz.parseUpdate(_code);
+        clazz.parseUpdate(file, _code);
 
         // MxUpdate File Date => must be always overwritten if newer!
         clazz.getProperties().setValue4KeyValue(
@@ -324,9 +326,9 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
         // initialize MQL builder (with or w/o suffix!)
         final MultiLineMqlBuilder mql;
         if ((this.getTypeDef().getMxAdminSuffix() != null) && !this.getTypeDef().getMxAdminSuffix().isEmpty())  {
-            mql = MqlBuilder_mxJPO.multiLine(new File(_file), "escape mod " + this.getTypeDef().getMxAdminName() + " $1 " + this.getTypeDef().getMxAdminSuffix(), this.getName());
+            mql = MqlBuilder_mxJPO.multiLine(file, "escape mod " + this.getTypeDef().getMxAdminName() + " $1 " + this.getTypeDef().getMxAdminSuffix(), this.getName());
         } else  {
-            mql = MqlBuilder_mxJPO.multiLine(new File(_file), "escape mod " + this.getTypeDef().getMxAdminName() + " $1", this.getName());
+            mql = MqlBuilder_mxJPO.multiLine(file, "escape mod " + this.getTypeDef().getMxAdminName() + " $1", this.getName());
         }
 
         clazz.calcDelta(_paramCache, mql, (CLASS) this);

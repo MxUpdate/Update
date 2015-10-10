@@ -15,6 +15,7 @@
 
 package org.mxupdate.update.userinterface;
 
+import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Iterator;
@@ -77,7 +78,8 @@ System.err.println("The table is derived from '" + _content + "'! This is curren
     }
 
     @Override()
-    public void parseUpdate(final String _code)
+    public void parseUpdate(final File _file,
+                            final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
         new TableParser_mxJPO(new StringReader(_code)).parse(this);

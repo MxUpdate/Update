@@ -15,6 +15,7 @@
 
 package org.mxupdate.update.system;
 
+import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collections;
@@ -80,7 +81,8 @@ public class PackageCI_mxJPO
     }
 
     @Override()
-    public void parseUpdate(final String _code)
+    public void parseUpdate(final File _file,
+                            final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
         new PackageParser_mxJPO(new StringReader(_code)).parse(this);

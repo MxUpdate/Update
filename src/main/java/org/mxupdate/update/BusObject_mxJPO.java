@@ -364,9 +364,9 @@ public class BusObject_mxJPO
     }
 
     @Override()
-    public void parseUpdate(final String _code)
-        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException,
-        ParseException
+    public void parseUpdate(final File _file,
+                            final String _code)
+        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
         new BusObjectParser_mxJPO(new StringReader(_code)).parse(this);
     }
@@ -428,7 +428,7 @@ public class BusObject_mxJPO
         throws Exception
     {
         final BusObject_mxJPO clazz = (BusObject_mxJPO) this.getTypeDef().newTypeInstance(this.busName + BusObject_mxJPO.SPLIT_NAME + this.busRevision);
-        clazz.parseUpdate(_code);
+        clazz.parseUpdate(new File(_file), _code);
 
         this.busType = clazz.busType;
         this.parse(_paramCache);

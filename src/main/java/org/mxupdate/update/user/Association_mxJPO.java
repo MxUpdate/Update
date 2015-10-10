@@ -15,6 +15,7 @@
 
 package org.mxupdate.update.user;
 
+import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 
@@ -62,7 +63,8 @@ public class Association_mxJPO
     }
 
     @Override()
-    public void parseUpdate(final String _code)
+    public void parseUpdate(final File _file,
+                            final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
         new AssociationParser_mxJPO(new StringReader(_code)).parse(this);

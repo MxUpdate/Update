@@ -15,6 +15,7 @@
 
 package org.mxupdate.update;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
@@ -73,6 +74,7 @@ public abstract class AbstractObject_mxJPO<CLASS extends AbstractObject_mxJPO<CL
     /**
      * Parses the given {@code _code} and updates this data instance.
      *
+     * @param _file     file which holds the code to parse
      * @param _code     code to parse
      * @throws SecurityException
      * @throws IllegalArgumentException
@@ -82,7 +84,8 @@ public abstract class AbstractObject_mxJPO<CLASS extends AbstractObject_mxJPO<CL
      * @throws InvocationTargetException
      * @throws ParseException
      */
-    public abstract void parseUpdate(final String _code)
+    public abstract void parseUpdate(final File _file,
+                                     final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException;
 
     /**

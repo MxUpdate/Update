@@ -15,6 +15,7 @@
 
 package org.mxupdate.update.user;
 
+import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
@@ -129,7 +130,8 @@ public class PersonAdmin_mxJPO
     }
 
     @Override()
-    public void parseUpdate(final String _code)
+    public void parseUpdate(final File _file,
+                            final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
         // define dummy admin access (to be checked after parsing..)

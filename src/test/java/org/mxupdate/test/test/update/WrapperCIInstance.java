@@ -52,7 +52,7 @@ public class WrapperCIInstance<DATA extends AbstractObject_mxJPO<?>>
     public void parseUpdateWOStrip(final String _ciCode)
         throws Exception
     {
-        this.data.parseUpdate(_ciCode);
+        this.data.parseUpdate(new File("dummy.txt").getAbsoluteFile(), _ciCode);
     }
 
     /**
@@ -64,7 +64,7 @@ public class WrapperCIInstance<DATA extends AbstractObject_mxJPO<?>>
     public void parseUpdate(final String _ciCode)
         throws Exception
     {
-        this.data.parseUpdate(this.strip(_ciCode));
+        this.data.parseUpdate(new File("dummy.txt").getAbsoluteFile(), this.strip(_ciCode));
     }
 
     /**
