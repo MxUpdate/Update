@@ -28,7 +28,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test()
-public class RelationshipCI_1ParserLocalPathTypeTest
+public class RelationshipCI_1Parser3LocalPathTypeTest
     extends AbstractParserTest<Relationship_mxJPO>
 {
     @Override()
