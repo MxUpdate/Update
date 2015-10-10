@@ -35,7 +35,6 @@ public class TypeCI_1Parser2LocalAttributesTest
     public Object[][] getData()
     {
         return new Object[][]  {
-
             // general attribute definition
             {"0a) local binary attribute",
                     "",
@@ -56,102 +55,113 @@ public class TypeCI_1Parser2LocalAttributesTest
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind string  description \"\" !hidden !multivalue !resetonclone !resetonrevision             !multiline maxlength 0 default \"\" } "},
 
+            // uuid
+            {"1a) uuid with minus separator",
+                    "",
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+            {"1b) uuid w/o minus separator",
+                    "",
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean uuid \"FDA75674979211E6AE2256B6B6499611\"     description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+            {"1c) uuid convert from single to string",
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
+                    "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean uuid   FDA7-5674979211-E6AE2256B6-B6499611    description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+
              // attribute registered name
-            {"1a) attribute symbolic name",
+            {"2a) attribute symbolic name",
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean symbolicname \"attribute_abc\"                                description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
-            {"1b) attribute two symbolic names",
+            {"2b) attribute two symbolic names",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean symbolicname \"attribute_abc\" symbolicname \"attribute_def\" description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean symbolicname \"attribute_def\" symbolicname \"attribute_abc\" description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
 
             // attribute description
-            {"2a) attribute description",
+            {"3a) attribute description",
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"abc def\"  !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
-            {"2b) attribute description not defined",
+            {"3b) attribute description not defined",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\"         !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean                          !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
-            {"2c) multi-line attribute description",
+            {"3c) multi-line attribute description",
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
 
             // attribute hidden flag
-            {"3a) attribute hidden",
+            {"4a) attribute hidden",
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" hidden  !multivalue !resetonclone !resetonrevision default \"\" }"},
-            {"3b) attribute not hidden (not defined)",
+            {"4b) attribute not hidden (not defined)",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\"         !multivalue !resetonclone !resetonrevision default \"\" }"},
 
             // attribute multivalue flag
-            {"4a) attribute multivalue flag",
+            {"5a) attribute multivalue flag",
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden multivalue  !resetonclone !resetonrevision default \"\" }"},
-            {"4b) attribute multivalue flag not defined",
+            {"5b) attribute multivalue flag not defined",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden             !resetonclone !resetonrevision default \"\" }"},
 
             // attribute resetonclone flag
-            {"5a) attribute resetonclone flag",
+            {"6a) attribute resetonclone flag",
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue resetonclone  !resetonrevision default \"\" }"},
-            {"5b) attribute resetonclone flag not defined",
+            {"6b) attribute resetonclone flag not defined",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue               !resetonrevision default \"\" }"},
 
             // attribute resetonrevision flag
-            {"6a) attribute resetonrevision flag",
+            {"7a) attribute resetonrevision flag",
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone resetonrevision  default \"\" }"},
-            {"6b) attribute resetonrevision flag not defined",
+            {"7b) attribute resetonrevision flag not defined",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone                  default \"\" }"},
 
             // attribute default value
-            {"7a) attribute default value",
+            {"8a) attribute default value",
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc def\"  }"},
-            {"7b) attribute default value not defined",
+            {"8b) attribute default value not defined",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"         }",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision                      }"},
-            {"7c) multi-line attribute default value",
+            {"8) multi-line attribute default value",
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\ndef\" }"},
 
             // real attribute rangevalue flag
-            {"8a) real attribute rangevalue flag",
+            {"9a) real attribute rangevalue flag",
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision rangevalue  default \"\" }"},
-            {"8b) real attribute rangevalue flag not defined",
+            {"9b) real attribute rangevalue flag not defined",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" }",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision             default \"\" }"},
 
             // string attribute multiline flag
-            {"9a) attribute multiline flag",
+            {"10a) attribute multiline flag",
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision multiline  maxlength 0 default \"\" }"},
-            {"9b) attribute multiline flag not defined",
+            {"10b) attribute multiline flag not defined",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\" }",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision            maxlength 0 default \"\" }"},
 
              // string attribute maxlength
-            {"10a) attribute maxlength",
+            {"11a) attribute maxlength",
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision multiline  maxlength 125 default \"\" }"},
-            {"10b) attribute maxlength not defined",
+            {"11b) attribute maxlength not defined",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0   default \"\" }",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline               default \"\" }"},
 
             // attribute rule
-            {"11a) attribute rule",
+            {"12a) attribute rule",
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision rule \"A\"            default \"\"  }"},
-            {"11a) attribute rule list (if more than one none)",
+            {"12a) attribute rule list (if more than one none)",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision                       default \"\"  }",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision rule \"A\" rule \"B\" default \"\"  }"},
 
             // attribute dimension
-            {"12a) real attribute dimension",
+            {"13) real attribute dimension",
                     "",
                     "description \"\" !hidden local attribute \"ATTRNAME\" { kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue dimension \"DIM\" default \"\"  }"},
 

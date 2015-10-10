@@ -141,6 +141,19 @@ public class TypeCI_2DeltaCalculationTest
                                     .setFlag("multiline", false, Create.ViaFlag)
                                     .setSingle("maxlength", "0")
                                     .setValue("default", "")) },
+            {"107) attribute with uuid",
+                new TypeData(this, "Test"),
+                new TypeData(this, "Test")
+                        .addLocalAttribute(
+                                new AttributeBooleanData(this, "ATTR1")
+                                    .setSingle("kind", "boolean")
+                                    .setValue("uuid", "UUID")
+                                    .setValue("description", "")
+                                    .setFlag("hidden", false, Create.ViaFlag)
+                                    .setFlag("multivalue", false, Create.ViaFlag)
+                                    .setFlag("resetonclone", false, Create.ViaFlag)
+                                    .setFlag("resetonrevision", false, Create.ViaFlag)
+                                    .setValue("default", "")) },
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // local path type
