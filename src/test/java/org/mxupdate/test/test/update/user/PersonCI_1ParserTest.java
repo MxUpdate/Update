@@ -29,7 +29,7 @@ import org.testng.annotations.Test;
  * @author The MxUpdate Team
  */
 @Test
-public class PersonAdminCI_1ParserTest
+public class PersonCI_1ParserTest
     extends AbstractParserTest<PersonCI_mxJPO>
 {
     @Override

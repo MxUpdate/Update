@@ -40,7 +40,7 @@ import matrix.util.MatrixException;
  * @author The MxUpdate Team
  */
 @Test
-public class PersonAdminCI_2DeltaCalculationTest
+public class PersonCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<PersonCI_mxJPO,PersonData>
 {
     @Override

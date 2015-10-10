@@ -34,7 +34,7 @@ import matrix.util.MatrixException;
  * @author The MxUpdate Team
  */
 @Test
-public class PersonAdminCI_3UpdateTest
+public class PersonCI_3UpdateTest
     extends AbstractUserTest<PersonData>
 {
     @DataProvider(name = "data")

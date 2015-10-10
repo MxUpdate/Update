@@ -34,7 +34,7 @@ import matrix.util.MatrixException;
  * @author The MxUpdate Team
  */
 @Test
-public class PersonAdminCI_2DeltaDefaultTest
+public class PersonCI_2DeltaDefaultTest
     extends AbstractDeltaNoChangeTest<PersonCI_mxJPO,PersonData>
 {
     @Override
