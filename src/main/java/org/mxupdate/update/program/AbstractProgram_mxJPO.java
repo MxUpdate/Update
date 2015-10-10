@@ -27,6 +27,8 @@ import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.FileUtil_mxJPO;
 
 /**
  * Common definition for the code of a program.
@@ -219,6 +221,7 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
                              final CLASS _current)
+        throws UpdateException_mxJPO
     {
         final AbstractProgram_mxJPO<?> current = (AbstractProgram_mxJPO<?>) _current;
 
@@ -244,10 +247,10 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
             } else  {
                 tmpFile = _mql.getFile().getParent() + "/" + this.file;
             }
-            _mql.newLine().cmd("file ").arg(tmpFile);
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "code", this.readCode(new File(tmpFile)),   current.getCode());
         } else  {
             // code via code
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "code",                        this.getCode(),                     current.getCode());
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "code", this.getCode(),                     current.getCode());
         }
 
         // rule
@@ -266,6 +269,19 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
         }
 
         this.getProperties().calcDelta(_mql, "", current.getProperties());
+    }
+
+    /**
+     * Reads code from given file.
+     *
+     * @param _file     file
+     * @return read code
+     * @throws UpdateException_mxJPO if read failed
+     */
+    protected String readCode(final File _file)
+        throws UpdateException_mxJPO
+    {
+        return FileUtil_mxJPO.readFileToString(_file);
     }
 
     /**

@@ -15,9 +15,13 @@
 
 package org.mxupdate.update.program;
 
+import java.io.File;
+
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.JPOUtil_mxJPO;
 
 /**
  * The class is used to export, create, delete and update JPOs within MX.
@@ -55,11 +59,24 @@ public class JPOProgram_mxJPO
      * @return always <i>true</i>
      * @throws Exception if the compile of the JPO failed
      */
-    @Override()
+    @Override
     public boolean compile(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
         MqlBuilder_mxJPO.mql().cmd("escape compile prog ").arg(this.getName()).exec(_paramCache);
         return true;
+    }
+
+    /**
+     * Reads the Java source code and converts them to JPO source code.
+     *
+     * @param _file     file to read
+     * @return JPO source code of the given file
+     */
+    @Override
+    protected String readCode(final File _file)
+        throws UpdateException_mxJPO
+    {
+        return JPOUtil_mxJPO.convertJavaToJPOCode(this.getName(), super.readCode(_file));
     }
 }

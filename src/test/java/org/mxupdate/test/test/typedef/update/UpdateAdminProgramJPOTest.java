@@ -19,8 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
-import matrix.util.MatrixException;
-
 import org.apache.commons.io.FileUtils;
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.test.AbstractTest;
@@ -34,6 +32,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link JPOProgram_mxJPO jpo program CI} update.
@@ -62,12 +62,12 @@ public class UpdateAdminProgramJPOTest
     public Object[][] getTest()
     {
         return new Object[][]  {
-            {"jpo => jpo",                      this.origJPO,       "MXUPDATE_Test",                                    false, true},
-            {"jpo + mxu => mxu",                this.origMXU,       "MXUPDATE_Test",                                    true,  true},
-            {"mxu => mxu",                      this.origMXU,       "MXUPDATE_TestWOJpo",                               true,  false},
-            {"with package: jpo => jpo",        this.origPckJPO,    "MXUPDATE_org.mxupdate.test.TestWithPackage",       false, true},
-            {"with package: jpo + mxu => mxu",  this.origPckMXU,    "MXUPDATE_org.mxupdate.test.TestWithPackage",       true,  true},
-            {"with package: mxu => mxu",        this.origPckMXU,    "MXUPDATE_org.mxupdate.test.TestWithPackageWOJpo",  true,  false},
+            {"jpo => jpo",                      this.origJPO,       "MXUPDATE_Test",                                    false},
+            {"jpo + mxu => mxu",                this.origMXU,       "MXUPDATE_Test",                                    true},
+            {"mxu => mxu",                      this.origMXU,       "MXUPDATE_TestWOJpo",                               true},
+            {"with package: jpo => jpo",        this.origPckJPO,    "MXUPDATE_org.mxupdate.test.TestWithPackage",       false},
+            {"with package: jpo + mxu => mxu",  this.origPckMXU,    "MXUPDATE_org.mxupdate.test.TestWithPackage",       true},
+            {"with package: mxu => mxu",        this.origPckMXU,    "MXUPDATE_org.mxupdate.test.TestWithPackageWOJpo",  true},
         };
     }
 
@@ -77,8 +77,7 @@ public class UpdateAdminProgramJPOTest
      * @param _description      description
      * @param _file             file
      * @param _name             name
-     * @param _expUpdateCalled  expected updated valled
-     * @param _expCodeDefined   expected code defined
+     * @param _expUpdateCalled  expected updated called
      * @throws Exception if test failed
      */
     @Test(description = "positive test",
@@ -86,8 +85,7 @@ public class UpdateAdminProgramJPOTest
     public void positiveTest(final String _description,
                              final File _file,
                              final String _name,
-                             final boolean _expUpdateCalled,
-                             final boolean _expCodeDefined)
+                             final boolean _expUpdateCalled)
         throws Exception
     {
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
@@ -112,7 +110,7 @@ public class UpdateAdminProgramJPOTest
             {
                 this.updateCalled = true;
 
-                final WrapperCIInstance<JPOProgram_mxJPO> wrapper = new WrapperCIInstance<JPOProgram_mxJPO>((JPOProgram_mxJPO) _typeDef.newTypeInstance(_name));
+                final WrapperCIInstance<JPOProgram_mxJPO> wrapper = new WrapperCIInstance<>((JPOProgram_mxJPO) _typeDef.newTypeInstance(_name));
                 wrapper.parseUpdate(FileUtils.readFileToString(_file));
                 wrapper.store(_file, _paramCache);
             }
@@ -120,9 +118,8 @@ public class UpdateAdminProgramJPOTest
 
         final String code = this.mql("print prog '" + _name + "' select code dump");
 
-        Assert.assertEquals(
+        Assert.assertTrue(
                 !code.isEmpty(),
-                _expCodeDefined,
                 "code defined");
         Assert.assertEquals(
                 !this.mql("print prog '" + _name + "' select description dump").isEmpty(),
