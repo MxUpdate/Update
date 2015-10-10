@@ -70,9 +70,7 @@ PARSER_END(PersonAdminParser)
 
 <DEFAULT> TOKEN : /** first level */
 {
-      <KIND:                                "kind">                                        : KIND_EXPECTED
-
-    | <UUID:                                "uuid">                                         : STRING_EXPECTED
+      <UUID:                                "uuid">                                        : STRING_EXPECTED
 
     | <SYMBOLICNAME:                        "symbolicname">                                : STRING_EXPECTED
 
@@ -126,12 +124,6 @@ PARSER_END(PersonAdminParser)
 {
       <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
     | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
-}
-
-/*********************************************************************** Kind */
-<KIND_EXPECTED> TOKEN :
-{
-    <KIND_ADMIN:                             "admin">                                      : DEFAULT
 }
 
 /********************************************************************* Access */
@@ -235,8 +227,6 @@ void parse(final PersonAdmin_mxJPO _personAdmin)
     Token tmp;
     AdminProperty property;
 } {
-    <KIND> <KIND_ADMIN>
-
     (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_personAdmin, "symbolicNames",                this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(_personAdmin, "symbolicNames",                this.getSingle(tmp.image));} ) )
 

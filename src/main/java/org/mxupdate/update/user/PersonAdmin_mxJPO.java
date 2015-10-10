@@ -353,7 +353,6 @@ public class PersonAdmin_mxJPO
         _updateBuilder
                 //                  tag              | default | value                              | write?
                 .stringNotNull( "uuid",                          this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
-                .single(                 "kind",                 "admin")
                 .list(                   "symbolicname",         this.getSymbolicNames())
                 .string(                 "comment",              this.getDescription())
                 .flag(                   "active",        false, this.active)

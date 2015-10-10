@@ -42,8 +42,6 @@ class PersonAdminParser_mxJPO
  */
   final public void parse(final PersonAdmin_mxJPO _personAdmin) throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {Token tmp;
     AdminProperty property;
-    jj_consume_token(KIND);
-    jj_consume_token(KIND_ADMIN);
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -655,10 +653,10 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x1fffffc0,0x60000000,0x60000000,0x80000000,0x0,0x0,0x0,0x0,0x60000000,0x60000000,0x60000000,0x60000000,0x60000000,0x0,0x0,0x0,0x60000000,0x60000000,0x60000000,0x60000000,0x60000000,0x60000000,0x0,0x60000000,0x0,0x60000000,0x0,0x1fffffc0,};
+      jj_la1_0 = new int[] {0xfffffe0,0x30000000,0x30000000,0xc0000000,0x0,0x0,0x0,0x0,0x30000000,0x30000000,0x30000000,0x30000000,0x30000000,0x0,0x0,0x0,0x30000000,0x30000000,0x30000000,0x30000000,0x30000000,0x30000000,0x0,0x30000000,0x0,0x30000000,0x0,0xfffffe0,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x881084,0x0,0x0,0x1,0x40,0x18,0x800,0x300,0x0,0x0,0x0,0x0,0x0,0x400000,0x78000,0x78000,0x0,0x0,0x0,0x0,0x0,0x0,0x3000000,0x0,0xc000000,0x0,0x3000000,0x881084,};
+      jj_la1_1 = new int[] {0x220421,0x0,0x0,0x0,0x10,0x6,0x200,0xc0,0x0,0x0,0x0,0x0,0x0,0x100000,0x1e000,0x1e000,0x0,0x0,0x0,0x0,0x0,0x0,0xc00000,0x0,0x3000000,0x0,0xc00000,0x220421,};
    }
 
   /** Constructor with InputStream. */
@@ -783,7 +781,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[60];
+    boolean[] la1tokens = new boolean[58];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -800,7 +798,7 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
         }
       }
     }
-    for (int i = 0; i < 60; i++) {
+    for (int i = 0; i < 58; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

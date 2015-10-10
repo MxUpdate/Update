@@ -26,115 +26,111 @@ interface PersonAdminParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int KIND = 5;
+  int UUID = 5;
   /** RegularExpression Id. */
-  int UUID = 6;
+  int SYMBOLICNAME = 6;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 7;
+  int COMMENT = 7;
   /** RegularExpression Id. */
-  int COMMENT = 8;
+  int HIDDEN_TRUE = 8;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 9;
+  int HIDDEN_FALSE = 9;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 10;
+  int ACTIVE_TRUE = 10;
   /** RegularExpression Id. */
-  int ACTIVE_TRUE = 11;
+  int ACTIVE_FALSE = 11;
   /** RegularExpression Id. */
-  int ACTIVE_FALSE = 12;
+  int TRUSTED_TRUE = 12;
   /** RegularExpression Id. */
-  int TRUSTED_TRUE = 13;
+  int TRUSTED_FALSE = 13;
   /** RegularExpression Id. */
-  int TRUSTED_FALSE = 14;
+  int EMAIL_TRUE = 14;
   /** RegularExpression Id. */
-  int EMAIL_TRUE = 15;
+  int EMAIL_FALSE = 15;
   /** RegularExpression Id. */
-  int EMAIL_FALSE = 16;
+  int INCONMAIL_TRUE = 16;
   /** RegularExpression Id. */
-  int INCONMAIL_TRUE = 17;
+  int INCONMAIL_FALSE = 17;
   /** RegularExpression Id. */
-  int INCONMAIL_FALSE = 18;
+  int VAULT = 18;
   /** RegularExpression Id. */
-  int VAULT = 19;
+  int APPLICATION = 19;
   /** RegularExpression Id. */
-  int APPLICATION = 20;
+  int SITE = 20;
   /** RegularExpression Id. */
-  int SITE = 21;
+  int GROUP = 21;
   /** RegularExpression Id. */
-  int GROUP = 22;
+  int ROLE = 22;
   /** RegularExpression Id. */
-  int ROLE = 23;
+  int ADDRESS = 23;
   /** RegularExpression Id. */
-  int ADDRESS = 24;
+  int EMAILADDRESS = 24;
   /** RegularExpression Id. */
-  int EMAILADDRESS = 25;
+  int FAX = 25;
   /** RegularExpression Id. */
-  int FAX = 26;
+  int FULLNAME = 26;
   /** RegularExpression Id. */
-  int FULLNAME = 27;
+  int PHONE = 27;
   /** RegularExpression Id. */
-  int PHONE = 28;
+  int STRING = 28;
   /** RegularExpression Id. */
-  int STRING = 29;
+  int SINGLE = 29;
   /** RegularExpression Id. */
-  int SINGLE = 30;
+  int MULTILINESTRING = 30;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 31;
+  int MULTILINESINGLE = 31;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 32;
+  int ACCESS = 32;
   /** RegularExpression Id. */
-  int KIND_ADMIN = 33;
+  int ACCESS_ALL = 33;
   /** RegularExpression Id. */
-  int ACCESS = 34;
+  int ACCESS_OPEN = 34;
   /** RegularExpression Id. */
-  int ACCESS_ALL = 35;
+  int ACCESS_CLOSE = 35;
   /** RegularExpression Id. */
-  int ACCESS_OPEN = 36;
+  int ACCESS_EXPECTED_SINGLE = 36;
   /** RegularExpression Id. */
-  int ACCESS_CLOSE = 37;
+  int ADMIN = 37;
   /** RegularExpression Id. */
-  int ACCESS_EXPECTED_SINGLE = 38;
+  int ADMIN_ALL = 38;
   /** RegularExpression Id. */
-  int ADMIN = 39;
+  int ADMIN_OPEN = 39;
   /** RegularExpression Id. */
-  int ADMIN_ALL = 40;
+  int ADMIN_CLOSE = 40;
   /** RegularExpression Id. */
-  int ADMIN_OPEN = 41;
+  int ADMIN_EXPECTED_SINGLE = 41;
   /** RegularExpression Id. */
-  int ADMIN_CLOSE = 42;
+  int TYPE = 42;
   /** RegularExpression Id. */
-  int ADMIN_EXPECTED_SINGLE = 43;
+  int TYPE_OPEN = 43;
   /** RegularExpression Id. */
-  int TYPE = 44;
+  int TYPE_CLOSE = 44;
   /** RegularExpression Id. */
-  int TYPE_OPEN = 45;
+  int TYPE_APPLICATION = 45;
   /** RegularExpression Id. */
-  int TYPE_CLOSE = 46;
+  int TYPE_FULL = 46;
   /** RegularExpression Id. */
-  int TYPE_APPLICATION = 47;
+  int TYPE_BUSINESS = 47;
   /** RegularExpression Id. */
-  int TYPE_FULL = 48;
+  int TYPE_SYSTEM = 48;
   /** RegularExpression Id. */
-  int TYPE_BUSINESS = 49;
+  int PRODUCT = 49;
   /** RegularExpression Id. */
-  int TYPE_SYSTEM = 50;
+  int PRODUCT_OPEN = 50;
   /** RegularExpression Id. */
-  int PRODUCT = 51;
+  int PRODUCT_CLOSE = 51;
   /** RegularExpression Id. */
-  int PRODUCT_OPEN = 52;
+  int PRODUCT_EXPECTED_SINGLE = 52;
   /** RegularExpression Id. */
-  int PRODUCT_CLOSE = 53;
+  int PROPERTY = 53;
   /** RegularExpression Id. */
-  int PRODUCT_EXPECTED_SINGLE = 54;
+  int PROPERTYTO = 54;
   /** RegularExpression Id. */
-  int PROPERTY = 55;
+  int PROPERTYVAL = 55;
   /** RegularExpression Id. */
-  int PROPERTYTO = 56;
+  int ADMINTYPE_STRING = 56;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 57;
-  /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 58;
-  /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 59;
+  int ADMINTYPE_SINGLE = 57;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -155,13 +151,11 @@ interface PersonAdminParserConstants_mxJPO {
   /** Lexical state. */
   int ACCESS_OPENEXPECTED = 8;
   /** Lexical state. */
-  int KIND_EXPECTED = 9;
+  int MULTILINESTRING_EXPECTED = 9;
   /** Lexical state. */
-  int MULTILINESTRING_EXPECTED = 10;
+  int STRING_EXPECTED = 10;
   /** Lexical state. */
-  int STRING_EXPECTED = 11;
-  /** Lexical state. */
-  int DEFAULT = 12;
+  int DEFAULT = 11;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -170,7 +164,6 @@ interface PersonAdminParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
-    "\"kind\"",
     "\"uuid\"",
     "\"symbolicname\"",
     "\"comment\"",
@@ -198,7 +191,6 @@ interface PersonAdminParserConstants_mxJPO {
     "<SINGLE>",
     "<MULTILINESTRING>",
     "<MULTILINESINGLE>",
-    "\"admin\"",
     "\"access\"",
     "\"all\"",
     "\"{\"",

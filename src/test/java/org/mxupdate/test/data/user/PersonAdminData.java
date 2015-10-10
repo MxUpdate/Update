@@ -44,8 +44,7 @@ public class PersonAdminData
     {
         final StringBuilder strg = new StringBuilder();
         this.append4CIFileHeader(strg);
-        strg.append("mxUpdate person \"${NAME}\" {\n")
-            .append(" kind admin\n");
+        strg.append("mxUpdate person \"${NAME}\" {\n");
 
         this.getFlags().append4Update("    ", strg);
         this.getValues().append4Update("    ", strg);
