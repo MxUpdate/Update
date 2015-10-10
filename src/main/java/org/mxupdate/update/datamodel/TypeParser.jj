@@ -337,7 +337,6 @@ void parse(final Type_mxJPO _type)
                                                                                                this.setValue(property, "name",  "UUID");}
                                             ( tmp = <STRING>                                  {this.setValue(property, "value", this.getString(tmp.image));}
                                             | tmp = <SINGLE>                                  {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-
                         | ( <SYMBOLICNAME>  ( tmp = <STRING>                                  {this.appendValue(localAttr, "symbolicNames",                   this.getString(tmp.image));}
                                             | tmp = <SINGLE>                                  {this.appendValue(localAttr, "symbolicNames",                   this.getSingle(tmp.image));} ) )
                         | ( <DESCRIPTION>   ( tmp = <MULTILINESTRING>                         {this.setValue(localAttr, "description",                        this.getString(tmp.image));}
@@ -419,7 +418,12 @@ void parse(final Type_mxJPO _type)
             ( tmp = <STRING>                                                                  {localPathType = new LocalPathType(this.getString(tmp.image));this.appendValue(_type, "localPathTypes", localPathType);}
             | tmp = <SINGLE>                                                                  {localPathType = new LocalPathType(this.getSingle(tmp.image));this.appendValue(_type, "localPathTypes", localPathType);} )
                  ( "{"
-                        ( ( <SYMBOLICNAME>  ( tmp = <STRING>                                  {this.appendValue(localPathType, "symbolicNames", this.getString(tmp.image));}
+                        ( ( <UUID>                                                            {property = new AdminProperty();
+                                                                                               this.appendValue(this.getValue(localPathType, "properties"), "propertiesStack", property);
+                                                                                               this.setValue(property, "name",  "UUID");}
+                                            ( tmp = <STRING>                                  {this.setValue(property, "value", this.getString(tmp.image));}
+                                            | tmp = <SINGLE>                                  {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                        | ( <SYMBOLICNAME>  ( tmp = <STRING>                                  {this.appendValue(localPathType, "symbolicNames", this.getString(tmp.image));}
                                             | tmp = <SINGLE>                                  {this.appendValue(localPathType, "symbolicNames", this.getSingle(tmp.image));} ) )
                         | ( <DESCRIPTION>   ( tmp = <MULTILINESTRING>                         {this.setValue(localPathType, "description", this.getString(tmp.image));}
                                             | tmp = <MULTILINESINGLE>                         {this.setValue(localPathType, "description", this.getSingle(tmp.image));} ) )
