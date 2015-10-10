@@ -26,6 +26,8 @@ import org.mxupdate.test.ExportParser.Line;
 import org.mxupdate.test.data.datamodel.PathTypeData;
 import org.testng.Assert;
 
+import matrix.util.MatrixException;
+
 /**
  * List of path types used locally.
  *
@@ -50,6 +52,19 @@ public class LocalPathTypeDataList
             _cmd.append(_prefix).append("local pathtype \"").append(pathType.getName()).append("\" {\n");
             pathType.append4Update(_prefix + "    ", _cmd);
             _cmd.append(_prefix).append("}\n");
+        }
+    }
+
+    /**
+     * Creates depending referenced objects from the path type.
+     *
+     * @throws MatrixException if create failed
+     */
+    public void createDependings()
+        throws MatrixException
+    {
+        for (final PathTypeData pathType : this)  {
+            pathType.createDependings();
         }
     }
 

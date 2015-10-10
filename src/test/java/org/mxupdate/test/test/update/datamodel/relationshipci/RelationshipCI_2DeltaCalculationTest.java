@@ -282,13 +282,19 @@ public class RelationshipCI_2DeltaCalculationTest
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalPathType(new PathTypeData(this, "PathType").setValue("uuid", "UUID").def4FromSingle("cardinality", "many")) },
-            {"303a) local path type with embedded local attribute",
+            {"303) local path type with global attribute",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .def4FromSingle("cardinality", "many")
+                                    .defData("attribute", new AttributeData(this, "PathType Attribute").setSingle("kind", "string"))) },
+            {"304a) local path type with embedded local attribute",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalPathType(new PathTypeData(this, "PathType")
                                     .def4FromSingle("cardinality", "many")
                                     .addLocalAttribute(new AttributeData(this, "PathType Attribute").setSingle("kind", "string"))) },
-            {"303b) local path type with embedded local attribute with uuid",
+            {"304b) local path type with embedded local attribute with uuid",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalPathType(new PathTypeData(this, "PathType")

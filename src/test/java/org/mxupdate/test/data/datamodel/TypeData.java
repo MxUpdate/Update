@@ -22,6 +22,8 @@ import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.datamodel.helper.LocalPathTypeDataList;
 import org.mxupdate.test.data.datamodel.helper.LocaleAttributeList;
 
+import matrix.util.MatrixException;
+
 /**
  * Used to define a type, create them and test the result.
  *
@@ -92,6 +94,17 @@ public class TypeData
         strg.append("}");
 
         return strg.toString();
+    }
+
+    @Override
+    public TypeData createDependings()
+        throws MatrixException
+    {
+        super.createDependings();
+
+        this.localPathTypes.createDependings();
+
+        return this;
     }
 
     @Override

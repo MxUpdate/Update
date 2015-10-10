@@ -208,6 +208,8 @@ public class RelationshipData
         this.from.datas.createDependings();
         this.to.datas.createDependings();
 
+        this.localPathTypes.createDependings();
+
         return this;
     }
 

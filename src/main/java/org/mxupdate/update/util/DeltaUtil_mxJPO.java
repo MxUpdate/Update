@@ -352,7 +352,7 @@ public final class DeltaUtil_mxJPO
                 }
             }
             for (final String newValue : _new)  {
-                if (!_current.contains(newValue))  {
+                if ((_current == null) || !_current.contains(newValue))  {
                     _paramCache.logDebug("    - " + _kind +" '" + newValue + "' is added");
                     _mql.newLine().cmd("add ").cmd(_kind).cmd(" ").arg(newValue);
                 }

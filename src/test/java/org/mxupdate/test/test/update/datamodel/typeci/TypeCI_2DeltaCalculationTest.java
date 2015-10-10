@@ -61,112 +61,118 @@ public class TypeCI_2DeltaCalculationTest
             // local attribute
 
             {"101) binary attribute",
-                new TypeData(this, "Test"),
-                new TypeData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "binary")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "binary")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
             {"102) boolean attribute",
-                new TypeData(this, "Test"),
-                new TypeData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "boolean")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
             {"103) date attribute",
-                new TypeData(this, "Test"),
-                new TypeData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "date")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setFlag("rangevalue", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "date")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("rangevalue", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
             {"104) integer attribute",
-                new TypeData(this, "Test"),
-                new TypeData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "integer")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setFlag("rangevalue", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "integer")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("rangevalue", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
             {"105) real attribute",
-                new TypeData(this, "Test"),
-                new TypeData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "real")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setFlag("rangevalue", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "real")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("rangevalue", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
             {"106) string attribute",
-                new TypeData(this, "Test"),
-                new TypeData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "string")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setFlag("multiline", false, Create.ViaFlag)
-                                    .setSingle("maxlength", "0")
-                                    .setValue("default", "")) },
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "string")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("multiline", false, Create.ViaFlag)
+                                        .setSingle("maxlength", "0")
+                                        .setValue("default", "")) },
             {"107) attribute with uuid",
-                new TypeData(this, "Test"),
-                new TypeData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "boolean")
-                                    .setValue("uuid", "UUID")
-                                    .setValue("description", "")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "boolean")
+                                        .setValue("uuid", "UUID")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // local path type
 
             {"301) simple local path type",
-                new TypeData(this, "Test"),
-                new TypeData(this, "Test")
-                        .addLocalPathType(new PathTypeData(this, "PathType").def4FromSingle("cardinality", "many")) },
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType").def4FromSingle("cardinality", "many")) },
             {"302) local path type with uuid",
-                new TypeData(this, "Test"),
-                new TypeData(this, "Test")
-                        .addLocalPathType(new PathTypeData(this, "PathType").setValue("uuid", "UUID").def4FromSingle("cardinality", "many")) },
-            {"303) local path type with embedded local attribute",
-                new TypeData(this, "Test"),
-                new TypeData(this, "Test")
-                        .addLocalPathType(new PathTypeData(this, "PathType")
-                                .def4FromSingle("cardinality", "many")
-                                .addLocalAttribute(new AttributeData(this, "PathType Attribute").setSingle("kind", "string"))) },
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType").setValue("uuid", "UUID").def4FromSingle("cardinality", "many")) },
+            {"303) local path type with global attribute",
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .def4FromSingle("cardinality", "many")
+                                    .defData("attribute", new AttributeData(this, "PathType Attribute").setSingle("kind", "string"))) },
+            {"304) local path type with embedded local attribute",
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .def4FromSingle("cardinality", "many")
+                                    .addLocalAttribute(new AttributeData(this, "PathType Attribute").setSingle("kind", "string"))) },
        };
     }
 
