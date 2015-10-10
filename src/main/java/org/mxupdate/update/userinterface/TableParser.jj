@@ -22,7 +22,23 @@ options {
     SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
     UNICODE_INPUT = true;
 }
-PARSER_BEGIN(TableParser)
+
+PARSER_BEGIN(TableParser)
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
 package org.mxupdate.update.userinterface;
 
 import java.lang.reflect.InvocationTargetException;
@@ -39,20 +55,26 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 
 /**
- * Parses the update format for {@link Table_mxJPO}. */
+ * Parses the update format for {@link Table_mxJPO}.
+ */
 @SuppressWarnings("unused")
 class TableParser
     extends AbstractParser_mxJPO
 {
 }
-PARSER_END(TableParser)<*> SKIP :
+
+PARSER_END(TableParser)
+
+<*> SKIP :
 {
   " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
 <DEFAULT> TOKEN : /** first level */
 {
-      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+      <UUID:                                "uuid">                                         : STRING_EXPECTED
+
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
     | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
@@ -139,7 +161,8 @@ class TableParser
 }
 
 /**************************************************************************** */
-/**
+
+/**
  * Parses one complete interface definition.
  *
  * @param _form    target interface to update with parsed values
@@ -152,7 +175,13 @@ void parse(final Table_mxJPO _table)
     Column column;
     Setting setting;
 } {
-    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_table, "symbolicNames",                  this.getString(tmp.image));}
+    (   ( <UUID>                                                            {property = new AdminProperty();
+                                                                             this.appendValue(this.getValue(_table, "properties"), "propertiesStack", property);
+                                                                             this.setValue(property, "name",  "UUID");}
+                                    ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+
+      | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_table, "symbolicNames",                  this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(_table, "symbolicNames",                  this.getSingle(tmp.image));} ) )
 
       | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_table, "description",                       this.getString(tmp.image));}
@@ -188,7 +217,7 @@ void parse(final Table_mxJPO _table)
                                         | <COLUMN_SORTTYPE_OTHER>           {this.setValue(column, "sortType",                          SortType.OTHER);}
                                         | <COLUMN_SORTTYPE_NONE>            {this.setValue(column, "sortType",                          SortType.NONE);} )
                     | <COLUMN_SETTING>                                      {setting = new Setting();this.appendValue(column, "settings", setting);}
-                                         ( tmp = <SETTING_STRING>           {this.setValue(setting, "name",                             this.getString(tmp.image));}
+                                        ( tmp = <SETTING_STRING>            {this.setValue(setting, "name",                             this.getString(tmp.image));}
                                         | tmp = <SETTING_SINGLE>            {this.setValue(setting, "name",                             this.getSingle(tmp.image));} )
                                         ( tmp = <COLUMN_STRING>             {this.setValue(setting, "value",                            this.getString(tmp.image));}
                                         | tmp = <COLUMN_SINGLE>             {this.setValue(setting, "value",                            this.getSingle(tmp.image));} ) ) *
