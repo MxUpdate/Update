@@ -108,7 +108,27 @@ public class UpdateAdminProgramJPOTest
         }
     }
 
-    @BeforeMethod()
+    /**
+     * Positive test that JPO is automatically created.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test that JPO is automatically created")
+    public void positiveTestCreate()
+        throws Exception
+    {
+        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
+
+        new UpdateAdminProgramJPO_mxJPO().update(paramCache, paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), false, "MXUPDATE_Test", this.origJPO);
+
+        final String code = this.mql("print prog 'MXUPDATE_Test' select code dump");
+
+        Assert.assertTrue(
+                !code.isEmpty(),
+                "code defined");
+    }
+
+    @BeforeMethod
     @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException, IOException

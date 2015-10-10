@@ -28,7 +28,7 @@ import org.testng.annotations.Test;
  */
 @Test
 public class EKLProgramCI_2DeltaCalculationTest
-    extends AbstractProgramCI_2DeltaCalculationTest<EKLProgramData>
+    extends Abstract_2DeltaCalculationTest<EKLProgramData>
 {
     @Override
     protected ProgramCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,

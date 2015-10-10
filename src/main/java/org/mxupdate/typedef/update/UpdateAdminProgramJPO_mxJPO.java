@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.Map;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -49,7 +50,7 @@ public class UpdateAdminProgramJPO_mxJPO
      * @param _file         file with TCL update code
      * @throws Exception if the update from the derived class failed
      */
-    @Override()
+    @Override
     public void update(final ParameterCache_mxJPO _paramCache,
                        final TypeDef_mxJPO _typeDef,
                        final boolean _create,
@@ -62,11 +63,17 @@ public class UpdateAdminProgramJPO_mxJPO
 
             final MultiLineMqlBuilder mql = MqlBuilderUtil_mxJPO.multiLine(_file, "");
 
-            // check property already exists => remove property
-            final String propExists = MqlBuilderUtil_mxJPO.mql().cmd("escape print program ").arg(_name).cmd(" select ").arg("property[" + propName + "]").exec(_paramCache.getContext());
-            if (!propExists.isEmpty())  {
-                mql.newLine().cmd("escape mod program ").arg(_name).cmd(" remove property ").arg(propName);
+            if (!EMxAdmin_mxJPO.Program.exist(_paramCache, _name))  {
+                // create program if not exists
+                mql.newLine().cmd("escape add program ").arg(_name).cmd(" java");
+            } else  {
+                // check property already exists => remove property
+                final String propExists = MqlBuilderUtil_mxJPO.mql().cmd("escape print program ").arg(_name).cmd(" select ").arg("property[" + propName + "]").exec(_paramCache.getContext());
+                if (!propExists.isEmpty())  {
+                    mql.newLine().cmd("escape mod program ").arg(_name).cmd(" remove property ").arg(propName);
+                }
             }
+
             // define file date
             mql.newLine().cmd("escape mod program ").arg(_name).cmd(" add property ")
                     .arg(propName).cmd(" value ").arg(StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified())));

@@ -40,7 +40,7 @@ import matrix.util.MatrixException;
  *
  * @author The MxUpdate Team
  */
-public abstract class AbstractProgramCI_2DeltaCalculationTest<TESTDATA extends AbstractAdminData<?>>
+public abstract class Abstract_2DeltaCalculationTest<TESTDATA extends AbstractAdminData<?>>
     extends AbstractDeltaCalculationTest<ProgramCI_mxJPO,TESTDATA>
 {
     @Override
@@ -132,7 +132,7 @@ public abstract class AbstractProgramCI_2DeltaCalculationTest<TESTDATA extends A
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
         @SuppressWarnings("unchecked")
-        final TESTDATA prog = (TESTDATA) this.createNewTestData("Test").create().setValue("code", _code);
+        final TESTDATA prog = (TESTDATA) this.createNewTestData("Test").create().setValue("code", _code).setSingle("kind", this.getKind());
 
         final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(this.createNewData(paramCache, prog.getName()));
         wrapper.parseUpdate(prog);

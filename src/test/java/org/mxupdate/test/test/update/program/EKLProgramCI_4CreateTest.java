@@ -15,37 +15,28 @@
 
 package org.mxupdate.test.test.update.program;
 
-import org.mxupdate.test.data.program.MQLProgramData;
-import org.mxupdate.update.program.ProgramCI_mxJPO;
-import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.test.data.program.EKLProgramData;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link ProgramCI_mxJPO program CI} delta calculation for MQL
- * programs.
+ * Tests the create of EKL
+ * {@link org.mxupdate.update.program.ProgramCI_mxJPO program}.
  *
  * @author The MxUpdate Team
  */
 @Test
-public class MQLProgramCI_2DeltaCalculationTest
-    extends Abstract_2DeltaCalculationTest<MQLProgramData>
+public class EKLProgramCI_4CreateTest
+    extends Abstract_4CreateTest
 {
     @Override
-    protected ProgramCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
-                                            final String _name)
+    protected EKLProgramData createNewTestData(final String _name)
     {
-        return new ProgramCI_mxJPO(_name);
-    }
-
-    @Override
-    protected MQLProgramData createNewTestData(final String _name)
-    {
-        return new MQLProgramData(this, _name);
+        return new EKLProgramData(this, _name);
     }
 
     @Override
     protected String getKind()
     {
-        return "mql";
+        return "ekl";
     }
 }

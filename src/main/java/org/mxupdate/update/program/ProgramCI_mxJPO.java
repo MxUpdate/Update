@@ -247,6 +247,11 @@ public class ProgramCI_mxJPO
                 && this.getProperties().hasNoValuesDefined(_paramCache);
     }
 
+    @Override
+    public void createOld(final ParameterCache_mxJPO _paramCache)
+    {
+    }
+
     /**
      * Creates given program object from given type with given name.
      *
@@ -254,7 +259,7 @@ public class ProgramCI_mxJPO
      * @throws Exception if create of JPO failed
      */
     @Override
-    public void createOld(final ParameterCache_mxJPO _paramCache)
+    public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
         MqlBuilderUtil_mxJPO.mql().cmd("escape add program ").arg(this.getName()).cmd(" ").cmd(this.kind.name().toLowerCase()).exec(_paramCache.getContext());

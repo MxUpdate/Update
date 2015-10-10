@@ -28,7 +28,7 @@ import org.testng.annotations.Test;
  */
 @Test
 public class ExternalProgramCI_2DeltaCalculationTest
-    extends AbstractProgramCI_2DeltaCalculationTest<ExternalProgramData>
+    extends Abstract_2DeltaCalculationTest<ExternalProgramData>
 {
     @Override
     protected ProgramCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
