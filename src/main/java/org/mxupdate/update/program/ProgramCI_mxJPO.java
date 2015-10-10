@@ -38,7 +38,21 @@ import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import matrix.util.MatrixException;
 
 /**
- * Common definition for the code of a program.
+ * Common definition for the code of a program. The handled properties are
+ * <ul>
+ * <li>{@link #kind} of program</li>
+ * <li>uuid</li>
+ * <li>symbolic names</li>
+ * <li>description</li>
+ * <li>{@link AbstractCode_mxJPO#getCode() content}</li>
+ * <li>{@link #user}</li>
+ * <li>{@link #needsBusinessObjectContext}</li>
+ * <li>{@link #downloadable}</li>
+ * <li>{@link #pipe}</li>
+ * <li>{@link #pooled}</li>
+ * <li>{@link #execute}</li>
+ * <li>{@link #rule}</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  * @param <CLASS> derived from this class
@@ -118,7 +132,7 @@ public class ProgramCI_mxJPO
         }
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -147,7 +161,7 @@ public class ProgramCI_mxJPO
      * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
      *         <i>false</i>
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -198,6 +212,7 @@ public class ProgramCI_mxJPO
         _updateBuilder
                 //              tag                 | default | value                                | write?
                 .single(        "kind",                         this.kind.name().toLowerCase())
+                .stringNotNull( "uuid",                         this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",                 this.getSymbolicNames())
                 .string(        "description",                  this.getDescription())
                 .flagIfTrue(    "hidden",               false,  this.isHidden(),                        this.isHidden())
@@ -238,7 +253,7 @@ public class ProgramCI_mxJPO
      * @param _paramCache   parameter cache
      * @throws Exception if create of JPO failed
      */
-    @Override()
+    @Override
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {

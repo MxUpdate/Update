@@ -29,9 +29,19 @@ public abstract class AbstractProgramCI_1ParserTest
     protected Object[][] getData(final String _kind)
     {
         return new Object[][]  {
-            {"1) simple",
+            {"0) simple",
                     "",
                     "kind " + _kind + " description \"\" "},
+            // uuid
+            {"1a) uuid with minus separator",
+                    "",
+                    "kind " + _kind + " uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\""},
+            {"1b) uuid w/o minus separator",
+                    "",
+                    "kind " + _kind + " uuid \"FDA75674979211E6AE2256B6B6499611\"     description \"\""},
+            {"1c) uuid convert from single to string",
+                    "kind " + _kind + " uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\"",
+                    "kind " + _kind + " uuid   FDA7-5674979211-E6AE2256B6-B6499611    description \"\""},
             // description
             {"2a) description",
                     "",

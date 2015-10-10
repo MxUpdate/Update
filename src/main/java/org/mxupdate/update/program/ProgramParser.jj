@@ -45,7 +45,6 @@ import java.lang.reflect.InvocationTargetException;
 import org.mxupdate.update.program.ProgramCI_mxJPO.Execute;
 import org.mxupdate.update.program.ProgramCI_mxJPO.Kind;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
-import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
@@ -71,6 +70,8 @@ class ProgramParser
     | <EXTERNAL:                            "external">
     | <JAVA:                                "java">
     | <MQL:                                 "mql">
+
+    | <UUID:                                "uuid">                                         : STRING_EXPECTED
 
     | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
@@ -146,6 +147,13 @@ void parse(final ProgramCI_mxJPO _prog)
                                     | <EXTERNAL>                            {this.setValue(_prog, "kind",                       Kind.EXTERNAL);}
                                     | <MQL>                                 {this.setValue(_prog, "kind",                       Kind.MQL);}
                                     | <JAVA>                                {this.setValue(_prog, "kind",                       Kind.JAVA);} ) )
+
+      | ( <UUID>                                                            {property = new AdminProperty();
+                                                                             this.appendValue(this.getValue(_prog, "properties"), "propertiesStack", property);
+                                                                             this.setValue(property, "name",  "UUID");}
+                                    ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+
       | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_prog, "symbolicNames",           this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(_prog, "symbolicNames",           this.getSingle(tmp.image));} ) )
 
