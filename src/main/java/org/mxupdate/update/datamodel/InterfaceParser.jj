@@ -90,7 +90,9 @@ class InterfaceParser
 
 <FOR_EXPECTED> TOKEN :
 {
-      <FOR_RELATIONSHIP_ALL:                "relationship" ([" ","\t","\n","\r"])+ "all">   : DEFAULT
+      <FOR_PATHTYPE_ALL:                    "pathtype" ([" ","\t","\n","\r"])+ "all">       : DEFAULT
+    | <FOR_PATHTYPE:                        "pathtype">                                     : STRING_EXPECTED
+    | <FOR_RELATIONSHIP_ALL:                "relationship" ([" ","\t","\n","\r"])+ "all">   : DEFAULT
     | <FOR_RELATIONSHIP:                    "relationship">                                 : STRING_EXPECTED
     | <FOR_TYPE_ALL:                        "type" ([" ","\t","\n","\r"])+ "all">           : DEFAULT
     | <FOR_TYPE:                            "type">                                         : STRING_EXPECTED
@@ -112,7 +114,7 @@ class InterfaceParser
 
     | <RANGEVALUE_TRUE:                     "rangevalue">                                   : DEFAULT
     | <RANGEVALUE_FALSE:                    "!rangevalue">                                  : DEFAULT
-    
+
     | <MULTILINE_TRUE:                      "multiline">                                    : DEFAULT
     | <MULTILINE_FALSE:                     "!multiline">                                   : DEFAULT
 
@@ -260,7 +262,10 @@ void parse(final Interface_mxJPO _interface)
                                     | tmp = <SINGLE>                        {this.appendValue(_interface, "attributes",                     this.getSingle(tmp.image));} ) )
 
       | ( <FOR>
-            ( <FOR_RELATIONSHIP_ALL>                                        {this.setValue(_interface, "relationAll",                       true);}
+            ( <FOR_PATHTYPE_ALL>                                            {this.setValue(_interface, "pathTypeAll",                       true);}
+            | <FOR_PATHTYPE>        ( tmp = <STRING>                        {this.appendValue(_interface, "pathTypes",                      this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_interface, "pathTypes",                      this.getSingle(tmp.image));} )
+            | <FOR_RELATIONSHIP_ALL>                                        {this.setValue(_interface, "relationAll",                       true);}
             | <FOR_RELATIONSHIP>    ( tmp = <STRING>                        {this.appendValue(_interface, "relations",                      this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(_interface, "relations",                      this.getSingle(tmp.image));} )
             | <FOR_TYPE_ALL>                                                {this.setValue(_interface, "typeAll",                           true);}

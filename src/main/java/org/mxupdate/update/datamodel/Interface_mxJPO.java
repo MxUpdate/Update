@@ -69,15 +69,10 @@ public class Interface_mxJPO
     /** Local attributes. */
     private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO();
 
-    /** Are all types allowed for this interface? */
-    private boolean typeAll;
+    /** Are all path types / relationships / types allowed for this interface? */
+    private boolean pathTypeAll = false, relationAll = false, typeAll = false;
     /** Information about all allowed types for this interface. */
-    private final SortedSet<String> types = new TreeSet<>();
-
-    /** Are all relationships allowed for this interface? */
-    private boolean relationAll;
-    /** Information about all allowed relationships for this interface. */
-    private final SortedSet<String> relations = new TreeSet<>();
+    private final SortedSet<String> pathTypes = new TreeSet<>(), relations = new TreeSet<>(), types = new TreeSet<>();
 
     /**
      * Constructor used to initialize the interface class instance.
@@ -168,6 +163,8 @@ public class Interface_mxJPO
                 .flag(          "hidden",           false,  this.isHidden())
                 .list(          "attribute",                this.attributes)
                 .write(this.localAttributes)
+                .singleIfTrue(  "for pathtype",             "all",                  this.pathTypeAll)
+                .listIfTrue(    "for pathtype",             this.pathTypes,         !this.pathTypeAll)
                 .singleIfTrue(  "for relationship",         "all",                  this.relationAll)
                 .listIfTrue(    "for relationship",         this.relations,         !this.relationAll)
                 .singleIfTrue(  "for type",                 "all",                  this.typeAll)
