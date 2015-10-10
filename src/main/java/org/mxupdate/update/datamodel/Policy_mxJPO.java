@@ -47,6 +47,8 @@ import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateLine;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MqlBuilder;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 import matrix.util.MatrixException;
@@ -105,9 +107,6 @@ public class Policy_mxJPO
         Policy_mxJPO.IGNORED_URLS.add("/stateDefList/stateDef/triggerList");
     }
 
-    /** Stores the flag the the update needs a create of the policy. */
-    private boolean updateWithCreate = false;
-
     /** Default format of this policy. */
     private String defaultFormat = null;
     /** All possible formats of this policy. */
@@ -161,31 +160,27 @@ public class Policy_mxJPO
 
     /**
      * {@inheritDoc}
-     * Parsing is only allowed if the update is not done within
-     * {@link #updateWithCreate create}. The
-     * {@link #allStateAccess all state access} and
+     * The {@link #allStateAccess all state access} and
      * {@link State#access state access} statements are sorted if defined.
      */
     @Override
     public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
-        if (!this.updateWithCreate)  {
-            super.parse(_paramCache);
+        super.parse(_paramCache);
 
-            // define default values..
-            if (this.minorsequence == null)  {
-                this.minorsequence = "";
-            }
-            if (this.majorsequence == null)  {
-                this.majorsequence = "";
-            }
+        // define default values..
+        if (this.minorsequence == null)  {
+            this.minorsequence = "";
+        }
+        if (this.majorsequence == null)  {
+            this.majorsequence = "";
+        }
 
-            if (_paramCache.getValueBoolean(ValueKeys.DMPolicyAllowExportAccessSorting))  {
-                this.allStateAccess.sort();
-                for (final State state : this.states)  {
-                    state.access.sort();
-                }
+        if (_paramCache.getValueBoolean(ValueKeys.DMPolicyAllowExportAccessSorting))  {
+            this.allStateAccess.sort();
+            for (final State state : this.states)  {
+                state.access.sort();
             }
         }
     }
@@ -287,17 +282,6 @@ public class Policy_mxJPO
         }
     }
 
-    /**
-     * Original method is overridden because policies must be directly created
-     * within update.
-     *
-     * @param _paramCache       not used
-     */
-    @Override
-    public void createOld(final ParameterCache_mxJPO _paramCache)
-    {
-    }
-
     @Override
     public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
@@ -336,14 +320,27 @@ public class Policy_mxJPO
     }
 
     /**
-     * Defines the {@link #updateWithCreate} flag.
+     * Original method is overridden because policies must be directly created
+     * within update.
      *
-     * @param _updateWithCreate new value
+     * @param _paramCache       not used
      */
-    public void setUpdateWithCreate(final boolean _updateWithCreate)
-        throws Exception
+    @Override
+    public void createOld(final ParameterCache_mxJPO _paramCache)
     {
-        this.updateWithCreate = _updateWithCreate;
+    }
+
+    @Override
+    public void create(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException
+    {
+        final MqlBuilder mql = MqlBuilderUtil_mxJPO.mql().cmd("escape add policy ").arg(this.getName());
+        if ((this.delimiter != null) && !this.delimiter.isEmpty())  {
+            mql.cmd(" delimiter ").arg(this.delimiter)
+               .cmd(" minorsequence ").arg(this.minorsequence)
+               .cmd(" majorsequence ").arg(this.majorsequence);
+        }
+        mql.exec(_paramCache.getContext());
     }
 
     @Override
@@ -352,18 +349,8 @@ public class Policy_mxJPO
                           final Policy_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        // creates policy if done within update
-        if (_current.updateWithCreate)  {
-            _paramCache.logDebug("    - create policy");
-            _mql.pushPrefix("escape add policy $1", this.getName()).newLine();
-            if ((this.delimiter != null) && !this.delimiter.isEmpty())  {
-                _mql.cmd("delimiter ").arg(this.delimiter)
-                    .cmd(" minorsequence ").arg(this.minorsequence)
-                    .cmd(" majorsequence ").arg(this.majorsequence);
-            }
-            _mql.popPrefix();
         // check that delimiter is NOT updated
-        } else if (((_current.delimiter == null) && (this.delimiter != null) && !this.delimiter.isEmpty())
+        if (((_current.delimiter == null) && (this.delimiter != null) && !this.delimiter.isEmpty())
                 || ((_current.delimiter != null) && !_current.delimiter.isEmpty() && (this.delimiter == null))
                 || ((_current.delimiter != null) && !_current.delimiter.equals(this.delimiter)))  {
             throw new UpdateException_mxJPO(

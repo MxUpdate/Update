@@ -24,7 +24,6 @@ import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
-import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -75,7 +74,6 @@ public class MxUpdateStatement_mxJPO
         } else  {
             this.execAdmin(
                     _context.getParamCache(),
-                    Boolean.valueOf(_context.getVarValue("CREATE")),
                     mxClass,
                     _context.getVarValue("NAME"),
                     _context.getVarValue("FILEDATE"),
@@ -97,7 +95,6 @@ public class MxUpdateStatement_mxJPO
      * @throws Exception if execute failed
      */
     private void execAdmin(final ParameterCache_mxJPO _paramCache,
-                           final boolean _create,
                            final EMxAdmin_mxJPO _mxClass,
                            final String _mxName,
                            final String _fileDate,
@@ -148,10 +145,6 @@ public class MxUpdateStatement_mxJPO
             mql = MqlBuilderUtil_mxJPO.multiLine(_file, "escape mod " + target.mxClassDef().mxClass() + " $1 " + target.mxClassDef().mxClassSuffix(), target.getName());
         } else  {
             mql = MqlBuilderUtil_mxJPO.multiLine(_file, "escape mod " + target.mxClassDef().mxClass() + " $1", target.getName());
-        }
-
-        if (_mxClass == EMxAdmin_mxJPO.Policy)  {
-            ((Policy_mxJPO) target).setUpdateWithCreate(_create);
         }
 
         ((AbstractAdminObject_mxJPO) target).calcDelta(_paramCache, mql, current);
