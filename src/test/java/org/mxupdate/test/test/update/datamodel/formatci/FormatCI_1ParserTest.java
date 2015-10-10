@@ -26,11 +26,11 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class FormatCI_1ParserTest
     extends AbstractParserTest<Format_mxJPO>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
@@ -38,85 +38,89 @@ public class FormatCI_1ParserTest
             {"0) simple",
                     "",
                     "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
+            // uuid
+            {"1a) uuid with minus separator",
+                    "",
+                    "uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
+            {"1b) uuid w/o minus separator",
+                    "",
+                    "uuid \"FDA75674979211E6AE2256B6B6499611\"     description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
+            {"1c) uuid convert from single to string",
+                    "uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\"",
+                    "uuid   FDA7-5674979211-E6AE2256B6-B6499611    description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
             // registered name
-            {"1a) symbolic name",
+            {"2a) symbolic name",
                     "",
                     "symbolicname \"format_abc\" description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
-            {"1b) two symbolic names",
+            {"2b) two symbolic names",
                     "symbolicname \"format_abc\" symbolicname \"format_def\" description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\"",
                     "symbolicname \"format_def\" symbolicname \"format_abc\" description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
             // description
-            {"2a) description",
+            {"3a) description",
                     "",
                     "description \"abc def\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
-            {"2b) description not defined",
+            {"3b) description not defined",
                     "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\"",
                     "                 !hidden mime \"\" suffix \"\" type \"\" version \"\""},
-            {"2c) multi-line description",
+            {"3c) multi-line description",
                     "",
                     "description \"abc\ndef\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
-            {"2d) tab's in description",
+            {"3d) tab's in description",
                     "",
                     "description \"abc\tdef\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
             // hidden
-            {"3a) not hidden",
+            {"4a) not hidden",
                     "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\"",
                     "description \"\"         mime \"\" suffix \"\" type \"\" version \"\""},
-            {"3b) hidden",
+            {"4b) hidden",
                     "",
                     "description \"\" hidden mime \"\" suffix \"\" type \"\" version \"\""},
             // mime
-            {"4a) mime",
+            {"5a) mime",
                     "",
                     "description \"\" !hidden mime \"abc\" suffix \"\" type \"\" version \"\""},
-            {"4b) mime not defined",
+            {"5b) mime not defined",
                     "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\"",
                     "description \"\" !hidden           suffix \"\" type \"\" version \"\""},
             // suffix
-            {"5a) mime",
+            {"6a) mime",
                     "",
                     "description \"\" !hidden mime \"\" suffix \"abc\" type \"\" version \"\""},
-            {"5b) mime not defined",
+            {"6b) mime not defined",
                     "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\"",
                     "description \"\" !hidden mime \"\"             type \"\" version \"\""},
             // type
-            {"6a) mime",
+            {"7a) mime",
                     "",
                     "description \"\" !hidden mime \"\" suffix \"\" type \"abc\" version \"\""},
-            {"6b) mime not defined",
+            {"7b) mime not defined",
                     "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\"",
                     "description \"\" !hidden mime \"\" suffix \"\"           version \"\""},
             // version
-            {"7a) mime",
+            {"8a) mime",
                     "",
                     "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"abc\""},
-            {"7b) mime not defined",
+            {"8b) mime not defined",
                     "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\"",
                     "description \"\" !hidden mime \"\" suffix \"\" type \"\"             "},
             // property
-            {"8a) property special characters",
+            {"9a) property special characters",
                 "",
                 "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\" property \"{}\\\"\""},
-            {"8b) property and value special characters",
+            {"9b) property and value special characters",
                 "",
                 "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\" property \"{}\\\"\" value \"{}\\\"\""},
-            {"8c) property link special characters",
+            {"9c) property link special characters",
                 "",
                 "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\" property \"{}\\\"\" to type \"{}\\\"\""},
-            {"8d) property link and value special characters",
+            {"9d) property link and value special characters",
                 "",
                 "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\" property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\""},
-            {"8e) two properties",
+            {"9e) two properties",
                 "",
                 "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\" property \"1\" property \"2\" value \"value\" "},
         };
     }
-  /*
-    .append("    mime \"").append(StringUtil_mxJPO.convertUpdate(this.mimeType)).append("\"\n")
-    .append("    suffix \"").append(StringUtil_mxJPO.convertUpdate(this.fileSuffix)).append("\"\n")
-    .append("    type \"").append(StringUtil_mxJPO.convertUpdate(this.type)).append("\"\n")
-    .append("    version \"").append(StringUtil_mxJPO.convertUpdate(this.version)).append("\"\n");
-*/
 
     @Override
     protected Format_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,

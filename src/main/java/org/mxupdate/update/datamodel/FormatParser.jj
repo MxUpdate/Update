@@ -21,7 +21,23 @@ options {
     GENERATE_BOILERPLATE = false;
     UNICODE_INPUT = true;
 }
-PARSER_BEGIN(FormatParser)
+
+PARSER_BEGIN(FormatParser)
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
 package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
@@ -42,21 +58,33 @@ class FormatParser
     extends AbstractParser_mxJPO
 {
 }
-PARSER_END(FormatParser)<*> SKIP :
+
+PARSER_END(FormatParser)
+
+<*> SKIP :
 {
   " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
 TOKEN : /** first level */
 {
-      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+      <UUID:                                "uuid">                                         : STRING_EXPECTED
+
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
     | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
+
     | <MIME:                                "mime">                                         : STRING_EXPECTED
+
     | <SUFFIX:                              "suffix">                                       : STRING_EXPECTED
+
     | <TYPE:                                "type">                                         : STRING_EXPECTED
+
     | <VERSION:                             "version">                                      : STRING_EXPECTED
+
     | <VIEW:                                "view">                                         : STRING_EXPECTED
     | <EDIT:                                "edit">                                         : STRING_EXPECTED
     | <PRINT:                               "print">                                        : STRING_EXPECTED
@@ -91,7 +119,7 @@ TOKEN : /** first level */
 }
 
 /**************************************************************************** */
-/**
+/**
  * Parses one complete format definition.
  *
  * @param _format   target format to update with parsed values
@@ -102,8 +130,13 @@ void parse(final Format_mxJPO _format)
     Token tmp;
     AdminProperty property;
 } {
-    (
-        ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_format, "symbolicNames", this.getString(tmp.image));}
+    (   ( <UUID>                                                            {property = new AdminProperty();
+                                                                             this.appendValue(this.getValue(_format, "properties"), "propertiesStack", property);
+                                                                             this.setValue(property, "name",  "UUID");}
+                                    ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));property = null;}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));property = null;} ) )
+
+      | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_format, "symbolicNames", this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(_format, "symbolicNames", this.getSingle(tmp.image));} ) )
 
       | (<DESCRIPTION>              ( tmp = <MULTILINESTRING>               {this.setValue(_format, "description", this.getString(tmp.image));}
