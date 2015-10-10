@@ -26,6 +26,7 @@ import java.util.TreeSet;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO;
+import org.mxupdate.update.datamodel.helper.LocalPathTypeList_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
@@ -50,8 +51,9 @@ import matrix.util.MatrixException;
  * <li>hidden flag</li>
  * <li>{@link #preventDuplicates prevent duplicates} flag</li>
  * <li>{@link #from} and {@link #to} side informations</li>
- * <li>{@link #attributes global attributes}</li>
+ * <li>{@link #globalAttributes global attributes}</li>
  * <li>{@link #localAttributes local attributes}</li>
+ * <li>{@link #localPathTypes local path types}</li>
  * <li>properties</li>
  * </ul>
  *
@@ -102,9 +104,12 @@ public class Relationship_mxJPO
     private final Side to = new Side("to");
 
     /** Global attributes. */
-    private final SortedSet<String> attributes = new TreeSet<>();
+    private final SortedSet<String> globalAttributes = new TreeSet<>();
     /** Local attributes. */
     private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO();
+
+    /** Local path types. */
+    private final LocalPathTypeList_mxJPO localPathTypes = new LocalPathTypeList_mxJPO();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -118,7 +123,7 @@ public class Relationship_mxJPO
         super(_typeDef, _mxName);
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -135,7 +140,7 @@ public class Relationship_mxJPO
      * in this way, there is no other possibility to evaluate the information
      * {@link Side#typeAll} or {@link Side#relationAll}.
      */
-    @Override()
+    @Override
     public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
@@ -172,7 +177,7 @@ public class Relationship_mxJPO
             this.rule = _content;
             parsed = true;
         } else if (_url.startsWith("/attributeDefRefList/attributeDefRef"))  {
-            this.attributes.add(_content);
+            this.globalAttributes.add(_content);
             parsed = true;
         } else if (_url.startsWith("/derivedFromRelationship/relationshipDefRefList/relationshipDefRef"))  {
             this.derived = _content;
@@ -243,14 +248,15 @@ public class Relationship_mxJPO
      * After the relationship is parsed, the relationship and local attributes
      * must be prepared.
      */
-    @Override()
+    @Override
     protected void prepare()
     {
         super.prepare();
         this.localAttributes.prepare();
+        this.localPathTypes.prepare();
     }
 
-    @Override()
+    @Override
     protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
@@ -266,12 +272,13 @@ public class Relationship_mxJPO
                 .write(this.getTriggers())
                 .write(this.from)
                 .write(this.to)
-                .list(          "attribute",                this.attributes)
+                .list(          "attribute",                this.globalAttributes)
                 .write(this.localAttributes)
+                .write(this.localPathTypes)
                 .properties(this.getProperties());
     }
 
-    @Override()
+    @Override
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
                              final Relationship_mxJPO _current)
@@ -285,7 +292,7 @@ public class Relationship_mxJPO
 
         DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql,    "attribute",
                 ErrorKey.DM_RELATION_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
-                ValueKeys.DMRelationAttrIgnore, ValueKeys.DMRelationAttrRemove,         this.attributes,        _current.attributes);
+                ValueKeys.DMRelationAttrIgnore, ValueKeys.DMRelationAttrRemove,         this.globalAttributes,        _current.globalAttributes);
         this.localAttributes.calcDelta(_paramCache, _mql, EMxAdmin_mxJPO.Relationship, this.getName(), ErrorKey.DM_RELATION_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
 
         // only one rule can exists maximum, but they must be technically handled like as list
@@ -443,7 +450,7 @@ public class Relationship_mxJPO
          * @param _updateBuilder    update builder
          * @see Relationship_mxJPO#writeObject(ParameterCache_mxJPO, Appendable)
          */
-        @Override()
+        @Override
         public void write(final UpdateBuilder_mxJPO _updateBuilder)
         {
             _updateBuilder
