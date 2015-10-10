@@ -19,6 +19,8 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.data.AbstractAdminData;
 
+import matrix.util.MatrixException;
+
 /**
  * The class is used to define all program objects used to create / update and
  * to export.
@@ -26,8 +28,8 @@ import org.mxupdate.test.data.AbstractAdminData;
  * @author The MxUpdate Team
  * @param <T>   defines the class which is derived from this class
  */
-public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
-    extends AbstractAdminData<T>
+public abstract class AbstractProgramData<DATA extends AbstractProgramData<?>>
+    extends AbstractAdminData<DATA>
 {
     /**
      * Initialize the values for program objects.
@@ -41,5 +43,46 @@ public abstract class AbstractProgramData<T extends AbstractProgramData<?>>
                                   final String _name)
     {
         super(_test, _ci, _name);
+    }
+
+    /**
+     * Creates this program.
+     *
+     * @return this admin data instance
+     * @throws MatrixException if create failed
+     */
+    @Override
+    @SuppressWarnings("unchecked")
+    public DATA create()
+        throws MatrixException
+    {
+        if (!this.isCreated())  {
+            this.createDependings();
+
+            final String kind = this.getSingles().remove("kind");
+
+            final StringBuilder cmd = new StringBuilder()
+                    .append("escape add " + this.getCI().getMxType() + " \"" + AbstractTest.convertMql(this.getName()) + "\"");
+            if (kind != null)  {
+                cmd.append(" ").append(kind);
+            }
+
+            this.append4Create(cmd);
+
+            this.getTest().mql(cmd);
+
+            this.getTest().mql(new  StringBuilder()
+               .append("escape add property ").append(this.getSymbolicName())
+               .append(" on program eServiceSchemaVariableMapping.tcl")
+               .append(" to " + this.getCI().getMxType() + " \"").append(AbstractTest.convertMql(this.getName())).append("\""));
+
+            this.setCreated(true);
+
+            if (kind != null)  {
+                this.setSingle("kind", kind);
+            }
+        }
+
+        return (DATA) this;
     }
 }

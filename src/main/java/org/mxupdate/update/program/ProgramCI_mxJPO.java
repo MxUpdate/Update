@@ -298,6 +298,10 @@ public class ProgramCI_mxJPO
         }
 
         if (update)  {
+            // at first => check that kind is correct set
+            if (this.kind != _current.kind)  {
+                _mql.newLine().cmd(" ").cmd(this.kind.name().toLowerCase());
+            }
 
             // execute must be defined before downloadable...
             if (this.execute != _current.execute)  {

@@ -72,6 +72,11 @@ public class UpdateAdminProgramJPO_mxJPO
                 if (!propExists.isEmpty())  {
                     mql.newLine().cmd("escape mod program ").arg(_name).cmd(" remove property ").arg(propName);
                 }
+                // check if program type is java => if not define
+                final String isJava = MqlBuilderUtil_mxJPO.mql().cmd("escape print program ").arg(_name).cmd(" select ").arg("isjavaprogram").exec(_paramCache.getContext());
+                if (!"TRUE".equalsIgnoreCase(isJava))  {
+                    mql.newLine().cmd("escape mod program ").arg(_name).cmd(" java");
+                }
             }
 
             // define file date

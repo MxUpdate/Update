@@ -22,6 +22,7 @@ import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.typedef.update.UpdateAdminProgramJPO_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -121,11 +122,48 @@ public class UpdateAdminProgramJPOTest
 
         new UpdateAdminProgramJPO_mxJPO().update(paramCache, paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), false, "MXUPDATE_Test", this.origJPO);
 
-        final String code = this.mql("print prog 'MXUPDATE_Test' select code dump");
-
         Assert.assertTrue(
-                !code.isEmpty(),
+                !MqlBuilderUtil_mxJPO.mql().cmd("escape print program ").arg("MXUPDATE_Test").cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()).isEmpty(),
                 "code defined");
+
+        Assert.assertEquals(
+                MqlBuilderUtil_mxJPO.mql().cmd("escape print program ").arg("MXUPDATE_Test").cmd(" select ").arg("isjavaprogram").cmd(" dump").exec(this.getContext()),
+                "TRUE",
+                "is java code");
+    }
+
+    /**
+     * Returns the list of all possible program kinds.
+     *
+     * @return list of all possible program kinds
+     */
+    @DataProvider(name = "allkinds")
+    public Object[][] dataAllKinds()
+    {
+        return new Object[][]{{""}, {"external"}, {"ekl"}, {"java"}, {"mql"}};
+    }
+
+    /**
+     * Positive test that the kind of the program is updated.
+     *
+     * @param _createKind   kind used within create
+     * @throws Exception if test failed
+     */
+    @Test(description = "positive test that the kind of the program is updated to java",
+          dataProvider = "allkinds")
+    public void positiveTestUpdateKind(final String _createKind)
+        throws Exception
+    {
+        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
+
+        MqlBuilderUtil_mxJPO.mql().cmd("escape add program ").arg(AbstractTest.PREFIX + "Test").cmd(" ").cmd(_createKind).exec(this.getContext());
+
+        new UpdateAdminProgramJPO_mxJPO().update(paramCache, paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), false, AbstractTest.PREFIX + "Test", this.origJPO);
+
+        Assert.assertEquals(
+                MqlBuilderUtil_mxJPO.mql().cmd("escape print program ").arg("MXUPDATE_Test").cmd(" select ").arg("isjavaprogram").cmd(" dump").exec(this.getContext()),
+                "TRUE",
+                "is java code");
     }
 
     @BeforeMethod
