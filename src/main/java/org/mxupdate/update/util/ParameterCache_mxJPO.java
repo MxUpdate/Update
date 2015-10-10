@@ -920,6 +920,8 @@ public class ParameterCache_mxJPO
     {
         /** List of attribute names which are cached for easy reuse. */
         Attributes,
+        /** List of path type names which are cached for easy reuse. */
+        PathTypes,
         /** List of program names which are cached for easy reuse. */
         Programs,
         /** Map between the JPO name and the class name used within MX for type definition. */
