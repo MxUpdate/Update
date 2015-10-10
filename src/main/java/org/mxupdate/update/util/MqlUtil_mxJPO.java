@@ -81,28 +81,4 @@ public final class MqlUtil_mxJPO
         }
         return mql.getResult().trim();
     }
-
-    /**
-     * Sets the history on.
-     *
-     * @param _paramCache       parameter cache
-     * @throws MatrixException if the history could not be set to on
-     */
-    public static void setHistoryOn(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
-    {
-        MqlUtil_mxJPO.execMql(_paramCache, "escape history on");
-    }
-
-    /**
-     * Sets the history off.
-     *
-     * @param _paramCache       parameter cache
-     * @throws MatrixException if the history could not be set to off
-     */
-    public static void setHistoryOff(final ParameterCache_mxJPO _paramCache)
-            throws MatrixException
-    {
-        MqlUtil_mxJPO.execMql(_paramCache, "escape history off");
-    }
 }
