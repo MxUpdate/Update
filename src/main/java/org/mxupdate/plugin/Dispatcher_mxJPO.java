@@ -52,9 +52,6 @@ public class Dispatcher_mxJPO
     /** Name of the key in the return map for the values. */
     private static final String RETURN_KEY_VALUES = "values"; //$NON-NLS-1$
 
-    /** Name of the &quot;Execute&quot; method within the parameters map. */
-    private static final String METHOD_EXECUTE = "Execute"; //$NON-NLS-1$
-
     /**
      * Main method to dispatch between different plug-in methods.
      *
@@ -116,18 +113,7 @@ public class Dispatcher_mxJPO
                 }));
 
                 final Object bck;
-                if (Dispatcher_mxJPO.METHOD_EXECUTE.equals(method))  {
-                    bck = new Execute_mxJPO().execute(paramCache, arguments);
-                } else  {
-                    throw new Exception("unknown plug-in method '" + method + "'");
-                }
-
-                if (textErr.length() > 0)  {
-                    paramCache.logError(textErr.toString());
-                }
-                if (textOut.length() > 0)  {
-                    paramCache.logInfo(textOut.toString());
-                }
+                throw new Exception("unknown plug-in method '" + method + "'");
 
                 ret = this.prepareReturn(paramCache.getLogString(),
                                          (String) null,
