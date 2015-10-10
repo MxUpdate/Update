@@ -87,189 +87,105 @@ public class DimensionCI_1ParserTest
             {"4f) simple hidden dimension definition defined as value with apostrophe",
                     "description \"\" hidden",
                     "description \"\" hidden \"True\""},
+            // property
+            {"5a) property special characters",
+                    "",
+                    "description \"\" !hidden property \"{}\\\"\""},
+            {"5b) property and value special characters",
+                    "",
+                    "description \"\" !hidden property \"{}\\\"\" value \"{}\\\"\""},
+            {"5c) property link special characters",
+                    "",
+                    "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\""},
+            {"5d) property link and value special characters",
+                    "",
+                    "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\""},
+
             // unit
-            {"5a) dimension with simple default unit",
-                      "",
-                      "description \"\"\n"
-                    + "!hidden\n"
-                    + "unit \"name1\" {\n"
-                    + "  default\n"
-                    + "  description \"\"\n"
-                    + "  label \"\"\n"
-                    + "  multiplier 1.0\n"
-                    + "  offset 0.0\n"
-                    + "}\n"
-                    + "unit \"name2\" {\n"
-                    + "  description \"\"\n"
-                    + "  label \"\"\n"
-                    + "  multiplier -10.0\n"
-                    + "  offset 20.0\n"
-                    + "}",
+            {"100) dimension with simple default unit",
+                    "",
+                    "description \"\" !hidden "
+                            + "unit \"name1\" { default description \"\" label \"\" multiplier 1.0   offset 0.0  } "
+                            + "unit \"name2\" {         description \"\" label \"\" multiplier -10.0 offset 20.0 }",
             },
-            {"5b) dimension with simple default unit defined as value w/o apostrophe",
-                    "description \"\"\n"
-                  + "!hidden\n"
-                  + "unit \"name1\" {\n"
-                  + "  default\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier 1.0\n"
-                  + "  offset 0.0\n"
-                  + "}\n"
-                  + "unit \"name2\" {\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier -10.0\n"
-                  + "  offset 20.0\n"
-                  + "}",
-                    "description \"\"\n"
-                  + "!hidden\n"
-                  + "unit \"name1\" {\n"
-                  + "  default true\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier 1.0\n"
-                  + "  offset 0.0\n"
-                  + "}\n"
-                  + "unit \"name2\" {\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier -10.0\n"
-                  + "  offset 20.0\n"
-                  + "}",
+            // unit uuid
+            {"101a) unit uuid with minus separator",
+                    "",
+                    "description \"\" !hidden "
+                              + "unit \"name1\" { uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" default description \"\" label \"\" multiplier 1.0 offset 0.0 }"
             },
-            {"5c) dimension with simple default unit defined as value with apostrophe",
-                    "description \"\"\n"
-                  + "!hidden\n"
-                  + "unit \"name1\" {\n"
-                  + "  default\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier 1.0\n"
-                  + "  offset 0.0\n"
-                  + "}\n"
-                  + "unit \"name2\" {\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier -10.0\n"
-                  + "  offset 20.0\n"
-                  + "}",
-                    "description \"\"\n"
-                  + "!hidden\n"
-                  + "unit \"name1\" {\n"
-                  + "  default \"TRUE\"\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier 1.0\n"
-                  + "  offset 0.0\n"
-                  + "}\n"
-                  + "unit \"name2\" {\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier -10.0\n"
-                  + "  offset 20.0\n"
-                  + "}",
+            {"101b) unit uuid w/o minus separator",
+                    "",
+                    "description \"\" !hidden "
+                              + "unit \"name1\" { uuid \"FDA75674979211E6AE2256B6B6499611\"     default description \"\" label \"\" multiplier 1.0 offset 0.0 }"},
+            {"101c) unit uuid convert from single to string",
+                    "description \"\" !hidden "
+                              + "unit \"name1\" { uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  default description \"\" label \"\" multiplier 1.0 offset 0.0 }",
+                    "description \"\" !hidden "
+                              + "unit \"name1\" { uuid   FDA7-5674979211-E6AE2256B6-B6499611    default description \"\" label \"\" multiplier 1.0 offset 0.0 }"},
+            // default unit
+            {"102a) dimension with simple default unit defined as value w/o apostrophe",
+                    "description \"\" !hidden "
+                            + "unit \"name1\" { default description \"\" label \"\" multiplier 1.0   offset 0.0 } "
+                            + "unit \"name2\" {         description \"\" label \"\" multiplier -10.0 offset 20.0 }",
+                    "description \"\" !hidden\n"
+                            + "unit \"name1\" { default true description \"\" label \"\" multiplier 1.0   offset 0.0 } "
+                            + "unit \"name2\" {              description \"\" label \"\" multiplier -10.0 offset 20.0 }",
             },
-            {"5d) dimension with simple default unit and not default",
-                    "description \"\"\n"
-                  + "!hidden\n"
-                  + "unit \"name1\" {\n"
-                  + "  default\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier 1.0\n"
-                  + "  offset 0.0\n"
-                  + "}\n"
-                  + "unit \"name2\" {\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier -10.0\n"
-                  + "  offset 20.0\n"
-                  + "}",
-                    "description \"\"\n"
-                  + "!hidden\n"
-                  + "unit \"name1\" {\n"
-                  + "  default\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier 1.0\n"
-                  + "  offset 0.0\n"
-                  + "}\n"
-                  + "unit \"name2\" {\n"
-                  + "  !default\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier -10.0\n"
-                  + "  offset 20.0\n"
-                  + "}",
+            {"102b) dimension with simple default unit defined as value with apostrophe",
+                    "description \"\" !hidden "
+                            + "unit \"name1\" { default description \"\" label \"\" multiplier 1.0   offset 0.0 } "
+                            + "unit \"name2\" {         description \"\" label \"\" multiplier -10.0 offset 20.0 }",
+                    "description \"\" !hidden "
+                            + "unit \"name1\" { default \"TRUE\" description \"\" label \"\" multiplier 1.0   offset 0.0 } "
+                            + "unit \"name2\" {                  description \"\" label \"\" multiplier -10.0 offset 20.0 }",
             },
-            {"5e) dimension with simple default unit and not default as value w/o apostrophe",
-                    "description \"\"\n"
-                  + "!hidden\n"
-                  + "unit \"name1\" {\n"
-                  + "  default\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier 1.0\n"
-                  + "  offset 0.0\n"
-                  + "}\n"
-                  + "unit \"name2\" {\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier -10.0\n"
-                  + "  offset 20.0\n"
-                  + "}",
-                    "description \"\"\n"
-                  + "!hidden\n"
-                  + "unit \"name1\" {\n"
-                  + "  default\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier 1.0\n"
-                  + "  offset 0.0\n"
-                  + "}\n"
-                  + "unit \"name2\" {\n"
-                  + "  default FALSE\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier -10.0\n"
-                  + "  offset 20.0\n"
-                  + "}",
+            {"102c) dimension with simple default unit and not default",
+                    "description \"\" !hidden "
+                            + "unit \"name1\" { default description \"\" label \"\" multiplier 1.0   offset 0.0 } "
+                            + "unit \"name2\" {         description \"\" label \"\" multiplier -10.0 offset 20.0 }",
+                    "description \"\" !hidden\n"
+                            + "unit \"name1\" { default  description \"\" label \"\" multiplier 1.0   offset 0.0 } "
+                            + "unit \"name2\" { !default description \"\" label \"\" multiplier -10.0 offset 20.0 }",
             },
-            {"5f) dimension with simple default unit and not default as value with apostrophe",
-                    "description \"\"\n"
-                  + "!hidden\n"
-                  + "unit \"name1\" {\n"
-                  + "  default\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier 1.0\n"
-                  + "  offset 0.0\n"
-                  + "}\n"
-                  + "unit \"name2\" {\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier -10.0\n"
-                  + "  offset 20.0\n"
-                  + "}",
-                    "description \"\"\n"
-                  + "!hidden\n"
-                  + "unit \"name1\" {\n"
-                  + "  default\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier 1.0\n"
-                  + "  offset 0.0\n"
-                  + "}\n"
-                  + "unit \"name2\" {\n"
-                  + "  default \"false\"\n"
-                  + "  description \"\"\n"
-                  + "  label \"\"\n"
-                  + "  multiplier -10.0\n"
-                  + "  offset 20.0\n"
-                  + "}",
+            {"102d) dimension with simple default unit and not default as value w/o apostrophe",
+                    "description \"\" !hidden "
+                            + "unit \"name1\" { default description \"\" label \"\" multiplier 1.0   offset 0.0 } "
+                            + "unit \"name2\" {         description \"\" label \"\" multiplier -10.0 offset 20.0 }",
+                    "description \"\" !hidden "
+                            + "unit \"name1\" { default       description \"\" label \"\" multiplier 1.0   offset 0.0 } "
+                            + "unit \"name2\" { default FALSE description \"\" label \"\" multiplier -10.0 offset 20.0 }",
             },
-            {"6) complex dimension definition",
+            {"102e) dimension with simple default unit and not default as value with apostrophe",
+                    "description \"\" !hidden "
+                            + "unit \"name1\" { default description \"\" label \"\" multiplier 1.0   offset 0.0 } "
+                            + "unit \"name2\" {         description \"\" label \"\" multiplier -10.0 offset 20.0 }",
+                    "description \"\" !hidden "
+                            + "unit \"name1\" { default           description \"\" label \"\" multiplier 1.0   offset 0.0 } "
+                            + "unit \"name2\" { default \"false\" description \"\" label \"\" multiplier -10.0 offset 20.0 }",
+            },
+            // unit offset
+            {"103) dimension with unit with negative offset",
+                    "",
+                    "description \"ein test\" !hidden "
+                            + "unit \"name1\" { default description \"description1\"  label \"label1\" multiplier 1.0  offset 0.0 } "
+                            + "unit \"name2\" {         description \"description 2\" label \"label2\" multiplier 10.0 offset -20.0 }",
+            },
+            // unit mulitplier
+            {"104) dimension with unit with negative multiplier",
+                    "",
+                    "description \"ein test\" !hidden "
+                            + "unit \"name1\" { default description \"description1\"  label \"label1\" multiplier 1.0  offset 0.0 } "
+                            + "unit \"name2\" {         description \"description 2\" label \"label2\" multiplier -10.0 offset 20.0 }",
+            },
+            {"105) dimension with unit with integer number",
+                    "description \"ein test\" !hidden "
+                            + "unit \"name1\" { default description \"\" label \"\" multiplier 1.0 offset 0.0 }",
+                    "description \"ein test\" !hidden "
+                            + "unit \"name1\" { default multiplier 1 offset 0 }"
+            },
+            // complex definition
+            {"106) complex dimension definition",
                     "",
                       "description \"ein test\"\n"
                     + "!hidden\n"
@@ -296,73 +212,6 @@ public class DimensionCI_1ParserTest
                     + "  system \"Duration Units\" to unit \"name2\"\n"
                     + "}",
             },
-            {"7) dimension with unit with negative offset",
-                    "",
-                    "description \"ein test\"\n"
-                    + "!hidden\n"
-                    + "unit \"name1\" {\n"
-                    + "  default\n"
-                    + "  description \"description1\"\n"
-                    + "  label \"label1\"\n"
-                    + "  multiplier 1.0\n"
-                    + "  offset 0.0\n"
-                    + "}\n"
-                    + "unit \"name2\" {\n"
-                    + "  description \"description 2\"\n"
-                    + "  label \"label2\"\n"
-                    + "  multiplier 10.0\n"
-                    + "  offset -20.0\n"
-                    + "}",
-            },
-            {"8) dimension with unit with negative multiplier",
-                    "",
-                    "description \"ein test\"\n"
-                    + "!hidden\n"
-                    + "unit \"name1\" {\n"
-                    + "  default\n"
-                    + "  description \"description1\"\n"
-                    + "  label \"label1\"\n"
-                    + "  multiplier 1.0\n"
-                    + "  offset 0.0\n"
-                    + "}\n"
-                    + "unit \"name2\" {\n"
-                    + "  description \"description 2\"\n"
-                    + "  label \"label2\"\n"
-                    + "  multiplier -10.0\n"
-                    + "  offset 20.0\n"
-                    + "}",
-            },
-            {"9) dimension with unit with integer number",
-                    "description \"ein test\"\n"
-                    + "!hidden\n"
-                    + "unit \"name1\" {\n"
-                    + "  default\n"
-                    + "  description \"\"\n"
-                    + "  label \"\"\n"
-                    + "  multiplier 1.0\n"
-                    + "  offset 0.0\n"
-                    + "}",
-                    "description \"ein test\"\n"
-                    + "!hidden\n"
-                    + "unit \"name1\" {\n"
-                    + "  default\n"
-                    + "  multiplier 1\n"
-                    + "  offset 0\n"
-                    + "}"
-            },
-            // property
-            {"10a) property special characters",
-                "",
-                "description \"\" !hidden property \"{}\\\"\""},
-            {"10b) property and value special characters",
-                "",
-                "description \"\" !hidden property \"{}\\\"\" value \"{}\\\"\""},
-            {"10c) property link special characters",
-                "",
-                "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\""},
-            {"10d) property link and value special characters",
-                "",
-                "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\""},
         };
     }
 

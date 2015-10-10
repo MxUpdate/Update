@@ -191,11 +191,12 @@ public class Dimension_mxJPO
             _updateBuilder
                     .stepStartNewLine().stepSingle("unit").stepString(unit.name).stepEndLineWithStartChild()
                     //              tag             | default | value                              | write?
-                    .flagIfTrue("default",              false, unit.defaultUnit,                    unit.defaultUnit)
-                    .string(    "description",                 unit.description)
-                    .string(    "label",                       unit.label)
-                    .single(    "multiplier",                  Double.toString(unit.multiplier))
-                    .single(    "offset",                      Double.toString(unit.offset));
+                    .stringNotNull( "uuid",                     unit.properties.getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
+                    .flagIfTrue(    "default",           false, unit.defaultUnit,                    unit.defaultUnit)
+                    .string(        "description",              unit.description)
+                    .string(        "label",                    unit.label)
+                    .single(        "multiplier",               Double.toString(unit.multiplier))
+                    .single(        "offset",                   Double.toString(unit.offset));
             // system information
             for (final Map.Entry<String, Set<String>> systemInfo : unit.systemInfos.entrySet())  {
                 for (final String unitName : systemInfo.getValue())  {

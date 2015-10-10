@@ -62,71 +62,73 @@ interface DimensionParserConstants_mxJPO {
   /** RegularExpression Id. */
   int UNITDEF_END = 22;
   /** RegularExpression Id. */
-  int UNITDEF_DEFAULT_TRUE = 23;
+  int UNITDEF_UUID = 23;
   /** RegularExpression Id. */
-  int UNITDEF_DEFAULT_TRUE_VIA_VALUE = 24;
+  int UNITDEF_DEFAULT_TRUE = 24;
   /** RegularExpression Id. */
-  int UNITDEF_DEFAULT_TRUE_VIA_VALUE_APOSTROPHE = 25;
+  int UNITDEF_DEFAULT_TRUE_VIA_VALUE = 25;
   /** RegularExpression Id. */
-  int UNITDEF_DEFAULT_FALSE = 26;
+  int UNITDEF_DEFAULT_TRUE_VIA_VALUE_APOSTROPHE = 26;
   /** RegularExpression Id. */
-  int UNITDEF_DEFAULT_FALSE_VIA_VALUE = 27;
+  int UNITDEF_DEFAULT_FALSE = 27;
   /** RegularExpression Id. */
-  int UNITDEF_DEFAULT_FALSE_VIA_VALUE_APOSTROPHE = 28;
+  int UNITDEF_DEFAULT_FALSE_VIA_VALUE = 28;
   /** RegularExpression Id. */
-  int UNITDEF_DESCRIPTION = 29;
+  int UNITDEF_DEFAULT_FALSE_VIA_VALUE_APOSTROPHE = 29;
   /** RegularExpression Id. */
-  int UNITDEF_LABEL = 30;
+  int UNITDEF_DESCRIPTION = 30;
   /** RegularExpression Id. */
-  int UNITDEF_MULTIPLIER = 31;
+  int UNITDEF_LABEL = 31;
   /** RegularExpression Id. */
-  int UNITDEF_OFFSET = 32;
+  int UNITDEF_MULTIPLIER = 32;
   /** RegularExpression Id. */
-  int UNITDEF_SETTING = 33;
+  int UNITDEF_OFFSET = 33;
   /** RegularExpression Id. */
-  int UNITDEF_PROPERTY = 34;
+  int UNITDEF_SETTING = 34;
   /** RegularExpression Id. */
-  int UNITDEF_PROPERTYVAL = 35;
+  int UNITDEF_PROPERTY = 35;
   /** RegularExpression Id. */
-  int UNITDEF_PROPERTYTO = 36;
+  int UNITDEF_PROPERTYVAL = 36;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEM = 37;
+  int UNITDEF_PROPERTYTO = 37;
   /** RegularExpression Id. */
-  int UNITDEF_STRING_STRING = 38;
+  int UNITDEF_SYSTEM = 38;
   /** RegularExpression Id. */
-  int UNITDEF_STRING_SINGLE = 39;
+  int UNITDEF_STRING = 39;
   /** RegularExpression Id. */
-  int UNITDEF_STRINGSTRING_STRING = 40;
+  int UNITDEF_SINGLE = 40;
   /** RegularExpression Id. */
-  int UNITDEF_STRINGSTRING_SINGLE = 41;
+  int UNITDEF_STRINGSTRING_STRING = 41;
   /** RegularExpression Id. */
-  int UNITDEF_DOUBLE_DOUBLE = 42;
+  int UNITDEF_STRINGSTRING_SINGLE = 42;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMNAME_STRING = 43;
+  int UNITDEF_DOUBLE_DOUBLE = 43;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMNAME_SINGLE = 44;
+  int UNITDEF_SYSTEMNAME_STRING = 44;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMDEF_TO = 45;
+  int UNITDEF_SYSTEMNAME_SINGLE = 45;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMDEF_UNIT = 46;
+  int UNITDEF_SYSTEMDEF_TO = 46;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMUNIT_STRING = 47;
+  int UNITDEF_SYSTEMDEF_UNIT = 47;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMUNIT_SINGLE = 48;
+  int UNITDEF_SYSTEMUNIT_STRING = 48;
   /** RegularExpression Id. */
-  int PROPERTY = 49;
+  int UNITDEF_SYSTEMUNIT_SINGLE = 49;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 50;
+  int PROPERTY = 50;
   /** RegularExpression Id. */
-  int PROPERTYTO = 51;
+  int PROPERTYVAL = 51;
   /** RegularExpression Id. */
-  int PROPERTYTOTYPE = 52;
+  int PROPERTYTO = 52;
   /** RegularExpression Id. */
-  int PROPERTYTO_CHAR = 53;
+  int PROPERTYTOTYPE = 53;
   /** RegularExpression Id. */
-  int PROPERTY_STRING_STRING = 54;
+  int PROPERTYTO_CHAR = 54;
   /** RegularExpression Id. */
-  int PROPERTY_STRING_SINGLE = 55;
+  int PROPERTY_STRING_STRING = 55;
+  /** RegularExpression Id. */
+  int PROPERTY_STRING_SINGLE = 56;
 
   /** Lexical state. */
   int PROPERTY_STRING_EXPECTED = 0;
@@ -180,6 +182,7 @@ interface DimensionParserConstants_mxJPO {
     "<UNITNAME_SINGLE>",
     "\"{\"",
     "\"}\"",
+    "\"uuid\"",
     "\"default\"",
     "<UNITDEF_DEFAULT_TRUE_VIA_VALUE>",
     "<UNITDEF_DEFAULT_TRUE_VIA_VALUE_APOSTROPHE>",
@@ -195,8 +198,8 @@ interface DimensionParserConstants_mxJPO {
     "\"value\"",
     "\"to\"",
     "\"system\"",
-    "<UNITDEF_STRING_STRING>",
-    "<UNITDEF_STRING_SINGLE>",
+    "<UNITDEF_STRING>",
+    "<UNITDEF_SINGLE>",
     "<UNITDEF_STRINGSTRING_STRING>",
     "<UNITDEF_STRINGSTRING_SINGLE>",
     "<UNITDEF_DOUBLE_DOUBLE>",

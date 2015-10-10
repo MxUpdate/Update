@@ -118,6 +118,7 @@ PARSER_END(DimensionParser)
 {
       <UNITDEF_START :                              "{">                                                                                            : UNITDEF_EXPECTED
     | <UNITDEF_END :                                "}">                                                                                            : DEFAULT
+    | <UNITDEF_UUID:                                "uuid">                                                                                         : UNITDEF_STRING_EXPECTED
     | <UNITDEF_DEFAULT_TRUE:                        "default">                                                                                      : UNITDEF_EXPECTED
     | <UNITDEF_DEFAULT_TRUE_VIA_VALUE:              "default" ([" ","\t","\n","\r"])+ ["t","T"] ["r","R"] ["u","U"] ["e","E"]>                      : UNITDEF_EXPECTED
     | <UNITDEF_DEFAULT_TRUE_VIA_VALUE_APOSTROPHE:   "default" ([" ","\t","\n","\r"])+ "\"" ["t","T"] ["r","R"] ["u","U"] ["e","E"] "\"">            : UNITDEF_EXPECTED
@@ -138,8 +139,8 @@ PARSER_END(DimensionParser)
 /** String for Unit Definition */
 <UNITDEF_STRING_EXPECTED> TOKEN :
 {
-      <UNITDEF_STRING_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : UNITDEF_EXPECTED
-    | <UNITDEF_STRING_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : UNITDEF_EXPECTED
+      <UNITDEF_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : UNITDEF_EXPECTED
+    | <UNITDEF_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : UNITDEF_EXPECTED
 }
 
 /** Two Strings for Unit Definition */
@@ -234,7 +235,12 @@ void parse(final Dimension_mxJPO _dimension)
             ( tmp = <UNITNAME_STRING>                                           {this.setValue(unit, "name", this.getString(tmp.image));}
             | tmp = <UNITNAME_SINGLE>                                           {this.setValue(unit, "name", this.getSingle(tmp.image));} )
                 <UNITDEF_START>
-                    ( ( ( <UNITDEF_DEFAULT_TRUE>
+                    ( ( <UNITDEF_UUID>                                          {property = new AdminProperty();
+                                                                                 this.appendValue(this.getValue(unit, "properties"), "propertiesStack", property);
+                                                                                 this.setValue(property, "name",  "UUID");}
+                                                ( tmp = <UNITDEF_STRING>        {this.setValue(property, "value", this.getString(tmp.image));}
+                                                | tmp = <UNITDEF_SINGLE>        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                    | ( ( <UNITDEF_DEFAULT_TRUE>
                         | <UNITDEF_DEFAULT_TRUE_VIA_VALUE>
                         | <UNITDEF_DEFAULT_TRUE_VIA_VALUE_APOSTROPHE> )         {this.setValue(unit, "defaultUnit", true);} )
                     | ( ( <UNITDEF_DEFAULT_FALSE>
@@ -363,9 +369,9 @@ String uvString() : {
     String ret;
 } {
     (
-        (tmp = <UNITDEF_STRING_STRING>) {ret = this.getString(tmp.image);}
+        (tmp = <UNITDEF_STRING>) {ret = this.getString(tmp.image);}
         |
-        (tmp = <UNITDEF_STRING_SINGLE>) {ret = this.getSingle(tmp.image);}
+        (tmp = <UNITDEF_SINGLE>) {ret = this.getSingle(tmp.image);}
     )
     {
         return ret;

@@ -17,6 +17,7 @@ package org.mxupdate.test.test.update.datamodel.dimensionci;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.DimensionData;
+import org.mxupdate.test.data.datamodel.DimensionData.UnitData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -53,6 +54,25 @@ public class DimensionCI_2DeltaCalculationTest
             {"3) description",
                     new DimensionData(this, "Test"),
                     new DimensionData(this, "Test").setValue("description", "abc def")},
+            {"4) unit",
+                    new DimensionData(this, "Test"),
+                    new DimensionData(this, "Test")
+                            .addUnit(new UnitData("unit")
+                                    .setFlag("default", true)
+                                    .setValueWithQuots("description", "\"\\\\ hello")
+                                    .setValueWithQuots("label", "\"\\\\ label")
+                                    .setValueWOQuots("multiplier", "1.0")
+                                    .setValueWOQuots("offset", "0.0"))},
+            {"5) unit with uuid",
+                    new DimensionData(this, "Test"),
+                    new DimensionData(this, "Test")
+                            .addUnit(new UnitData("unit")
+                                    .setFlag("default", true)
+                                    .setValueWithQuots("uuid", "FDA75674979211E6AE2256B6B6499611")
+                                    .setValueWithQuots("description", "\"\\\\ hello")
+                                    .setValueWithQuots("label", "\"\\\\ label")
+                                    .setValueWOQuots("multiplier", "1.0")
+                                    .setValueWOQuots("offset", "0.0"))},
        };
     }
 
