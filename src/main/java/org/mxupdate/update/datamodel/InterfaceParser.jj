@@ -100,7 +100,7 @@ PARSER_END(InterfaceParser)
 /*************************************************** Common Multi-Line-String */
 <MULTILINESTRING_EXPECTED> TOKEN :
 {
-      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\n" | "\t" | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" | "\\t" )* "\"" )> : DEFAULT
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\n" | "\t" | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" | "\\t" | "\\u" )* "\"" )> : DEFAULT
     | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 

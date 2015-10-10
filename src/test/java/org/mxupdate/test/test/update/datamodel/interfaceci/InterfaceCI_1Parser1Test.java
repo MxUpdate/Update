@@ -68,6 +68,9 @@ public class InterfaceCI_1Parser1Test
             {"3d) tab's in description",
                     "",
                     "description \"abc\\tdef\" !hidden"},
+            {"3e) unicode character in description",
+                        "",
+                        "description \"abc\\u2019def\" !hidden"},
             // abstract flag
             {"4a) not abstract",
                     "description \"\" !hidden",
