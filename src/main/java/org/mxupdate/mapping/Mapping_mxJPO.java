@@ -144,17 +144,28 @@ public class Mapping_mxJPO
     protected Properties readProperties(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, IOException
     {
-        final String code = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
-                new StringBuilder()
-                        .append("print prog \"").append(Mapping_mxJPO.PROP_NAME)
-                        .append("\" select code dump"),
-                false);
+        final Properties ret = new Properties();
 
-        final InputStream is = new ByteArrayInputStream(code.getBytes());
-        final Properties properties = new Properties();
-        properties.load(is);
+        InputStream is = null;
 
-        return properties;
+        is = this.getClass().getResourceAsStream("/org/mxupdate/mapping.properties");
+
+        if (is == null)  {
+            final String code = MqlUtil_mxJPO.execMql(_paramCache.getContext(),
+                    new StringBuilder()
+                            .append("print prog \"").append(Mapping_mxJPO.PROP_NAME)
+                            .append("\" select code dump"),
+                    false);
+            is = new ByteArrayInputStream(code.getBytes());
+        }
+
+        try {
+            ret.load(is);
+        } finally  {
+            is.close();
+        }
+
+        return ret;
     }
 
     /**
