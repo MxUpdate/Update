@@ -188,6 +188,19 @@ public class InterfaceCI_2DeltaCalculationTest
                                     .setFlag("multiline", false, Create.ViaFlag)
                                     .setSingle("maxlength", "0")
                                     .setValue("default", "")) },
+            {"207) attribute with uuid",
+                new InterfaceData(this, "Test"),
+                new InterfaceData(this, "Test")
+                        .addLocalAttribute(
+                                new AttributeBooleanData(this, "ATTR1")
+                                    .setSingle("kind", "boolean")
+                                    .setValue("uuid", "UUID")
+                                    .setValue("description", "")
+                                    .setFlag("hidden", false, Create.ViaFlag)
+                                    .setFlag("multivalue", false, Create.ViaFlag)
+                                    .setFlag("resetonclone", false, Create.ViaFlag)
+                                    .setFlag("resetonrevision", false, Create.ViaFlag)
+                                    .setValue("default", "")) },
        };
     }
 
