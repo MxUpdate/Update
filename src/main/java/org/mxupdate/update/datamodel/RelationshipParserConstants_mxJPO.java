@@ -29,108 +29,208 @@ interface RelationshipParserConstants_mxJPO {
   /** RegularExpression Id. */
   int PREVENTDUPLICATES_FALSE = 13;
   /** RegularExpression Id. */
-  int ATTRIBUTE = 14;
+  int LOCAL = 14;
   /** RegularExpression Id. */
-  int RULE = 15;
+  int ATTRIBUTE = 15;
   /** RegularExpression Id. */
-  int STRING = 16;
+  int RULE = 16;
   /** RegularExpression Id. */
-  int SINGLE = 17;
+  int STRING = 17;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 18;
+  int SINGLE = 18;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 19;
+  int MULTILINESTRING = 19;
   /** RegularExpression Id. */
-  int KIND = 20;
+  int MULTILINESINGLE = 20;
   /** RegularExpression Id. */
-  int BASIC = 21;
+  int KIND = 21;
   /** RegularExpression Id. */
-  int COMPOSITIONAL = 22;
+  int BASIC = 22;
   /** RegularExpression Id. */
-  int TRIGGER = 23;
+  int COMPOSITIONAL = 23;
   /** RegularExpression Id. */
-  int INPUT = 24;
+  int KIND_BINARY = 24;
   /** RegularExpression Id. */
-  int TRIGEVENT = 25;
+  int KIND_BOOLEAN = 25;
   /** RegularExpression Id. */
-  int ACTION = 26;
+  int KIND_DATE = 26;
   /** RegularExpression Id. */
-  int CHECK = 27;
+  int KIND_INTEGER = 27;
   /** RegularExpression Id. */
-  int OVERRIDE = 28;
+  int KIND_REAL = 28;
   /** RegularExpression Id. */
-  int START_FROM = 29;
+  int KIND_STRING = 29;
   /** RegularExpression Id. */
-  int START_TO = 30;
+  int TRIGGER = 30;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATEMODIFY_TRUE = 31;
+  int INPUT = 31;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATEMODIFY_FALSE = 32;
+  int TRIGEVENT = 32;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATECONNECTION_TRUE = 33;
+  int ACTION = 33;
   /** RegularExpression Id. */
-  int FROMTO_PROPAGATECONNECTION_FALSE = 34;
+  int CHECK = 34;
   /** RegularExpression Id. */
-  int FROMTO_MEANING = 35;
+  int OVERRIDE = 35;
   /** RegularExpression Id. */
-  int FROMTO_REVISION_NONE = 36;
+  int START_FROM = 36;
   /** RegularExpression Id. */
-  int FROMTO_REVISION_FLOAT = 37;
+  int START_TO = 37;
   /** RegularExpression Id. */
-  int FROMTO_REVISION_REPLICATE = 38;
+  int FROMTO_PROPAGATEMODIFY_TRUE = 38;
   /** RegularExpression Id. */
-  int FROMTO_CLONE_NONE = 39;
+  int FROMTO_PROPAGATEMODIFY_FALSE = 39;
   /** RegularExpression Id. */
-  int FROMTO_CLONE_FLOAT = 40;
+  int FROMTO_PROPAGATECONNECTION_TRUE = 40;
   /** RegularExpression Id. */
-  int FROMTO_CLONE_REPLICATE = 41;
+  int FROMTO_PROPAGATECONNECTION_FALSE = 41;
   /** RegularExpression Id. */
-  int FROMTO_CARDINALITY_ONE = 42;
+  int FROMTO_MEANING = 42;
   /** RegularExpression Id. */
-  int FROMTO_CARDINALITY_MANY = 43;
+  int FROMTO_REVISION_NONE = 43;
   /** RegularExpression Id. */
-  int FROMTO_TYPE_ALL = 44;
+  int FROMTO_REVISION_FLOAT = 44;
   /** RegularExpression Id. */
-  int FROMTO_TYPE = 45;
+  int FROMTO_REVISION_REPLICATE = 45;
   /** RegularExpression Id. */
-  int FROMTO_RELATIONSHIP_ALL = 46;
+  int FROMTO_CLONE_NONE = 46;
   /** RegularExpression Id. */
-  int FROMTO_RELATIONSHIP = 47;
+  int FROMTO_CLONE_FLOAT = 47;
   /** RegularExpression Id. */
-  int FROMTO_END = 48;
+  int FROMTO_CLONE_REPLICATE = 48;
   /** RegularExpression Id. */
-  int FROMTO_STRING = 49;
+  int FROMTO_CARDINALITY_ONE = 49;
   /** RegularExpression Id. */
-  int FROMTO_SINGLE = 50;
+  int FROMTO_CARDINALITY_MANY = 50;
   /** RegularExpression Id. */
-  int PROPERTY = 51;
+  int FROMTO_TYPE_ALL = 51;
   /** RegularExpression Id. */
-  int PROPERTYTO = 52;
+  int FROMTO_TYPE = 52;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 53;
+  int FROMTO_RELATIONSHIP_ALL = 53;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 54;
+  int FROMTO_RELATIONSHIP = 54;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 55;
+  int FROMTO_END = 55;
+  /** RegularExpression Id. */
+  int FROMTO_STRING = 56;
+  /** RegularExpression Id. */
+  int FROMTO_SINGLE = 57;
+  /** RegularExpression Id. */
+  int DEFAULTVALUE = 58;
+  /** RegularExpression Id. */
+  int MULTIVALUE_TRUE = 59;
+  /** RegularExpression Id. */
+  int MULTIVALUE_FALSE = 60;
+  /** RegularExpression Id. */
+  int RESETONCLONE_TRUE = 61;
+  /** RegularExpression Id. */
+  int RESETONCLONE_FALSE = 62;
+  /** RegularExpression Id. */
+  int RESETONREVISION_TRUE = 63;
+  /** RegularExpression Id. */
+  int RESETONREVISION_FALSE = 64;
+  /** RegularExpression Id. */
+  int RANGEVALUE_TRUE = 65;
+  /** RegularExpression Id. */
+  int RANGEVALUE_FALSE = 66;
+  /** RegularExpression Id. */
+  int MULTILINE_TRUE = 67;
+  /** RegularExpression Id. */
+  int MULTILINE_FALSE = 68;
+  /** RegularExpression Id. */
+  int DIMENSION = 69;
+  /** RegularExpression Id. */
+  int MAXLENGTH = 70;
+  /** RegularExpression Id. */
+  int MAXLENGTH_NUMBER = 71;
+  /** RegularExpression Id. */
+  int RANGE_EQUAL = 72;
+  /** RegularExpression Id. */
+  int RANGE_GREATERTHAN = 73;
+  /** RegularExpression Id. */
+  int RANGE_GREATERTHANEQUAL = 74;
+  /** RegularExpression Id. */
+  int RANGE_LESSTHAN = 75;
+  /** RegularExpression Id. */
+  int RANGE_LESSTHANEQUAL = 76;
+  /** RegularExpression Id. */
+  int RANGE_NOTEQUAL = 77;
+  /** RegularExpression Id. */
+  int RANGE_MATCH = 78;
+  /** RegularExpression Id. */
+  int RANGE_NOTMATCH = 79;
+  /** RegularExpression Id. */
+  int RANGE_SMATCH = 80;
+  /** RegularExpression Id. */
+  int RANGE_NOTSMATCH = 81;
+  /** RegularExpression Id. */
+  int RANGE_PROGRAM = 82;
+  /** RegularExpression Id. */
+  int RANGE_BETWEEN = 83;
+  /** RegularExpression Id. */
+  int BETW1_STRING = 84;
+  /** RegularExpression Id. */
+  int BETW1_SINGLE = 85;
+  /** RegularExpression Id. */
+  int BETW1_APOSTROPHE = 86;
+  /** RegularExpression Id. */
+  int BETW1_CHAR = 87;
+  /** RegularExpression Id. */
+  int BETW2_INCLUSIVE = 88;
+  /** RegularExpression Id. */
+  int BETW2_EXCLUSIVE = 89;
+  /** RegularExpression Id. */
+  int BETW3_STRING = 90;
+  /** RegularExpression Id. */
+  int BETW3_SINGLE = 91;
+  /** RegularExpression Id. */
+  int BETW3_APOSTROPHE = 92;
+  /** RegularExpression Id. */
+  int BETW3_CHAR = 93;
+  /** RegularExpression Id. */
+  int BETW4_INCLUSIVE = 94;
+  /** RegularExpression Id. */
+  int BETW4_EXCLUSIVE = 95;
+  /** RegularExpression Id. */
+  int PROPERTY = 96;
+  /** RegularExpression Id. */
+  int PROPERTYTO = 97;
+  /** RegularExpression Id. */
+  int PROPERTYVAL = 98;
+  /** RegularExpression Id. */
+  int ADMINTYPE_STRING = 99;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 100;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
   /** Lexical state. */
-  int FROMTO_STRING_EXPECTED = 1;
+  int BETW4_EXPECTED = 1;
   /** Lexical state. */
-  int FROMTO_EXPECTED = 2;
+  int BETW3_EXPECTED = 2;
   /** Lexical state. */
-  int TRIGKIND_EXPECTED = 3;
+  int BETW2_EXPECTED = 3;
   /** Lexical state. */
-  int TRIGEVENT_EXPECTED = 4;
+  int BETW1_EXPECTED = 4;
   /** Lexical state. */
-  int KIND_EXPECTED = 5;
+  int MAXLENGTH_EXPECTED = 5;
   /** Lexical state. */
-  int MULTILINESTRING_EXPECTED = 6;
+  int FROMTO_STRING_EXPECTED = 6;
   /** Lexical state. */
-  int STRING_EXPECTED = 7;
+  int FROMTO_EXPECTED = 7;
   /** Lexical state. */
-  int DEFAULT = 8;
+  int TRIGKIND_EXPECTED = 8;
+  /** Lexical state. */
+  int TRIGEVENT_EXPECTED = 9;
+  /** Lexical state. */
+  int KIND_EXPECTED = 10;
+  /** Lexical state. */
+  int MULTILINESTRING_EXPECTED = 11;
+  /** Lexical state. */
+  int STRING_EXPECTED = 12;
+  /** Lexical state. */
+  int DEFAULT = 13;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -148,6 +248,7 @@ interface RelationshipParserConstants_mxJPO {
     "\"!hidden\"",
     "\"preventduplicates\"",
     "\"!preventduplicates\"",
+    "\"local\"",
     "\"attribute\"",
     "\"rule\"",
     "<STRING>",
@@ -157,6 +258,12 @@ interface RelationshipParserConstants_mxJPO {
     "\"kind\"",
     "\"basic\"",
     "\"compositional\"",
+    "\"binary\"",
+    "\"boolean\"",
+    "\"date\"",
+    "\"integer\"",
+    "\"real\"",
+    "\"string\"",
     "\"trigger\"",
     "\"input\"",
     "<TRIGEVENT>",
@@ -185,11 +292,51 @@ interface RelationshipParserConstants_mxJPO {
     "\"}\"",
     "<FROMTO_STRING>",
     "<FROMTO_SINGLE>",
+    "\"default\"",
+    "\"multivalue\"",
+    "\"!multivalue\"",
+    "\"resetonclone\"",
+    "\"!resetonclone\"",
+    "\"resetonrevision\"",
+    "\"!resetonrevision\"",
+    "\"rangevalue\"",
+    "\"!rangevalue\"",
+    "\"multiline\"",
+    "\"!multiline\"",
+    "\"dimension\"",
+    "\"maxlength\"",
+    "<MAXLENGTH_NUMBER>",
+    "<RANGE_EQUAL>",
+    "<RANGE_GREATERTHAN>",
+    "<RANGE_GREATERTHANEQUAL>",
+    "<RANGE_LESSTHAN>",
+    "<RANGE_LESSTHANEQUAL>",
+    "<RANGE_NOTEQUAL>",
+    "<RANGE_MATCH>",
+    "<RANGE_NOTMATCH>",
+    "<RANGE_SMATCH>",
+    "<RANGE_NOTSMATCH>",
+    "<RANGE_PROGRAM>",
+    "<RANGE_BETWEEN>",
+    "<BETW1_STRING>",
+    "<BETW1_SINGLE>",
+    "\"\\\"\"",
+    "<BETW1_CHAR>",
+    "\"inclusive\"",
+    "\"exclusive\"",
+    "<BETW3_STRING>",
+    "<BETW3_SINGLE>",
+    "\"\\\"\"",
+    "<BETW3_CHAR>",
+    "\"inclusive\"",
+    "\"exclusive\"",
     "\"property\"",
     "\"to\"",
     "\"value\"",
     "<ADMINTYPE_STRING>",
     "<ADMINTYPE_SINGLE>",
+    "\"{\"",
+    "\"}\"",
   };
 
 }

@@ -23,9 +23,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
@@ -36,6 +35,8 @@ import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
+
+import matrix.util.MatrixException;
 
 /**
  * Data model relationship class used to export and update relationships.
@@ -57,7 +58,7 @@ public class Relationship_mxJPO
     extends AbstractDMWithTriggers_mxJPO<Relationship_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for relationships. */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         Relationship_mxJPO.IGNORED_URLS.add("/attributeDefRefList");
         Relationship_mxJPO.IGNORED_URLS.add("/derivedFromRelationship");
@@ -110,8 +111,11 @@ public class Relationship_mxJPO
     private final Side from = new Side("from");
     /** To side information. */
     private final Side to = new Side("to");
-    /** Attribute list. */
-    private final SortedSet<String> attributes = new TreeSet<String>();
+
+    /** Global attributes. */
+    private final SortedSet<String> attributes = new TreeSet<>();
+    /** Local attributes. */
+    private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -243,6 +247,17 @@ public class Relationship_mxJPO
         return parsed;
     }
 
+    /**
+     * After the relationship is parsed, the relationship and local attributes
+     * must be prepared.
+     */
+    @Override()
+    protected void prepare()
+    {
+        super.prepare();
+        this.localAttributes.prepare();
+    }
+
     @Override()
     protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
@@ -260,6 +275,7 @@ public class Relationship_mxJPO
                 .write(this.from)
                 .write(this.to)
                 .list(          "attribute",                this.attributes)
+                .write(this.localAttributes)
                 .properties(this.getProperties());
     }
 
@@ -279,11 +295,11 @@ public class Relationship_mxJPO
                 ValueKeys.DMRelationAttrIgnore, ValueKeys.DMRelationAttrRemove,         this.attributes,        _current.attributes);
 
         // only one rule can exists maximum, but they must be technically handled like as list
-        final SortedSet<String> thisRules = new TreeSet<String>();
+        final SortedSet<String> thisRules = new TreeSet<>();
         if ((this.rule != null) && !this.rule.isEmpty())  {
             thisRules.add(this.rule);
         }
-        final SortedSet<String> currentRules = new TreeSet<String>();
+        final SortedSet<String> currentRules = new TreeSet<>();
         if ((_current.rule != null) && !_current.rule.isEmpty())  {
             currentRules.add(_current.rule);
         }
@@ -354,12 +370,12 @@ public class Relationship_mxJPO
         private boolean propagateModify = false;
 
         /** Side type list. */
-        private final SortedSet<String> types = new TreeSet<String>();
+        private final SortedSet<String> types = new TreeSet<>();
         /** Are all types on the side allowed? */
         private boolean typeAll = false;
 
         /** From side relationship list. */
-        private final SortedSet<String> relations = new TreeSet<String>();
+        private final SortedSet<String> relations = new TreeSet<>();
         /** Are all relationships on the from side allowed? */
         private boolean relationAll = false;
 

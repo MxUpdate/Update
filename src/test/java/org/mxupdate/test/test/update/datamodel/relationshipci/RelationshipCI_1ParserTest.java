@@ -315,14 +315,14 @@ public class RelationshipCI_1ParserTest
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"abc\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                               + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }",
-                    "description \"\" !preventduplicates "
+                    "description \"\" !hidden !preventduplicates "
                             + "from { meaning abc cardinality many revision none clone none !propagatemodify  !propagateconnection } "
                               + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
             {"20c) from: default meaning",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                               + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }",
-                    "description \"\" !preventduplicates "
+                    "description \"\" !hidden !preventduplicates "
                             + "from {              cardinality many revision none clone none !propagatemodify  !propagateconnection } "
                               + "to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection }"},
             // from cardinality
@@ -596,6 +596,421 @@ public class RelationshipCI_1ParserTest
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "  to { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection relationship \"DEF\" relationship \"ABC\" }"},
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // local attribute
+
+            // general attribute definition
+            {"100a) local binary attribute",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind binary  description \"\" !hidden             !resetonclone !resetonrevision                                    default \"\" }"},
+            {"100b) local boolean attribute",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision                                    default \"\" }"},
+            {"100c) local date attribute",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind date    description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue                        default \"\" }"},
+            {"100d) local integer attribute",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue                        default \"\" }"},
+            {"100e) local real attribute",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind real    description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue                        default \"\" }"},
+            {"100f) local string attribute",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind string  description \"\" !hidden !multivalue !resetonclone !resetonrevision             !multiline maxlength 0 default \"\" }"},
+
+             // attribute registered name
+            {"101a) attribute symbolic name",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean symbolicname \"attribute_abc\"                                description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+            {"101b) attribute two symbolic names",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean symbolicname \"attribute_abc\" symbolicname \"attribute_def\" description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean symbolicname \"attribute_def\" symbolicname \"attribute_abc\" description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+
+            // attribute description
+            {"102a) attribute description",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"abc def\"  !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+            {"102b) attribute description not defined",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\"         !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean                          !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+            {"102c) multi-line attribute description",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"abc\ndef\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }"},
+
+            // attribute hidden flag
+            {"103a) attribute hidden",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" hidden  !multivalue !resetonclone !resetonrevision default \"\" }"},
+            {"103b) attribute not hidden (not defined)",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\"         !multivalue !resetonclone !resetonrevision default \"\" }"},
+
+            // attribute multivalue flag
+            {"104a) attribute multivalue flag",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden multivalue  !resetonclone !resetonrevision default \"\" }"},
+            {"104b) attribute multivalue flag not defined",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden             !resetonclone !resetonrevision default \"\" }"},
+
+            // attribute resetonclone flag
+            {"105a) attribute resetonclone flag",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue resetonclone  !resetonrevision default \"\" }"},
+            {"105b) attribute resetonclone flag not defined",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue               !resetonrevision default \"\" }"},
+
+            // attribute resetonrevision flag
+            {"106a) attribute resetonrevision flag",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone resetonrevision  default \"\" }"},
+            {"106b) attribute resetonrevision !preventduplicates flag not defined",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" }",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone                  default \"\" }"},
+
+            // attribute default value
+            {"107a) attribute default value",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc def\"  }"},
+            {"107b) attribute default value not defined",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"         }",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision                      }"},
+            {"107c) multi-line attribute default value",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc\ndef\" }"},
+
+            // real attribute rangevalue flag
+            {"108a) real attribute rangevalue flag",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision rangevalue  default \"\" }"},
+            {"108b) real attribute rangevalue flag not defined",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" }",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision             default \"\" }"},
+
+            // string attribute multiline flag
+            {"109a) attribute multiline flag",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision multiline  maxlength 0 default \"\" }"},
+            {"109b) attribute multiline flag not defined",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\" }",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision            maxlength 0 default \"\" }"},
+
+             // string attribute maxlength
+            {"110a) attribute maxlength",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision multiline  maxlength 125 default \"\" }"},
+            {"110b) attribute maxlength not defined",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0   default \"\" }",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline               default \"\" }"},
+
+            // attribute rule
+            {"111a) attribute rule",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision rule \"A\"            default \"\"  }"},
+            {"111a) attribute rule list (if more than one none)",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision                       default \"\"  }",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision rule \"A\" rule \"B\" default \"\"  }"},
+
+            // attribute dimension
+            {"112a) real attribute dimension",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue dimension \"DIM\" default \"\"  }"},
+
+            // attribute action trigger
+            {"120a) action trigger with input",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\" input \"{}\\\"\" }"},
+            {"120b) action trigger w/o input",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\" input \"\" }",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\" }"},
+            //  attribute check trigger
+            {"121a) check trigger with input",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\" input \"{}\\\"\" }"},
+            {"121b) check trigger w/o input",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\" input \"\" }",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\" }"},
+            //  attribute override trigger
+            {"122a) override trigger with input",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify override \"{}\\\"\" input \"{}\\\"\" }"},
+            {"122b) override trigger w/o input",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify override \"{}\\\"\" input \"\" }",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify override \"{}\\\"\" }"},
+
+            // attribute ranges
+            {"130a) attribute range",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range = \"VALUE1\" }"},
+            {"130b) attribute range",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range = \"VALUE1\" range = \"VALUE2\" }"},
+            {"130c) attribute range >",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range > \"VALUE1\" }"},
+            {"130d) attribute range >=",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range >= \"VALUE1\" }"},
+            {"130e) attribute range <",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range < \"VALUE1\" }"},
+            {"130f) attribute range <=",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range <= \"VALUE1\" }"},
+            {"130g) attribute range !=",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range != \"VALUE1\" }"},
+            {"130h) attribute range match",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range match \"VALUE1\" }"},
+            {"130i) attribute range !match",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range !match \"VALUE1\" }"},
+            {"130j) attribute range smatch",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range smatch \"VALUE1\" }"},
+            {"130k) attribute range !smatch",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range !smatch \"VALUE1\" }"},
+            {"130l) attribute range program",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range program \"VALUE1\" }"},
+            {"130m) attribute range program input",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range program \"VALUE1\" input \"VALUE2\" }"},
+            {"130n) attribute range between inclusive",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range between \"VALUE1\" inclusive \"VALUE2\" inclusive }"},
+            {"130o) attribute range between exclusive",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range between \"VALUE1\" exclusive \"VALUE2\" exclusive }"},
+
+            // attribute property
+            {"140a) attribute property special characters",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" }"},
+            {"140b) attribute property and value special characters",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" value \"{}\\\"\" }"},
+            {"140c) attribute property link special characters",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" to type \"{}\\\"\" }"},
+            {"140d) attribute property link and value special characters",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\" }"},
         };
     }
 

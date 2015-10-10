@@ -22,12 +22,16 @@ options {
     SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
     UNICODE_INPUT = true;
 }
+
 PARSER_BEGIN(RelationshipParser)
 package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.mxupdate.update.datamodel.Relationship_mxJPO.Kind;
+import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
+import org.mxupdate.update.datamodel.AttributeCI_mxJPO.Range;
+import org.mxupdate.update.datamodel.Relationship_mxJPO;
+import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO.LocalAttribute;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -44,6 +48,7 @@ class RelationshipParser
     extends AbstractParser_mxJPO
 {
 }
+
 PARSER_END(RelationshipParser)
 
 <*> SKIP :
@@ -62,7 +67,10 @@ PARSER_END(RelationshipParser)
     | <HIDDEN_FALSE:                        "!hidden">
     | <PREVENTDUPLICATES_TRUE:              "preventduplicates">
     | <PREVENTDUPLICATES_FALSE:             "!preventduplicates">
+    
+    | <LOCAL:                               "local">
     | <ATTRIBUTE:                           "attribute">                                    : STRING_EXPECTED
+
     | <RULE:                                "rule">                                         : STRING_EXPECTED
 }
 
@@ -85,13 +93,22 @@ PARSER_END(RelationshipParser)
 {
       <KIND:                                "kind">                                         : KIND_EXPECTED
 }
-
+/** Kind for relationship definition. */
 <KIND_EXPECTED> TOKEN :
 {
       <BASIC:                               "basic">                                        : DEFAULT
     | <COMPOSITIONAL:                       "compositional">                                : DEFAULT
 }
-
+/** Kind for attribute definition. */
+<KIND_EXPECTED> TOKEN :
+{
+      <KIND_BINARY:                         "binary">                                       : DEFAULT
+    | <KIND_BOOLEAN:                        "boolean">                                      : DEFAULT
+    | <KIND_DATE:                           "date">                                         : DEFAULT
+    | <KIND_INTEGER:                        "integer">                                      : DEFAULT
+    | <KIND_REAL:                           "real">                                         : DEFAULT
+    | <KIND_STRING:                         "string">                                       : DEFAULT
+}
 /******************************************************************** Trigger */
 <DEFAULT> TOKEN :
 {
@@ -149,6 +166,84 @@ PARSER_END(RelationshipParser)
     | <FROMTO_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : FROMTO_EXPECTED
 }
 
+/************************************************************ Local Attribute */
+<DEFAULT> TOKEN :
+{
+      <DEFAULTVALUE:                        "default">                                      : MULTILINESTRING_EXPECTED
+
+    | <MULTIVALUE_TRUE:                     "multivalue">                                   : DEFAULT
+    | <MULTIVALUE_FALSE:                    "!multivalue">                                  : DEFAULT
+
+    | <RESETONCLONE_TRUE:                   "resetonclone">                                 : DEFAULT
+    | <RESETONCLONE_FALSE:                  "!resetonclone">                                : DEFAULT
+
+    | <RESETONREVISION_TRUE:                "resetonrevision">                              : DEFAULT
+    | <RESETONREVISION_FALSE:               "!resetonrevision">                             : DEFAULT
+
+    | <RANGEVALUE_TRUE:                     "rangevalue">                                   : DEFAULT
+    | <RANGEVALUE_FALSE:                    "!rangevalue">                                  : DEFAULT
+    
+    | <MULTILINE_TRUE:                      "multiline">                                    : DEFAULT
+    | <MULTILINE_FALSE:                     "!multiline">                                   : DEFAULT
+
+    | <DIMENSION:                           "dimension">                                    : STRING_EXPECTED
+}
+
+/** Max Length */
+<DEFAULT> TOKEN:
+{
+      <MAXLENGTH:                           "maxlength">                                    : MAXLENGTH_EXPECTED
+}
+<MAXLENGTH_EXPECTED> TOKEN :
+{
+      <MAXLENGTH_NUMBER : (["\u0030"-"\u0039"])+> : DEFAULT
+}
+
+/** Ranges */
+<DEFAULT> TOKEN:
+{
+      <RANGE_EQUAL:                         "range" ([" ","\t","\n","\r"])+ "=">            : STRING_EXPECTED
+    | <RANGE_GREATERTHAN:                   "range" ([" ","\t","\n","\r"])+ ">">            : STRING_EXPECTED
+    | <RANGE_GREATERTHANEQUAL:              "range" ([" ","\t","\n","\r"])+ ">=">           : STRING_EXPECTED
+    | <RANGE_LESSTHAN:                      "range" ([" ","\t","\n","\r"])+ "< ">           : STRING_EXPECTED
+    | <RANGE_LESSTHANEQUAL:                 "range" ([" ","\t","\n","\r"])+ "<=">           : STRING_EXPECTED
+    | <RANGE_NOTEQUAL:                      "range" ([" ","\t","\n","\r"])+ "!=">           : STRING_EXPECTED
+    | <RANGE_MATCH:                         "range" ([" ","\t","\n","\r"])+ "match">        : STRING_EXPECTED
+    | <RANGE_NOTMATCH:                      "range" ([" ","\t","\n","\r"])+ "!match">       : STRING_EXPECTED
+    | <RANGE_SMATCH:                        "range" ([" ","\t","\n","\r"])+ "smatch">       : STRING_EXPECTED
+    | <RANGE_NOTSMATCH:                     "range" ([" ","\t","\n","\r"])+ "!smatch">      : STRING_EXPECTED
+    | <RANGE_PROGRAM:                       "range" ([" ","\t","\n","\r"])+ "program">      : STRING_EXPECTED
+    | <RANGE_BETWEEN:                       "range" ([" ","\t","\n","\r"])+ "between">      : BETW1_EXPECTED
+}
+
+<BETW1_EXPECTED> TOKEN :
+{
+      <BETW1_STRING: (<BETW1_APOSTROPHE>(<BETW1_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<BETW1_APOSTROPHE>)> : BETW2_EXPECTED
+    | <BETW1_SINGLE: (<BETW1_CHAR>)+> : BETW2_EXPECTED
+    | <#BETW1_APOSTROPHE: "\"" >
+    | <#BETW1_CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+<BETW2_EXPECTED> TOKEN :
+{
+      <BETW2_INCLUSIVE: "inclusive"> : BETW3_EXPECTED
+    | <BETW2_EXCLUSIVE: "exclusive"> : BETW3_EXPECTED
+}
+
+<BETW3_EXPECTED> TOKEN :
+{
+      <BETW3_STRING: (<BETW3_APOSTROPHE>(<BETW3_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<BETW3_APOSTROPHE>)> : BETW4_EXPECTED
+    | <BETW3_SINGLE: (<BETW3_CHAR>)+> : BETW4_EXPECTED
+    | <#BETW3_APOSTROPHE: "\"" >
+    | <#BETW3_CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+
+<BETW4_EXPECTED> TOKEN :
+{
+      <BETW4_INCLUSIVE: "inclusive"> : DEFAULT
+    | <BETW4_EXCLUSIVE: "exclusive"> : DEFAULT
+}
+
 /******************************************************************* Property */
 <DEFAULT> TOKEN :
 {
@@ -176,6 +271,8 @@ void parse(final Relationship_mxJPO _relationship)
     AdminProperty property;
     Trigger trigger;
     String fromTo;
+    LocalAttribute localAttr;
+    Range range;
 } {
     (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_relationship, "symbolicNames", this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(_relationship, "symbolicNames", this.getSingle(tmp.image));} ) )
@@ -183,8 +280,8 @@ void parse(final Relationship_mxJPO _relationship)
       | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_relationship, "description",                    this.getString(tmp.image));}
                                     | tmp = <MULTILINESINGLE>               {this.setValue(_relationship, "description",                    this.getSingle(tmp.image));} ) )
 
-      | ( <KIND>                    ( <BASIC>                               {this.setValue(_relationship, "kind",                           Kind.Basic);}
-                                    | <COMPOSITIONAL>                       {this.setValue(_relationship, "kind",                           Kind.Compositional);} ) )
+      | ( <KIND>                    ( <BASIC>                               {this.setValue(_relationship, "kind",                           Relationship_mxJPO.Kind.Basic);}
+                                    | <COMPOSITIONAL>                       {this.setValue(_relationship, "kind",                           Relationship_mxJPO.Kind.Compositional);} ) )
 
       | ( <ABSTRACT_TRUE>                                                   {this.setValue(_relationship, "abstractFlag",                   true);} )
       | ( <ABSTRACT_FALSE>                                                  {this.setValue(_relationship, "abstractFlag",                   false);} )
@@ -239,6 +336,108 @@ void parse(final Relationship_mxJPO _relationship)
 
       | ( <ATTRIBUTE>               ( tmp = <STRING>                        {this.appendValue(_relationship, "attributes",                  this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(_relationship, "attributes",                  this.getSingle(tmp.image));} ) )
+
+      | ( <LOCAL> <ATTRIBUTE>
+            ( tmp = <STRING>                                                {localAttr = new LocalAttribute(this.getString(tmp.image));this.appendValue(_relationship, "localAttributes", localAttr);}
+            | tmp = <SINGLE>                                                {localAttr = new LocalAttribute(this.getSingle(tmp.image));this.appendValue(_relationship, "localAttributes", localAttr);} )
+                 ( "{"
+                      (   ( <KIND>          ( <KIND_BINARY>                 {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Binary);}
+                                            | <KIND_BOOLEAN>                {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Boolean);}
+                                            | <KIND_DATE>                   {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Date);}
+                                            | <KIND_INTEGER>                {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Integer);}
+                                            | <KIND_REAL>                   {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Real);}
+                                            | <KIND_STRING>                 {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.String);} ) )
+
+                        | ( <SYMBOLICNAME>  ( tmp = <STRING>                {this.appendValue(localAttr, "symbolicNames",                   this.getString(tmp.image));}
+                                            | tmp = <SINGLE>                {this.appendValue(localAttr, "symbolicNames",                   this.getSingle(tmp.image));} ) )
+
+                        | ( <DESCRIPTION>   ( tmp = <MULTILINESTRING>       {this.setValue(localAttr, "description",                        this.getString(tmp.image));}
+                                            | tmp = <MULTILINESINGLE>       {this.setValue(localAttr, "description",                        this.getSingle(tmp.image));} ) )
+
+                        | (<DEFAULTVALUE>   ( tmp = <MULTILINESTRING>       {this.setValue(localAttr, "defaultValue",                       this.getString(tmp.image));}
+                                            | tmp = <MULTILINESINGLE>       {this.setValue(localAttr, "defaultValue",                       this.getSingle(tmp.image));} ) )
+
+                        | ( <HIDDEN_TRUE>                                   {this.setValue(localAttr, "hidden",                             true);} )
+                        | ( <HIDDEN_FALSE>                                  {this.setValue(localAttr, "hidden",                             false);} )
+
+                        | (<MULTIVALUE_TRUE>                                {this.setValue(localAttr, "multiValue",                         true);} )
+                        | (<MULTIVALUE_FALSE>                               {this.setValue(localAttr, "multiValue",                         false);} )
+
+                        | (<RESETONCLONE_TRUE>                              {this.setValue(localAttr, "resetOnClone",                       true);} )
+                        | (<RESETONCLONE_FALSE>                             {this.setValue(localAttr, "resetOnClone",                       false);} )
+
+                        | (<RESETONREVISION_TRUE>                           {this.setValue(localAttr, "resetOnRevision",                    true);} )
+                        | (<RESETONREVISION_FALSE>                          {this.setValue(localAttr, "resetOnRevision",                    false);} )
+
+                        | (<RANGEVALUE_TRUE>                                {this.setValue(localAttr, "rangeValue",                         true);} )
+                        | (<RANGEVALUE_FALSE>                               {this.setValue(localAttr, "rangeValue",                         false);} )
+
+                        | (<MULTILINE_TRUE>                                 {this.setValue(localAttr, "multiline",                          true);} )
+                        | (<MULTILINE_FALSE>                                {this.setValue(localAttr, "multiline",                          false);} )
+
+                        | (<MAXLENGTH>      ( tmp = <MAXLENGTH_NUMBER>      {this.setValue(localAttr, "maxLength",                          this.getSingle(tmp.image));} ) )
+
+                        | (<RULE>           ( tmp = <STRING>                {this.appendValue(localAttr, "rules",                           this.getString(tmp.image));}
+                                            | tmp = <SINGLE>                {this.appendValue(localAttr, "rules",                           this.getSingle(tmp.image));} ) )
+
+                        | (<DIMENSION>      ( tmp = <STRING>                {this.setValue(localAttr, "dimension",                          this.getString(tmp.image));}
+                                            | tmp = <SINGLE>                {this.setValue(localAttr, "dimension",                          this.getSingle(tmp.image));} ) )
+
+                        | ( <TRIGGER>                                       {trigger = new Trigger(); this.appendValue(localAttr, "triggers", trigger);}
+                              tmp = <TRIGEVENT>                             {this.setValue(trigger, "eventType",                            this.getSingle(tmp.image));}
+                                      ( <ACTION>                            {this.setValue(trigger, "kind",                                 "action");}
+                                      | <CHECK>                             {this.setValue(trigger, "kind",                                 "check");}
+                                      | <OVERRIDE>                          {this.setValue(trigger, "kind",                                 "override");} )
+                                              ( tmp = <STRING>              {this.setValue(trigger, "program",                              this.getString(tmp.image));}
+                                              | tmp = <SINGLE>              {this.setValue(trigger, "program",                              this.getSingle(tmp.image));} )
+                                                     ( <INPUT>
+                                                           ( tmp = <STRING> {this.setValue(trigger, "arguments",                            this.getString(tmp.image));}
+                                                           | tmp = <SINGLE> {this.setValue(trigger, "arguments",                            this.getSingle(tmp.image));} ) )? )
+
+                        | (<RANGE_EQUAL>            ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "=");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "=");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | (<RANGE_GREATERTHAN>      ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", ">");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", ">");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | (<RANGE_GREATERTHANEQUAL> ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", ">=");     this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", ">=");     this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | (<RANGE_LESSTHAN>         ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "<");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "<");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | (<RANGE_LESSTHANEQUAL>    ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "<=");     this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "<=");     this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | (<RANGE_NOTEQUAL>         ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "!=");     this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "!=");     this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | (<RANGE_MATCH>            ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "match");  this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "match");  this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | (<RANGE_NOTMATCH>         ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "!match"); this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "!match"); this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | (<RANGE_SMATCH>           ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "smatch"); this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "smatch"); this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | (<RANGE_NOTSMATCH>        ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "!smatch");this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "!smatch");this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | (<RANGE_PROGRAM>          ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "program");this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "program");this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} )
+                                  ( <INPUT>         ( tmp = <STRING>        {this.setValue(range, "value2", this.getString(tmp.image));}
+                                                    | tmp = <SINGLE>        {this.setValue(range, "value2", this.getSingle(tmp.image));} ) )? )
+                        | (<RANGE_BETWEEN>                                  {range = new Range();this.setValue(range, "type", "between");this.appendValue(localAttr, "rangesStack", range);}
+                                                    ( tmp = <BETW1_STRING>  {this.setValue(range, "value1", this.getString(tmp.image));}
+                                                    | tmp = <BETW1_SINGLE>  {this.setValue(range, "value1", this.getSingle(tmp.image));} )
+                                                    ( <BETW2_INCLUSIVE>     {this.setValue(range, "include1", true);}
+                                                    | <BETW2_EXCLUSIVE>     {this.setValue(range, "include1", false);})
+                                                    ( tmp = <BETW3_STRING>  {this.setValue(range, "value2", this.getString(tmp.image));}
+                                                    | tmp = <BETW3_SINGLE>  {this.setValue(range, "value2", this.getSingle(tmp.image));} )
+                                                    ( <BETW4_INCLUSIVE>     {this.setValue(range, "include2", true);}
+                                                    | <BETW4_EXCLUSIVE>     {this.setValue(range, "include2", false);} ) )
+
+                        | (<PROPERTY>                                       {property = new AdminProperty(); this.appendValue(this.getValue(localAttr, "properties"), "propertiesStack", property);}
+                                                ( tmp = <STRING>            {this.setValue(property, "name", this.getString(tmp.image));}
+                                                | tmp = <SINGLE>            {this.setValue(property, "name", this.getSingle(tmp.image));} )
+                              ( ( <PROPERTYVAL> ( tmp = <STRING>            {this.setValue(property, "value", this.getString(tmp.image));}
+                                                | tmp = <SINGLE>            {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                              | ( <PROPERTYTO>  ( tmp = <ADMINTYPE_STRING>  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                                | tmp = <ADMINTYPE_SINGLE>  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                                ( tmp = <STRING>            {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                                | tmp = <SINGLE>            {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* ) )*
+                   "}" ) )
 
       | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_relationship, "properties", "propertiesStack", property);}
                                     ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}

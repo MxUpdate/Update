@@ -145,7 +145,8 @@ public class InterfaceCI_1ParserTest
                     "description \"\" !hidden property \"111\" to type \"TestType\" value \"222\" property \"111\" to type \"TestType\" value \"333\"",
                     "description \"\" !hidden property \"111\" to type \"TestType\" value \"333\" property \"111\" to type \"TestType\" value \"222\""},
 
-            /***********************************************************************************************************************************************************************************************************/
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // local attribute
 
             // general attribute definition
             {"100a) local binary attribute",

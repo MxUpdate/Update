@@ -64,15 +64,15 @@ public class Interface_mxJPO
     /** From which interfaces is this interface derived? */
     private final SortedSet<String> derived = new TreeSet<>();
 
-    /** Attribute list. */
+    /** Global attributes. */
     private final SortedSet<String> attributes = new TreeSet<>();
+    /** Local attributes. */
+    private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO();
 
     /** Are all types allowed for this interface? */
     private boolean typeAll;
     /** Information about all allowed types for this interface. */
     private final SortedSet<String> types = new TreeSet<>();
-    /** Local Attributes. */
-    private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO();
 
     /** Are all relationships allowed for this interface? */
     private boolean relationAll;

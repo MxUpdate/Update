@@ -74,10 +74,9 @@ public class Type_mxJPO
     /** Defines all methods of this type. */
     private final SortedSet<String> methods = new TreeSet<>();
 
-    /** Attribute list. */
+    /** Global attributes. */
     private final SortedSet<String> attributes = new TreeSet<>();
-
-    /** Local Attributes. */
+    /** Local attributes. */
     private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO();
 
 
