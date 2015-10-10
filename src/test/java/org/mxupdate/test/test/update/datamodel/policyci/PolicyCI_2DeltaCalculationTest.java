@@ -15,11 +15,11 @@
 
 package org.mxupdate.test.test.update.datamodel.policyci;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.PolicyData;
+import org.mxupdate.test.data.datamodel.PolicyData.AllState;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
+import org.mxupdate.test.data.datamodel.helper.Access;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -27,6 +27,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link Policy_mxJPO policy} delta calculation.
@@ -78,6 +80,20 @@ public class PolicyCI_2DeltaCalculationTest
             {"20c) insert state",
                     new PolicyData(this, "Test").addState(new State().setName("A"))                                   .addState(new State().setName("C")),
                     new PolicyData(this, "Test").addState(new State().setName("A")).addState(new State().setName("B")).addState(new State().setName("C"))},
+
+            // allstate
+            {"20a) all state access: new public all",
+                        new PolicyData(this, "Test")
+                                .addState(new State().setName("A")),
+                        new PolicyData(this, "Test")
+                                .setAllState(new AllState().addAccess(new Access().setKind("public").addAccess("all")))
+                                .addState(new State().setName("A"))},
+            {"20b) all state access: remove public all",
+                                    new PolicyData(this, "Test")
+                                            .setAllState(new AllState().addAccess(new Access().setKind("public").addAccess("all")))
+                                            .addState(new State().setName("A")),
+                                    new PolicyData(this, "Test")
+                                            .addState(new State().setName("A"))},
        };
     }
 

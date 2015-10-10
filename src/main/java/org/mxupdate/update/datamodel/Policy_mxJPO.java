@@ -28,8 +28,6 @@ import java.util.SortedSet;
 import java.util.Stack;
 import java.util.TreeSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
@@ -47,6 +45,8 @@ import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateLine;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
+
+import matrix.util.MatrixException;
 
 /**
  * The class is used to export and import / update policy configuration items.
@@ -411,9 +411,9 @@ public class Policy_mxJPO
             }
 
             _mql.pushPrefixByAppending("allstate");
-            this.allStateAccess.calcDelta(_mql, (this.allStateAccess != null) ? this.allStateAccess : null);
+            this.allStateAccess.calcDelta(_mql, (_current.allStateAccess != null) ? _current.allStateAccess : null);
             _mql.popPrefix();
-        } else if (this.allState)  {
+        } else if (_current.allState)  {
             _mql.newLine().cmd("remove allstate");
         }
 
