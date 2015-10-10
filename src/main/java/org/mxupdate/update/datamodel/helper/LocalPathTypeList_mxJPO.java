@@ -214,15 +214,6 @@ public class LocalPathTypeList_mxJPO
             super.calcDelta(_paramCache, _mql, _current);
         }
 
-        /**
-         * Method is defined to be called from the locale attribute list.
-         */
-        @Override
-        protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
-        {
-            super.writeUpdate(_updateBuilder);
-        }
-
         @Override
         public int compareTo(final LocalPathType _compareTo)
         {

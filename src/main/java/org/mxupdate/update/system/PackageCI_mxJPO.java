@@ -54,7 +54,7 @@ public class PackageCI_mxJPO
     extends AbstractAdminObject_mxJPO<PackageCI_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for packages. */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         PackageCI_mxJPO.IGNORED_URLS.add("/memberList");
         PackageCI_mxJPO.IGNORED_URLS.add("/memberList/member/adminRef");
@@ -64,9 +64,9 @@ public class PackageCI_mxJPO
     /** Custom flag. */
     private Boolean custom;
     /** Uses packages. */
-    private final SortedSet<String> usesPackages = new TreeSet<String>();
+    private final SortedSet<String> usesPackages = new TreeSet<>();
     /** Holds all referenced meber's. */
-    private final Stack<MemberRef> members = new Stack<MemberRef>();
+    private final Stack<MemberRef> members = new Stack<>();
 
     /**
      * Initializes this system package configuration item.
@@ -134,8 +134,8 @@ public class PackageCI_mxJPO
         Collections.sort(this.members);
     }
 
-    @Override()
-    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
+    @Override
+    public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
                 .string("description", this.getDescription())

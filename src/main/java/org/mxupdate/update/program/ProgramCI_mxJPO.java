@@ -182,8 +182,8 @@ public class ProgramCI_mxJPO
         return parsed;
     }
 
-    @Override()
-    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
+    @Override
+    public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
                 //              tag                 | default | value                                | write?

@@ -147,7 +147,7 @@ public class TestOldXMLExportEncoding
         }
 
         @Override
-        protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
+        public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
         {
             // TODO Auto-generated method stub
         }

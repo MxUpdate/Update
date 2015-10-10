@@ -16,13 +16,11 @@
 package org.mxupdate.update;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
-import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
@@ -100,34 +98,11 @@ public abstract class AbstractObject_mxJPO<CLASS extends AbstractObject_mxJPO<CL
         throws MatrixException, ParseException;
 
     /**
-     * Writes the complete update code.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          writer instance
-     * @throws IOException  if the write of the TCL update to the writer
-     *                      instance failed
-     */
-    public void write(final ParameterCache_mxJPO _paramCache,
-                      final Appendable _out)
-        throws IOException
-    {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(FileHandlingUtil_mxJPO.calcCIFileName(this.getTypeDef(), this.getName()), _paramCache);
-
-        updateBuilder.start(this.getTypeDef());
-
-        this.writeUpdate(updateBuilder);
-
-        updateBuilder.end();
-
-        _out.append(updateBuilder.toString());
-    }
-
-    /**
      * Writes the update file content to the builder.
      *
      * @param _updateBuilder    update builder
      */
-    protected abstract void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder);
+    public abstract void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder);
 
     /**
      * Deletes administration object with given name.

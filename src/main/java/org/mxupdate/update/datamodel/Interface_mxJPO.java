@@ -167,7 +167,7 @@ public class Interface_mxJPO
     }
 
     @Override
-    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
+    public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
                 .list(          "symbolicname",             this.getSymbolicNames())

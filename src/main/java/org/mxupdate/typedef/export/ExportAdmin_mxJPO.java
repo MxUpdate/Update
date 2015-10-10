@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
@@ -31,15 +29,17 @@ import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 
+import matrix.util.MatrixException;
+
 /**
  * Exports admin object as single CI file.
  *
  * @author The MxUpdate Team
  */
 public class ExportAdmin_mxJPO
-    implements IExport_mxJPO
+    extends AbstractExportObject_mxJPO
 {
-    @Override()
+    @Override
     public void export(final ParameterCache_mxJPO _paramCache,
                        final TypeDef_mxJPO _typeDef,
                        final String _mxName,
@@ -47,7 +47,7 @@ public class ExportAdmin_mxJPO
         throws IOException, MatrixException, ParseException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
     {
         try  {
-            final AbstractObject_mxJPO clazz = _typeDef.newTypeInstance(_mxName);
+            final AbstractObject_mxJPO<?> clazz = _typeDef.newTypeInstance(_mxName);
 
             clazz.parse(_paramCache);
 
@@ -66,7 +66,7 @@ public class ExportAdmin_mxJPO
             }
 
             final Writer out = new FileWriter(file);
-            clazz.write(_paramCache, out);
+            this.write(_paramCache, clazz, _typeDef, out);
             out.flush();
             out.close();
         } catch (final MatrixException e)  {

@@ -36,7 +36,7 @@ import matrix.util.MatrixException;
  * @author The MxUpdate Team
  */
 public class ExportAdminProgramJPO_mxJPO
-    implements IExport_mxJPO
+    extends AbstractExportObject_mxJPO
 {
     /**
      * First writes the MXU file and then the JPO itself.
@@ -50,7 +50,7 @@ public class ExportAdminProgramJPO_mxJPO
      * @throws ParseException   if the XML export of the object could not
      *                          parsed (for admin objects)
      */
-    @Override()
+    @Override
     public void export(final ParameterCache_mxJPO _paramCache,
                        final TypeDef_mxJPO _typeDef,
                        final String _mxName,
@@ -71,7 +71,7 @@ public class ExportAdminProgramJPO_mxJPO
                 }
                 final Writer out = new FileWriter(file);
                 try  {
-                    clazz.write(_paramCache, out);
+                    this.write(_paramCache, clazz, _typeDef, out);
                     out.flush();
                 } finally {
                     out.close();

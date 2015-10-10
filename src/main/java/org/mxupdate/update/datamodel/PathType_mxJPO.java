@@ -176,7 +176,7 @@ public class PathType_mxJPO
     }
 
     @Override
-    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
+    public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
                 //              tag             | default | value                              | write?

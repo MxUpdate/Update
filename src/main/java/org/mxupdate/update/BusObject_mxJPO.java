@@ -31,15 +31,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import matrix.db.Attribute;
-import matrix.db.AttributeList;
-import matrix.db.BusinessObject;
-import matrix.db.BusinessObjectWithSelect;
-import matrix.db.ExpansionWithSelect;
-import matrix.db.RelationshipWithSelect;
-import matrix.util.MatrixException;
-import matrix.util.StringList;
-
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -54,6 +45,15 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateLine;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+
+import matrix.db.Attribute;
+import matrix.db.AttributeList;
+import matrix.db.BusinessObject;
+import matrix.db.BusinessObjectWithSelect;
+import matrix.db.ExpansionWithSelect;
+import matrix.db.RelationshipWithSelect;
+import matrix.util.MatrixException;
+import matrix.util.StringList;
 
 /**
  * The class is used to export, create, delete and update business objects
@@ -93,7 +93,7 @@ public class BusObject_mxJPO
     };
 
     /** Sorted set of attribute values.*/
-    private final SortedMap<String,String> attrValues = new TreeMap<String,String>(BusObject_mxJPO.COMP);
+    private final SortedMap<String,String> attrValues = new TreeMap<>(BusObject_mxJPO.COMP);
 
     /** Type of business object.*/
     private String busType;
@@ -111,7 +111,7 @@ public class BusObject_mxJPO
     private StringList busStates;
 
     /** Holds all connected objects. */
-    private final SortedSet<Connection> connections = new TreeSet<Connection>();
+    private final SortedSet<Connection> connections = new TreeSet<>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -252,7 +252,7 @@ public class BusObject_mxJPO
         Map<String,String> attrs = cache.get(_relation);
         if (attrs == null)
         {
-            attrs = new HashMap<String,String>();
+            attrs = new HashMap<>();
             cache.put(_relation, attrs);
 
             final String attrStr = MqlUtil_mxJPO.execMql(_paramCache,
@@ -371,8 +371,8 @@ public class BusObject_mxJPO
         new BusObjectParser_mxJPO(new StringReader(_code)).parse(this);
     }
 
-    @Override()
-    protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
+    @Override
+    public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
@@ -381,7 +381,7 @@ public class BusObject_mxJPO
                 .string(        "current",                  this.busCurrent);
 
         // system properties are not written
-        final Set<String> notWriteProps = new HashSet<String>();
+        final Set<String> notWriteProps = new HashSet<>();
         for (final PropertyDef_mxJPO propDef : PropertyDef_mxJPO.values())  {
             final String attrName = propDef.getAttrName(_updateBuilder.getParamCache());
             if (attrName != null)  {
@@ -585,7 +585,7 @@ public class BusObject_mxJPO
         private final String conId;
 
         /** Set of all attribute values of this connection. */
-        private final SortedMap<String,String> attrValues = new TreeMap<String,String>(BusObject_mxJPO.COMP);
+        private final SortedMap<String,String> attrValues = new TreeMap<>(BusObject_mxJPO.COMP);
 
         /**
          * Constructor to create a new connection instance.
