@@ -26,94 +26,104 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class InterfaceCI_1ParserTest
     extends AbstractParserTest<Interface_mxJPO>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
         return new Object[][]
         {
             {"0) simple",
-                "",
-                "description \"\" !hidden"},
-          // registered name
-            {"1a) symbolic name",
+                    "",
+                    "description \"\" !hidden"},
+            // uuid
+            {"1a) uuid with minus separator",
+                    "",
+                    "uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" !hidden"},
+            {"1b) uuid w/o minus separator",
+                    "",
+                    "uuid \"FDA75674979211E6AE2256B6B6499611\"     description \"\" !hidden"},
+            {"1c) uuid convert from single to string",
+                    "uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" !hidden",
+                    "uuid   FDA7-5674979211-E6AE2256B6-B6499611    description \"\" !hidden"},
+            // registered name
+            {"2a) symbolic name",
                     "",
                     "symbolicname \"interface_abc\" description \"\" !hidden"},
-            {"1b) two symbolic names",
+            {"2b) two symbolic names",
                     "symbolicname \"interface_abc\" symbolicname \"interface_def\" description \"\" !hidden",
                     "symbolicname \"interface_def\" symbolicname \"interface_abc\" description \"\" !hidden"},
             // description
-            {"2a) description",
+            {"3a) description",
                     "",
                     "description \"abc def\" !hidden"},
-            {"2b) description not defined",
+            {"3b) description not defined",
                     "description \"\" !hidden",
                     "!hidden"},
-            {"2c) multi-line description",
+            {"3c) multi-line description",
                     "",
                     "description \"abc\ndef\" !hidden"},
-            {"2d) tab's in description",
+            {"3d) tab's in description",
                     "",
                     "description \"abc\tdef\" !hidden"},
             // abstract flag
-            {"3a) not abstract",
+            {"4a) not abstract",
                     "description \"\" !hidden",
                     "description \"\" !abstract !hidden"},
-            {"3b) abstract",
+            {"4b) abstract",
                     "",
                     "description \"\" abstract !hidden"},
             // derived
-            {"4a) derived",
+            {"5a) derived",
                     "",
                     "description \"\" derived \"123\" !hidden"},
-            {"4b) multiple derived (to test sorting)",
+            {"5b) multiple derived (to test sorting)",
                     "description \"\" derived \"111\" derived \"222\" derived \"333\" !hidden",
                     "description \"\" derived \"222\" derived \"111\" derived \"333\" !hidden"},
             // hidden flag
-            {"5a) hidden",
+            {"6a) hidden",
                     "",
                     "description \"\" hidden"},
-            {"5b) not hidden (not defined)",
+            {"6b) not hidden (not defined)",
                     "description \"\" !hidden",
                     "description \"\""},
             // attribute
-            {"6a) attribute",
+            {"7a) attribute",
                     "",
                     "description \"\" !hidden attribute \"111\""},
-            {"6b) attribute name w/o apostrophe",
+            {"7b) attribute name w/o apostrophe",
                     "description \"\" !hidden attribute \"111\"",
                     "description \"\" !hidden attribute 111"},
-            {"6c) two attributes (to check sort)",
+            {"7c) two attributes (to check sort)",
                     "description \"\" !hidden attribute \"111\" attribute \"222\"",
                     "description \"\" !hidden attribute \"222\" attribute \"111\""},
             // properties
-            {"7a) property",
+            {"8a) property",
                     "",
                     "description \"\" !hidden property \"111\""},
-            {"7b) property with value",
+            {"8b) property with value",
                     "",
                     "description \"\" !hidden property \"111\" value \"222\""},
-            {"7c) property with referenced admin object",
+            {"8c) property with referenced admin object",
                     "",
                     "description \"\" !hidden property \"111\" to type \"TestType\""},
-            {"7d) property with referenced admin object and value",
+            {"8d) property with referenced admin object and value",
                     "",
                     "description \"\" !hidden property \"111\" to type \"TestType\" value \"222\""},
             // two properties for sorting
-            {"8a) sorting property",
+            {"9a) sorting property",
                      "description \"\" !hidden property \"111\" property \"222\"",
                     "description \"\" !hidden  property \"222\" property \"111\""},
-            {"8b) sorting property with value",
+            {"9b) sorting property with value",
                     "description \"\" !hidden property \"111\" value \"222\" property \"111\" value \"333\"",
                     "description \"\" !hidden property \"111\" value \"333\" property \"111\" value \"222\""},
-            {"8c) sorting  property with referenced admin object",
+            {"9c) sorting  property with referenced admin object",
                     "description \"\" !hidden property \"111\" to type \"TestType1\" property \"111\" to type \"TestType2\"",
                     "description \"\" !hidden property \"111\" to type \"TestType2\" property \"111\" to type \"TestType1\""},
-            {"8d) sorting  property with referenced admin object and value",
+            {"9d) sorting  property with referenced admin object and value",
                     "description \"\" !hidden property \"111\" to type \"TestType\" value \"222\" property \"111\" to type \"TestType\" value \"333\"",
                     "description \"\" !hidden property \"111\" to type \"TestType\" value \"333\" property \"111\" to type \"TestType\" value \"222\""},
 

@@ -44,7 +44,7 @@ import matrix.util.MatrixException;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class InterfaceCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<Interface_mxJPO,InterfaceData>
 {
@@ -54,25 +54,25 @@ public class InterfaceCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1a) simple",
-                new InterfaceData(this, "Test"),
-                new InterfaceData(this, "Test")},
-            {"1b) with escaped name",
+            {"0a) simple",
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test")},
+            {"0b) with escaped name",
                     new InterfaceData(this, "TestInterface \" 1"),
                     new InterfaceData(this, "TestInterface \" 1")},
-
-            {"2) issue #123: interface which is abstract",
+            {"1) uuid",
                     new InterfaceData(this, "Test"),
-                    new InterfaceData(this, "Test").setFlag("abstract", true, Create.ViaValue)},
-
-            {"3a) symbolic name",
+                    new InterfaceData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+            {"2a) symbolic name",
                     new InterfaceData(this, "Test"),
                     new InterfaceData(this, "Test").setValue("symbolicname", "interface_123")},
-            {"3b) two symbolic name",
+            {"2b) two symbolic name",
                     new InterfaceData(this, "Test"),
                     new InterfaceData(this, "Test").setValue("symbolicname", "interface_123").setValue("symbolicname", "interface_345")},
-
-            {"4a) with property",
+            {"3) issue #123: interface which is abstract",
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test").setFlag("abstract", true, Create.ViaValue)},
+            {"4) with property",
                     new InterfaceData(this, "Test"),
                     new InterfaceData(this, "Test").addProperty(new PropertyDef("my test \"property\" desc\"\\\\ription"))},
 

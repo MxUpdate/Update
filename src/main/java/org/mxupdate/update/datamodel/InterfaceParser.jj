@@ -22,7 +22,23 @@ options {
     SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
     UNICODE_INPUT = true;
 }
-PARSER_BEGIN(InterfaceParser)
+
+PARSER_BEGIN(InterfaceParser)
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
 package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
@@ -32,27 +48,33 @@ import org.mxupdate.update.datamodel.AttributeCI_mxJPO.Range;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO.LocalAttribute;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
-import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 
 /**
- * Parses the update format for {@link Interface_mxJPO}. */
+ * Parses the update format for {@link Interface_mxJPO}.
+ */
 @SuppressWarnings("unused")
 class InterfaceParser
     extends AbstractParser_mxJPO
 {
 }
-PARSER_END(InterfaceParser)<*> SKIP :
+
+PARSER_END(InterfaceParser)
+
+<*> SKIP :
 {
   " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
 <DEFAULT> TOKEN :
 {
-      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+      <UUID:                                "uuid">                                         : STRING_EXPECTED
+
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
     | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <ABSTRACT_TRUE:                       "abstract">
@@ -229,7 +251,8 @@ class InterfaceParser
 }
 
 /**************************************************************************** */
-/**
+
+/**
  * Parses one complete interface definition.
  *
  * @param _interface    target interface to update with parsed values
@@ -243,7 +266,13 @@ void parse(final Interface_mxJPO _interface)
     Range range;
     Trigger trigger;
 } {
-    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_interface, "symbolicNames", this.getString(tmp.image));}
+    (   ( <UUID>                                                            {property = new AdminProperty();
+                                                                             this.appendValue(this.getValue(_interface, "properties"), "propertiesStack", property);
+                                                                             this.setValue(property, "name",  "UUID");}
+                                    ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+
+      | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_interface, "symbolicNames", this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(_interface, "symbolicNames", this.getSingle(tmp.image));} ) )
 
       | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_interface, "description",                       this.getString(tmp.image));}
@@ -258,8 +287,8 @@ void parse(final Interface_mxJPO _interface)
       | ( <HIDDEN_TRUE>                                                     {this.setValue(_interface, "hidden",                            true);} )
       | ( <HIDDEN_FALSE>                                                    {this.setValue(_interface, "hidden",                            false);} )
 
-      | ( <ATTRIBUTE>               ( tmp = <STRING>                        {this.appendValue(_interface, "attributes",                     this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.appendValue(_interface, "attributes",                     this.getSingle(tmp.image));} ) )
+      | ( <ATTRIBUTE>               ( tmp = <STRING>                        {this.appendValue(_interface, "globalAttributes",               this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.appendValue(_interface, "globalAttributes",               this.getSingle(tmp.image));} ) )
 
       | ( <FOR>
             ( <FOR_PATHTYPE_ALL>                                            {this.setValue(_interface, "pathTypeAll",                       true);}

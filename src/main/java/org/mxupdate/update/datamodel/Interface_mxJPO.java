@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO;
@@ -36,7 +37,19 @@ import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 /**
- * Data model interface class.
+ * Data model interface class. The handled properties are:
+ * <ul>
+ * <li>uuid</li>
+ * <li>symbolic name</li>
+ * <li>description</li>
+ * <li>hidden flag</li>
+ * <li>{@link #derived} from interface</li>
+ * <li>{@link #globalAttributes global attributes}</li>
+ * <li>{@link #localAttributes local attributes}</li>
+ * <li>for {@link #pathTypes}</li>
+ * <li>for {@link #relations}</li>
+ * <li>for {@link #types}</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  */
@@ -66,7 +79,7 @@ public class Interface_mxJPO
     private final SortedSet<String> derived = new TreeSet<>();
 
     /** Global attributes. */
-    private final SortedSet<String> attributes = new TreeSet<>();
+    private final SortedSet<String> globalAttributes = new TreeSet<>();
     /** Local attributes. */
     private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO();
 
@@ -140,7 +153,7 @@ public class Interface_mxJPO
             parsed = true;
 
         } else if (_url.startsWith("/attributeDefRefList/attributeDefRef"))  {
-            this.attributes.add(_content);
+            this.globalAttributes.add(_content);
             parsed = true;
         } else if (_url.startsWith("/localAttributes/attributeDefList/attributeDef"))  {
             parsed = this.localAttributes.parseAdminXMLExportEvent(_paramCache, _url.substring(46), _content);
@@ -167,12 +180,14 @@ public class Interface_mxJPO
     public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
+                //              tag             | default | value                 | write?
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flagIfTrue(    "abstract",         false,  this.abstractFlag,      (this.abstractFlag != null) && this.abstractFlag)
                 .list(          "derived",                  this.derived)
                 .flag(          "hidden",           false,  this.isHidden())
-                .list(          "attribute",                this.attributes)
+                .list(          "attribute",                this.globalAttributes)
                 .write(this.localAttributes)
                 .singleIfTrue(  "for pathtype",             "all",                  this.pathTypeAll)
                 .listIfTrue(    "for pathtype",             this.pathTypes,         !this.pathTypeAll)
@@ -199,7 +214,7 @@ public class Interface_mxJPO
 
         DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql, "attribute",
                 ErrorKey.DM_INTERFACE_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
-                ValueKeys.DMInterfaceAttrIgnore, ValueKeys.DMInterfaceAttrRemove,       this.attributes,                    _current.attributes);
+                ValueKeys.DMInterfaceAttrIgnore, ValueKeys.DMInterfaceAttrRemove,       this.globalAttributes,              _current.globalAttributes);
         this.localAttributes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_INTERFACE_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
 
         DeltaUtil_mxJPO.calcLstOneCallDelta(_paramCache, _mql, "derived",
