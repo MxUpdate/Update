@@ -27,35 +27,35 @@ interface TypeParserConstants_mxJPO {
   /** RegularExpression Id. */
   int METHOD = 12;
   /** RegularExpression Id. */
-  int LOCAL = 13;
+  int STRING = 13;
   /** RegularExpression Id. */
-  int ATTRIBUTE = 14;
+  int SINGLE = 14;
   /** RegularExpression Id. */
-  int STRING = 15;
+  int MULTILINESTRING = 15;
   /** RegularExpression Id. */
-  int SINGLE = 16;
+  int MULTILINESINGLE = 16;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 17;
+  int KIND = 17;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 18;
+  int BASIC = 18;
   /** RegularExpression Id. */
-  int KIND = 19;
+  int COMPOSED = 19;
   /** RegularExpression Id. */
-  int BASIC = 20;
+  int KIND_BINARY = 20;
   /** RegularExpression Id. */
-  int COMPOSED = 21;
+  int KIND_BOOLEAN = 21;
   /** RegularExpression Id. */
-  int KIND_BINARY = 22;
+  int KIND_DATE = 22;
   /** RegularExpression Id. */
-  int KIND_BOOLEAN = 23;
+  int KIND_INTEGER = 23;
   /** RegularExpression Id. */
-  int KIND_DATE = 24;
+  int KIND_REAL = 24;
   /** RegularExpression Id. */
-  int KIND_INTEGER = 25;
+  int KIND_STRING = 25;
   /** RegularExpression Id. */
-  int KIND_REAL = 26;
+  int GLOBAL_ATTRIBUTE = 26;
   /** RegularExpression Id. */
-  int KIND_STRING = 27;
+  int LOCAL_ATTRIBUTE = 27;
   /** RegularExpression Id. */
   int DEFAULTVALUE = 28;
   /** RegularExpression Id. */
@@ -135,27 +135,45 @@ interface TypeParserConstants_mxJPO {
   /** RegularExpression Id. */
   int BETW4_EXCLUSIVE = 66;
   /** RegularExpression Id. */
-  int TRIGGER = 67;
+  int LOCAL_PATHTYPE = 67;
   /** RegularExpression Id. */
-  int INPUT = 68;
+  int FROM = 68;
   /** RegularExpression Id. */
-  int TRIGEVENT = 69;
+  int TO = 69;
   /** RegularExpression Id. */
-  int ACTION = 70;
+  int CARDINALITY_ONE = 70;
   /** RegularExpression Id. */
-  int CHECK = 71;
+  int CARDINALITY_MANY = 71;
   /** RegularExpression Id. */
-  int OVERRIDE = 72;
+  int TYPE_ALL = 72;
   /** RegularExpression Id. */
-  int PROPERTY = 73;
+  int TYPE = 73;
   /** RegularExpression Id. */
-  int PROPERTYTO = 74;
+  int RELATIONSHIP_ALL = 74;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 75;
+  int RELATIONSHIP = 75;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 76;
+  int TRIGGER = 76;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 77;
+  int INPUT = 77;
+  /** RegularExpression Id. */
+  int TRIGEVENT = 78;
+  /** RegularExpression Id. */
+  int ACTION = 79;
+  /** RegularExpression Id. */
+  int CHECK = 80;
+  /** RegularExpression Id. */
+  int OVERRIDE = 81;
+  /** RegularExpression Id. */
+  int PROPERTY = 82;
+  /** RegularExpression Id. */
+  int PROPERTYTO = 83;
+  /** RegularExpression Id. */
+  int PROPERTYVAL = 84;
+  /** RegularExpression Id. */
+  int ADMINTYPE_STRING = 85;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 86;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -197,8 +215,6 @@ interface TypeParserConstants_mxJPO {
     "\"hidden\"",
     "\"!hidden\"",
     "\"method\"",
-    "\"local\"",
-    "\"attribute\"",
     "<STRING>",
     "<SINGLE>",
     "<MULTILINESTRING>",
@@ -212,6 +228,8 @@ interface TypeParserConstants_mxJPO {
     "\"integer\"",
     "\"real\"",
     "\"string\"",
+    "\"attribute\"",
+    "<LOCAL_ATTRIBUTE>",
     "\"default\"",
     "\"multivalue\"",
     "\"!multivalue\"",
@@ -251,6 +269,15 @@ interface TypeParserConstants_mxJPO {
     "<BETW3_CHAR>",
     "\"inclusive\"",
     "\"exclusive\"",
+    "<LOCAL_PATHTYPE>",
+    "<FROM>",
+    "<TO>",
+    "<CARDINALITY_ONE>",
+    "<CARDINALITY_MANY>",
+    "<TYPE_ALL>",
+    "\"type\"",
+    "<RELATIONSHIP_ALL>",
+    "\"relationship\"",
     "\"trigger\"",
     "\"input\"",
     "<TRIGEVENT>",

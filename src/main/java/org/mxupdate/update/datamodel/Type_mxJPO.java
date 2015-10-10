@@ -25,6 +25,7 @@ import java.util.TreeSet;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO;
+import org.mxupdate.update.datamodel.helper.LocalPathTypeList_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
@@ -44,8 +45,9 @@ import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
  * <li>{@link #abstractFlag information about is the type abstract}</li>
  * <li>{@link #derived from information from which type this type is
  *     derived}</li>
- * <li>{@link #attributes global attributes}</li>
+ * <li>{@link #globalAttributes global attributes}</li>
  * <li>{@link #localAttributes local attributes}</li>
+ * <li>{@link #localPathTypes local path types}</li>
  * <li>{@link #methods type methods}</li>
  * <li>properties</li>
  * </ul>
@@ -78,10 +80,12 @@ public class Type_mxJPO
     private final SortedSet<String> methods = new TreeSet<>();
 
     /** Global attributes. */
-    private final SortedSet<String> attributes = new TreeSet<>();
+    private final SortedSet<String> globalAttributes = new TreeSet<>();
     /** Local attributes. */
     private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO();
 
+    /** Local path types. */
+    private final LocalPathTypeList_mxJPO localPathTypes = new LocalPathTypeList_mxJPO();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -95,7 +99,7 @@ public class Type_mxJPO
         super(_typeDef, _mxName);
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -122,7 +126,7 @@ public class Type_mxJPO
      *         <i>false</i>
      * @see #IGNORED_URLS
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -133,14 +137,16 @@ public class Type_mxJPO
         } else if ("/abstract".equals(_url))  {
             this.abstractFlag = true;
             parsed = true;
-        } else if (_url.startsWith("/attributeDefRefList/attributeDefRef"))  {
-            this.attributes.add(_content);
-            parsed = true;
         } else if ("/derivedFrom/typeRefList/typeRef".equals(_url))  {
             this.derived = _content;
             parsed = true;
+
+        } else if (_url.startsWith("/attributeDefRefList/attributeDefRef"))  {
+            this.globalAttributes.add(_content);
+            parsed = true;
         } else if (_url.startsWith("/localAttributes/attributeDefList/attributeDef"))  {
             parsed = this.localAttributes.parseAdminXMLExportEvent(_paramCache, _url.substring(46), _content);
+
         } else if ("/methodList/programRef".equals(_url))  {
             this.methods.add(_content);
             parsed = true;
@@ -163,14 +169,15 @@ public class Type_mxJPO
     /**
      * After the type is parsed, the type and local attributes must be prepared.
      */
-    @Override()
+    @Override
     protected void prepare()
     {
         super.prepare();
         this.localAttributes.prepare();
+        this.localPathTypes.prepare();
     }
 
-    @Override()
+    @Override
     protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
@@ -183,12 +190,13 @@ public class Type_mxJPO
                 .flag(          "hidden",                   false, this.isHidden())
                 .write(this.getTriggers())
                 .list(          "method",                   this.methods)
-                .list(          "attribute",                this.attributes)
+                .list(          "attribute",                this.globalAttributes)
                 .write(this.localAttributes)
+                .write(this.localPathTypes)
                 .properties(this.getProperties());
     }
 
-    @Override()
+    @Override
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
                              final Type_mxJPO _current)
@@ -202,7 +210,7 @@ public class Type_mxJPO
 
         DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql,    "attribute",
                 ErrorKey.DM_TYPE_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
-                ValueKeys.DMTypeAttrIgnore, ValueKeys.DMTypeAttrRemove,                 this.attributes,        _current.attributes);
+                ValueKeys.DMTypeAttrIgnore, ValueKeys.DMTypeAttrRemove,                 this.globalAttributes,  _current.globalAttributes);
         this.localAttributes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_TYPE_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
 
         this.getTriggers()  .calcDelta(_mql,     _current.getTriggers());

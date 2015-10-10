@@ -22,15 +22,18 @@ options {
     SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
     UNICODE_INPUT = true;
 }
-PARSER_BEGIN(TypeParser)
+
+PARSER_BEGIN(TypeParser)
 package org.mxupdate.update.datamodel;
 
 import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.datamodel.AttributeCI_mxJPO.Range;
+import org.mxupdate.update.datamodel.PathType_mxJPO.Cardinality;
 import org.mxupdate.update.datamodel.Type_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO.LocalAttribute;
+import org.mxupdate.update.datamodel.helper.LocalPathTypeList_mxJPO.LocalPathType;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -47,7 +50,10 @@ class TypeParser
     extends AbstractParser_mxJPO
 {
 }
-PARSER_END(TypeParser)<*> SKIP :
+
+PARSER_END(TypeParser)
+
+<*> SKIP :
 {
   " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
@@ -67,9 +73,6 @@ class TypeParser
     | <HIDDEN_FALSE:                        "!hidden">
 
     | <METHOD:                              "method">                                       : STRING_EXPECTED
-
-    | <LOCAL:                               "local">
-    | <ATTRIBUTE:                           "attribute">                                    : STRING_EXPECTED
 }
 
 /************************************************************** Common String */
@@ -108,10 +111,14 @@ class TypeParser
     | <KIND_STRING:                         "string">                                       : DEFAULT
 }
 
-/************************************************************ Local Attribute */
+/*************************************************** Global / Local Attribute */
 <DEFAULT> TOKEN :
 {
-      <DEFAULTVALUE:                        "default">                                      : MULTILINESTRING_EXPECTED
+      <GLOBAL_ATTRIBUTE:                    "attribute">                                    : STRING_EXPECTED
+
+    | <LOCAL_ATTRIBUTE:                     "local"  ([" ","\t","\n","\r"])+ "attribute">   : STRING_EXPECTED
+
+    | <DEFAULTVALUE:                        "default">                                      : MULTILINESTRING_EXPECTED
 
     | <MULTIVALUE_TRUE:                     "multivalue">                                   : DEFAULT
     | <MULTIVALUE_FALSE:                    "!multivalue">                                  : DEFAULT
@@ -124,7 +131,7 @@ class TypeParser
 
     | <RANGEVALUE_TRUE:                     "rangevalue">                                   : DEFAULT
     | <RANGEVALUE_FALSE:                    "!rangevalue">                                  : DEFAULT
-    
+
     | <MULTILINE_TRUE:                      "multiline">                                    : DEFAULT
     | <MULTILINE_FALSE:                     "!multiline">                                   : DEFAULT
 
@@ -188,6 +195,25 @@ class TypeParser
     | <BETW4_EXCLUSIVE: "exclusive"> : DEFAULT
 }
 
+/************************************************************ Local Path Type */
+<DEFAULT> TOKEN:
+{
+      <LOCAL_PATHTYPE:                      "local"  ([" ","\t","\n","\r"])+ "pathtype">    : STRING_EXPECTED
+}
+
+/** From / To Information */
+<DEFAULT> TOKEN :
+{
+      <FROM:                                "from" ([" ","\t","\n"])+ "{">                  : DEFAULT
+    | <TO:                                  "to"   ([" ","\t","\n"])+ "{">                  : DEFAULT
+    | <CARDINALITY_ONE:                     "cardinality" ([" ","\t","\n"])+ "one">         : DEFAULT
+    | <CARDINALITY_MANY:                    "cardinality" ([" ","\t","\n"])+ "many">        : DEFAULT
+    | <TYPE_ALL:                            "type" ([" ","\t","\n"])+ "all">                : DEFAULT
+    | <TYPE:                                "type">                                         : STRING_EXPECTED
+    | <RELATIONSHIP_ALL:                    "relationship" ([" ","\t","\n"])+ "all">        : DEFAULT
+    | <RELATIONSHIP:                        "relationship">                                 : STRING_EXPECTED
+}
+
 /******************************************************************** Trigger */
 <DEFAULT> TOKEN :
 {
@@ -203,7 +229,8 @@ class TypeParser
 
 /** Trigger Kind */
 <TRIGKIND_EXPECTED> TOKEN :
-{      <ACTION:                              "action">                                       : STRING_EXPECTED
+{
+      <ACTION:                              "action">                                       : STRING_EXPECTED
     | <CHECK:                               "check">                                        : STRING_EXPECTED
     | <OVERRIDE:                            "override">                                     : STRING_EXPECTED
  }
@@ -223,7 +250,7 @@ class TypeParser
 }
 
 /**************************************************************************** */
-/**
+/**
  * Parses one complete type definition.
  *
  * @param _type     target type to update with parsed values
@@ -236,152 +263,265 @@ void parse(final Type_mxJPO _type)
     Trigger trigger;
     LocalAttribute localAttr;
     Range range;
+    LocalPathType localPathType;
 } {
-    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_type, "symbolicNames", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.appendValue(_type, "symbolicNames", this.getSingle(tmp.image));} ) )
+    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                                          {this.appendValue(_type, "symbolicNames", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                                          {this.appendValue(_type, "symbolicNames", this.getSingle(tmp.image));} ) )
 
-      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_type, "description",                            this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>               {this.setValue(_type, "description",                            this.getSingle(tmp.image));} ) )
+      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>                                 {this.setValue(_type, "description",                            this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>                                 {this.setValue(_type, "description",                            this.getSingle(tmp.image));} ) )
 
-      | ( <KIND>                    ( <BASIC>                               {this.setValue(_type, "kind",                                   Type_mxJPO.Kind.Basic);}
-                                    | <COMPOSED>                            {this.setValue(_type, "kind",                                   Type_mxJPO.Kind.Composed);} ) )
+      | ( <KIND>                    ( <BASIC>                                                 {this.setValue(_type, "kind",                                   Type_mxJPO.Kind.Basic);}
+                                    | <COMPOSED>                                              {this.setValue(_type, "kind",                                   Type_mxJPO.Kind.Composed);} ) )
 
-      | ( <ABSTRACT_TRUE>                                                   {this.setValue(_type, "abstractFlag",                           true);} )
-      | ( <ABSTRACT_FALSE>                                                  {this.setValue(_type, "abstractFlag",                           false);} )
+      | ( <ABSTRACT_TRUE>                                                                     {this.setValue(_type, "abstractFlag",                           true);} )
+      | ( <ABSTRACT_FALSE>                                                                    {this.setValue(_type, "abstractFlag",                           false);} )
 
-      | ( <DERIVED>                 ( tmp = <STRING>                        {this.setValue(_type, "derived",                                this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_type, "derived",                                this.getSingle(tmp.image));} ) )
+      | ( <DERIVED>                 ( tmp = <STRING>                                          {this.setValue(_type, "derived",                                this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                                          {this.setValue(_type, "derived",                                this.getSingle(tmp.image));} ) )
 
-      | ( <HIDDEN_TRUE>                                                     {this.setValue(_type, "hidden",                                 true);} )
-      | ( <HIDDEN_FALSE>                                                    {this.setValue(_type, "hidden",                                 false);} )
+      | ( <HIDDEN_TRUE>                                                                       {this.setValue(_type, "hidden",                                 true);} )
+      | ( <HIDDEN_FALSE>                                                                      {this.setValue(_type, "hidden",                                 false);} )
 
-      | ( <TRIGGER>                                                         {trigger = new Trigger();this.appendValue(_type, "triggers", "triggersStack", trigger);}
-            tmp = <TRIGEVENT>                                               {this.setValue(trigger, "eventType",                            this.getSingle(tmp.image));}
-                    ( <ACTION>                                              {this.setValue(trigger, "kind",                                 "action");}
-                    | <CHECK>                                               {this.setValue(trigger, "kind",                                 "check");}
-                    | <OVERRIDE>                                            {this.setValue(trigger, "kind",                                 "override");} )
-                            ( tmp = <STRING>                                {this.setValue(trigger, "program",                              this.getString(tmp.image));}
-                            | tmp = <SINGLE>                                {this.setValue(trigger, "program",                              this.getSingle(tmp.image));} )
+      | ( <TRIGGER>                                                                           {trigger = new Trigger();this.appendValue(_type, "triggers", "triggersStack", trigger);}
+            tmp = <TRIGEVENT>                                                                 {this.setValue(trigger, "eventType",                            this.getSingle(tmp.image));}
+                    ( <ACTION>                                                                {this.setValue(trigger, "kind",                                 "action");}
+                    | <CHECK>                                                                 {this.setValue(trigger, "kind",                                 "check");}
+                    | <OVERRIDE>                                                              {this.setValue(trigger, "kind",                                 "override");} )
+                            ( tmp = <STRING>                                                  {this.setValue(trigger, "program",                              this.getString(tmp.image));}
+                            | tmp = <SINGLE>                                                  {this.setValue(trigger, "program",                              this.getSingle(tmp.image));} )
                                     ( <INPUT>
-                                            ( tmp = <STRING>                {this.setValue(trigger, "arguments",                            this.getString(tmp.image));}
-                                            | tmp = <SINGLE>                {this.setValue(trigger, "arguments",                            this.getSingle(tmp.image));} ) )?  )
+                                            ( tmp = <STRING>                                  {this.setValue(trigger, "arguments",                            this.getString(tmp.image));}
+                                            | tmp = <SINGLE>                                  {this.setValue(trigger, "arguments",                            this.getSingle(tmp.image));} ) )?  )
 
-      | ( <METHOD>                  ( tmp = <STRING>                        {this.appendValue(_type, "methods",                             this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.appendValue(_type, "methods",                             this.getSingle(tmp.image));} ) )
+      | ( <METHOD>                  ( tmp = <STRING>                                          {this.appendValue(_type, "methods",                             this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                                          {this.appendValue(_type, "methods",                             this.getSingle(tmp.image));} ) )
 
-      | ( <ATTRIBUTE>               ( tmp = <STRING>                        {this.appendValue(_type, "attributes",                          this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.appendValue(_type, "attributes",                          this.getSingle(tmp.image));} ) )
+      | ( <GLOBAL_ATTRIBUTE>        ( tmp = <STRING>                                          {this.appendValue(_type, "globalAttributes",                    this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                                          {this.appendValue(_type, "globalAttributes",                    this.getSingle(tmp.image));} ) )
 
-      | ( <LOCAL> <ATTRIBUTE>
-            ( tmp = <STRING>                                                {localAttr = new LocalAttribute(this.getString(tmp.image));this.appendValue(_type, "localAttributes", localAttr);}
-            | tmp = <SINGLE>                                                {localAttr = new LocalAttribute(this.getSingle(tmp.image));this.appendValue(_type, "localAttributes", localAttr);} )
+      | ( <LOCAL_ATTRIBUTE>
+            ( tmp = <STRING>                                                                  {localAttr = new LocalAttribute(this.getString(tmp.image));this.appendValue(_type, "localAttributes", localAttr);}
+            | tmp = <SINGLE>                                                                  {localAttr = new LocalAttribute(this.getSingle(tmp.image));this.appendValue(_type, "localAttributes", localAttr);} )
                  ( "{"
-                      (   ( <KIND>          ( <KIND_BINARY>                 {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Binary);}
-                                            | <KIND_BOOLEAN>                {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Boolean);}
-                                            | <KIND_DATE>                   {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Date);}
-                                            | <KIND_INTEGER>                {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Integer);}
-                                            | <KIND_REAL>                   {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Real);}
-                                            | <KIND_STRING>                 {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.String);} ) )
-
-                        | ( <SYMBOLICNAME>  ( tmp = <STRING>                {this.appendValue(localAttr, "symbolicNames",                   this.getString(tmp.image));}
-                                            | tmp = <SINGLE>                {this.appendValue(localAttr, "symbolicNames",                   this.getSingle(tmp.image));} ) )
-
-                        | ( <DESCRIPTION>   ( tmp = <MULTILINESTRING>       {this.setValue(localAttr, "description",                        this.getString(tmp.image));}
-                                            | tmp = <MULTILINESINGLE>       {this.setValue(localAttr, "description",                        this.getSingle(tmp.image));} ) )
-
-                        | (<DEFAULTVALUE>   ( tmp = <MULTILINESTRING>       {this.setValue(localAttr, "defaultValue",                       this.getString(tmp.image));}
-                                            | tmp = <MULTILINESINGLE>       {this.setValue(localAttr, "defaultValue",                       this.getSingle(tmp.image));} ) )
-
-                        | ( <HIDDEN_TRUE>                                   {this.setValue(localAttr, "hidden",                             true);} )
-                        | ( <HIDDEN_FALSE>                                  {this.setValue(localAttr, "hidden",                             false);} )
-
-                        | (<MULTIVALUE_TRUE>                                {this.setValue(localAttr, "multiValue",                         true);} )
-                        | (<MULTIVALUE_FALSE>                               {this.setValue(localAttr, "multiValue",                         false);} )
-
-                        | (<RESETONCLONE_TRUE>                              {this.setValue(localAttr, "resetOnClone",                       true);} )
-                        | (<RESETONCLONE_FALSE>                             {this.setValue(localAttr, "resetOnClone",                       false);} )
-
-                        | (<RESETONREVISION_TRUE>                           {this.setValue(localAttr, "resetOnRevision",                    true);} )
-                        | (<RESETONREVISION_FALSE>                          {this.setValue(localAttr, "resetOnRevision",                    false);} )
-
-                        | (<RANGEVALUE_TRUE>                                {this.setValue(localAttr, "rangeValue",                         true);} )
-                        | (<RANGEVALUE_FALSE>                               {this.setValue(localAttr, "rangeValue",                         false);} )
-
-                        | (<MULTILINE_TRUE>                                 {this.setValue(localAttr, "multiline",                          true);} )
-                        | (<MULTILINE_FALSE>                                {this.setValue(localAttr, "multiline",                          false);} )
-
-                        | (<MAXLENGTH>      ( tmp = <MAXLENGTH_NUMBER>      {this.setValue(localAttr, "maxLength",                          this.getSingle(tmp.image));} ) )
-
-                        | (<RULE>           ( tmp = <STRING>                {this.appendValue(localAttr, "rules",                           this.getString(tmp.image));}
-                                            | tmp = <SINGLE>                {this.appendValue(localAttr, "rules",                           this.getSingle(tmp.image));} ) )
-
-                        | (<DIMENSION>      ( tmp = <STRING>                {this.setValue(localAttr, "dimension",                          this.getString(tmp.image));}
-                                            | tmp = <SINGLE>                {this.setValue(localAttr, "dimension",                          this.getSingle(tmp.image));} ) )
-
-                        | ( <TRIGGER>                                       {trigger = new Trigger(); this.appendValue(localAttr, "triggers", trigger);}
-                              tmp = <TRIGEVENT>                             {this.setValue(trigger, "eventType",                            this.getSingle(tmp.image));}
-                                      ( <ACTION>                            {this.setValue(trigger, "kind",                                 "action");}
-                                      | <CHECK>                             {this.setValue(trigger, "kind",                                 "check");}
-                                      | <OVERRIDE>                          {this.setValue(trigger, "kind",                                 "override");} )
-                                              ( tmp = <STRING>              {this.setValue(trigger, "program",                              this.getString(tmp.image));}
-                                              | tmp = <SINGLE>              {this.setValue(trigger, "program",                              this.getSingle(tmp.image));} )
+                        ( ( <KIND>          ( <KIND_BINARY>                                   {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Binary);}
+                                            | <KIND_BOOLEAN>                                  {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Boolean);}
+                                            | <KIND_DATE>                                     {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Date);}
+                                            | <KIND_INTEGER>                                  {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Integer);}
+                                            | <KIND_REAL>                                     {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Real);}
+                                            | <KIND_STRING>                                   {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.String);} ) )
+                        | ( <SYMBOLICNAME>  ( tmp = <STRING>                                  {this.appendValue(localAttr, "symbolicNames",                   this.getString(tmp.image));}
+                                            | tmp = <SINGLE>                                  {this.appendValue(localAttr, "symbolicNames",                   this.getSingle(tmp.image));} ) )
+                        | ( <DESCRIPTION>   ( tmp = <MULTILINESTRING>                         {this.setValue(localAttr, "description",                        this.getString(tmp.image));}
+                                            | tmp = <MULTILINESINGLE>                         {this.setValue(localAttr, "description",                        this.getSingle(tmp.image));} ) )
+                        | ( <DEFAULTVALUE>  ( tmp = <MULTILINESTRING>                         {this.setValue(localAttr, "defaultValue",                       this.getString(tmp.image));}
+                                            | tmp = <MULTILINESINGLE>                         {this.setValue(localAttr, "defaultValue",                       this.getSingle(tmp.image));} ) )
+                        | ( <HIDDEN_TRUE>                                                     {this.setValue(localAttr, "hidden",                             true);} )
+                        | ( <HIDDEN_FALSE>                                                    {this.setValue(localAttr, "hidden",                             false);} )
+                        | ( <MULTIVALUE_TRUE>                                                 {this.setValue(localAttr, "multiValue",                         true);} )
+                        | ( <MULTIVALUE_FALSE>                                                {this.setValue(localAttr, "multiValue",                         false);} )
+                        | ( <RESETONCLONE_TRUE>                                               {this.setValue(localAttr, "resetOnClone",                       true);} )
+                        | ( <RESETONCLONE_FALSE>                                              {this.setValue(localAttr, "resetOnClone",                       false);} )
+                        | ( <RESETONREVISION_TRUE>                                            {this.setValue(localAttr, "resetOnRevision",                    true);} )
+                        | ( <RESETONREVISION_FALSE>                                           {this.setValue(localAttr, "resetOnRevision",                    false);} )
+                        | ( <RANGEVALUE_TRUE>                                                 {this.setValue(localAttr, "rangeValue",                         true);} )
+                        | ( <RANGEVALUE_FALSE>                                                {this.setValue(localAttr, "rangeValue",                         false);} )
+                        | ( <MULTILINE_TRUE>                                                  {this.setValue(localAttr, "multiline",                          true);} )
+                        | ( <MULTILINE_FALSE>                                                 {this.setValue(localAttr, "multiline",                          false);} )
+                        | ( <MAXLENGTH>     ( tmp = <MAXLENGTH_NUMBER>                        {this.setValue(localAttr, "maxLength",                          this.getSingle(tmp.image));} ) )
+                        | ( <RULE>          ( tmp = <STRING>                                  {this.appendValue(localAttr, "rules",                           this.getString(tmp.image));}
+                                            | tmp = <SINGLE>                                  {this.appendValue(localAttr, "rules",                           this.getSingle(tmp.image));} ) )
+                        | ( <DIMENSION>     ( tmp = <STRING>                                  {this.setValue(localAttr, "dimension",                          this.getString(tmp.image));}
+                                            | tmp = <SINGLE>                                  {this.setValue(localAttr, "dimension",                          this.getSingle(tmp.image));} ) )
+                        | ( <TRIGGER>                                                         {trigger = new Trigger(); this.appendValue(localAttr, "triggers", trigger);}
+                              tmp = <TRIGEVENT>                                               {this.setValue(trigger, "eventType",                            this.getSingle(tmp.image));}
+                                      ( <ACTION>                                              {this.setValue(trigger, "kind",                                 "action");}
+                                      | <CHECK>                                               {this.setValue(trigger, "kind",                                 "check");}
+                                      | <OVERRIDE>                                            {this.setValue(trigger, "kind",                                 "override");} )
+                                              ( tmp = <STRING>                                {this.setValue(trigger, "program",                              this.getString(tmp.image));}
+                                              | tmp = <SINGLE>                                {this.setValue(trigger, "program",                              this.getSingle(tmp.image));} )
                                                      ( <INPUT>
-                                                           ( tmp = <STRING> {this.setValue(trigger, "arguments",                            this.getString(tmp.image));}
-                                                           | tmp = <SINGLE> {this.setValue(trigger, "arguments",                            this.getSingle(tmp.image));} ) )? )
-
-                        | (<RANGE_EQUAL>            ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "=");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
-                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "=");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
-                        | (<RANGE_GREATERTHAN>      ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", ">");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
-                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", ">");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
-                        | (<RANGE_GREATERTHANEQUAL> ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", ">=");     this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
-                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", ">=");     this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
-                        | (<RANGE_LESSTHAN>         ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "<");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
-                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "<");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
-                        | (<RANGE_LESSTHANEQUAL>    ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "<=");     this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
-                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "<=");     this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
-                        | (<RANGE_NOTEQUAL>         ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "!=");     this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
-                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "!=");     this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
-                        | (<RANGE_MATCH>            ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "match");  this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
-                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "match");  this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
-                        | (<RANGE_NOTMATCH>         ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "!match"); this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
-                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "!match"); this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
-                        | (<RANGE_SMATCH>           ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "smatch"); this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
-                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "smatch"); this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
-                        | (<RANGE_NOTSMATCH>        ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "!smatch");this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
-                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "!smatch");this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
-                        | (<RANGE_PROGRAM>          ( tmp = <STRING>        {range = new Range();this.setValue(range, "type", "program");this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
-                                                    | tmp = <SINGLE>        {range = new Range();this.setValue(range, "type", "program");this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} )
-                                  ( <INPUT>         ( tmp = <STRING>        {this.setValue(range, "value2", this.getString(tmp.image));}
-                                                    | tmp = <SINGLE>        {this.setValue(range, "value2", this.getSingle(tmp.image));} ) )? )
-                        | (<RANGE_BETWEEN>                                  {range = new Range();this.setValue(range, "type", "between");this.appendValue(localAttr, "rangesStack", range);}
-                                                    ( tmp = <BETW1_STRING>  {this.setValue(range, "value1", this.getString(tmp.image));}
-                                                    | tmp = <BETW1_SINGLE>  {this.setValue(range, "value1", this.getSingle(tmp.image));} )
-                                                    ( <BETW2_INCLUSIVE>     {this.setValue(range, "include1", true);}
-                                                    | <BETW2_EXCLUSIVE>     {this.setValue(range, "include1", false);})
-                                                    ( tmp = <BETW3_STRING>  {this.setValue(range, "value2", this.getString(tmp.image));}
-                                                    | tmp = <BETW3_SINGLE>  {this.setValue(range, "value2", this.getSingle(tmp.image));} )
-                                                    ( <BETW4_INCLUSIVE>     {this.setValue(range, "include2", true);}
-                                                    | <BETW4_EXCLUSIVE>     {this.setValue(range, "include2", false);} ) )
-
-                        | (<PROPERTY>                                       {property = new AdminProperty(); this.appendValue(this.getValue(localAttr, "properties"), "propertiesStack", property);}
-                                                ( tmp = <STRING>            {this.setValue(property, "name", this.getString(tmp.image));}
-                                                | tmp = <SINGLE>            {this.setValue(property, "name", this.getSingle(tmp.image));} )
-                              ( ( <PROPERTYVAL> ( tmp = <STRING>            {this.setValue(property, "value", this.getString(tmp.image));}
-                                                | tmp = <SINGLE>            {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-                              | ( <PROPERTYTO>  ( tmp = <ADMINTYPE_STRING>  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                                | tmp = <ADMINTYPE_SINGLE>  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                                ( tmp = <STRING>            {this.setValue(property, "refAdminName", this.getString(tmp.image));}
-                                                | tmp = <SINGLE>            {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* ) )*
+                                                           ( tmp = <STRING>                   {this.setValue(trigger, "arguments",                            this.getString(tmp.image));}
+                                                           | tmp = <SINGLE>                   {this.setValue(trigger, "arguments",                            this.getSingle(tmp.image));} ) )? )
+                        | ( <RANGE_EQUAL>            ( tmp = <STRING>                         {range = new Range();this.setValue(range, "type", "=");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                     | tmp = <SINGLE>                         {range = new Range();this.setValue(range, "type", "=");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | ( <RANGE_GREATERTHAN>      ( tmp = <STRING>                         {range = new Range();this.setValue(range, "type", ">");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                     | tmp = <SINGLE>                         {range = new Range();this.setValue(range, "type", ">");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | ( <RANGE_GREATERTHANEQUAL> ( tmp = <STRING>                         {range = new Range();this.setValue(range, "type", ">=");     this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                     | tmp = <SINGLE>                         {range = new Range();this.setValue(range, "type", ">=");     this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | ( <RANGE_LESSTHAN>         ( tmp = <STRING>                         {range = new Range();this.setValue(range, "type", "<");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                     | tmp = <SINGLE>                         {range = new Range();this.setValue(range, "type", "<");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | ( <RANGE_LESSTHANEQUAL>    ( tmp = <STRING>                         {range = new Range();this.setValue(range, "type", "<=");     this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                     | tmp = <SINGLE>                         {range = new Range();this.setValue(range, "type", "<=");     this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | ( <RANGE_NOTEQUAL>         ( tmp = <STRING>                         {range = new Range();this.setValue(range, "type", "!=");     this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                     | tmp = <SINGLE>                         {range = new Range();this.setValue(range, "type", "!=");     this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | ( <RANGE_MATCH>            ( tmp = <STRING>                         {range = new Range();this.setValue(range, "type", "match");  this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                     | tmp = <SINGLE>                         {range = new Range();this.setValue(range, "type", "match");  this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | ( <RANGE_NOTMATCH>         ( tmp = <STRING>                         {range = new Range();this.setValue(range, "type", "!match"); this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                     | tmp = <SINGLE>                         {range = new Range();this.setValue(range, "type", "!match"); this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | ( <RANGE_SMATCH>           ( tmp = <STRING>                         {range = new Range();this.setValue(range, "type", "smatch"); this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                     | tmp = <SINGLE>                         {range = new Range();this.setValue(range, "type", "smatch"); this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | ( <RANGE_NOTSMATCH>        ( tmp = <STRING>                         {range = new Range();this.setValue(range, "type", "!smatch");this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                     | tmp = <SINGLE>                         {range = new Range();this.setValue(range, "type", "!smatch");this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                        | ( <RANGE_PROGRAM>          ( tmp = <STRING>                         {range = new Range();this.setValue(range, "type", "program");this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                     | tmp = <SINGLE>                         {range = new Range();this.setValue(range, "type", "program");this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} )
+                                  ( <INPUT>          ( tmp = <STRING>                         {this.setValue(range, "value2", this.getString(tmp.image));}
+                                                     | tmp = <SINGLE>                         {this.setValue(range, "value2", this.getSingle(tmp.image));} ) )? )
+                        | ( <RANGE_BETWEEN>                                                   {range = new Range();this.setValue(range, "type", "between");this.appendValue(localAttr, "rangesStack", range);}
+                                                    ( tmp = <BETW1_STRING>                    {this.setValue(range, "value1", this.getString(tmp.image));}
+                                                    | tmp = <BETW1_SINGLE>                    {this.setValue(range, "value1", this.getSingle(tmp.image));} )
+                                                    ( <BETW2_INCLUSIVE>                       {this.setValue(range, "include1", true);}
+                                                    | <BETW2_EXCLUSIVE>                       {this.setValue(range, "include1", false);})
+                                                    ( tmp = <BETW3_STRING>                    {this.setValue(range, "value2", this.getString(tmp.image));}
+                                                    | tmp = <BETW3_SINGLE>                    {this.setValue(range, "value2", this.getSingle(tmp.image));} )
+                                                    ( <BETW4_INCLUSIVE>                       {this.setValue(range, "include2", true);}
+                                                    | <BETW4_EXCLUSIVE>                       {this.setValue(range, "include2", false);} ) )
+                        | ( <PROPERTY>                                                        {property = new AdminProperty(); this.appendValue(this.getValue(localAttr, "properties"), "propertiesStack", property);}
+                                                ( tmp = <STRING>                              {this.setValue(property, "name", this.getString(tmp.image));}
+                                                | tmp = <SINGLE>                              {this.setValue(property, "name", this.getSingle(tmp.image));} )
+                              ( ( <PROPERTYVAL> ( tmp = <STRING>                              {this.setValue(property, "value", this.getString(tmp.image));}
+                                                | tmp = <SINGLE>                              {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                              | ( <PROPERTYTO>  ( tmp = <ADMINTYPE_STRING>                    {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                                | tmp = <ADMINTYPE_SINGLE>                    {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                                ( tmp = <STRING>                              {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                                | tmp = <SINGLE>                              {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* ) )*
                    "}" ) )
 
-      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_type, "properties", "propertiesStack", property);}
-                                    ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
-              (   ( <PROPERTYVAL>   ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+    | ( <LOCAL_PATHTYPE>
+            ( tmp = <STRING>                                                                  {localPathType = new LocalPathType(this.getString(tmp.image));this.appendValue(_type, "localPathTypes", localPathType);}
+            | tmp = <SINGLE>                                                                  {localPathType = new LocalPathType(this.getSingle(tmp.image));this.appendValue(_type, "localPathTypes", localPathType);} )
+                 ( "{"
+                        ( ( <SYMBOLICNAME>  ( tmp = <STRING>                                  {this.appendValue(localPathType, "symbolicNames", this.getString(tmp.image));}
+                                            | tmp = <SINGLE>                                  {this.appendValue(localPathType, "symbolicNames", this.getSingle(tmp.image));} ) )
+                        | ( <DESCRIPTION>   ( tmp = <MULTILINESTRING>                         {this.setValue(localPathType, "description", this.getString(tmp.image));}
+                                            | tmp = <MULTILINESINGLE>                         {this.setValue(localPathType, "description", this.getSingle(tmp.image));} ) )
+                        | ( <HIDDEN_TRUE>                                                     {this.setValue(localPathType, "hidden", true);} )
+                        | ( <HIDDEN_FALSE>                                                    {this.setValue(localPathType, "hidden", false);} )
+                        | ( <FROM>
+                                  (   ( <CARDINALITY_ONE>                                     {this.setValue(localPathType, "fromCardinality", Cardinality.One);} )
+                                    | ( <CARDINALITY_MANY>                                    {this.setValue(localPathType, "fromCardinality", Cardinality.Many);} )
+                                    | ( <TYPE>           ( tmp = <STRING>                     {this.appendValue(localPathType, "fromTypes", this.getString(tmp.image));}
+                                                         | tmp = <SINGLE>                     {this.appendValue(localPathType, "fromTypes", this.getSingle(tmp.image));} ) )
+                                    | ( <TYPE_ALL>                                            {this.setValue(localPathType, "fromTypeAll", true);} )
+                                    | ( <RELATIONSHIP>   ( tmp = <STRING>                     {this.appendValue(localPathType, "fromRelations", this.getString(tmp.image));}
+                                                         | tmp = <SINGLE>                     {this.appendValue(localPathType, "fromRelations", this.getSingle(tmp.image));} ) )
+                                    | ( <RELATIONSHIP_ALL>                                    {this.setValue(localPathType, "fromRelationAll", true);} ) )*
+                              "}" )
+                        | ( <TO>
+                                  (   ( <TYPE>           ( tmp = <STRING>                     {this.appendValue(localPathType, "toTypes", this.getString(tmp.image));}
+                                                      | tmp = <SINGLE>                        {this.appendValue(localPathType, "toTypes", this.getSingle(tmp.image));} ) )
+                                    | ( <TYPE_ALL>                                            {this.setValue(localPathType, "toTypeAll", true);} )
+                                    | ( <RELATIONSHIP>   ( tmp = <STRING>                     {this.appendValue(localPathType, "toRelations", this.getString(tmp.image));}
+                                                      | tmp = <SINGLE>                        {this.appendValue(localPathType, "toRelations", this.getSingle(tmp.image));} ) )
+                                    | ( <RELATIONSHIP_ALL>                                    {this.setValue(localPathType, "toRelationAll", true);} ) )*
+                              "}" )
+                        | ( <GLOBAL_ATTRIBUTE>  ( tmp = <STRING>                              {this.appendValue(localPathType, "globalAttributes", this.getString(tmp.image));}
+                                                | tmp = <SINGLE>                              {this.appendValue(localPathType, "globalAttributes", this.getSingle(tmp.image));} ) )
+                        | ( <LOCAL_ATTRIBUTE>
+                              ( tmp = <STRING>                                                {localAttr = new LocalAttribute(this.getString(tmp.image));this.appendValue(localPathType, "localAttributes", localAttr);}
+                              | tmp = <SINGLE>                                                {localAttr = new LocalAttribute(this.getSingle(tmp.image));this.appendValue(localPathType, "localAttributes", localAttr);} )
+                                   ( "{"
+                                          ( ( <KIND>          ( <KIND_BINARY>                 {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Binary);}
+                                                              | <KIND_BOOLEAN>                {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Boolean);}
+                                                              | <KIND_DATE>                   {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Date);}
+                                                              | <KIND_INTEGER>                {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Integer);}
+                                                              | <KIND_REAL>                   {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Real);}
+                                                              | <KIND_STRING>                 {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.String);} ) )
+                                          | ( <SYMBOLICNAME>  ( tmp = <STRING>                {this.appendValue(localAttr, "symbolicNames",                   this.getString(tmp.image));}
+                                                              | tmp = <SINGLE>                {this.appendValue(localAttr, "symbolicNames",                   this.getSingle(tmp.image));} ) )
+                                          | ( <DESCRIPTION>   ( tmp = <MULTILINESTRING>       {this.setValue(localAttr, "description",                        this.getString(tmp.image));}
+                                                              | tmp = <MULTILINESINGLE>       {this.setValue(localAttr, "description",                        this.getSingle(tmp.image));} ) )
+                                          | (<DEFAULTVALUE>   ( tmp = <MULTILINESTRING>       {this.setValue(localAttr, "defaultValue",                       this.getString(tmp.image));}
+                                                              | tmp = <MULTILINESINGLE>       {this.setValue(localAttr, "defaultValue",                       this.getSingle(tmp.image));} ) )
+                                          | ( <HIDDEN_TRUE>                                   {this.setValue(localAttr, "hidden",                             true);} )
+                                          | ( <HIDDEN_FALSE>                                  {this.setValue(localAttr, "hidden",                             false);} )
+                                          | ( <MULTIVALUE_TRUE>                               {this.setValue(localAttr, "multiValue",                         true);} )
+                                          | ( <MULTIVALUE_FALSE>                              {this.setValue(localAttr, "multiValue",                         false);} )
+                                          | ( <RESETONCLONE_TRUE>                             {this.setValue(localAttr, "resetOnClone",                       true);} )
+                                          | ( <RESETONCLONE_FALSE>                            {this.setValue(localAttr, "resetOnClone",                       false);} )
+                                          | ( <RESETONREVISION_TRUE>                          {this.setValue(localAttr, "resetOnRevision",                    true);} )
+                                          | ( <RESETONREVISION_FALSE>                         {this.setValue(localAttr, "resetOnRevision",                    false);} )
+                                          | ( <RANGEVALUE_TRUE>                               {this.setValue(localAttr, "rangeValue",                         true);} )
+                                          | ( <RANGEVALUE_FALSE>                              {this.setValue(localAttr, "rangeValue",                         false);} )
+                                          | ( <MULTILINE_TRUE>                                {this.setValue(localAttr, "multiline",                          true);} )
+                                          | ( <MULTILINE_FALSE>                               {this.setValue(localAttr, "multiline",                          false);} )
+                                          | ( <MAXLENGTH>     ( tmp = <MAXLENGTH_NUMBER>      {this.setValue(localAttr, "maxLength",                          this.getSingle(tmp.image));} ) )
+                                          | ( <RULE>          ( tmp = <STRING>                {this.appendValue(localAttr, "rules",                           this.getString(tmp.image));}
+                                                              | tmp = <SINGLE>                {this.appendValue(localAttr, "rules",                           this.getSingle(tmp.image));} ) )
+                                          | ( <DIMENSION>     ( tmp = <STRING>                {this.setValue(localAttr, "dimension",                          this.getString(tmp.image));}
+                                                              | tmp = <SINGLE>                {this.setValue(localAttr, "dimension",                          this.getSingle(tmp.image));} ) )
+                                          | ( <TRIGGER>                                       {trigger = new Trigger(); this.appendValue(localAttr, "triggers", trigger);}
+                                                tmp = <TRIGEVENT>                             {this.setValue(trigger, "eventType",                            this.getSingle(tmp.image));}
+                                                        ( <ACTION>                            {this.setValue(trigger, "kind",                                 "action");}
+                                                        | <CHECK>                             {this.setValue(trigger, "kind",                                 "check");}
+                                                        | <OVERRIDE>                          {this.setValue(trigger, "kind",                                 "override");} )
+                                                                ( tmp = <STRING>              {this.setValue(trigger, "program",                              this.getString(tmp.image));}
+                                                                | tmp = <SINGLE>              {this.setValue(trigger, "program",                              this.getSingle(tmp.image));} )
+                                                                       ( <INPUT>
+                                                                             ( tmp = <STRING> {this.setValue(trigger, "arguments",                            this.getString(tmp.image));}
+                                                                             | tmp = <SINGLE> {this.setValue(trigger, "arguments",                            this.getSingle(tmp.image));} ) )? )
+                                          | ( <RANGE_EQUAL>            ( tmp = <STRING>       {range = new Range();this.setValue(range, "type", "=");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                                       | tmp = <SINGLE>       {range = new Range();this.setValue(range, "type", "=");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                                          | ( <RANGE_GREATERTHAN>      ( tmp = <STRING>       {range = new Range();this.setValue(range, "type", ">");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                                       | tmp = <SINGLE>       {range = new Range();this.setValue(range, "type", ">");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                                          | ( <RANGE_GREATERTHANEQUAL> ( tmp = <STRING>       {range = new Range();this.setValue(range, "type", ">=");     this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                                       | tmp = <SINGLE>       {range = new Range();this.setValue(range, "type", ">=");     this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                                          | ( <RANGE_LESSTHAN>         ( tmp = <STRING>       {range = new Range();this.setValue(range, "type", "<");      this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                                       | tmp = <SINGLE>       {range = new Range();this.setValue(range, "type", "<");      this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                                          | ( <RANGE_LESSTHANEQUAL>    ( tmp = <STRING>       {range = new Range();this.setValue(range, "type", "<=");     this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                                       | tmp = <SINGLE>       {range = new Range();this.setValue(range, "type", "<=");     this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                                          | ( <RANGE_NOTEQUAL>         ( tmp = <STRING>       {range = new Range();this.setValue(range, "type", "!=");     this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                                       | tmp = <SINGLE>       {range = new Range();this.setValue(range, "type", "!=");     this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                                          | ( <RANGE_MATCH>            ( tmp = <STRING>       {range = new Range();this.setValue(range, "type", "match");  this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                                       | tmp = <SINGLE>       {range = new Range();this.setValue(range, "type", "match");  this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                                          | ( <RANGE_NOTMATCH>         ( tmp = <STRING>       {range = new Range();this.setValue(range, "type", "!match"); this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                                       | tmp = <SINGLE>       {range = new Range();this.setValue(range, "type", "!match"); this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                                          | ( <RANGE_SMATCH>           ( tmp = <STRING>       {range = new Range();this.setValue(range, "type", "smatch"); this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                                       | tmp = <SINGLE>       {range = new Range();this.setValue(range, "type", "smatch"); this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                                          | ( <RANGE_NOTSMATCH>        ( tmp = <STRING>       {range = new Range();this.setValue(range, "type", "!smatch");this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                                       | tmp = <SINGLE>       {range = new Range();this.setValue(range, "type", "!smatch");this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} ) )
+                                          | ( <RANGE_PROGRAM>          ( tmp = <STRING>       {range = new Range();this.setValue(range, "type", "program");this.setValue(range, "value1", this.getString(tmp.image));this.appendValue(localAttr, "rangesStack", range);}
+                                                                       | tmp = <SINGLE>       {range = new Range();this.setValue(range, "type", "program");this.setValue(range, "value1", this.getSingle(tmp.image));this.appendValue(localAttr, "rangesStack", range);} )
+                                                     ( <INPUT>         ( tmp = <STRING>       {this.setValue(range, "value2", this.getString(tmp.image));}
+                                                                       | tmp = <SINGLE>       {this.setValue(range, "value2", this.getSingle(tmp.image));} ) )? )
+                                          | ( <RANGE_BETWEEN>                                 {range = new Range();this.setValue(range, "type", "between");this.appendValue(localAttr, "rangesStack", range);}
+                                                                       ( tmp = <BETW1_STRING> {this.setValue(range, "value1", this.getString(tmp.image));}
+                                                                       | tmp = <BETW1_SINGLE> {this.setValue(range, "value1", this.getSingle(tmp.image));} )
+                                                                       ( <BETW2_INCLUSIVE>    {this.setValue(range, "include1", true);}
+                                                                       | <BETW2_EXCLUSIVE>    {this.setValue(range, "include1", false);})
+                                                                       ( tmp = <BETW3_STRING> {this.setValue(range, "value2", this.getString(tmp.image));}
+                                                                       | tmp = <BETW3_SINGLE> {this.setValue(range, "value2", this.getSingle(tmp.image));} )
+                                                                       ( <BETW4_INCLUSIVE>    {this.setValue(range, "include2", true);}
+                                                                       | <BETW4_EXCLUSIVE>    {this.setValue(range, "include2", false);} ) )
+                                          | ( <PROPERTY>                                      {property = new AdminProperty(); this.appendValue(this.getValue(localAttr, "properties"), "propertiesStack", property);}
+                                                                  ( tmp = <STRING>            {this.setValue(property, "name", this.getString(tmp.image));}
+                                                                  | tmp = <SINGLE>            {this.setValue(property, "name", this.getSingle(tmp.image));} )
+                                                ( ( <PROPERTYVAL> ( tmp = <STRING>            {this.setValue(property, "value", this.getString(tmp.image));}
+                                                                  | tmp = <SINGLE>            {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                                                | ( <PROPERTYTO>  ( tmp = <ADMINTYPE_STRING>  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                                                  | tmp = <ADMINTYPE_SINGLE>  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                                                  ( tmp = <STRING>            {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                                                  | tmp = <SINGLE>            {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* ) )*
+                                     "}" ) )
+                        | ( <PROPERTY>                                                        {property = new AdminProperty(); this.appendValue(this.getValue(localPathType, "properties"), "propertiesStack", property);}
+                                                ( tmp = <STRING>                              {this.setValue(property, "name", this.getString(tmp.image));}
+                                                | tmp = <SINGLE>                              {this.setValue(property, "name", this.getSingle(tmp.image));} )
+                              ( ( <PROPERTYVAL> ( tmp = <STRING>                              {this.setValue(property, "value", this.getString(tmp.image));}
+                                                | tmp = <SINGLE>                              {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                              | ( <PROPERTYTO>  ( tmp = <ADMINTYPE_STRING>                    {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                                | tmp = <ADMINTYPE_SINGLE>                    {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                                ( tmp = <STRING>                              {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                                | tmp = <SINGLE>                              {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* ) )*
+                   "}" ) )
+
+      | ( <PROPERTY>                                                                          {property = new AdminProperty();this.appendValue(_type, "properties", "propertiesStack", property);}
+                                    ( tmp = <STRING>                                          {this.setValue(property, "name", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                                          {this.setValue(property, "name", this.getSingle(tmp.image));} )
+              (   ( <PROPERTYVAL>   ( tmp = <STRING>                                          {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                                          {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>                                {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE>                                {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                    ( tmp = <STRING>                                          {this.setValue(property, "refAdminName", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                                          {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
     )*
 }
