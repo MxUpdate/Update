@@ -15,17 +15,11 @@
 
 package org.mxupdate.test.data.datamodel;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
-import org.mxupdate.test.ExportParser.Line;
-import org.testng.Assert;
+import org.mxupdate.test.data.datamodel.helper.LocaleAttributeList;
 
 /**
  * Used to define a type, create them and test the result.
@@ -36,7 +30,7 @@ public class TypeData
     extends AbstractDataWithTrigger<TypeData>
 {
     /** Local attributes. */
-    private final List<AbstractAttributeData<?>> attributes = new ArrayList<>();
+    private final LocaleAttributeList attributes = new LocaleAttributeList();
 
     /**
      * Initialize this type data with given <code>_name</code>.
@@ -55,7 +49,7 @@ public class TypeData
      * Appends given {@code _attributes}.
      *
      * @param _attributes    attributes list to append
-     * @return this rule data instance
+     * @return this type data instance
      */
     public TypeData addLocalAttribute(final AbstractAttributeData<?>... _attributes)
     {
@@ -75,17 +69,11 @@ public class TypeData
         this.getSingles()   .append4Update("    ", strg);
         this.getKeyValues() .append4Update("    ", strg);
         this.getDatas()     .append4Update("    ", strg);
-
-        for (final AbstractAttributeData<?> attribute : this.attributes)  {
-            strg.append("    local attribute \"").append(attribute.getName()).append("\" {\n");
-            attribute.append4CIFile("    ", strg);
-            strg.append("    }");
-        }
-
+        this.attributes     .append4Update("    ", strg);
         this.getTriggers()  .append4Update("    ", strg);
         this.getProperties().append4Update("    ", strg);
 
-        strg.append("\n}");
+        strg.append("}");
 
         return strg.toString();
     }
@@ -95,28 +83,6 @@ public class TypeData
     {
         super.checkExport(_exportParser);
 
-        // prepare list of defined attributes
-        final SortedMap<String,AbstractAttributeData<?>> defAttrs = new TreeMap<>();
-        for (final AbstractAttributeData<?> attribute : this.attributes)  {
-            defAttrs.put("attribute \"" + AbstractTest.convertUpdate(attribute.getName()) +  "\" {", attribute);
-        }
-        // prepare list of parsed attributes
-        final SortedMap<String,Line> lineAttrs = new TreeMap<>();
-        for (final Line line : _exportParser.getRootLines())  {
-            for (final Line sub : line.getChildren())  {
-                if ("local".equals(sub.getTag()))  {
-                    lineAttrs.put(sub.getValue(), sub);
-                }
-            }
-        }
-        // and check that both list are equal
-        Assert.assertEquals(lineAttrs.keySet(), defAttrs.keySet(), "check all attributes are defined");
-        final Iterator<AbstractAttributeData<?>> defIter = defAttrs.values().iterator();
-        final Iterator<Line> lineIter = lineAttrs.values().iterator();
-        while (defIter.hasNext())  {
-            final AbstractAttributeData<?> defAttr = defIter.next();
-            final Line lineAttr = lineIter.next();
-            defAttr.checkExport(new ExportParser("attr", new Line[]{lineAttr}));
-        }
+        this.attributes.checkExport(_exportParser);
     }
 }

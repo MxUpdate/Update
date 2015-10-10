@@ -202,7 +202,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
         this.append4CIFileHeader(strg);
 
         strg.append("mxUpdate attribute \"${NAME}\" {\n");
-        this.append4CIFile("", strg);
+        this.append4Update("    ", strg);
         strg.append("}");
 
         return strg.toString();
@@ -211,26 +211,26 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
     /**
      * Method to append all data for the attribute CI file.
      *
-     * @param _prefix   prefix in front of the values
-     * @param _cmd cmd to append to
+     * @param _prefix   prefix
+     * @param _cmd      string builder to append
      */
-    public void append4CIFile(final String _prefix,
+    public void append4Update(final String _prefix,
                               final StringBuilder _cmd)
     {
-        this.getFlags()     .append4Update(_prefix + "    ", _cmd);
-        this.getValues()    .append4Update(_prefix + "    ", _cmd);
-        this.getSingles()   .append4Update(_prefix + "    ", _cmd);
-        this.getTriggers()  .append4Update(_prefix + "    ", _cmd);
-        this.getProperties().append4Update(_prefix + "    ", _cmd);
+        this.getFlags()     .append4Update(_prefix, _cmd);
+        this.getValues()    .append4Update(_prefix, _cmd);
+        this.getSingles()   .append4Update(_prefix, _cmd);
+        this.getTriggers()  .append4Update(_prefix, _cmd);
+        this.getProperties().append4Update(_prefix, _cmd);
 
         // append rule
         if (this.rule != null) {
-            _cmd.append(_prefix).append("   rule \"").append(AbstractTest.convertUpdate(this.rule.getName())).append("\"\n");
+            _cmd.append(_prefix).append("rule \"").append(AbstractTest.convertUpdate(this.rule.getName())).append("\"\n");
         }
 
         // append dimension
         if (this.dimension != null) {
-            _cmd.append(_prefix).append("     dimension \"").append(AbstractTest.convertUpdate(this.dimension.getName())).append("\"\n");
+            _cmd.append(_prefix).append("dimension \"").append(AbstractTest.convertUpdate(this.dimension.getName())).append("\"\n");
         }
 
         // append 'adds' ranges
@@ -239,7 +239,7 @@ public abstract class AbstractAttributeData<T extends AbstractAttributeData<?>>
             range.evalAdds4CheckExport(needAdds);
         }
         for (final String needAdd : needAdds)  {
-            _cmd.append(_prefix).append("    ").append(needAdd).append('\n');
+            _cmd.append(_prefix).append(needAdd).append('\n');
         }
     }
 

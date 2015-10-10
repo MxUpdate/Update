@@ -17,8 +17,8 @@ package org.mxupdate.update.datamodel.helper;
 
 import java.util.TreeSet;
 
+import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
-import org.mxupdate.update.datamodel.Type_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO.LocalAttribute;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
@@ -107,7 +107,7 @@ public class LocalAttributeList_mxJPO
      */
     public void calcDelta(final ParameterCache_mxJPO _paramCache,
                           final MultiLineMqlBuilder _mql,
-                          final Type_mxJPO _owner,
+                          final AbstractAdminObject_mxJPO<? extends AbstractAdminObject_mxJPO<?>> _owner,
                           final LocalAttributeList_mxJPO _current)
         throws UpdateException_mxJPO
     {

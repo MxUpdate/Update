@@ -57,19 +57,6 @@ public class Interface_mxJPO
         Interface_mxJPO.IGNORED_URLS.add("/typeRefList");
         Interface_mxJPO.IGNORED_URLS.add("/localAttributes");
         Interface_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList");
-        Interface_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties");
-        Interface_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/creationInfo");
-        Interface_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/creationInfo/datetime");
-        Interface_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/modificationInfo");
-        Interface_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/modificationInfo/datetime");
-        Interface_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/propertyList");
-        Interface_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList");
-        Interface_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history");
-        Interface_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/datetime");
-        Interface_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/agent");
-        Interface_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/event");
-        Interface_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/order");
-        Interface_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList/attributeDef/adminProperties/historyList/history/string");
     }
 
     /** Is the interface abstract? */
@@ -145,6 +132,8 @@ public class Interface_mxJPO
         } else if ("/derivedFromInterface/interfaceTypeRefList/interfaceTypeRef".equals(_url))  {
             this.derived.add(_content);
             parsed = true;
+        } else if (_url.startsWith("/localAttributes/attributeDefList/attributeDef"))  {
+            parsed = this.localAttributes.parseAdminXMLExportEvent(_paramCache, _url.substring(46), _content);
         } else if ("/relationshipDefRefList/relationshipDefRef".equals(_url))  {
             this.relations.add(_content);
             parsed = true;
@@ -205,6 +194,7 @@ public class Interface_mxJPO
                 ErrorKey.DM_INTERFACE_REMOVE_PARENT, this.getName(),
                 ValueKeys.DMInterfaceParentIgnore, ValueKeys.DMInterfaceParentRemove,   this.derived,                       _current.derived);
 
+        this.localAttributes.calcDelta(_paramCache, _mql, this, _current.localAttributes);
         this.getProperties().calcDelta(_mql, "", _current.getProperties());
     }
 }

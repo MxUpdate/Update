@@ -15,12 +15,15 @@
 
 package org.mxupdate.test.data.datamodel;
 
-import matrix.util.MatrixException;
+import java.util.Arrays;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
+import org.mxupdate.test.data.datamodel.helper.LocaleAttributeList;
 import org.mxupdate.test.data.util.DataList;
+
+import matrix.util.MatrixException;
 
 /**
  * Used to define an interface, create them and test the result.
@@ -31,7 +34,9 @@ public class InterfaceData
     extends AbstractAdminData<InterfaceData>
 {
     /** All assigned relationships / types for this interface. */
-    private final DataList<AbstractDataWithTrigger<?>> fors = new DataList<AbstractDataWithTrigger<?>>("for ", "", true);
+    private final DataList<AbstractDataWithTrigger<?>> fors = new DataList<>("for ", "", true);
+    /** Local attributes. */
+    private final LocaleAttributeList attributes = new LocaleAttributeList();
 
     /**
      * Initialize this interface data with given <code>_name</code>.
@@ -98,6 +103,18 @@ public class InterfaceData
         return this;
     }
 
+    /**
+     * Appends given {@code _attributes}.
+     *
+     * @param _attributes    attributes list to append
+     * @return this interface data instance
+     */
+    public InterfaceData addLocalAttribute(final AbstractAttributeData<?>... _attributes)
+    {
+        this.attributes.addAll(Arrays.asList(_attributes));
+        return this;
+    }
+
     @Override()
     public String ciFile()
     {
@@ -110,6 +127,7 @@ public class InterfaceData
         this.getSingles()   .append4Update("    ", strg);
         this.getKeyValues() .append4Update("    ", strg);
         this.getDatas()     .append4Update("    ", strg);
+        this.attributes     .append4Update("    ", strg);
         this.getProperties().append4Update("    ", strg);
         this.fors           .append4Update("    ", strg);
 
@@ -178,5 +196,7 @@ public class InterfaceData
         super.checkExport(_exportParser);
 
         this.fors        .check4Export(_exportParser, "");
+
+        this.attributes.checkExport(_exportParser);
     }
 }
