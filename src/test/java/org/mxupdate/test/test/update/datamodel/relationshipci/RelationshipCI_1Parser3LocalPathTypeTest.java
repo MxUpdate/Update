@@ -574,8 +574,51 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "local attribute \"ATTRNAME\" { kind string  description \"\" !hidden !multivalue !resetonclone !resetonrevision             !multiline maxlength 0 default \"\" } "
                             + "}"},
 
+            // uuid
+            {"201a) local attribute with uuid with minus separator",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local pathtype \"PathType\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                                    + "local attribute \"ATTRNAME\" { kind string uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\" } "
+                            + "}"},
+            {"201b) local attribute with uuid w/o minus separator",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local pathtype \"PathType\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                                    + "local attribute \"ATTRNAME\" { kind string uuid \"FDA75674979211E6AE2256B6B6499611\" description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\" } "
+                            + "}"},
+            {"201c) local attribute with uuid convert from single to string",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local pathtype \"PathType\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                                    + "local attribute \"ATTRNAME\" { kind string uuid \"FDA7-5674979211-E6AE2256B6-B6499611\" description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\" } "
+                            + "}",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local pathtype \"PathType\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                                    + "local attribute \"ATTRNAME\" { kind string uuid FDA7-5674979211-E6AE2256B6-B6499611 description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\" } "
+                            + "}"},
+
              // attribute registered name
-            {"201a) local path type: local attribute symbolic name",
+            {"202a) local path type: local attribute symbolic name",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -586,7 +629,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean symbolicname \"attribute_abc\"                                description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" } "
                             + "}"},
-            {"201b) local path type: attribute two symbolic names",
+            {"202b) local path type: attribute two symbolic names",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -607,7 +650,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                             + "}"},
 
             // attribute description
-            {"202a) local path type: locale attribute description",
+            {"203a) local path type: locale attribute description",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -618,7 +661,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"abc def\"  !hidden !multivalue !resetonclone !resetonrevision default \"\" } "
                             + "}"},
-            {"202b) local path type: local attribute description not defined",
+            {"203b) local path type: local attribute description not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -637,7 +680,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean                          !hidden !multivalue !resetonclone !resetonrevision default \"\" } "
                             + "}"},
-            {"202c) local path type: multi-line local attribute description",
+            {"203c) local path type: multi-line local attribute description",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -650,7 +693,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                             + "}"},
 
             // attribute hidden flag
-            {"203a) local path type: local attribute hidden",
+            {"204a) local path type: local attribute hidden",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -661,7 +704,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" hidden  !multivalue !resetonclone !resetonrevision default \"\" } "
                             + "}"},
-            {"203b) local path type: local attribute not hidden (not defined)",
+            {"204b) local path type: local attribute not hidden (not defined)",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -682,7 +725,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                             + "}"},
 
             // attribute multivalue flag
-            {"204a) local path type: local attribute multivalue flag",
+            {"205a) local path type: local attribute multivalue flag",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -693,7 +736,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden multivalue  !resetonclone !resetonrevision default \"\" } "
                             + "}"},
-            {"204b) local path type: local attribute multivalue flag not defined",
+            {"205b) local path type: local attribute multivalue flag not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -714,7 +757,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                             + "}"},
 
             // attribute resetonclone flag
-            {"205a) local path type: local attribute resetonclone flag",
+            {"206a) local path type: local attribute resetonclone flag",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -725,7 +768,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue resetonclone  !resetonrevision default \"\" } "
                             + "}"},
-            {"205b) local path type: local attribute resetonclone flag not defined",
+            {"206b) local path type: local attribute resetonclone flag not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -746,7 +789,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                             + "}"},
 
             // attribute resetonrevision flag
-            {"206a) local path type: local attribute resetonrevision flag",
+            {"207a) local path type: local attribute resetonrevision flag",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -757,7 +800,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone resetonrevision  default \"\" } "
                             + "}"},
-            {"206b) local path type: local attribute resetonrevision flag not defined",
+            {"207b) local path type: local attribute resetonrevision flag not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -778,7 +821,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                             + "}"},
 
             // attribute default value
-            {"207a) local path type: local attribute default value",
+            {"208a) local path type: local attribute default value",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -789,7 +832,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc def\"  } "
                             + "}"},
-            {"207b) local path type: local attribute default value not defined",
+            {"208b) local path type: local attribute default value not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -808,7 +851,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision                      } "
                             + "}"},
-            {"207c) local path type: multi-line local attribute default value",
+            {"208c) local path type: multi-line local attribute default value",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -821,7 +864,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                             + "}"},
 
             // real attribute rangevalue flag
-            {"208a) local path type: local real attribute rangevalue flag",
+            {"209a) local path type: local real attribute rangevalue flag",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -832,7 +875,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision rangevalue  default \"\" } "
                             + "}"},
-            {"208b) local path type: local real attribute rangevalue flag not defined",
+            {"209b) local path type: local real attribute rangevalue flag not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -853,7 +896,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                             + "}"},
 
             // string attribute multiline flag
-            {"209a) local path type: local attribute multiline flag",
+            {"210a) local path type: local attribute multiline flag",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -864,7 +907,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision multiline  maxlength 0 default \"\" } "
                             + "}"},
-            {"209b) local path type: local attribute multiline flag not defined",
+            {"210b) local path type: local attribute multiline flag not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -885,7 +928,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                             + "}"},
 
              // string attribute maxlength
-            {"210a) local path type: local attribute maxlength",
+            {"211a) local path type: local attribute maxlength",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -896,7 +939,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision multiline  maxlength 125 default \"\" } "
                             + "}"},
-            {"210b) local path type: local attribute maxlength not defined",
+            {"211b) local path type: local attribute maxlength not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
