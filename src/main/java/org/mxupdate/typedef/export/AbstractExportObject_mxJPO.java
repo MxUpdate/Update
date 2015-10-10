@@ -19,9 +19,9 @@ import java.io.IOException;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
-import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
+import org.mxupdate.util.FileUtils_mxJPO;
 
 /**
  * Abstract definition of the export definition.
@@ -45,7 +45,7 @@ abstract class AbstractExportObject_mxJPO
                          final Appendable _out)
         throws IOException
     {
-        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(FileHandlingUtil_mxJPO.calcCIFileName(_typeDef, _object.getName()), _paramCache);
+        final UpdateBuilder_mxJPO updateBuilder = new UpdateBuilder_mxJPO(FileUtils_mxJPO.calcCIFileName(_typeDef, _object.getName()), _paramCache);
 
         updateBuilder.start(_typeDef);
 

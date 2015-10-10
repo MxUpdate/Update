@@ -13,9 +13,10 @@
  *
  */
 
-package org.mxupdate.update.util;
+package org.mxupdate.util;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.update.util.StringUtil_mxJPO;
 
 
 /**
@@ -23,12 +24,12 @@ import org.mxupdate.typedef.TypeDef_mxJPO;
  *
  * @author The MxUpdate Team
  */
-public final class FileHandlingUtil_mxJPO
+public final class FileUtils_mxJPO
 {
     /**
      * The constructor is defined to avoid external initialization.
      */
-    private FileHandlingUtil_mxJPO()
+    private FileUtils_mxJPO()
     {
     }
 

@@ -21,10 +21,10 @@ import java.util.Date;
 import org.mxupdate.script.ScriptHandler_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.BusObject_mxJPO;
-import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.FileUtils_mxJPO;
 import org.mxupdate.util.FileUtil_mxJPO;
 
 /**
@@ -78,7 +78,7 @@ public class UpdateObject_mxJPO
 
         script.defVar("FILEDATE", StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified())));
         script.defVar("FILENAME", _file.toString().replaceAll("\\\\", "/"));
-        script.defVar("FILESUBPATH", FileHandlingUtil_mxJPO.extraceSubPath(_file.getAbsolutePath(), _typeDef.getFilePath()));
+        script.defVar("FILESUBPATH", FileUtils_mxJPO.extraceSubPath(_file.getAbsolutePath(), _typeDef.getFilePath()));
         script.defVar("CREATE", String.valueOf(_create));
 
         if (_typeDef.getMxAdminName() != null)  {

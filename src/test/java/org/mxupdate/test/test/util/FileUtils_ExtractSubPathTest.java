@@ -13,20 +13,20 @@
  *
  */
 
-package org.mxupdate.test.test.update.util;
+package org.mxupdate.test.test.util;
 
 import junit.framework.Assert;
 
-import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
+import org.mxupdate.util.FileUtils_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests method {@link FileHandlingUtil_mxJPO#extraceSubPath(String, String)}.
+ * Tests method {@link FileUtils_mxJPO#extraceSubPath(String, String)}.
  *
  * @author The MxUpdate Team
  */
-public class FileHandlingUtil_ExtractSubPathTest
+public class FileUtils_ExtractSubPathTest
 {
     @DataProvider(name = "data")
     public Object[][] getData()
@@ -56,6 +56,6 @@ public class FileHandlingUtil_ExtractSubPathTest
                                    final String _fileName,
                                    final String _ciPath)
     {
-        Assert.assertEquals(_expected, FileHandlingUtil_mxJPO.extraceSubPath(_fileName, _ciPath));
+        Assert.assertEquals(_expected, FileUtils_mxJPO.extraceSubPath(_fileName, _ciPath));
     }
 }

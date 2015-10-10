@@ -25,9 +25,9 @@ import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
-import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
+import org.mxupdate.util.FileUtils_mxJPO;
 
 import matrix.util.MatrixException;
 
@@ -55,9 +55,9 @@ public class ExportAdmin_mxJPO
             final File file;
             final String subPath = clazz.getPropValue(_paramCache, PropertyDef_mxJPO.SUBPATH);
             if ((subPath != null) && !subPath.isEmpty())  {
-                file = new File(new File(new File(_path, _typeDef.getFilePath()), subPath), FileHandlingUtil_mxJPO.calcCIFileName(_typeDef, _mxName));
+                file = new File(new File(new File(_path, _typeDef.getFilePath()), subPath), FileUtils_mxJPO.calcCIFileName(_typeDef, _mxName));
             } else  {
-                file = new File(new File(_path, _typeDef.getFilePath()), FileHandlingUtil_mxJPO.calcCIFileName(_typeDef, _mxName));
+                file = new File(new File(_path, _typeDef.getFilePath()), FileUtils_mxJPO.calcCIFileName(_typeDef, _mxName));
             }
 
             // create parent directories

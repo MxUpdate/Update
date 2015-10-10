@@ -21,8 +21,8 @@ import java.io.IOException;
 import java.io.Writer;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.util.FileUtils_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 
 import matrix.util.MatrixException;
@@ -59,7 +59,7 @@ public class ExportSystemConfigSearchIndex_mxJPO
         }
 
         // write code
-        final File file = new File(new File(_path, _typeDef.getFilePath()), FileHandlingUtil_mxJPO.calcCIFileName(_typeDef, _mxName));
+        final File file = new File(new File(_path, _typeDef.getFilePath()), FileUtils_mxJPO.calcCIFileName(_typeDef, _mxName));
         if (!file.getParentFile().exists())  {
             file.getParentFile().mkdirs();
         }
