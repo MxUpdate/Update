@@ -26,11 +26,11 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class GroupCI_1ParserTest
     extends AbstractParserTest<Group_mxJPO>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
@@ -39,58 +39,68 @@ public class GroupCI_1ParserTest
             {"0) simple",
                     "",
                     "description \"\" !hidden"},
+            // uuid
+            {"1a) uuid with minus separator",
+                    "",
+                    "uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" !hidden"},
+            {"1b) uuid w/o minus separator",
+                    "",
+                    "uuid \"FDA75674979211E6AE2256B6B6499611\"     description \"\" !hidden"},
+            {"1c) uuid convert from single to string",
+                    "uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" !hidden",
+                    "uuid   FDA7-5674979211-E6AE2256B6-B6499611    description \"\" !hidden"},
             // registered name
-            {"1a) symbolic name",
+            {"2a) symbolic name",
                     "",
                     "symbolicname \"group_abc\" description \"\" !hidden"},
-            {"1b) two symbolic names",
+            {"2b) two symbolic names",
                     "symbolicname \"group_abc\" symbolicname \"group_def\" description \"\" !hidden",
                     "symbolicname \"group_def\" symbolicname \"group_abc\" description \"\" !hidden"},
             // description
-            {"2a) description",
+            {"3a) description",
                     "",
                     "description \"abc def\" !hidden"},
-            {"2b) description not defined",
+            {"3b) description not defined",
                     "description \"\" !hidden",
                     "!hidden"},
-            {"2c) multi-line description",
+            {"3c) multi-line description",
                     "",
                     "description \"abc\ndef\" !hidden"},
             // hidden flag
-            {"3a) hidden",
+            {"4a) hidden",
                     "",
                     "description \"\" hidden"},
-            {"3b) not hidden (not defined)",
+            {"4b) not hidden (not defined)",
                     "description \"\" !hidden",
                     "description \"\""},
             // description
-            {"4a) site",
+            {"5a) site",
                     "",
                     "description \"\" !hidden site \"side\""},
-            {"4b) empty site",
+            {"5b) empty site",
                     "description \"\" !hidden",
                     "description \"\" !hidden site \"\""},
             // parent groups
-            {"5a) parent",
+            {"6a) parent",
                     "",
                     "description \"\" !hidden parent \"111\""},
-            {"5b) parent name w/o apostrophe",
+            {"6b) parent name w/o apostrophe",
                     "description \"\" !hidden parent \"111\"",
                     "description \"\" !hidden parent 111"},
-            {"5c) two parents (to check sort)",
+            {"6c) two parents (to check sort)",
                     "description \"\" !hidden parent \"111\" parent \"222\"",
                     "description \"\" !hidden parent \"222\" parent \"111\""},
             // property
-            {"6a) property special characters",
+            {"7a) property special characters",
                     "",
                     "description \"\" !hidden property \"{}\\\"\""},
-            {"6b) property and value special characters",
+            {"7b) property and value special characters",
                     "",
                     "description \"\" !hidden property \"{}\\\"\" value \"{}\\\"\""},
-            {"6c) property link special characters",
+            {"7c) property link special characters",
                     "",
                     "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\""},
-            {"6d) property link and value special characters",
+            {"7d) property link and value special characters",
                     "",
                     "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\""},
         };

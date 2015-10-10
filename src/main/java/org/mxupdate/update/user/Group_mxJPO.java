@@ -24,19 +24,22 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 /**
  * The class is used to export, create, delete and update groups within MX.
  * Following properties are supported:
  * <ul>
+ * <li>uuid</li>
+ * <li>symbolic names</li>
  * <li>description</li>
  * <li>hidden flag</li>
  * <li>site</li>
@@ -75,7 +78,7 @@ public class Group_mxJPO
         super(EMxAdmin_mxJPO.Group, _mxName);
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -84,7 +87,7 @@ public class Group_mxJPO
         this.prepare();
     }
 
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -106,6 +109,7 @@ public class Group_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flag(          "hidden",            false, this.isHidden())
@@ -125,7 +129,7 @@ public class Group_mxJPO
      *         is ignored
      * @see #PARAM_IGNORE_WSO_GROUPS
      */
-    @Override()
+    @Override
     protected boolean ignoreWorkspaceObjects(final ParameterCache_mxJPO _paramCache)
     {
         boolean ignore = super.ignoreWorkspaceObjects(_paramCache);
