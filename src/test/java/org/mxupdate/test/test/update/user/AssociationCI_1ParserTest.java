@@ -26,60 +26,70 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class AssociationCI_1ParserTest
     extends AbstractParserTest<Association_mxJPO>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
         return new Object[][]
         {
             {"0) simple",
-                "",
-                "description \"\" !hidden definition \"\""},
+                    "",
+                    "description \"\" !hidden definition \"\""},
+            // uuid
+            {"1a) uuid with minus separator",
+                    "",
+                    "uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" !hidden definition \"\""},
+            {"1b) uuid w/o minus separator",
+                    "",
+                    "uuid \"FDA75674979211E6AE2256B6B6499611\"     description \"\" !hidden definition \"\""},
+            {"1c) uuid convert from single to string",
+                    "uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" !hidden definition \"\"",
+                    "uuid   FDA7-5674979211-E6AE2256B6-B6499611    description \"\" !hidden definition \"\""},
             // registered name
-            {"1a) symbolic name",
+            {"2a) symbolic name",
                     "",
                     "symbolicname \"association_abc\" description \"\" !hidden definition \"\""},
-            {"1b) two symbolic names",
+            {"2b) two symbolic names",
                     "symbolicname \"association_abc\" symbolicname \"association_def\" description \"\" !hidden definition \"\"",
                     "symbolicname \"association_def\" symbolicname \"association_abc\" description \"\" !hidden definition \"\""},
             // description
-            {"2a) description",
-                "",
-                "description \"abc def\" !hidden definition \"\""},
-            {"2b) description not defined",
-                "description \"\" !hidden definition \"\"",
-                "                 !hidden definition \"\""},
+            {"3a) description",
+                    "",
+                    "description \"abc def\" !hidden definition \"\""},
+            {"3b) description not defined",
+                    "description \"\" !hidden definition \"\"",
+                    "                 !hidden definition \"\""},
             // hidden flag
-            {"3a) hidden",
-                "",
-                "description \"\" hidden definition \"\""},
-            {"3b) not hidden (not defined)",
-                "description \"\" !hidden definition \"\"",
-                "description \"\"         definition \"\""},
+            {"4a) hidden",
+                    "",
+                    "description \"\" hidden definition \"\""},
+            {"4b) not hidden (not defined)",
+                    "description \"\" !hidden definition \"\"",
+                    "description \"\"         definition \"\""},
             // definition
-            {"4a) site",
-                "",
-                "description \"\" !hidden definition \"side\""},
-            {"4b) empty definition",
-                "description \"\" !hidden definition \"\"",
-                "description \"\" !hidden "},
+            {"5a) site",
+                    "",
+                    "description \"\" !hidden definition \"side\""},
+            {"5b) empty definition",
+                    "description \"\" !hidden definition \"\"",
+                    "description \"\" !hidden "},
             // property
-            {"5a) property special characters",
-                "",
-                "description \"\" !hidden definition \"\" property \"{}\\\"\""},
-            {"5b) property and value special characters",
-                "",
-                "description \"\" !hidden definition \"\" property \"{}\\\"\" value \"{}\\\"\""},
-            {"5c) property link special characters",
-                "",
-                "description \"\" !hidden definition \"\" property \"{}\\\"\" to type \"{}\\\"\""},
-            {"5d) property link and value special characters",
-                "",
-                "description \"\" !hidden definition \"\" property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\""},
+            {"6a) property special characters",
+                    "",
+                    "description \"\" !hidden definition \"\" property \"{}\\\"\""},
+            {"6b) property and value special characters",
+                    "",
+                    "description \"\" !hidden definition \"\" property \"{}\\\"\" value \"{}\\\"\""},
+            {"6c) property link special characters",
+                    "",
+                    "description \"\" !hidden definition \"\" property \"{}\\\"\" to type \"{}\\\"\""},
+            {"6d) property link and value special characters",
+                    "",
+                    "description \"\" !hidden definition \"\" property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\""},
         };
     }
 

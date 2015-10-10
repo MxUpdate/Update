@@ -23,12 +23,12 @@ import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 import matrix.util.MatrixException;
 
@@ -37,6 +37,8 @@ import matrix.util.MatrixException;
  * items.
  * The handled properties are:
  * <ul>
+ * <li>uuid</li>
+ * <li>symbolic names</li>
  * <li>description</li>
  * <li>hidden flag</li>
  * <li>{@link #definition}</li>
@@ -60,7 +62,7 @@ public class Association_mxJPO
         super(EMxAdmin_mxJPO.Association, _mxName);
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -78,7 +80,7 @@ public class Association_mxJPO
      * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
      *         <i>false</i>
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -104,7 +106,7 @@ public class Association_mxJPO
      * @return modified date of given update object
      * @throws MatrixException if the MQL print failed
      */
-    @Override()
+    @Override
     public String getPropValue(final ParameterCache_mxJPO _paramCache,
                                final PropertyDef_mxJPO _prop)
         throws MatrixException
@@ -134,6 +136,7 @@ public class Association_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flag(          "hidden",            false, this.isHidden())
