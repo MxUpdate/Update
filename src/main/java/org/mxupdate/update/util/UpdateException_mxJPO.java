@@ -68,6 +68,7 @@ public class UpdateException_mxJPO
      * <li>904: {@link org.mxupdate.update.util.MqlUtil_mxJPO}</li>
      * <li>905: {@link org.mxupdate.update.util.ParameterCache_mxJPO}</li>
      * <li>906: {@link org.mxupdate.update.util.StringUtil_mxJPO}</li>
+     * <li>907: {@link org.mxupdate.util.FileUtil_mxJPO}</li>
      * </ul>
      * </p>
      *
@@ -419,14 +420,16 @@ public class UpdateException_mxJPO
         USER_ROLE_NOT_ROLE_KIND(31201,
                 "The new kind ''{2}'' can not be set for role ''{0}'', because kind ''{1}'' is already set. Kinds of role can be only set for ''Role''."),
 
-        /**
-         * If the name of a configuration item could not be extracted from a
-         * file name.
-         *
-         * @see org.mxupdate.update.util.StringUtil_mxJPO#convertFromFileName(String)
-         */
-        UTIL_STRINGUTIL_CONVERT_FROM_FILENAME(90602,
-                "the file name is not correct defined and could not be converted back to a configuration item name");
+        /** If the name of a configuration item could not be extracted from a file name. */
+        UTIL_STRINGUTIL_CONVERT_FROM_FILENAME(
+                90602, "the file name is not correct defined and could not be converted back to a configuration item name"),
+
+        /** If the given file does not exists. */
+        UTIL_FILEUTIL_READ_FILE_NOT_EXISTS(
+                90701, "File ''{0}'' does not exists and can't be read."),
+        /** If an unexpected exception occurs within read of the file. */
+        UTIL_FILEUTIL_READ_FILE_UNEXPECTED(
+                90702, "File ''{0}'' can't be read because of {1}");
 
         /** Error code of this error enumeration. */
         private final int code;

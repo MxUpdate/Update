@@ -15,10 +15,7 @@
 
 package org.mxupdate.typedef.filenames;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.SortedMap;
 import java.util.regex.Matcher;
@@ -28,6 +25,7 @@ import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.program.JPOProgram_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.FileUtil_mxJPO;
 
 public class FileNamesAdminProgramJPO_mxJPO
     extends FileNamesAdmin_mxJPO
@@ -56,13 +54,7 @@ public class FileNamesAdminProgramJPO_mxJPO
             if (file.getName().endsWith(JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION))  {
                 // file identified as JPO
 
-                final String code;
-                try {
-                    code = this.getCode(file).toString();
-                } catch (final IOException e)  {
-// TODO: exception handling!
-throw new Error("could not open file " + file, e);
-                }
+                final String code = FileUtil_mxJPO.readFileToString(file);
                 String mxName = file.getName().substring(0, file.getName().length() - JPOProgram_mxJPO.NAME_SUFFIX_EXTENDSION_LENGTH);
 
                 // prefix with package name
@@ -80,28 +72,5 @@ throw new Error("could not open file " + file, e);
             }
         }
         return ret;
-    }
-
-    /**
-     * Reads for given file the code and returns them.
-     *
-     * @param _file     file to read the code
-     * @return read code of the file
-     * @throws IOException if the file could not be opened or read
-     */
-    private StringBuilder getCode(final File _file)
-        throws IOException
-    {
-        // read code
-        final StringBuilder code = new StringBuilder();
-        final BufferedReader reader = new BufferedReader(new FileReader(_file));
-        String line = reader.readLine();
-        while (line != null)  {
-            code.append(line).append('\n');
-            line = reader.readLine();
-        }
-        reader.close();
-
-        return code;
     }
 }
