@@ -22,7 +22,6 @@ import java.io.FileReader;
 import java.io.IOException;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 
@@ -82,7 +81,7 @@ public final class FileUtils_mxJPO
      * prefix within the type definition, the name of the MX object and the
      * file suffix within the type definition. All special characters are
      * converted automatically from
-     * {@link StringUtil_mxJPO#convertToFileName(String)}.
+     * {@link FileUtils_mxJPO#encodeFileName(String)}.
      *
      * @param _typeDef      type definition
      * @param _mxName       name of ci object
@@ -99,7 +98,7 @@ public final class FileUtils_mxJPO
         if (_typeDef.getFileSuffix() != null)  {
             ret.append(_typeDef.getFileSuffix());
         }
-        return StringUtil_mxJPO.convertToFileName(ret.toString());
+        return FileUtils_mxJPO.encodeFileName(ret.toString());
     }
 
     /**
@@ -132,7 +131,154 @@ public final class FileUtils_mxJPO
         } catch (final IOException e)  {
             throw new UpdateException_mxJPO(ErrorKey.UTIL_FILEUTILS_READ_FILE_UNEXPECTED, _file, e.getMessage());
         }
-    
+
         return code.toString();
+    }
+
+    /**
+     * <p>Decodes given MX name to a name which could be used within a file
+     * system. This must be done because some characters could not handled
+     * correctly from the file system.</p>
+     * <p>Following characters are not converted:
+     * <ul>
+     * <li>number</li>
+     * <li>alphabetic character (lower and upper case)</li>
+     * <li>left or right parenthesis</li>
+     * <li>plus '+' or minus '-'</li>
+     * <li>comma ',' or point '.'</li>
+     * <li>space</li>
+     * <li>equals sign '='</li>
+     * <li>underscore '_'</li>
+     * </ul>
+     * </p>
+     * <p>All other characters are converted with the algorithm:
+     * <ul>
+     * <li>the &quot;at symbol&quot; '@' will be converted to double at symbol
+     *     '@@'</li>
+     * <li>if a character is in the range of 0 and 254 (ASCII character), then
+     *     the character is converted to a two characters long hexa-decimal
+     *     code with '@' as prefix (e.g. double quotes '=' is converted to
+     *     '@22')</li>
+     * <li>characters greater than 254 are converted to a four characters
+     *     long hexa-decimal code with '@u' as prefix (e.g. the euro sign
+     *     '&euro;' is converted to '@u20AC')</li>
+     * </ul>
+     * </p>
+     *
+     * @param _name     MX name to convert
+     * @return converted file name
+     * @see decodeFileName
+     */
+    public static String encodeFileName(final String _name)
+    {
+        final char[] charName = _name.toCharArray();
+        final StringBuilder fileName = new StringBuilder();
+        for (final char ch : charName) {
+            if (ch == '@')  {
+                fileName.append("@@");
+            } else if (((ch < '(') || (ch > ')'))
+                    && ((ch < '+') || (ch > '.'))
+                    && ((ch < '0') || (ch > '9'))
+                    && ((ch < 'A') || (ch > 'Z'))
+                    && ((ch < 'a') || (ch > 'z'))
+                    && (ch != ' ') && (ch != '=') && (ch != '_'))  {
+
+                final String hex = String.valueOf(Integer.toHexString(ch));
+                fileName.append('@');
+                switch (hex.length())  {
+                    case 1:
+                        fileName.append('0').append(hex);
+                        break;
+                    case 3:
+                        fileName.append("u0").append(hex);
+                        break;
+                    case 4:
+                        fileName.append('u').append(hex);
+                        break;
+                    default:
+                        fileName.append(hex);
+                        break;
+                }
+            } else  {
+                fileName.append(ch);
+            }
+        }
+        return fileName.toString();
+    }
+
+    /**
+     * <p>Encodes the given file name back to internal used names. This must
+     * be done because some characters could not handled correctly from the
+     * file system.</p>
+     * <p>The same characters described in {@link FileUtils_mxJPO#decodeFileName(String)}
+     * are converted back.</p>
+     *
+     * @param _fileName     name from file to convert
+     * @return converted name extracted from a file name
+     * @throws UpdateException_mxJPO if the configuration item name could not
+     *                               be extracted from the file name
+     *                               <code>_fileName</code> because the encoded
+     *                               special characters are not in correct
+     *                               format
+     * @see FileUtils_mxJPO#decodeFileName(String)
+     */
+     public static String decodeFileName(final String _fileName)
+        throws UpdateException_mxJPO
+    {
+        final char[] charFileName = _fileName.toCharArray();
+        final StringBuilder name = new StringBuilder();
+        for (int idx = 0; idx < charFileName.length; idx++)  {
+            final char ch = charFileName[idx];
+            if (ch == '@')  {
+                switch (FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx))  {
+                    case '@':
+                        name.append('@');
+                        break;
+                    case 'u':
+                        final char[] hex4 = new char[4];
+                        hex4[0] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx);
+                        hex4[1] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx);
+                        hex4[3] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx);
+                        hex4[4] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx);
+                        name.append((char) ((int) Integer.valueOf(new String(hex4), 16)));
+                        break;
+                    default:
+                        final char[] hex2 = new char[2];
+                        hex2[0] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, idx);
+                        hex2[1] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx);
+                        name.append((char) ((int) Integer.valueOf(new String(hex2), 16)));
+                        break;
+                }
+            } else  {
+                name.append(ch);
+            }
+        }
+
+        return name.toString();
+    }
+
+    /**
+     * Returns the character on the position <code>_idx</code> within character
+     * array <code>_charFileName</code>. If the position does not exists, an
+     * exception will be thrown.
+     *
+     * @param _charFileName     character array
+     * @param _idx              index in the character array
+     *                          <code>_charFileName</code>
+     * @return the character on index <code>_idx</code> in character array
+     *         <code>_charFile</code>
+     * @throws UpdateException_mxJPO if the number in <code>_idx</code> is
+     *                               greater then the length of the character
+     *                               array <code>_charFileName</code> (meaning
+     *                               array out of bound exception)
+     */
+    private static char decodeFileNameGetChar(final char[] _charFileName,
+                                                   final int _idx)
+        throws UpdateException_mxJPO
+    {
+        if (_idx >= _charFileName.length)  {
+            throw new UpdateException_mxJPO(ErrorKey.UTIL_FILEUTILS_DECODE_FILENAME);
+        }
+        return _charFileName[_idx];
     }
 }

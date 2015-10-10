@@ -100,7 +100,7 @@ public class Common
         final Exception ex = (Exception) bck.get("exception");
         Assert.assertTrue((ex != null), "an exception must be thrown");
         Assert.assertTrue(ex.getMessage().contains("UpdateError #"
-                                                    + ErrorKey.UTIL_STRINGUTIL_CONVERT_FROM_FILENAME.getCode()
+                                                    + ErrorKey.UTIL_FILEUTILS_DECODE_FILENAME.getCode()
                                                     + ":"),
                           "correct error code is returned");
     }

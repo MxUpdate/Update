@@ -24,6 +24,7 @@ import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.FileUtils_mxJPO;
 
 /**
  *
@@ -95,7 +96,7 @@ public class FileNamesAdmin_mxJPO
         final String fileName = _file.getName();
         final String mxName;
         if (((prefix == null) || fileName.startsWith(prefix)) && ((suffix == null) || fileName.endsWith(suffix)))  {
-            mxName = StringUtil_mxJPO.convertFromFileName(fileName.substring(0, fileName.length() - suffixLength).substring(prefixLength));
+            mxName = FileUtils_mxJPO.decodeFileName(fileName.substring(0, fileName.length() - suffixLength).substring(prefixLength));
         } else  {
             mxName = null;
         }

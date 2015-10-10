@@ -51,7 +51,7 @@ public final class UpdateUtils_mxJPO
      *
      * @param _name     MX name to convert
      * @return converted file name
-     * @see #convertFromFileName(String)
+     * @see #decodeText(CharSequence)
      */
     public static String encodeText(final CharSequence _text)
     {
@@ -128,7 +128,7 @@ public final class UpdateUtils_mxJPO
      * @throws IllegalArgumentException if the text item name could not be
      *                  decoded, because the special characters are not in
      *                  correct format
-     * @see #decodeGetChar(char[], int)
+     * @see #encodeText(CharSequence)
      */
     public static String decodeText(final CharSequence _text)
         throws IllegalArgumentException
