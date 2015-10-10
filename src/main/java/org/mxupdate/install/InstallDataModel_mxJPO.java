@@ -27,10 +27,6 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
-import matrix.db.Context;
-import matrix.util.MatrixException;
-import matrix.util.Mime64;
-
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractObject_mxJPO;
@@ -38,6 +34,10 @@ import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+
+import matrix.db.Context;
+import matrix.util.MatrixException;
+import matrix.util.Mime64;
 
 /**
  * Installs and updates the data model needed for MxUpdate. The JPO class is
@@ -59,29 +59,6 @@ public class InstallDataModel_mxJPO
 
     /** Name of the parameter defining the format of the file date / format. */
     private static final String PARAM_INSTALLFILEDATEFORMAT = "InstallFileDateFormatJava";
-
-    /** Name of the parameter defining the description for the trigger group policy description. */
-    private static final String PARAM_TRIGGER_GROUP_POLICY_DESCRIPTION = "InstallTriggerGroupPolicyDesc";
-
-    /** Name of the parameter defining the description for the trigger group relationship description. */
-    private static final String PARAM_TRIGGER_GROUP_RELATION_DESCRIPTION = "InstallTriggerGroupRelationDesc";
-
-    /** Name of the parameter defining the description for the trigger group type description. */
-    private static final String PARAM_TRIGGER_GROUP_TYPE_DESCRIPTION = "InstallTriggerGroupTypeDesc";
-
-    /** Name of the type definition for the trigger group. */
-    private static final String TYPEDEF_TRIGGER_GROUP = "TriggerGroup";
-    /** Name of the type definition for the trigger. */
-    private static final String TYPEDEF_TRIGGER = "Trigger";
-
-    /** Name of the type definition for the policy. */
-    private static final String TYPEDEF_POLICY = "Policy";
-
-    /** Name of the type definition for the relationship. */
-    private static final String TYPEDEF_RELATIONSHIP = "Relationship";
-
-    /** Name of the type definition for types. */
-    private static final String TYPEDEF_TYPE = "Type";
 
     /** Name of the type definition for JPO programs. */
     private static final String TYPEDEF_JPO = "JPO";
@@ -120,9 +97,6 @@ public class InstallDataModel_mxJPO
      *                      second value the version of MxUpdate which must be
      *                      installed
      * @throws Exception if installation failed
-     * @see #installTriggerGroupType(ParameterCache_mxJPO, File, String, String, String, String, String, String)
-     * @see #installTriggerGroupPolicy(ParameterCache_mxJPO, String, String, String, String, String, String)
-     * @see #installTriggerGroupRelation(ParameterCache_mxJPO, String, String, String, String, String, String)
      * @see #updateAttributes(ParameterCache_mxJPO, String, String, String, String, String, String)
      * @see #updateBusTypes(ParameterCache_mxJPO)
      * @see #registerPrograms(ParameterCache_mxJPO, String, String, String, String, String)
@@ -148,18 +122,6 @@ public class InstallDataModel_mxJPO
         final String fileDate = dateFormat.format(new Date());
         final String installedDate = StringUtil_mxJPO.formatInstalledDate(paramCache, new Date());
 
-        this.installTriggerGroupType(paramCache, path,
-                applName, applVersion,
-                authorName, installerName,
-                fileDate, installedDate);
-        this.installTriggerGroupPolicy(paramCache,
-                applName, applVersion,
-                authorName, installerName,
-                fileDate, installedDate);
-        this.installTriggerGroupRelation(paramCache,
-                applName, applVersion,
-                authorName, installerName,
-                fileDate, installedDate);
         this.updateAttributes(paramCache,
                 applName, applVersion,
                 authorName, installerName,
@@ -203,11 +165,11 @@ public class InstallDataModel_mxJPO
         final TypeDef_mxJPO mqlTypeDef = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_MQL);
 
         final String progs = MqlUtil_mxJPO.execMql(_paramCache, InstallDataModel_mxJPO.LIST_MXUPDATE_PROGRAMS);
-        for (final String progLine : new TreeSet<String>(Arrays.asList(progs.split("\n"))))  {
+        for (final String progLine : new TreeSet<>(Arrays.asList(progs.split("\n"))))  {
             final String[] progLineArr = progLine.split("@");
             final String progName = progLineArr[0];
             // do we have a JPO?
-            final AbstractObject_mxJPO prog;
+            final AbstractObject_mxJPO<?> prog;
             if ("true".equalsIgnoreCase(progLineArr[1]))  {
                 prog = jpoTypeDef.newTypeInstance(progName);
             } else  {
@@ -252,243 +214,6 @@ public class InstallDataModel_mxJPO
                 .append("escape mod prog \"").append(StringUtil_mxJPO.convertMql(progName)).append("\" ")
                 .append("add property \"appVersion").append(StringUtil_mxJPO.convertMql(_applName)).append("\" ")
                 .append("value \"").append(StringUtil_mxJPO.convertMql(_version)).append("\""));
-    }
-
-    /**
-     * The trigger group type is installed.
-     *
-     * @param _paramCache       parameter cache with MX context
-     * @param _path             installation path (needed to fetch the icons)
-     * @param _applName         used application name of the MxUpdate Update
-     *                          deployment tool
-     * @param _applVersion      Mx Update version
-     * @param _authorName       used author name
-     * @param _installerName    used installer name
-     * @param _fileDate         used file date
-     * @param _installedDate    used installed date
-     * @throws Exception if the trigger group type could not be installed
-     * @see #PARAM_TRIGGER_GROUP_TYPE_DESCRIPTION
-     */
-    protected void installTriggerGroupType(final ParameterCache_mxJPO _paramCache,
-                                           final File _path,
-                                           final String _applName,
-                                           final String _applVersion,
-                                           final String _authorName,
-                                           final String _installerName,
-                                           final String _fileDate,
-                                           final String _installedDate)
-            throws Exception
-    {
-
-        final TypeDef_mxJPO trigGrpTypeDef
-                = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_TRIGGER_GROUP);
-        final String desc = _paramCache.getValueString(InstallDataModel_mxJPO.PARAM_TRIGGER_GROUP_TYPE_DESCRIPTION);
-
-        _paramCache.logInfo("check type '" + trigGrpTypeDef.getMxBusType() + "'");
-        final String installed = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
-                .append("escape list type \"").append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType())).append('\"'));
-        if ("".equals(installed))  {
-            _paramCache.logDebug("    - create");
-            MqlUtil_mxJPO.execMql(_paramCache,
-                    new StringBuilder()
-                        .append("escape add type \"").append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType())).append("\""));
-        }
-
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape mod type \"")
-                .append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType())).append("\" ");
-
-        // check type description
-        final String existingDesc = MqlUtil_mxJPO.execMql(
-                _paramCache,
-                new StringBuilder().append("escape print type \"")
-                        .append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType()))
-                        .append("\" select description dump"));
-        if ((desc != null) && !desc.equals(existingDesc))  {
-            _paramCache.logDebug("    - update description");
-            cmd.append("description \"").append(StringUtil_mxJPO.convertMql(desc)).append("\" ");
-        }
-
-        // update type icon
-        final File file = new File(_path, trigGrpTypeDef.getIconPath());
-        if (file.exists())  {
-            _paramCache.logDebug("    - update type icon");
-            cmd.append("icon \"").append(StringUtil_mxJPO.convertMql(file.toString())).append("\" ");
-        }
-
-        // append property settings
-        final AbstractObject_mxJPO instance = _paramCache.getMapping()
-                                            .getTypeDef(InstallDataModel_mxJPO.TYPEDEF_TYPE)
-                                            .newTypeInstance(trigGrpTypeDef.getMxBusType());
-        MqlUtil_mxJPO.execMql(_paramCache, cmd);
-
-        this.registerObject(_paramCache, instance);
-    }
-
-
-    /**
-     * The trigger group policy is installed. The trigger group policy is a
-     * copy of the trigger policy without the state 'Inactive' but with same
-     * defined access.
-     *
-     * @param _paramCache       parameter cache with MX context
-     * @param _applName         used application name of the MxUpdate Update
-     *                          deployment tool
-     * @param _applVersion      Mx Update version
-     * @param _authorName       used author name
-     * @param _installerName    used installer name
-     * @param _fileDate         used file date
-     * @param _installedDate    used installed date
-     * @throws Exception if the trigger group relationship could not be
-     *                   installed
-     * @see #PARAM_TRIGGER_GROUP_POLICY_DESCRIPTION
-     */
-    protected void installTriggerGroupPolicy(final ParameterCache_mxJPO _paramCache,
-                                             final String _applName,
-                                             final String _applVersion,
-                                             final String _authorName,
-                                             final String _installerName,
-                                             final String _fileDate,
-                                             final String _installedDate)
-            throws Exception
-    {
-        final TypeDef_mxJPO trigTypeDef
-                = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_TRIGGER);
-        final TypeDef_mxJPO trigGrpTypeDef
-                = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_TRIGGER_GROUP);
-        final String polName = trigGrpTypeDef.getMxBusPolicy();
-        final String desc = _paramCache.getValueString(InstallDataModel_mxJPO.PARAM_TRIGGER_GROUP_POLICY_DESCRIPTION);
-
-        _paramCache.logInfo("check policy '" + polName + "'");
-        final String installed = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
-                .append("escape list policy \"").append(StringUtil_mxJPO.convertMql(polName)).append('\"'));
-        if ("".equals(installed))  {
-            _paramCache.logDebug("    - create");
-            MqlUtil_mxJPO.execMql(_paramCache,
-                    new StringBuilder()
-                        .append("escape copy policy \"")
-                        .append(StringUtil_mxJPO.convertMql(trigTypeDef.getMxBusPolicy()))
-                        .append("\" \"")
-                        .append(StringUtil_mxJPO.convertMql(polName))
-                        .append("\" remove state Inactive"));
-        }
-
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape mod policy \"")
-                .append(StringUtil_mxJPO.convertMql(polName)).append("\" ");
-
-        // check policy description
-        final String existingDesc = MqlUtil_mxJPO.execMql(
-                _paramCache,
-                new StringBuilder().append("escape print policy \"").append(StringUtil_mxJPO.convertMql(polName)).append("\" select description dump"));
-        if ((desc != null) && !desc.equals(existingDesc))  {
-            _paramCache.logDebug("    - update description");
-            cmd.append("description \"").append(StringUtil_mxJPO.convertMql(desc)).append("\" ");
-        }
-
-        // assign trigger group type; remove all other types
-        final String existingTypes = MqlUtil_mxJPO.execMql(
-                _paramCache,
-                new StringBuilder().append("escape print policy \"")
-                        .append(StringUtil_mxJPO.convertMql(polName)).append("\" select type dump '\n'"));
-        boolean found = false;
-        if (!"".equals(existingTypes))  {
-            for (final String oneType : existingTypes.split("\n"))  {
-                if (trigGrpTypeDef.getMxBusType().equals(oneType))  {
-                    found = true;
-                } else  {
-                    _paramCache.logInfo("    - remove type '" + oneType + "'");
-                    cmd.append("remove type \"").append(StringUtil_mxJPO.convertMql(oneType)).append("\" ");
-                }
-            }
-        }
-        if (!found)  {
-            _paramCache.logDebug("    - assign type '" + trigGrpTypeDef.getMxBusType() + "'");
-            cmd.append("add type \"").append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType())).append("\" ");
-        }
-
-        // append property settings
-        final AbstractObject_mxJPO instance = _paramCache.getMapping()
-                                            .getTypeDef(InstallDataModel_mxJPO.TYPEDEF_POLICY)
-                                            .newTypeInstance(polName);
-        MqlUtil_mxJPO.execMql(_paramCache, cmd);
-
-        this.registerObject(_paramCache, instance);
-    }
-
-    /**
-     * The trigger group relationship is installed.
-     *
-     * @param _paramCache       parameter cache with MX context
-     * @param _applName         used application name of the MxUpdate Update
-     *                          deployment tool
-     * @param _applVersion      Mx Update version
-     * @param _authorName       used author name
-     * @param _installerName    used installer name
-     * @param _fileDate         used file date
-     * @param _installedDate    used installed date
-     * @throws Exception if the trigger group relationship could not be
-     *                   installed
-     * @see #PARAM_TRIGGER_GROUP_RELATION_DESCRIPTION
-     */
-    protected void installTriggerGroupRelation(final ParameterCache_mxJPO _paramCache,
-                                               final String _applName,
-                                               final String _applVersion,
-                                               final String _authorName,
-                                               final String _installerName,
-                                               final String _fileDate,
-                                               final String _installedDate)
-            throws Exception
-    {
-        final TypeDef_mxJPO trigTypeDef
-                = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_TRIGGER);
-        final TypeDef_mxJPO trigGrpTypeDef
-                = _paramCache.getMapping().getTypeDef(InstallDataModel_mxJPO.TYPEDEF_TRIGGER_GROUP);
-        final String relName = trigGrpTypeDef.getMxBusRelsBoth().iterator().next();
-        final String desc = _paramCache.getValueString(InstallDataModel_mxJPO.PARAM_TRIGGER_GROUP_RELATION_DESCRIPTION);
-
-        _paramCache.logInfo("check relationship '" + relName + "'");
-        final String installed = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
-                .append("escape list relationship \"").append(StringUtil_mxJPO.convertMql(relName)).append('\"'));
-        if ("".equals(installed))  {
-            _paramCache.logDebug("    - create");
-            MqlUtil_mxJPO.execMql(_paramCache,
-                    new StringBuilder()
-                        .append("escape add relationship \"")
-                        .append(StringUtil_mxJPO.convertMql(relName))
-                        .append("\""));
-        }
-        _paramCache.logDebug("    - update prevent duplicates");
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape mod relationship \"")
-                .append(StringUtil_mxJPO.convertMql(relName)).append("\" ")
-                .append("preventduplicates ");
-
-        // check relationship description
-        final String existingDesc = MqlUtil_mxJPO.execMql(
-                _paramCache,
-                new StringBuilder().append("escape print relationship \"")
-                        .append(StringUtil_mxJPO.convertMql(relName)).append("\" select description dump"));
-        if ((desc != null) && !desc.equals(existingDesc))  {
-            _paramCache.logDebug("    - update description");
-            cmd.append("description \"").append(StringUtil_mxJPO.convertMql(desc)).append("\" ");
-        }
-
-        _paramCache.logDebug("    - update from / to types");
-        cmd.append("from remove type all add type \"")
-                .append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType())).append("\" ")
-           .append("to remove type all add type \"")
-                .append(StringUtil_mxJPO.convertMql(trigTypeDef.getMxBusType())).append("\" ")
-                .append(" add type \"")
-                .append(StringUtil_mxJPO.convertMql(trigGrpTypeDef.getMxBusType())).append("\" ");
-
-        // append property settings
-        final AbstractObject_mxJPO instance = _paramCache.getMapping()
-                                            .getTypeDef(InstallDataModel_mxJPO.TYPEDEF_RELATIONSHIP)
-                                            .newTypeInstance(relName);
-        MqlUtil_mxJPO.execMql(_paramCache, cmd);
-
-        this.registerObject(_paramCache, instance);
     }
 
     /**
@@ -609,7 +334,7 @@ public class InstallDataModel_mxJPO
             throws IOException, MatrixException
     {
         // prepare properties as set
-        final Set<String> props = new TreeSet<String>();
+        final Set<String> props = new TreeSet<>();
         for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
             if (typeDef.getIconPath() != null)  {
 
@@ -701,7 +426,7 @@ public class InstallDataModel_mxJPO
     {
         final String newSymbName = _instance.getTypeDef().getMxAdminName() + "_"
                                     + _instance.getName().replaceAll(" ", "");
-        final Set<String> symbolicNames = new HashSet<String>();
+        final Set<String> symbolicNames = new HashSet<>();
 
         final String symbProg = _paramCache.getValueString(ValueKeys.RegisterSymbolicNames);
 
