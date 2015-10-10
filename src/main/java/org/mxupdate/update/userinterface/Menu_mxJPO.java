@@ -21,6 +21,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.WriteAppendChildSyntax;
@@ -38,6 +39,8 @@ import matrix.util.MatrixException;
  * The class is used to export and import / update menu configuration items.
  * The handled properties are:
  * <ul>
+ * <li>uuid</li>
+ * <li>symbolic names</li>
  * <li>description</li>
  * <li>hidden flag (only if <i>true</i>)</li>
  * <li>label</li>
@@ -76,7 +79,7 @@ public class Menu_mxJPO
         this.getProperties().setOtherPropTag("setting");
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -89,7 +92,7 @@ public class Menu_mxJPO
      * {@inheritDoc}
      * Also it is checked if the menu is assigned to the tree menu.
      */
-    @Override()
+    @Override
     public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
@@ -113,7 +116,7 @@ public class Menu_mxJPO
      * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
      *         <i>false</i>
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -134,7 +137,7 @@ public class Menu_mxJPO
     /**
      * Sorts the child objects as defined.
      */
-    @Override()
+    @Override
     protected void prepare()
     {
         this.children.prepare();
@@ -147,6 +150,7 @@ public class Menu_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flagIfTrue(    "hidden",           false,  this.isHidden(),                     this.isHidden())

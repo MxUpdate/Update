@@ -33,35 +33,38 @@ import matrix.util.MatrixException;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class MenuCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<Menu_mxJPO,MenuData>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
         return new Object[][] {
-                {"1) simple test",
+            {"1) uuid",
+                    new MenuData(this, "Test"),
+                    new MenuData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+            {"2) simple test",
                     new MenuData(this, "Menu1"),
                     new MenuData(this, "Menu1").setValue("description", "test").setValue("label", "").setValue("href", "").setValue("alt", "")},
-                {"2a) symbolic name",
+            {"3a) symbolic name",
                     new MenuData(this, "Test"),
                     new MenuData(this, "Test").setValue("symbolicname", "expression_123")},
-                {"2b) two symbolic name",
+            {"3b) two symbolic name",
                     new MenuData(this, "Test"),
                     new MenuData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
-                {"3) tree menu",
+            {"4) tree menu",
                     new MenuData(this, "Menu1"),
                     new MenuData(this, "Menu1").setTreeMenu(true)},
-                {"4) property name and value",
+            {"5) property name and value",
                     new MenuData(this, "Menu1"),
                     new MenuData(this, "Menu1").addProperty(new PropertyDef("property", "value"))},
        };
     }
 
     @Override
-    @BeforeMethod()
+    @BeforeMethod
     @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException
