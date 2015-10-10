@@ -214,7 +214,7 @@ public class RoleCI_3UpdateTest
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
+        this.cleanup(AbstractTest.CI.USR_PERSON);
         this.cleanup(AbstractTest.CI.USR_GROUP);
         this.cleanup(AbstractTest.CI.USR_ROLE);
         this.cleanup(AbstractTest.CI.SYS_SITE);

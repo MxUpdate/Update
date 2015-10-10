@@ -15,27 +15,27 @@
 
 package org.mxupdate.test.test.update.user;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ci.user.AbstractUserTest;
-import org.mxupdate.test.data.user.PersonAdminData;
+import org.mxupdate.test.data.user.PersonData;
 import org.mxupdate.test.util.Version;
-import org.mxupdate.update.user.PersonAdmin_mxJPO;
+import org.mxupdate.update.user.PersonCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import matrix.util.MatrixException;
+
 /**
- * Tests the {@link PersonAdmin_mxJPO person admin CI} export / update.
+ * Tests the {@link PersonCI_mxJPO person CI} export / update.
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class PersonAdminCI_3UpdateTest
-    extends AbstractUserTest<PersonAdminData>
+    extends AbstractUserTest<PersonData>
 {
     @DataProvider(name = "data")
     public Object[][] getData()
@@ -130,18 +130,18 @@ public class PersonAdminCI_3UpdateTest
                 .checkExport();
     }
 
-    @Override()
-    protected PersonAdminData createNewData(final String _name)
+    @Override
+    protected PersonData createNewData(final String _name)
     {
-        return new PersonAdminData(this, _name);
+        return new PersonData(this, _name);
     }
 
-    @BeforeMethod()
+    @BeforeMethod
     @AfterClass(groups = "close")
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
+        this.cleanup(AbstractTest.CI.USR_PERSON);
         this.cleanup(AbstractTest.CI.SYS_SITE);
     }
 }

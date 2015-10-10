@@ -64,25 +64,25 @@ import matrix.util.MatrixException;
  *
  * @author The MxUpdate Team
  */
-public class PersonAdmin_mxJPO
-    extends AbstractUser_mxJPO<PersonAdmin_mxJPO>
+public class PersonCI_mxJPO
+    extends AbstractUser_mxJPO<PersonCI_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for persons. */
     private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
-        PersonAdmin_mxJPO.IGNORED_URLS.add("/assignmentList");
-        PersonAdmin_mxJPO.IGNORED_URLS.add("/assignmentList/assignment");
-        PersonAdmin_mxJPO.IGNORED_URLS.add("/access");
-        PersonAdmin_mxJPO.IGNORED_URLS.add("/adminAccess");
-        PersonAdmin_mxJPO.IGNORED_URLS.add("/defaultApplication");
-        PersonAdmin_mxJPO.IGNORED_URLS.add("/homeVault");
+        PersonCI_mxJPO.IGNORED_URLS.add("/assignmentList");
+        PersonCI_mxJPO.IGNORED_URLS.add("/assignmentList/assignment");
+        PersonCI_mxJPO.IGNORED_URLS.add("/access");
+        PersonCI_mxJPO.IGNORED_URLS.add("/adminAccess");
+        PersonCI_mxJPO.IGNORED_URLS.add("/defaultApplication");
+        PersonCI_mxJPO.IGNORED_URLS.add("/homeVault");
         // password settings are completely ignored!
-        PersonAdmin_mxJPO.IGNORED_URLS.add("/password");
-        PersonAdmin_mxJPO.IGNORED_URLS.add("/passwordChangeRequired");
-        PersonAdmin_mxJPO.IGNORED_URLS.add("/passwordModification");
-        PersonAdmin_mxJPO.IGNORED_URLS.add("/passwordModification/datetime");
-        PersonAdmin_mxJPO.IGNORED_URLS.add("/productList");
-        PersonAdmin_mxJPO.IGNORED_URLS.add("/passwordNeverExpires");
+        PersonCI_mxJPO.IGNORED_URLS.add("/password");
+        PersonCI_mxJPO.IGNORED_URLS.add("/passwordChangeRequired");
+        PersonCI_mxJPO.IGNORED_URLS.add("/passwordModification");
+        PersonCI_mxJPO.IGNORED_URLS.add("/passwordModification/datetime");
+        PersonCI_mxJPO.IGNORED_URLS.add("/productList");
+        PersonCI_mxJPO.IGNORED_URLS.add("/passwordNeverExpires");
     }
 
     /** Holds all group assignments of this person. */
@@ -141,7 +141,7 @@ public class PersonAdmin_mxJPO
      *
      * @param _mxName   MX name of the administration object
      */
-    public PersonAdmin_mxJPO(final String _mxName)
+    public PersonCI_mxJPO(final String _mxName)
     {
         super(EMxAdmin_mxJPO.Person, _mxName);
         this.access.add("all");
@@ -158,7 +158,7 @@ public class PersonAdmin_mxJPO
         this.admin.clear();
         this.admin.add("dummy");
 
-        new PersonAdminParser_mxJPO(new StringReader(_code)).parse(this);
+        new PersonCIParser_mxJPO(new StringReader(_code)).parse(this);
 
         // fix none admin access
         if ((this.admin.size() == 1) && this.admin.iterator().next().equals("none")) {
@@ -233,7 +233,7 @@ public class PersonAdmin_mxJPO
                                             final String _content)
     {
         final boolean parsed;
-        if (PersonAdmin_mxJPO.IGNORED_URLS.contains(_url))  {
+        if (PersonCI_mxJPO.IGNORED_URLS.contains(_url))  {
             parsed = true;
         } else if ("/assignmentList/assignment/groupRef".equals(_url))  {
             this.groups.add(_content);
@@ -394,7 +394,7 @@ public class PersonAdmin_mxJPO
     @Override
     public void calcDelta(final ParameterCache_mxJPO _paramCache,
                           final MultiLineMqlBuilder _mql,
-                          final PersonAdmin_mxJPO _current)
+                          final PersonCI_mxJPO _current)
         throws UpdateException_mxJPO
     {
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);

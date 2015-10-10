@@ -53,6 +53,6 @@ public class JPOTest
         throws Exception
     {
         this.cleanup(CI.PRG_JPO);
-        this.cleanup(CI.USR_PERSONADMIN);
+        this.cleanup(CI.USR_PERSON);
     }
 }

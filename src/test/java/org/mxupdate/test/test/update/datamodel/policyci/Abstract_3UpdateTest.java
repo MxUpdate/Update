@@ -44,7 +44,7 @@ public abstract class Abstract_3UpdateTest
         this.cleanup(AbstractTest.CI.DM_TYPE);
         this.cleanup(AbstractTest.CI.DM_FORMAT);
         this.cleanup(AbstractTest.CI.USR_GROUP);
-        this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
+        this.cleanup(AbstractTest.CI.USR_PERSON);
         this.cleanup(AbstractTest.CI.USR_ROLE);
    }
 

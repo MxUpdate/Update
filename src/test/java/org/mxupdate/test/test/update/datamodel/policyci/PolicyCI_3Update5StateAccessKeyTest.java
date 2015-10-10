@@ -18,7 +18,7 @@ package org.mxupdate.test.test.update.datamodel.policyci;
 import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.data.datamodel.helper.Access;
-import org.mxupdate.test.data.user.PersonAdminData;
+import org.mxupdate.test.data.user.PersonData;
 import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.test.util.Version;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
@@ -297,7 +297,7 @@ public class PolicyCI_3Update5StateAccessKeyTest
                                         .setName("create")
                                         .addAccess(new Access()
                                                 .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .setUser(new PersonData(this, "creator"))
                                                 .addAccess("all")))},
                 new Object[]{
                         "issue #180: policy state with access for user all for key",
@@ -307,7 +307,7 @@ public class PolicyCI_3Update5StateAccessKeyTest
                                         .setName("create")
                                         .addAccess(new Access()
                                                 .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .setUser(new PersonData(this, "creator"))
                                                 .addAccess("all")
                                                 .setKey("abcd 123")))},
                 new Object[]{
@@ -316,7 +316,7 @@ public class PolicyCI_3Update5StateAccessKeyTest
                                 .defNotSupported(Version.V6R2011x)
                                 .addState(new State() {
                                     {
-                                        final PersonAdminData user = new PersonAdminData(PolicyCI_3Update5StateAccessKeyTest.this, "creator");
+                                        final PersonData user = new PersonData(PolicyCI_3Update5StateAccessKeyTest.this, "creator");
                                         this.setName("create")
                                             .addAccess(
                                                     new Access()
@@ -345,7 +345,7 @@ public class PolicyCI_3Update5StateAccessKeyTest
                                         .addAccess(new Access()
                                                 .setPrefix("login")
                                                 .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .setUser(new PersonData(this, "creator"))
                                                 .addAccess("all")))},
                 new Object[]{
                         "issue #180: policy state with access for login user all for key",
@@ -356,7 +356,7 @@ public class PolicyCI_3Update5StateAccessKeyTest
                                         .addAccess(new Access()
                                                 .setPrefix("login")
                                                 .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .setUser(new PersonData(this, "creator"))
                                                 .addAccess("all")
                                                 .setKey("abcd 123")))},
                 new Object[]{
@@ -365,7 +365,7 @@ public class PolicyCI_3Update5StateAccessKeyTest
                                 .defNotSupported(Version.V6R2011x)
                                 .addState(new State() {
                                     {
-                                        final PersonAdminData user = new PersonAdminData(PolicyCI_3Update5StateAccessKeyTest.this, "creator");
+                                        final PersonData user = new PersonData(PolicyCI_3Update5StateAccessKeyTest.this, "creator");
                                         this.setName("create")
                                             .addAccess(
                                                     new Access()
@@ -397,7 +397,7 @@ public class PolicyCI_3Update5StateAccessKeyTest
                                         .addAccess(new Access()
                                                 .setPrefix("revoke")
                                                 .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .setUser(new PersonData(this, "creator"))
                                                 .addAccess("all")))},
                 new Object[]{
                         "issue #180: policy state with access for revoke user all for key",
@@ -408,7 +408,7 @@ public class PolicyCI_3Update5StateAccessKeyTest
                                         .addAccess(new Access()
                                                 .setPrefix("revoke")
                                                 .setKind("user")
-                                                .setUser(new PersonAdminData(this, "creator"))
+                                                .setUser(new PersonData(this, "creator"))
                                                 .addAccess("all")
                                                 .setKey("abcd 123")))},
                 new Object[]{
@@ -417,7 +417,7 @@ public class PolicyCI_3Update5StateAccessKeyTest
                                 .defNotSupported(Version.V6R2011x)
                                 .addState(new State()  {
                                     {
-                                        final PersonAdminData user = new PersonAdminData(PolicyCI_3Update5StateAccessKeyTest.this, "creator");
+                                        final PersonData user = new PersonData(PolicyCI_3Update5StateAccessKeyTest.this, "creator");
                                         this.setName("create")
                                             .addAccess(
                                                     new Access()

@@ -23,8 +23,8 @@ import org.mxupdate.test.AbstractTest;
  *
  * @author The MxUpdate Team
  */
-public class PersonAdminData
-    extends AbstractUserData<PersonAdminData>
+public class PersonData
+    extends AbstractUserData<PersonData>
 {
     /**
      * Constructor to initialize this administration person.
@@ -33,10 +33,10 @@ public class PersonAdminData
      *                  person is defined)
      * @param _name     name of the administration person
      */
-    public PersonAdminData(final AbstractTest _test,
-                           final String _name)
+    public PersonData(final AbstractTest _test,
+                      final String _name)
     {
-        super(_test, AbstractTest.CI.USR_PERSONADMIN, _name);
+        super(_test, AbstractTest.CI.USR_PERSON, _name);
     }
 
     @Override

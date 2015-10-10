@@ -25,7 +25,7 @@ options {
     UNICODE_INPUT = true;
 }
 
-PARSER_BEGIN(PersonAdminParser)
+PARSER_BEGIN(PersonCIParser)
 /*
  *  This file is part of MxUpdate <http://www.mxupdate.org>.
  *
@@ -45,7 +45,7 @@ package org.mxupdate.update.user;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.mxupdate.update.user.PersonAdmin_mxJPO.TypeItem;
+import org.mxupdate.update.user.PersonCI_mxJPO.TypeItem;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
@@ -53,15 +53,15 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
 import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 
 /**
- * Parses the update format for {@link PersonAdmin_mxJPO}.
+ * Parses the update format for {@link PersonCI_mxJPO}.
  */
 @SuppressWarnings("unused")
-class PersonAdminParser
+class PersonCIParser
     extends AbstractParser_mxJPO
 {
 }
 
-PARSER_END(PersonAdminParser)
+PARSER_END(PersonCIParser)
 
 <*> SKIP :
 {
@@ -221,7 +221,7 @@ PARSER_END(PersonAdminParser)
  *
  * @param _personAdmin  target admin person to update with parsed values
  */
-void parse(final PersonAdmin_mxJPO _personAdmin)
+void parse(final PersonCI_mxJPO _personAdmin)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
     Token tmp;

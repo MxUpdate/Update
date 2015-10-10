@@ -21,7 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.datamodel.RuleData;
-import org.mxupdate.test.data.user.PersonAdminData;
+import org.mxupdate.test.data.user.PersonData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.test.test.update.WrapperCIInstance;
@@ -86,9 +86,9 @@ public abstract class AbstractProgramCI_2DeltaCalculationTest<TESTDATA extends A
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setSingle("execute", "deferred")},
             {"10c) execute user",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
-                    this.createNewTestData("Test").setSingle("kind", this.getKind()).defData("execute user", new PersonAdminData(this, "Test"))},
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).defData("execute user", new PersonData(this, "Test"))},
             {"10d) remove execute user",
-                    this.createNewTestData("Test").setSingle("kind", this.getKind()).defData("execute user", new PersonAdminData(this, "Test")),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).defData("execute user", new PersonData(this, "Test")),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setSingle("execute", null)},
             {"11) code",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
@@ -213,6 +213,6 @@ public abstract class AbstractProgramCI_2DeltaCalculationTest<TESTDATA extends A
         this.cleanup(CI.PRG_EKL);
         this.cleanup(CI.PRG_MQL);
         this.cleanup(CI.DM_RULE);
-        this.cleanup(CI.USR_PERSONADMIN);
+        this.cleanup(CI.USR_PERSON);
     }
 }

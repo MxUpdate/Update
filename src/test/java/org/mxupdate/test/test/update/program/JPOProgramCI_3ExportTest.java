@@ -23,7 +23,7 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.datamodel.RuleData;
 import org.mxupdate.test.data.program.JPOProgramData;
-import org.mxupdate.test.data.user.PersonAdminData;
+import org.mxupdate.test.data.user.PersonData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.test.update.WrapperCIInstance;
 import org.mxupdate.typedef.export.ExportAdminProgramJPO_mxJPO;
@@ -102,7 +102,7 @@ public class JPOProgramCI_3ExportTest
             {"pooled",              this.origJPO,    this.testJPO,    this.testMXU,    new JPOProgramData(this, "Test").setSingle("kind", "java").setFlag("pooled", true)},
             {"deferred",            this.origJPO,    this.testJPO,    this.testMXU,    new JPOProgramData(this, "Test").setSingle("kind", "java").setSingle("execute", "deferred")},
             {"rule",                this.origJPO,    this.testJPO,    this.testMXU,    new JPOProgramData(this, "Test").setSingle("kind", "java").defData("rule", new RuleData(this, "Test"))},
-            {"execute user",        this.origJPO,    this.testJPO,    this.testMXU,    new JPOProgramData(this, "Test").setSingle("kind", "java").defData("execute user", new PersonAdminData(this, "Test"))},
+            {"execute user",        this.origJPO,    this.testJPO,    this.testMXU,    new JPOProgramData(this, "Test").setSingle("kind", "java").defData("execute user", new PersonData(this, "Test"))},
             {"property",            this.origJPO,    this.testJPO,    this.testMXU,    new JPOProgramData(this, "Test").setSingle("kind", "java").addProperty(new PropertyDef("Test"))},
             // with package
             {"symbolicname",        this.origPckJPO, this.testPckJPO, this.testPckMXU, new JPOProgramData(this, "org.mxupdate.test.TestWithPackage").setSingle("kind", "java").setValue("symbolicname", "program_abc")},
@@ -114,7 +114,7 @@ public class JPOProgramCI_3ExportTest
             {"pooled",              this.origPckJPO, this.testPckJPO, this.testPckMXU, new JPOProgramData(this, "org.mxupdate.test.TestWithPackage").setSingle("kind", "java").setFlag("pooled", true)},
             {"deferred",            this.origPckJPO, this.testPckJPO, this.testPckMXU, new JPOProgramData(this, "org.mxupdate.test.TestWithPackage").setSingle("kind", "java").setSingle("execute", "deferred")},
             {"rule",                this.origPckJPO, this.testPckJPO, this.testPckMXU, new JPOProgramData(this, "org.mxupdate.test.TestWithPackage").setSingle("kind", "java").defData("rule", new RuleData(this, "Test"))},
-            {"execute user",        this.origPckJPO, this.testPckJPO, this.testPckMXU, new JPOProgramData(this, "org.mxupdate.test.TestWithPackage").setSingle("kind", "java").defData("execute user", new PersonAdminData(this, "Test"))},
+            {"execute user",        this.origPckJPO, this.testPckJPO, this.testPckMXU, new JPOProgramData(this, "org.mxupdate.test.TestWithPackage").setSingle("kind", "java").defData("execute user", new PersonData(this, "Test"))},
             {"property",            this.origPckJPO, this.testPckJPO, this.testPckMXU, new JPOProgramData(this, "org.mxupdate.test.TestWithPackage").setSingle("kind", "java").addProperty(new PropertyDef("Test"))},
         };
     }
@@ -283,7 +283,7 @@ public class JPOProgramCI_3ExportTest
         this.cleanup(CI.PRG_EKL);
         this.cleanup(CI.PRG_JPO);
         this.cleanup(CI.DM_RULE);
-        this.cleanup(CI.USR_PERSONADMIN);
+        this.cleanup(CI.USR_PERSON);
         FileUtils.deleteDirectory(this.testDir);
     }
 }

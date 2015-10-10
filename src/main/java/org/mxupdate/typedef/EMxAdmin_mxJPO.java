@@ -38,7 +38,7 @@ import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.system.PackageCI_mxJPO;
 import org.mxupdate.update.user.Association_mxJPO;
 import org.mxupdate.update.user.Group_mxJPO;
-import org.mxupdate.update.user.PersonAdmin_mxJPO;
+import org.mxupdate.update.user.PersonCI_mxJPO;
 import org.mxupdate.update.user.Role_mxJPO;
 import org.mxupdate.update.userinterface.Channel_mxJPO;
 import org.mxupdate.update.userinterface.Command_mxJPO;
@@ -130,7 +130,7 @@ public enum EMxAdmin_mxJPO
             return ret;
         }
     },
-    Person(PersonAdmin_mxJPO.class),
+    Person(PersonCI_mxJPO.class),
     Policy(Policy_mxJPO.class),
     Portal(Portal_mxJPO.class),
     Program(ProgramCI_mxJPO.class),

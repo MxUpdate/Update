@@ -92,6 +92,6 @@ public class MQLTest
         throws Exception
     {
         this.cleanup(CI.PRG_MQL);
-        this.cleanup(CI.USR_PERSONADMIN);
+        this.cleanup(CI.USR_PERSON);
     }
 }

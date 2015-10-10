@@ -16,7 +16,7 @@
 package org.mxupdate.test.test.update.userinterface;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.user.PersonAdminData;
+import org.mxupdate.test.data.user.PersonData;
 import org.mxupdate.test.data.userinterface.TableData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.userinterface.Table_mxJPO;
@@ -128,7 +128,7 @@ public class TableCI_2DeltaCalculationTest
             {"17) set user",
                     new TableData(this, "Table1"),
                     new TableData(this, "Table1")
-                            .newField("field").defData("user", new PersonAdminData(this, "Test.Old")).getFormTable()},
+                            .newField("field").defData("user", new PersonData(this, "Test.Old")).getFormTable()},
             {"18) set setting",
                     new TableData(this, "Table1"),
                     new TableData(this, "Table1")
@@ -181,9 +181,9 @@ public class TableCI_2DeltaCalculationTest
                             .newField("field").setFlag("hidden", true).getFormTable()},
             {"27) update user",
                     new TableData(this, "Table1")
-                            .newField("field").defData("user", new PersonAdminData(this, "Test.Old")).getFormTable(),
+                            .newField("field").defData("user", new PersonData(this, "Test.Old")).getFormTable(),
                     new TableData(this, "Table1")
-                            .newField("field").defData("user", new PersonAdminData(this, "Test.New")).getFormTable()},
+                            .newField("field").defData("user", new PersonData(this, "Test.New")).getFormTable()},
             {"28) update setting",
                     new TableData(this, "Table1")
                             .newField("field").setKeyValue("setting", "key", "value.old").getFormTable(),
@@ -198,7 +198,7 @@ public class TableCI_2DeltaCalculationTest
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
+        this.cleanup(AbstractTest.CI.USR_PERSON);
         this.cleanup(AbstractTest.CI.UI_TABLE);
     }
 

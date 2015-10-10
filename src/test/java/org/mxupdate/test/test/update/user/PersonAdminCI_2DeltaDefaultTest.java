@@ -16,9 +16,9 @@
 package org.mxupdate.test.test.update.user;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.user.PersonAdminData;
+import org.mxupdate.test.data.user.PersonData;
 import org.mxupdate.test.test.update.AbstractDeltaNoChangeTest;
-import org.mxupdate.update.user.PersonAdmin_mxJPO;
+import org.mxupdate.update.user.PersonCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -28,48 +28,48 @@ import org.testng.annotations.Test;
 import matrix.util.MatrixException;
 
 /**
- * Tests the {@link PersonAdmin_mxJPO person admin CI} delta calculation for
+ * Tests the {@link PersonCI_mxJPO person admin CI} delta calculation for
  * default values.
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class PersonAdminCI_2DeltaDefaultTest
-    extends AbstractDeltaNoChangeTest<PersonAdmin_mxJPO,PersonAdminData>
+    extends AbstractDeltaNoChangeTest<PersonCI_mxJPO,PersonData>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
         return new Object[][] {
             {"0) simple w/o values",
-                    new PersonAdminData(this, "Test")},
+                    new PersonData(this, "Test")},
             {"1a) with all access",
-                    new PersonAdminData(this, "Test").setSingle("access", "all")},
+                    new PersonData(this, "Test").setSingle("access", "all")},
             {"1b) with none access",
-                    new PersonAdminData(this, "Test").setSingle("access", "{none}")},
+                    new PersonData(this, "Test").setSingle("access", "{none}")},
             {"2a) with business type (to check admin access)",
-                    new PersonAdminData(this, "Test").setSingle("type", "{business}")},
+                    new PersonData(this, "Test").setSingle("type", "{business}")},
             {"2b) with system type (to check admin access)",
-                    new PersonAdminData(this, "Test").setSingle("type", "{system}")},
+                    new PersonData(this, "Test").setSingle("type", "{system}")},
             {"2c) with none admin access",
-                    new PersonAdminData(this, "Test").setSingle("admin", "{none}")},
+                    new PersonData(this, "Test").setSingle("admin", "{none}")},
        };
     }
 
-    @Override()
-    @BeforeMethod()
+    @Override
+    @BeforeMethod
     @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException
     {
-        this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
+        this.cleanup(AbstractTest.CI.USR_PERSON);
     }
 
     @Override
-    protected PersonAdmin_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
-                                              final String _name)
+    protected PersonCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
+                                           final String _name)
     {
-        return new PersonAdmin_mxJPO(_name);
+        return new PersonCI_mxJPO(_name);
     }
 }

@@ -20,7 +20,7 @@ import matrix.util.MatrixException;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.ci.userinterface.AbstractUITest;
-import org.mxupdate.test.data.user.PersonAdminData;
+import org.mxupdate.test.data.user.PersonData;
 import org.mxupdate.test.data.user.RoleData;
 import org.mxupdate.test.data.userinterface.CommandData;
 import org.mxupdate.test.util.IssueLink;
@@ -68,7 +68,7 @@ public class CommandCI_3UpdateTest
                                 .setValue("alt", "${COMMON_DIR}/emxTreeAlt.jsp?mode=insert")
                                 .setKeyValue("setting", "Setting 1", "Setting Value ' 1")
                                 .defData("user", new RoleData(this, "assigned \"role\""))
-                                .defData("user", new PersonAdminData(this, "assigned \"person\""))},
+                                .defData("user", new PersonData(this, "assigned \"person\""))},
                 new Object[]{
                         "complex command with value with escaped special characters but w/o any space",
                         new CommandData(this, "command")
@@ -107,7 +107,7 @@ public class CommandCI_3UpdateTest
         throws Exception
     {
         final CommandData orgData = new CommandData(this, "command").addCILine("add user \"" + AbstractTest.PREFIX + "adminuser" + "\"");
-        final CommandData expData = new CommandData(this, "command").defData("user", new PersonAdminData(this, "adminuser"));
+        final CommandData expData = new CommandData(this, "command").defData("user", new PersonData(this, "adminuser"));
 
         expData.createDependings();
 
@@ -149,7 +149,7 @@ public class CommandCI_3UpdateTest
     {
         this.cleanup(AbstractTest.CI.UI_COMMAND);
         this.cleanup(AbstractTest.CI.USR_ROLE);
-        this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
+        this.cleanup(AbstractTest.CI.USR_PERSON);
     }
 
     @Override()

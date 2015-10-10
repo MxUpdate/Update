@@ -95,7 +95,7 @@ public class GroupCI_3UpdateTest
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.USR_GROUP);
-        this.cleanup(AbstractTest.CI.USR_PERSONADMIN);
+        this.cleanup(AbstractTest.CI.USR_PERSON);
         this.cleanup(AbstractTest.CI.SYS_SITE);
         this.cleanup(AbstractTest.CI.PRG_MQL);
     }

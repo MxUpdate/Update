@@ -18,19 +18,19 @@
 package org.mxupdate.test.test.update.user;
 
 import org.mxupdate.test.test.update.AbstractParserTest;
-import org.mxupdate.update.user.PersonAdmin_mxJPO;
+import org.mxupdate.update.user.PersonCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link PersonAdmin_mxJPO person admin CI} parser.
+ * Tests the {@link PersonCI_mxJPO person admin CI} parser.
  *
  * @author The MxUpdate Team
  */
 @Test
 public class PersonAdminCI_1ParserTest
-    extends AbstractParserTest<PersonAdmin_mxJPO>
+    extends AbstractParserTest<PersonCI_mxJPO>
 {
     @Override
     @DataProvider(name = "data")
@@ -267,9 +267,9 @@ public class PersonAdminCI_1ParserTest
     }
 
     @Override
-    protected PersonAdmin_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
-                                              final String _name)
+    protected PersonCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
+                                           final String _name)
     {
-        return new PersonAdmin_mxJPO(_name);
+        return new PersonCI_mxJPO(_name);
     }
 }

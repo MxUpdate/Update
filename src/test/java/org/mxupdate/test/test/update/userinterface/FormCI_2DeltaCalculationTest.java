@@ -16,7 +16,7 @@
 package org.mxupdate.test.test.update.userinterface;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.user.PersonAdminData;
+import org.mxupdate.test.data.user.PersonData;
 import org.mxupdate.test.data.userinterface.FormData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.userinterface.Form_mxJPO;
@@ -120,7 +120,7 @@ public class FormCI_2DeltaCalculationTest
             {"17) set user",
                     new FormData(this, "Form1"),
                     new FormData(this, "Form1")
-                            .newField("field").defData("user", new PersonAdminData(this, "Test.Old")).getFormTable()},
+                            .newField("field").defData("user", new PersonData(this, "Test.Old")).getFormTable()},
             {"18) new setting",
                     new FormData(this, "Form1"),
                     new FormData(this, "Form1")
@@ -158,9 +158,9 @@ public class FormCI_2DeltaCalculationTest
                             .newField("field").setValue("range", "value.new").getFormTable()},
             {"27) update user",
                     new FormData(this, "Form1")
-                            .newField("field").defData("user", new PersonAdminData(this, "Test.Old")).getFormTable(),
+                            .newField("field").defData("user", new PersonData(this, "Test.Old")).getFormTable(),
                     new FormData(this, "Form1")
-                            .newField("field").defData("user", new PersonAdminData(this, "Test.New")).getFormTable()},
+                            .newField("field").defData("user", new PersonData(this, "Test.New")).getFormTable()},
             {"28) update setting",
                     new FormData(this, "Form1")
                             .newField("field").setKeyValue("setting", "key", "value.old").getFormTable(),

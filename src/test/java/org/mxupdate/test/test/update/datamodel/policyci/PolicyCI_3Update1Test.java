@@ -25,7 +25,7 @@ import org.mxupdate.test.data.datamodel.PolicyData.Signature;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.datamodel.helper.Access;
-import org.mxupdate.test.data.user.PersonAdminData;
+import org.mxupdate.test.data.user.PersonData;
 import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.util.IssueLink;
@@ -362,7 +362,7 @@ public class PolicyCI_3Update1Test
                                         .setName("create")
                                         .addSignature(new Signature()
                                                 .setName("Test")
-                                                .addApprover(new PersonAdminData(this, "User 1"), new PersonAdminData(this, "User 2"))
+                                                .addApprover(new PersonData(this, "User 1"), new PersonData(this, "User 2"))
                                                 .setBranch("create")))},
                 new Object[] {
                         "issue #203: policy state with signature with ignore",
@@ -371,7 +371,7 @@ public class PolicyCI_3Update1Test
                                         .setName("create")
                                         .addSignature(new Signature()
                                                 .setName("Test")
-                                                .addIgnore(new PersonAdminData(this, "User 1"), new PersonAdminData(this, "User 2"))
+                                                .addIgnore(new PersonData(this, "User 1"), new PersonData(this, "User 2"))
                                                 .setBranch("create")))},
                 new Object[] {
                         "issue #203: policy state with signature with reject",
@@ -380,7 +380,7 @@ public class PolicyCI_3Update1Test
                                         .setName("create")
                                         .addSignature(new Signature()
                                                 .setName("Test")
-                                                .addReject(new PersonAdminData(this, "User 1"), new PersonAdminData(this, "User 2"))
+                                                .addReject(new PersonData(this, "User 1"), new PersonData(this, "User 2"))
                                                 .setBranch("create")))},
                 new Object[] {
                         "issue #203: policy state with signature with defined filter",
@@ -698,7 +698,7 @@ public class PolicyCI_3Update1Test
     public void positiveTestUpdateRemoveFilter()
         throws Exception
     {
-        final PersonAdminData creator = new PersonAdminData(this, "creator").create();
+        final PersonData creator = new PersonData(this, "creator").create();
         final State state = new State().setName("Test")
                 .addAccess(
                         new Access().setKind("owner").addAccess("all"),
