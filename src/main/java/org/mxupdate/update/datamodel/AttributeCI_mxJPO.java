@@ -74,7 +74,7 @@ public class AttributeCI_mxJPO
     extends AbstractAdminObject_mxJPO<AttributeCI_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for attributes. */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         AttributeCI_mxJPO.IGNORED_URLS.add("/rangeList");
         AttributeCI_mxJPO.IGNORED_URLS.add("/rangeProgram");
@@ -85,7 +85,7 @@ public class AttributeCI_mxJPO
      * Mapping between the comparators defined within XML and the comparators
      * used within MX.
      */
-    private static final Map<String,String> RANGE_COMP = new HashMap<String,String>();
+    private static final Map<String,String> RANGE_COMP = new HashMap<>();
     static  {
         AttributeCI_mxJPO.RANGE_COMP.put("equal",             "=");
         AttributeCI_mxJPO.RANGE_COMP.put("greaterthan",       ">");
@@ -105,7 +105,7 @@ public class AttributeCI_mxJPO
     private Kind kind;
 
     /** Set holding all rules referencing this attribute. */
-    private final  SortedSet<String> rules = new TreeSet<String>();
+    private final  SortedSet<String> rules = new TreeSet<>();
 
     /**
      * If the range is a program the value references a program. Because only
@@ -117,7 +117,7 @@ public class AttributeCI_mxJPO
     /** If the range is a program the value are the input arguments. */
     private String rangeProgramInputArguments;
     /** Stores the ranges of the attribute (used while parsing the XML attribute). */
-    private final Stack<Range> rangesStack = new Stack<Range>();
+    private final Stack<Range> rangesStack = new Stack<>();
     /** All ranges but sorted after they are prepared. */
     private final Ranges rangesSorted = new Ranges();
 
@@ -157,10 +157,12 @@ public class AttributeCI_mxJPO
     {
         super(_typeDef, _mxName);
 
-        for (final Kind checkKind : Kind.values())  {
-            if (checkKind.name().toLowerCase().equals(_typeDef.getMxUpdateKind()))  {
-                this.kind = checkKind;
-                break;
+        if (_typeDef != null)  {
+            for (final Kind checkKind : Kind.values())  {
+                if (checkKind.name().toLowerCase().equals(_typeDef.getMxUpdateKind()))  {
+                    this.kind = checkKind;
+                    break;
+                }
             }
         }
     }

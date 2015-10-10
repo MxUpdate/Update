@@ -24,6 +24,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
@@ -52,7 +53,7 @@ public class Type_mxJPO
     extends AbstractDMWithTriggers_mxJPO<Type_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for types. */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         Type_mxJPO.IGNORED_URLS.add("/attributeDefRefList");
         Type_mxJPO.IGNORED_URLS.add("/derivedFrom");
@@ -84,10 +85,14 @@ public class Type_mxJPO
     private String derived;
 
     /** Defines all methods of this type. */
-    private final SortedSet<String> methods = new TreeSet<String>();
+    private final SortedSet<String> methods = new TreeSet<>();
 
     /** Attribute list. */
-    private final SortedSet<String> attributes = new TreeSet<String>();
+    private final SortedSet<String> attributes = new TreeSet<>();
+
+    /** Local Attributes. */
+    private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO();
+
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -164,6 +169,16 @@ public class Type_mxJPO
         return parsed;
     }
 
+    /**
+     * After the type is parsed, the type and local attributes must be prepared.
+     */
+    @Override()
+    protected void prepare()
+    {
+        super.prepare();
+        this.localAttributes.prepare();
+    }
+
     @Override()
     protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
@@ -178,6 +193,7 @@ public class Type_mxJPO
                 .write(this.getTriggers())
                 .list(          "method",                   this.methods)
                 .list(          "attribute",                this.attributes)
+                .write(this.localAttributes)
                 .properties(this.getProperties());
     }
 
