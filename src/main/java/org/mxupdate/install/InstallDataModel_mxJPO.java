@@ -16,9 +16,6 @@
 package org.mxupdate.install;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -37,7 +34,6 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 
 import matrix.db.Context;
 import matrix.util.MatrixException;
-import matrix.util.Mime64;
 
 /**
  * Installs and updates the data model needed for MxUpdate. The JPO class is
@@ -76,15 +72,10 @@ public class InstallDataModel_mxJPO
      * Method used as entry from the MQL interface to install / update the data
      * model for MxUpdate. The data model is installed / updated in this order:
      * <ul>
-     * <li>install trigger group type</li>
-     * <li>install trigger group policy</li>
-     * <li>install trigger group relationship</li>
      * <li>update attributes in
      *     {@link #updateAttributes(ParameterCache_mxJPO, String, String, String, String, String, String)}</li>
      * <li>update used business types by appending required MxUpdate attributes
      *     in {@link #updateBusTypes(ParameterCache_mxJPO)}</li>
-     * <li>define plug-in properties in
-     *     {@link #makePluginProperty(ParameterCache_mxJPO, File)}</li>
      * <li>register the MxUdpate Update programs with their symbolic names in
      *     {@link #registerPrograms(ParameterCache_mxJPO, String, String, String, String, String)}</li>
      * <li>register MxUpdate as application in
@@ -127,7 +118,6 @@ public class InstallDataModel_mxJPO
                 authorName, installerName,
                 fileDate, installedDate);
         this.updateBusTypes(paramCache);
-        this.makePluginProperty(paramCache, path);
         this.registerPrograms(paramCache,
                 applName, applVersion,
                 authorName, installerName,
@@ -314,62 +304,6 @@ public class InstallDataModel_mxJPO
                 }
             }
         }
-    }
-
-    /**
-     * Creates and stores the properties for the plugin. A property entry is
-     * created for each type definition of {@link TypeDef_mxJPO} for which an
-     * icon (path) is defined. The format of the properties is defined in
-     * {@link org.mxupdate.plugin.GetProperties_mxJPO}.
-     *
-     * @param _paramCache       parameter cache
-     * @param _sourcePath       reference to the source path
-     * @throws IOException      if the file of icon not exists or could not
-     *                          opened
-     * @throws MatrixException  if the update of the plugin properties program
-     *                          failed
-     */
-    protected void makePluginProperty(final ParameterCache_mxJPO _paramCache,
-                                      final File _sourcePath)
-            throws IOException, MatrixException
-    {
-        // prepare properties as set
-        final Set<String> props = new TreeSet<>();
-        for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
-            if (typeDef.getIconPath() != null)  {
-
-                final File file = new File(_sourcePath, typeDef.getIconPath());
-                final String icon;
-                final InputStream in = new FileInputStream(file);
-                try  {
-                    final byte[] bin = new byte[in.available()];
-                    in.read(bin);
-                    icon = Mime64.encode(bin);
-                } finally  {
-                    in.close();
-                }
-
-                props.add(new StringBuilder()
-                            .append(typeDef.getName()).append(".FilePrefix = ").append(typeDef.getFilePrefix() == null ? "" : typeDef.getFilePrefix()).append('\n')
-                            .append(typeDef.getName()).append(".FileSuffix = ").append(typeDef.getFileSuffix() == null ? "" : typeDef.getFileSuffix()).append('\n')
-                            .append(typeDef.getName()).append(".Icon = ").append(icon).toString());
-            }
-        }
-
-        // make string of properties set
-        final StringBuilder propString = new StringBuilder();
-        for (final String prop : props)  {
-            propString.append(prop).append('\n');
-        }
-
-        // write properties
-        final String installed = MqlUtil_mxJPO.execMql(_paramCache, "list prog 'org.mxupdate.plugin.plugin.properties'");
-        if (installed.isEmpty())  {
-            MqlUtil_mxJPO.execMql(_paramCache, "escape add prog 'org.mxupdate.plugin.plugin.properties'");
-        }
-        MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
-                .append("escape mod prog 'org.mxupdate.plugin.plugin.properties' code \"")
-                .append(StringUtil_mxJPO.convertMql(propString)).append("\""));
     }
 
     /**

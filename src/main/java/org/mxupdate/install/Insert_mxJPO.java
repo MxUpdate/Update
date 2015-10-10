@@ -27,11 +27,11 @@ import java.util.Set;
 import java.util.TimeZone;
 import java.util.TreeMap;
 
+import org.mxupdate.util.JPOHandler_mxJPO.ClassFile;
+
 import matrix.db.Context;
 import matrix.db.MQLCommand;
 import matrix.util.MatrixException;
-
-import org.mxupdate.util.JPOHandler_mxJPO.ClassFile;
 
 /**
  * The JPO is used to install the Mx Update JPO file package. Because the Mx
@@ -64,6 +64,9 @@ public class Insert_mxJPO
             = "list prog \"MxUpdate,org.mxupdate.*,net.sourceforge.mxupdate.*\" "
                     + "select name isjavaprogram property[" + Insert_mxJPO.PROP_FILEDATE + "].value "
                     + "dump \"\t\"";
+
+    /** Name of the properties file program. */
+    private static final String NAME_PROPERTY_FiLE = "org.mxupdate.mapping.properties";
 
     /**
      * Defines the date format used for the installation date.
@@ -149,7 +152,7 @@ System.out.println("update jpo '" + classFile.getJpoName() + "'");
             throws MatrixException
     {
         final String jpos = this.execMql(_context, Insert_mxJPO.CMD_LISTJPOS);
-        final Map<String,Date> installedProgs = new TreeMap<String,Date>();
+        final Map<String,Date> installedProgs = new TreeMap<>();
         for (final String oneJPO : jpos.split("\n"))  {
             final String[] oneJPOArr = oneJPO.split("\t");
             final String name = oneJPOArr[0];
@@ -163,8 +166,8 @@ System.out.println("update jpo '" + classFile.getJpoName() + "'");
                     mxDate = null;
                 }
                 installedProgs.put(name, mxDate);
-            } else if (!name.endsWith(".properties")) {
-System.out.println("program '" + name + "' is ignored because not a JPO");
+            } else if (!name.equals(Insert_mxJPO.NAME_PROPERTY_FiLE)) {
+                installedProgs.put(name, null);
             }
         }
         return installedProgs;

@@ -27,8 +27,6 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.mapping.AbstractValue_mxJPO;
 import org.mxupdate.mapping.Mapping_mxJPO;
 import org.mxupdate.typedef.export.IExport_mxJPO;
@@ -41,6 +39,8 @@ import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+
+import matrix.util.MatrixException;
 
 /**
  * Enumeration for administration type definitions.
@@ -59,7 +59,7 @@ public final class TypeDef_mxJPO
     /** Must be checked if the business type exists? */
     private boolean busCheckExists = false;
     /** Defines the list of attributes which are automatically ignored within the update. */
-    private final Set<String> busIgnoredAttributes = new HashSet<String>();
+    private final Set<String> busIgnoredAttributes = new HashSet<>();
     /** Mapping between internal used type definitions and the MX policy names. */
     private String busPolicy;
     /** Defines the list of both relationships which must be evaluated to write and run of update script. */
@@ -86,9 +86,6 @@ public final class TypeDef_mxJPO
     private String mxUpdateKind;
     /** Name of the mxUpdate type for this type definition */
     private String mxUpdateType;
-
-    /** Stores the path to the icon for the type definition. */
-    private String iconPath;
 
     /** JPO implementing the CI MxUpdate functionality. */
     private Class<? extends AbstractObject_mxJPO<?>> jpoClass;
@@ -171,8 +168,6 @@ public final class TypeDef_mxJPO
                 case MxUpdateKind:          typeDef.mxUpdateKind = _value;break;
                 case MxUpdateType:          typeDef.mxUpdateType = _value;break;
 
-                case Icon:                  typeDef.iconPath = _value;break;
-
                 case JPO:                   typeDef.jpoClass            = (Class<? extends AbstractObject_mxJPO<?>>) TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
                 case JpoExport:             typeDef.jpoExport           = (Class<? extends IExport_mxJPO>)           TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
                 case JpoMatchFileNames:     typeDef.jpoMatchFileNames   = (Class<? extends IMatcherFileNames_mxJPO>) TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
@@ -206,7 +201,7 @@ public final class TypeDef_mxJPO
         Map<String,String> jpos = (Map<String,String>) _paramCache.getCache(CacheKey.TypeDefJPOs);
 
         if (jpos == null)  {
-            jpos = new HashMap<String,String>();
+            jpos = new HashMap<>();
             _paramCache.setCache(CacheKey.TypeDefJPOs, jpos);
 
             final String tmp = MqlBuilder_mxJPO.mql()
@@ -456,17 +451,6 @@ public final class TypeDef_mxJPO
     }
 
     /**
-     * Returns the related {@link #iconPath icon path}. The method returns only
-     * correct values if the initialize method was called!
-     *
-     * @return icon path for this type definition
-     */
-    public String getIconPath()
-    {
-        return this.iconPath;
-    }
-
-    /**
      * Returns the related logging string. The method returns only correct
      * values if the initialize method was called!
      *
@@ -690,9 +674,6 @@ public final class TypeDef_mxJPO
         MxUpdateKind,
         /** Used prefix of mxupdate type definitions within the property file. */
         MxUpdateType,
-
-        /** Used file suffix of icon path definitions within the property file. */
-        Icon,
 
         /** Used prefix of the JPO name. */
         JPO,

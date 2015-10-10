@@ -25,11 +25,11 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+
+import matrix.util.MatrixException;
 
 /**
  * The class is used to map from used names within the MxUpdate JPOs and the
@@ -39,124 +39,45 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  */
 public class Mapping_mxJPO
 {
-    /**
-     * Name of the MX program where the mapping definition is stored as
-     * properties.
-     */
+    /** Name of the MX program where the mapping definition is stored as properties. */
     private static final String PROP_NAME = "org.mxupdate.mapping.properties";
 
-    /**
-     * Used prefix of property definition within the property file.
-     *
-     * @see #Mapping_mxJPO(ParameterCache_mxJPO)
-     */
+    /** Used prefix of property definition within the property file. */
     private static final String PREFIX_PROPERTYDEF = "PropertyDef.";
-
-    /**
-     * Length of the prefix of property definition within the property file.
-     *
-     * @see #Mapping_mxJPO(ParameterCache_mxJPO)
-     */
+    /** Length of the prefix of property definition within the property file. */
     private static final int LENGTH_PROPERTYDEF = Mapping_mxJPO.PREFIX_PROPERTYDEF.length();
 
-    /**
-     * Used prefix of parameter definition within the property file.
-     *
-     * @see #Mapping_mxJPO(ParameterCache_mxJPO)
-     */
+    /** Used prefix of parameter definition within the property file. */
     private static final String PREFIX_PARAMETERDEF = "ParameterDef.";
-
-    /**
-     * Length of the {@link #PREFIX_PARAMETERDEF prefix of parameter definition}
-     * within the property file.
-     *
-     * @see #Mapping_mxJPO(ParameterCache_mxJPO)
-     */
+    /** Length of the {@link #PREFIX_PARAMETERDEF prefix of parameter definition} within the property file. */
     private static final int LENGTH_PARAMETERDEF = Mapping_mxJPO.PREFIX_PARAMETERDEF.length();
 
-    /**
-     * Properties holding all mapping definitions.
-     */
+    /** Properties holding all mapping definitions. */
     private final Properties properties = new Properties();
 
-    /**
-     * Maps from the mode enumeration {@link Mode_mxJPO} to the related
-     * instance holding the parameter names and description.
-     *
-     * @see Mode_mxJPO#defineValue(Mapping_mxJPO, String, String)
-     * @see #getModeMap()
-     */
-    private final Map<Mode_mxJPO,AbstractValue_mxJPO> modeMap
-            = new HashMap<Mode_mxJPO,AbstractValue_mxJPO>();
+    /** Maps from the mode enumeration {@link Mode_mxJPO} to the related instance holding the parameter names and description. */
+    private final Map<Mode_mxJPO,AbstractValue_mxJPO> modeMap = new HashMap<>();
 
-    /**
-     * Maps from the name of the parameter to the parameter instance.
-     *
-     * @see ParameterDef_mxJPO#defineValue(Mapping_mxJPO, String, String)
-     * @see #getAllParameterDefs()
-     * @see #getParameterDef(String)
-     * @see #getParameterDefMap()
-     */
-    private final Map<String,ParameterDef_mxJPO> parameterDefMap = new HashMap<String,ParameterDef_mxJPO>();
+    /** Maps from the name of the parameter to the parameter instance. */
+    private final Map<String,ParameterDef_mxJPO> parameterDefMap = new HashMap<>();
 
-    /**
-     * Mapping between internal used admin property definitions and the MX
-     * attribute names.
-     *
-     * @see PropertyDef_mxJPO#getAttrName(ParameterCache_mxJPO)
-     * @see #getPropertyAttributes()
-     */
-    private final Map<PropertyDef_mxJPO,String> propertyAttributes = new HashMap<PropertyDef_mxJPO,String>();
+    /** Mapping between internal used admin property definitions and the MX attribute names. */
+    private final Map<PropertyDef_mxJPO,String> propertyAttributes = new HashMap<>();
 
-    /**
-     * Mapping between internal used admin property definitions and the MX
-     * admin property names.
-     *
-     * @see PropertyDef_mxJPO#getPropName(ParameterCache_mxJPO)
-     * @see #getPropertyEnum2Names()
-     */
-    private final Map<PropertyDef_mxJPO,String> propertyEnum2Names = new HashMap<PropertyDef_mxJPO,String>();
+    /** Mapping between internal used admin property definitions and the MX admin property names. */
+    private final Map<PropertyDef_mxJPO,String> propertyEnum2Names = new HashMap<>();
 
-    /**
-     * Mapping between MX admin property name and the internal used admin
-     * property definition.
-     *
-     * @see PropertyDef_mxJPO#getEnumByPropName(ParameterCache_mxJPO, String)
-     * @see #getPropertyNames2Enum()
-     */
-    private final Map<String,PropertyDef_mxJPO> propertyNames2Enum = new HashMap<String,PropertyDef_mxJPO>();
+    /** Mapping between MX admin property name and the internal used admin property definition. */
+    private final Map<String,PropertyDef_mxJPO> propertyNames2Enum = new HashMap<>();
 
     /** Maps from the name of the type definition group to the related type definition group instance. */
-    private final Map<String,TypeDef_mxJPO> typeDefMap = new HashMap<String,TypeDef_mxJPO>();
+    private final Map<String,TypeDef_mxJPO> typeDefMap = new HashMap<>();
 
-    /**
-     * Sorted type definition used to define the order of the update.
-     *
-     * @see #getAllTypeDefsSorted()
-     */
-    private final Set<TypeDef_mxJPO> typeDefSorted = new TreeSet<TypeDef_mxJPO>();
+    /** Sorted type definition used to define the order of the update. */
+    private final Set<TypeDef_mxJPO> typeDefSorted = new TreeSet<>();
 
-    /**
-     * Maps from the name of the type definition group to the related type
-     * definition group instance.
-     *
-     * @see TypeDefGroup_mxJPO#defineValue(Mapping_mxJPO, String, String)
-     * @see #getTypeDefGroup(String)
-     * @see #getAllTypeDefGroups()
-     * @see #getTypeDefGroupMap()
-     */
-    private final Map<String,TypeDefGroup_mxJPO> typeDefGroupMap = new HashMap<String,TypeDefGroup_mxJPO>();
-
-    /**
-     * Maps from the name of the type definition tree to the related type
-     * definition tree instance.
-     *
-     * @see TypeDefTree_mxJPO#defineValue(Mapping_mxJPO, String, String)
-     * @see #getTypeDefTree(String)
-     * @see #getAllTypeDefTrees()
-     * @see #getTypeDefTreeMap()
-     */
-    private final Map<String,TypeDefTree_mxJPO> typeDefTreeMap = new HashMap<String,TypeDefTree_mxJPO>();
+    /** Maps from the name of the type definition group to the related type definition group instance. */
+    private final Map<String,TypeDefGroup_mxJPO> typeDefGroupMap = new HashMap<>();
 
     /**
      *
@@ -175,7 +96,7 @@ public class Mapping_mxJPO
             this.evalKeyValue(_paramCache, (String) entry.getKey(), (String) entry.getValue());
         }
         // executes the checks for the parameter definitions
-        final Map<String,String> checkResult = new HashMap<String,String>();
+        final Map<String,String> checkResult = new HashMap<>();
         for (final ParameterDef_mxJPO param : this.parameterDefMap.values())  {
             param.evalCheck(_paramCache, checkResult);
         }
@@ -206,8 +127,6 @@ public class Mapping_mxJPO
             TypeDef_mxJPO.defineValue(_paramCache, this.typeDefMap, _key.substring(8), _value);
         } else if (_key.startsWith("TypeDefGroup."))  {
             TypeDefGroup_mxJPO.defineValue(this, _key.substring(13), _value);
-        } else if (_key.startsWith("TypeDefTree."))  {
-            TypeDefTree_mxJPO.defineValue(this, _key.substring(12), _value);
         }
     }
 
@@ -381,42 +300,5 @@ public class Mapping_mxJPO
     protected Map<String,TypeDefGroup_mxJPO> getTypeDefGroupMap()
     {
         return this.typeDefGroupMap;
-    }
-
-    /**
-     * Returns for given name the related type definition tree instance.
-     *
-     * @param _name name of the searched type definition tree instance
-     * @return found type definition tree instance (or <code>null</code> if
-     *         not found)
-     * @see #typeDefTreeMap
-     */
-    public TypeDefTree_mxJPO getTypeDefTree(final String _name)
-    {
-        return this.typeDefTreeMap.get(_name);
-    }
-
-    /**
-     * Returns the list of all type definition tree instances.
-     *
-     * @return list of all type definition tree instances
-     * @see #typeDefTreeMap
-     */
-    public Collection<TypeDefTree_mxJPO> getAllTypeDefTrees()
-    {
-        return this.typeDefTreeMap.values();
-    }
-
-    /**
-     * Returns the mapping between the type definition tree name and the
-     * related type definition tree instance.
-     *
-     * @return mapping between type definition tree name and the related type
-     *         definition tree instance
-     * @see #typeDefTreeMap
-     */
-    protected Map<String,TypeDefTree_mxJPO> getTypeDefTreeMap()
-    {
-        return this.typeDefTreeMap;
     }
 }
