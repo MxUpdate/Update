@@ -21,12 +21,19 @@ import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.security.SecureRandom;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.maven.settings.DefaultMavenSettingsBuilder;
@@ -336,6 +343,19 @@ public abstract class AbstractTest
         final String url        = (_url != null)        ? _url      : this.getSetting(AbstractTest.PROP_URL);
         final String user       = (_user != null)       ? _user     : this.getSetting(AbstractTest.PROP_USER);
         final String password   = (_password != null)   ? _password : this.getSetting(AbstractTest.PROP_PASSWORD);
+
+        // work-around that all SSL certificates are allowed (needed for self-signed SSL certificates!)
+        final SSLContext sc = SSLContext.getInstance("SSL");
+        sc.init(null,
+                new TrustManager[] {
+                    new X509TrustManager() {
+                       @Override public X509Certificate[] getAcceptedIssuers() {return null;}
+                       @Override public void checkClientTrusted(final X509Certificate[] certs, final String authType) {}
+                       @Override public void checkServerTrusted(final X509Certificate[] certs, final String authType) {}
+                    }
+                },
+                new SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
         this.context = new Context(url);
         this.context.resetContext(user, password, null);
