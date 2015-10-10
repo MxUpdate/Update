@@ -26,81 +26,90 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class RoleCI_1ParserTest
     extends AbstractParserTest<Role_mxJPO>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
-        return new Object[][]
-        {
+        return new Object[][]  {
             {"0) simple",
                     "",
                     "description \"\" !hidden"},
+            // uuid
+            {"1a) uuid with minus separator",
+                    "",
+                    "uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" !hidden"},
+            {"1b) uuid w/o minus separator",
+                    "",
+                    "uuid \"FDA75674979211E6AE2256B6B6499611\"     description \"\" !hidden"},
+            {"1c) uuid convert from single to string",
+                    "uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" !hidden",
+                    "uuid   FDA7-5674979211-E6AE2256B6-B6499611    description \"\" !hidden"},
             // registered name
-            {"1a) symbolic name",
+            {"2a) symbolic name",
                     "",
                     "symbolicname \"role_abc\" description \"\" !hidden"},
-            {"1b) two symbolic names",
+            {"2b) two symbolic names",
                     "symbolicname \"role_abc\" symbolicname \"role_def\" description \"\" !hidden",
                     "symbolicname \"role_def\" symbolicname \"role_abc\" description \"\" !hidden"},
             // description
-            {"2a) description",
+            {"3a) description",
                     "",
                     "description \"abc def\" !hidden"},
-            {"2b) description not defined",
+            {"3b) description not defined",
                     "description \"\" !hidden",
                     "                 !hidden"},
-            {"2c) multi-line description",
+            {"3c) multi-line description",
                     "",
                     "description \"abc\ndef\" !hidden"},
             // kind
-            {"3a) kind organization",
+            {"4a) kind organization",
                     "",
                     "kind organization description \"\" !hidden"},
-            {"3b) kind project",
+            {"4b) kind project",
                     "",
                     "kind project description \"\" !hidden"},
-            {"3c) kind role",
+            {"4c) kind role",
                     "          description \"\" !hidden",
                     "kind role description \"\" !hidden"},
             // hidden flag
-            {"4a) hidden",
+            {"5a) hidden",
                     "",
                     "description \"\" hidden"},
-            {"4b) not hidden (not defined)",
+            {"5b) not hidden (not defined)",
                     "description \"\" !hidden",
                     "description \"\"        "},
             // site
-            {"5a) site",
+            {"6a) site",
                     "",
                     "description \"\" !hidden site \"side\""},
-            {"5b) empty site",
+            {"6b) empty site",
                     "description \"\" !hidden",
                     "description \"\" !hidden site \"\""},
             // parent roles
-            {"6a) parent",
+            {"7a) parent",
                     "",
                     "description \"\" !hidden parent \"111\""},
-            {"6b) parent name w/o apostrophe",
+            {"7b) parent name w/o apostrophe",
                     "description \"\" !hidden parent \"111\"",
                     "description \"\" !hidden parent 111"},
-            {"6c) two parents (to check sort)",
+            {"7c) two parents (to check sort)",
                     "description \"\" !hidden parent \"111\" parent \"222\"",
                     "description \"\" !hidden parent \"222\" parent \"111\""},
             // property
-            {"7a) property special characters",
+            {"8a) property special characters",
                     "",
                     "description \"\" !hidden property \"{}\\\"\""},
-            {"7b) property and value special characters",
+            {"8b) property and value special characters",
                     "",
                     "description \"\" !hidden property \"{}\\\"\" value \"{}\\\"\""},
-            {"7c) property link special characters",
+            {"8c) property link special characters",
                     "",
                     "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\""},
-            {"7d) property link and value special characters",
+            {"8d) property link and value special characters",
                     "",
                     "description \"\" !hidden property \"{}\\\"\" to type \"{}\\\"\" value \"{}\\\"\""},
         };

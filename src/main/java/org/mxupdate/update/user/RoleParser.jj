@@ -22,14 +22,29 @@ options {
     SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
     UNICODE_INPUT = true;
 }
-PARSER_BEGIN(RoleParser)
+
+PARSER_BEGIN(RoleParser)
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
 package org.mxupdate.update.user;
 
 import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.update.user.Role_mxJPO.Kind;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
-import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
 import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
@@ -43,14 +58,19 @@ class RoleParser
     extends AbstractParser_mxJPO
 {
 }
-PARSER_END(RoleParser)<*> SKIP :
+
+PARSER_END(RoleParser)
+
+<*> SKIP :
 {
   " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
 <DEFAULT> TOKEN :
 {
-      <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+      <UUID:                                "uuid">                                         : STRING_EXPECTED
+
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
     | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
@@ -104,7 +124,8 @@ class RoleParser
 }
 
 /**************************************************************************** */
-/**
+
+/**
  * Parses one complete role definition.
  *
  * @param _role     target role to update with parsed values
@@ -115,15 +136,21 @@ void parse(final Role_mxJPO _role)
     Token tmp;
     AdminProperty property;
 } {
-    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_role, "symbolicNames",                       this.getString(tmp.image));}
+    (   ( <KIND>                    ( <ORGANIZATION>                        {this.setValue(_role, "kind",                                   Kind.Organization);}
+                                    | <PROJECT>                             {this.setValue(_role, "kind",                                   Kind.Project);}
+                                    | <ROLE>                                {this.setValue(_role, "kind",                                   Kind.Role);} ) )
+
+      | ( <UUID>                                                            {property = new AdminProperty();
+                                                                             this.appendValue(this.getValue(_role, "properties"), "propertiesStack", property);
+                                                                             this.setValue(property, "name",  "UUID");}
+                                    ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
+                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+
+      | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_role, "symbolicNames",                       this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.appendValue(_role, "symbolicNames",                       this.getSingle(tmp.image));} ) )
 
       | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_role, "description",                            this.getString(tmp.image));}
                                     | tmp = <MULTILINESINGLE>               {this.setValue(_role, "description",                            this.getSingle(tmp.image));} ) )
-
-      | ( <KIND>                    ( <ORGANIZATION>                        {this.setValue(_role, "kind",                                   Kind.Organization);}
-                                    | <PROJECT>                             {this.setValue(_role, "kind",                                   Kind.Project);}
-                                    | <ROLE>                                {this.setValue(_role, "kind",                                   Kind.Role);} ) )
 
       | ( <HIDDEN_TRUE>                                                     {this.setValue(_role, "hidden",                                 true);} )
       | ( <HIDDEN_FALSE>                                                    {this.setValue(_role, "hidden",                                 false);} )
