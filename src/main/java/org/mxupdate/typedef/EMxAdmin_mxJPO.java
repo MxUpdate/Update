@@ -16,8 +16,11 @@
 package org.mxupdate.typedef;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
@@ -44,6 +47,11 @@ import org.mxupdate.update.userinterface.Inquiry_mxJPO;
 import org.mxupdate.update.userinterface.Menu_mxJPO;
 import org.mxupdate.update.userinterface.Portal_mxJPO;
 import org.mxupdate.update.userinterface.Table_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+
+import matrix.util.MatrixException;
 
 /**
  * Enumeration for MX admin object used as work arround.
@@ -52,7 +60,20 @@ import org.mxupdate.update.userinterface.Table_mxJPO;
  */
 public enum EMxAdmin_mxJPO
 {
-    Association(Association_mxJPO.class),
+    Association(Association_mxJPO.class)
+    {
+        @Override
+        public SortedSet<String> evalListWOCache(final ParameterCache_mxJPO _paramCache)
+            throws MatrixException
+        {
+            final SortedSet<String> ret = new TreeSet<>();
+            final String tmp = MqlBuilderUtil_mxJPO.mql().cmd("escape list association").exec(_paramCache.getContext());
+            if (!tmp.isEmpty())  {
+                ret.addAll(Arrays.asList(tmp.split("\n")));
+            }
+            return ret;
+        }
+    },
     Attribute(AttributeCI_mxJPO.class),
     Channel(Channel_mxJPO.class),
     Command(Command_mxJPO.class),
@@ -66,7 +87,28 @@ public enum EMxAdmin_mxJPO
     Menu(Menu_mxJPO.class),
     Package(PackageCI_mxJPO.class),
     Page(Page_mxJPO.class),
-    PathType(PathType_mxJPO.class),
+    PathType(PathType_mxJPO.class)
+    {
+        @Override public SortedSet<String> evalListWOCache(final ParameterCache_mxJPO _paramCache)
+            throws MatrixException
+        {
+            final SortedSet<String> ret = new TreeSet<>();
+            final String pathTypeStr = MqlBuilderUtil_mxJPO.mql()
+                    .cmd("escape list pathtype ").arg("*").cmd(" ")
+                            .cmd("select ").arg("name").cmd(" ").arg("owner").cmd(" ")
+                            .cmd("dump ").arg(EMxAdmin_mxJPO.SELECT_KEY)
+                            .exec(_paramCache.getContext());
+            if (!pathTypeStr.isEmpty())  {
+                for (final String nameOwnerStr : pathTypeStr.split("\n"))  {
+                    final String[] nameOwnerArr = nameOwnerStr.split(EMxAdmin_mxJPO.SELECT_KEY);
+                    if ((nameOwnerArr.length < 2) || nameOwnerArr[1].isEmpty())  {
+                        ret.add(nameOwnerArr[0]);
+                    }
+                }
+            }
+            return ret;
+        }
+    },
     Person(PersonAdmin_mxJPO.class),
     Policy(Policy_mxJPO.class),
     Portal(Portal_mxJPO.class),
@@ -74,8 +116,30 @@ public enum EMxAdmin_mxJPO
     Relationship(Relationship_mxJPO.class),
     Role(Role_mxJPO.class),
     Rule(Rule_mxJPO.class),
-    Table(Table_mxJPO.class) {@Override public String mxClassSuffix() {return "system";} @Override public boolean hasMxClassSuffix() {return true;}},
+    Table(Table_mxJPO.class) {
+        @Override public String mxClassSuffix()
+        {
+            return "system";
+        }
+        @Override public boolean hasMxClassSuffix()
+        {
+            return true;
+        }
+        @Override public SortedSet<String> evalListWOCache(final ParameterCache_mxJPO _paramCache)
+            throws MatrixException
+        {
+            final SortedSet<String> ret = new TreeSet<>();
+            final String tmp = MqlBuilderUtil_mxJPO.mql().cmd("escape list table system").exec(_paramCache.getContext());
+            if (!tmp.isEmpty())  {
+                ret.addAll(Arrays.asList(tmp.split("\n")));
+            }
+            return ret;
+        }
+    },
     Type(Type_mxJPO.class);
+
+    /** Key used for the select statements. */
+    private static final String SELECT_KEY = "@@@2@@@2@@@";
 
     private static final Map<String,EMxAdmin_mxJPO> MAP_FROM_MXCLASS = new HashMap<>();
     static  {
@@ -152,6 +216,50 @@ public enum EMxAdmin_mxJPO
     public boolean hasMxClassSuffix()
     {
         return false;
+    }
+
+    /**
+     * Checks if the current list of objects exists and if not evaluates the
+     * list of all objects.
+     *
+     * @param _paramCache   parameter cache
+     * @return set of all object names
+     * @throws MatrixException
+     */
+    public SortedSet<String> evalList(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException
+    {
+        final SortedSet<String> ret;
+        @SuppressWarnings("unchecked")
+        Map<EMxAdmin_mxJPO,SortedSet<String>> mxNames = (Map<EMxAdmin_mxJPO,SortedSet<String>>) _paramCache.getCache(CacheKey.MxNames);
+        if (mxNames == null)  {
+            mxNames = new HashMap<>();
+            _paramCache.setCache(CacheKey.MxNames, mxNames);
+        }
+        if (mxNames.containsKey(this))  {
+            ret = mxNames.get(this);
+        } else  {
+            ret = this.evalListWOCache(_paramCache);
+        }
+        return ret;
+    }
+
+    /**
+     * Evaluates the list of all objects.
+     *
+     * @param _paramCache   parameter cache
+     * @return list of all existing objects
+     * @throws MatrixException if evaluate failed
+     */
+    public SortedSet<String> evalListWOCache(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException
+    {
+        final SortedSet<String> ret = new TreeSet<>();
+        final String tmp = MqlBuilderUtil_mxJPO.mql().cmd("escape list ").cmd(this.mxClass()).cmd(" ").arg("*").exec(_paramCache.getContext());
+        if (!tmp.isEmpty())  {
+            ret.addAll(Arrays.asList(tmp.split("\n")));
+        }
+        return ret;
     }
 
     /**

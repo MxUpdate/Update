@@ -19,10 +19,10 @@ import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 
 import matrix.util.MatrixException;
 
@@ -35,22 +35,17 @@ import matrix.util.MatrixException;
 public class MxNamesAdmin_mxJPO
     implements IMatcherMxNames_mxJPO
 {
-    @Override()
+    @Override
     public SortedSet<String> match(final ParameterCache_mxJPO _paramCache,
                                    final TypeDef_mxJPO _typeDef,
                                    final Collection<String> _matches)
         throws MatrixException
     {
-        final String listStr = MqlBuilderUtil_mxJPO.mql()
-                .cmd("escape list ").cmd(_typeDef.getMxAdminName()).cmd(" ").arg("*").cmd(" ").cmd(_typeDef.getMxAdminSuffix())
-                .exec(_paramCache.getContext());
-
         final SortedSet<String> ret = new TreeSet<>();
-        if (!listStr.isEmpty())  {
-            for (final String mxName : listStr.split("\n"))  {
-                if (StringUtil_mxJPO.match(mxName, _matches))  {
-                    ret.add(mxName);
-                }
+        final EMxAdmin_mxJPO mxClassDef = EMxAdmin_mxJPO.valueOfByClass(_typeDef.getMxUpdateType());
+        for (final String mxName : mxClassDef.evalList(_paramCache))  {
+            if (StringUtil_mxJPO.match(mxName, _matches))  {
+                ret.add(mxName);
             }
         }
         return ret;
