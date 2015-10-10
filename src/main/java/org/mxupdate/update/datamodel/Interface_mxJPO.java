@@ -53,6 +53,7 @@ public class Interface_mxJPO
         Interface_mxJPO.IGNORED_URLS.add("/attributeDefRefList");
         Interface_mxJPO.IGNORED_URLS.add("/derivedFromInterface");
         Interface_mxJPO.IGNORED_URLS.add("/derivedFromInterface/interfaceTypeRefList");
+        Interface_mxJPO.IGNORED_URLS.add("/pathDefRefList");
         Interface_mxJPO.IGNORED_URLS.add("/relationshipDefRefList");
         Interface_mxJPO.IGNORED_URLS.add("/typeRefList");
         Interface_mxJPO.IGNORED_URLS.add("/localAttributes");
@@ -86,7 +87,7 @@ public class Interface_mxJPO
         super(_typeDef, _mxName);
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -104,7 +105,7 @@ public class Interface_mxJPO
      * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
      *         <i>false</i>
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -115,29 +116,41 @@ public class Interface_mxJPO
         } else if ("/abstract".equals(_url))  {
             this.abstractFlag = true;
             parsed = true;
-        } else if ("/allowAllRelationships".equals(_url))  {
-            this.relationAll = true;
-            parsed = true;
-        } else if ("/allowAllTypes".equals(_url))  {
-            this.typeAll = true;
-            parsed = true;
-        } else if (_url.startsWith("/attributeDefRefList/attributeDefRef"))  {
-            this.attributes.add(_content);
-            parsed = true;
         } else if ("/derivedFromInterface/interfaceTypeRefList/interfaceTypeRef".equals(_url))  {
             this.derived.add(_content);
             parsed = true;
-        } else if (_url.startsWith("/localAttributes/attributeDefList/attributeDef"))  {
-            parsed = this.localAttributes.parseAdminXMLExportEvent(_paramCache, _url.substring(46), _content);
+
+        } else if ("/allowAllPathTypes".equals(_url))  {
+            this.pathTypeAll = true;
+            parsed = true;
+        } else if ("/pathDefRefList/pathDefRef".equals(_url))  {
+            this.pathTypes.add(_content);
+            parsed = true;
+
+        } else if ("/allowAllRelationships".equals(_url))  {
+            this.relationAll = true;
+            parsed = true;
         } else if ("/relationshipDefRefList/relationshipDefRef".equals(_url))  {
             this.relations.add(_content);
+            parsed = true;
+
+        } else if ("/allowAllTypes".equals(_url))  {
+            this.typeAll = true;
             parsed = true;
         } else if ("/typeRefList/typeRef".equals(_url))  {
             this.types.add(_content);
             parsed = true;
+
+        } else if (_url.startsWith("/attributeDefRefList/attributeDefRef"))  {
+            this.attributes.add(_content);
+            parsed = true;
+        } else if (_url.startsWith("/localAttributes/attributeDefList/attributeDef"))  {
+            parsed = this.localAttributes.parseAdminXMLExportEvent(_paramCache, _url.substring(46), _content);
+
         } else  {
             parsed = super.parseAdminXMLExportEvent(_paramCache, _url, _content);
         }
+
         return parsed;
     }
 
@@ -145,14 +158,14 @@ public class Interface_mxJPO
      * After the interface is parsed, the interface and local attributes must be
      * prepared.
      */
-    @Override()
+    @Override
     protected void prepare()
     {
         super.prepare();
         this.localAttributes.prepare();
     }
 
-    @Override()
+    @Override
     protected void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
@@ -172,7 +185,7 @@ public class Interface_mxJPO
                 .properties(this.getProperties());
     }
 
-    @Override()
+    @Override
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
                              final Interface_mxJPO _current)
@@ -182,8 +195,9 @@ public class Interface_mxJPO
         DeltaUtil_mxJPO.calcValueDelta(            _mql, "description",                 this.getDescription(),              _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(             _mql, "hidden",              false,  this.isHidden(),                    _current.isHidden());
         DeltaUtil_mxJPO.calcValFlgDelta(           _mql, "abstract",            false,  this.abstractFlag,                  _current.abstractFlag);
-        DeltaUtil_mxJPO.calcListDelta(             _mql, "type",                        this.typeAll, this.types,           _current.typeAll, _current.types);
+        DeltaUtil_mxJPO.calcListDelta(             _mql, "pathtype",                    this.pathTypeAll, this.pathTypes,   _current.pathTypeAll, _current.pathTypes);
         DeltaUtil_mxJPO.calcListDelta(             _mql, "relationship",                this.relationAll, this.relations,   _current.relationAll, _current.relations);
+        DeltaUtil_mxJPO.calcListDelta(             _mql, "type",                        this.typeAll, this.types,           _current.typeAll, _current.types);
 
         DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql, "attribute",
                 ErrorKey.DM_INTERFACE_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),

@@ -23,9 +23,13 @@ import org.mxupdate.test.data.datamodel.AttributeIntegerData;
 import org.mxupdate.test.data.datamodel.AttributeRealData;
 import org.mxupdate.test.data.datamodel.AttributeStringData;
 import org.mxupdate.test.data.datamodel.InterfaceData;
+import org.mxupdate.test.data.datamodel.PathTypeData;
+import org.mxupdate.test.data.datamodel.RelationshipData;
+import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
+import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.update.datamodel.Interface_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.AfterClass;
@@ -44,22 +48,71 @@ import matrix.util.MatrixException;
 public class InterfaceCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<Interface_mxJPO,InterfaceData>
 {
-    @Override()
+    @Override
+    @IssueLink("123")
     @DataProvider(name = "data")
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1a) symbolic name",
+            {"1a) simple",
+                new InterfaceData(this, "Test"),
+                new InterfaceData(this, "Test")},
+            {"1b) with escaped name",
+                    new InterfaceData(this, "TestInterface \" 1"),
+                    new InterfaceData(this, "TestInterface \" 1")},
+
+            {"2) issue #123: interface which is abstract",
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test").setFlag("abstract", true, Create.ViaValue)},
+
+            {"3a) symbolic name",
                     new InterfaceData(this, "Test"),
                     new InterfaceData(this, "Test").setValue("symbolicname", "interface_123")},
-            {"1b) two symbolic name",
+            {"3b) two symbolic name",
                     new InterfaceData(this, "Test"),
                     new InterfaceData(this, "Test").setValue("symbolicname", "interface_123").setValue("symbolicname", "interface_345")},
-            {"2a) with property",
+
+            {"4a) with property",
                     new InterfaceData(this, "Test"),
                     new InterfaceData(this, "Test").addProperty(new PropertyDef("my test \"property\" desc\"\\\\ription"))},
 
-            {"101) binary attribute",
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // for relationship / type / interface
+
+            {"101) for pathtype all",
+                        new InterfaceData(this, "Test"),
+                        new InterfaceData(this, "Test").setSingle("for pathtype", "all")},
+            {"102) for one pathtype",
+                        new InterfaceData(this, "Test"),
+                        new InterfaceData(this, "Test").defData("for pathtype", new PathTypeData(this, "Test"))},
+            {"103) for two pathtypes",
+                        new InterfaceData(this, "Test"),
+                        new InterfaceData(this, "Test").defData("for pathtype", new PathTypeData(this, "Test \"1\"")).defData("for pathtype", new PathTypeData(this, "Test \"2\""))},
+
+            {"111) for relation all",
+                        new InterfaceData(this, "Test"),
+                        new InterfaceData(this, "Test").setSingle("for relationship", "all")},
+            {"112) for one relation",
+                        new InterfaceData(this, "Test"),
+                        new InterfaceData(this, "Test").defData("for relationship", new RelationshipData(this, "Test"))},
+            {"113) for two relations",
+                        new InterfaceData(this, "Test"),
+                        new InterfaceData(this, "Test").defData("for relationship", new RelationshipData(this, "Test \"1\"")).defData("for relationship", new RelationshipData(this, "Test \"2\""))},
+
+            {"121) for type all",
+                        new InterfaceData(this, "Test"),
+                        new InterfaceData(this, "Test").setSingle("for type", "all")},
+            {"122) for one type",
+                        new InterfaceData(this, "Test"),
+                        new InterfaceData(this, "Test").defData("for type", new TypeData(this, "Test"))},
+            {"123) for two types",
+                        new InterfaceData(this, "Test"),
+                        new InterfaceData(this, "Test").defData("for type", new TypeData(this, "Test \"1\"")).defData("for type", new TypeData(this, "Test \"2\""))},
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // local attribute
+
+            {"201) binary attribute",
                 new InterfaceData(this, "Test"),
                 new InterfaceData(this, "Test")
                         .addLocalAttribute(
@@ -70,7 +123,7 @@ public class InterfaceCI_2DeltaCalculationTest
                                     .setFlag("resetonclone", false, Create.ViaFlag)
                                     .setFlag("resetonrevision", false, Create.ViaFlag)
                                     .setValue("default", "")) },
-            {"102) boolean attribute",
+            {"202) boolean attribute",
                 new InterfaceData(this, "Test"),
                 new InterfaceData(this, "Test")
                         .addLocalAttribute(
@@ -82,7 +135,7 @@ public class InterfaceCI_2DeltaCalculationTest
                                     .setFlag("resetonclone", false, Create.ViaFlag)
                                     .setFlag("resetonrevision", false, Create.ViaFlag)
                                     .setValue("default", "")) },
-            {"103) date attribute",
+            {"203) date attribute",
                 new InterfaceData(this, "Test"),
                 new InterfaceData(this, "Test")
                         .addLocalAttribute(
@@ -95,7 +148,7 @@ public class InterfaceCI_2DeltaCalculationTest
                                     .setFlag("resetonrevision", false, Create.ViaFlag)
                                     .setFlag("rangevalue", false, Create.ViaFlag)
                                     .setValue("default", "")) },
-            {"104) integer attribute",
+            {"204) integer attribute",
                 new InterfaceData(this, "Test"),
                 new InterfaceData(this, "Test")
                         .addLocalAttribute(
@@ -108,7 +161,7 @@ public class InterfaceCI_2DeltaCalculationTest
                                     .setFlag("resetonrevision", false, Create.ViaFlag)
                                     .setFlag("rangevalue", false, Create.ViaFlag)
                                     .setValue("default", "")) },
-            {"105) real attribute",
+            {"205) real attribute",
                 new InterfaceData(this, "Test"),
                 new InterfaceData(this, "Test")
                         .addLocalAttribute(
@@ -121,7 +174,7 @@ public class InterfaceCI_2DeltaCalculationTest
                                     .setFlag("resetonrevision", false, Create.ViaFlag)
                                     .setFlag("rangevalue", false, Create.ViaFlag)
                                     .setValue("default", "")) },
-            {"106) string attribute",
+            {"206) string attribute",
                 new InterfaceData(this, "Test"),
                 new InterfaceData(this, "Test")
                         .addLocalAttribute(
@@ -139,15 +192,24 @@ public class InterfaceCI_2DeltaCalculationTest
     }
 
     @Override
-    @BeforeMethod()
+    @BeforeMethod
     @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.DM_INTERFACE);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BINARY);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BOOLEAN);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_DATE);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_INTEGER);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_REAL);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_STRING);
+        this.cleanup(AbstractTest.CI.DM_PATHTYPE);
+        this.cleanup(AbstractTest.CI.DM_RELATIONSHIP);
+        this.cleanup(AbstractTest.CI.DM_TYPE);
     }
 
-    @Override()
+    @Override
     protected Interface_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                             final String _name)
     {

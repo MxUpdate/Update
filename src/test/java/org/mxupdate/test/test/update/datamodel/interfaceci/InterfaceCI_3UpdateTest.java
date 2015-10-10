@@ -24,8 +24,6 @@ import org.mxupdate.test.data.datamodel.AttributeStringData;
 import org.mxupdate.test.data.datamodel.InterfaceData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
-import org.mxupdate.test.data.util.FlagList.Create;
-import org.mxupdate.test.util.IssueLink;
 import org.mxupdate.update.datamodel.Interface_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateException_mxJPO;
@@ -45,58 +43,14 @@ public class InterfaceCI_3UpdateTest
     extends AbstractDataExportUpdate<InterfaceData>
 {
     /**
-     * Data provider for test interfaces.
+     * Dummy implementation.
      *
      * @return object array with all test interfaces
      */
-    @IssueLink("123")
     @DataProvider(name = "data")
     public Object[][] dataInterfaces()
     {
-        return this.prepareData("interfaces",
-                new Object[]{
-                        "1) interface without anything (to test required fields)",
-                        new InterfaceData(this, "TestInterface")
-                                .setValue("description", "")
-                                .setFlag("hidden", false),
-                        new InterfaceData(this, "TestInterface")},
-                new Object[]{
-                        "2) interface with escaped name",
-                        new InterfaceData(this, "TestInterface \" 1")},
-
-                new Object[]{
-                        "3) issue #123: interface which is abstract",
-                        new InterfaceData(this, "TestInterface")
-                                .setFlag("abstract", true, Create.ViaValue)},
-
-                new Object[]{
-                        "4a) interface with one type",
-                        new InterfaceData(this, "TestInterface \" 1")
-                                .addType(new TypeData(this, "TestType \" 1"))},
-                new Object[]{
-                        "4b) interface with two types",
-                        new InterfaceData(this, "TestInterface \" 1")
-                                .addType(new TypeData(this, "TestType \" 1"))
-                                .addType(new TypeData(this, "TestType \" 2"))},
-                new Object[]{
-                        "4c) interface with all types",
-                        new InterfaceData(this, "TestInterface \" 1")
-                                .addAllTypes()},
-
-                new Object[]{
-                        "5a) interface with one relationship",
-                        new InterfaceData(this, "TestInterface \" 1")
-                                .addRelationship(new RelationshipData(this, "TestRelationship \" 1"))},
-                new Object[]{
-                        "5b) interface with two relationships",
-                        new InterfaceData(this, "TestInterface \" 1")
-                                .addRelationship(new RelationshipData(this, "TestRelationship \" 1"))
-                                .addRelationship(new RelationshipData(this, "TestRelationship \" 2"))},
-                new Object[]{
-                        "5c) interface with all relationships",
-                        new InterfaceData(this, "TestInterface \" 1")
-                                .addAllRelationships()}
-        );
+        return new Object[][]{};
     }
 
     /**
