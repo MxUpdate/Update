@@ -123,7 +123,7 @@ this.setValue(_page, "mimeType",                   this.getSingle(tmp.image));
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case MULTILINESTRING:{
           tmp = jj_consume_token(MULTILINESTRING);
-this.setValue(_page, "code",                       this.getString(tmp.image));
+this.setValue(_page, "code",                       this.getCode(tmp.image));
           break;
           }
         case MULTILINESINGLE:{

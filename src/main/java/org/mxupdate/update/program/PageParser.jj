@@ -116,7 +116,7 @@ void parse(final File _file, final Page_mxJPO _page)
       | ( <MIME>                    ( tmp = <STRING>                        {this.setValue(_page, "mimeType",                   this.getString(tmp.image));}
                                     | tmp = <SINGLE>                        {this.setValue(_page, "mimeType",                   this.getSingle(tmp.image));} ) )
 
-      | ( <CONTENT>                 ( tmp = <MULTILINESTRING>               {this.setValue(_page, "code",                       this.getString(tmp.image));}
+      | ( <CONTENT>                 ( tmp = <MULTILINESTRING>               {this.setValue(_page, "code",                       this.getCode(tmp.image));}
                                     | tmp = <MULTILINESINGLE>               {this.setValue(_page, "code",                       this.getSingle(tmp.image));} ) )
       | ( <FILE>                    ( tmp = <STRING>                        {this.setValue(_page, "code",                       this.getFileFromCode(_file, tmp.image));}
                                     | tmp = <SINGLE>                        {this.setValue(_page, "code",                       this.getFileFromCode(_file, tmp.image));} ) )

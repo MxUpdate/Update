@@ -105,7 +105,7 @@ public class Page_mxJPO
                 .flagIfTrue(    "hidden",           false, this.isHidden(),                     this.isHidden())
                 .string(        "mime",                    this.mimeType)
                 .properties(this.getProperties())
-                .stringIfTrue(  "content",                 "\n" + ((this.getCode() != null) ? this.getCode() : "") + "\n", (this.getCode() != null) && !this.getCode().isEmpty());
+                .codeIfTrue(    "content",                 this.getCode(),                      (this.getCode() != null) && !this.getCode().isEmpty());
     }
 
     @Override()

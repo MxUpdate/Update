@@ -81,7 +81,7 @@ public class PageCI_1ParserTest
                     "description \"\" mime \"\" content \"\" "},
             // file
             {"6a) file (as content)",
-                    "description \"\" mime \"\" content \" This is a page test. \"",
+                    "description \"\" mime \"\" content \"This is a page test.\"",
                     "file \"src/test/resources/program/page/test.page\""},
             // property
             {"20a) property special characters",
