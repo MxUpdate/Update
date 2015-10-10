@@ -32,29 +32,32 @@ import matrix.util.MatrixException;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class PortalCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<Portal_mxJPO,PortalData>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
         return new Object[][] {
-                {"1) simple test",
+            {"1) simple test",
                     new PortalData(this, "Portal1"),
                     new PortalData(this, "Portal1").setValue("description", "test").setValue("label", "").setValue("href", "").setValue("alt", "")},
-                {"2a) symbolic name",
+            {"2) uuid",
+                    new PortalData(this, "Test"),
+                    new PortalData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+            {"3a) symbolic name",
                     new PortalData(this, "Test"),
                     new PortalData(this, "Test").setValue("symbolicname", "expression_123")},
-                {"2b) two symbolic name",
+            {"3b) two symbolic name",
                     new PortalData(this, "Test"),
                     new PortalData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
        };
     }
 
     @Override
-    @BeforeMethod()
+    @BeforeMethod
     @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException

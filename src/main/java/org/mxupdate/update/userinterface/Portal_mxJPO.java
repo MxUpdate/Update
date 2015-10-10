@@ -21,20 +21,23 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.WriteAppendChildSyntax;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 /**
  * The class parses the information about the portal and writes the script used
  * to update portals. The handles properties are
  * <ul>
+ * <li>uuid</li>
+ * <li>symbolic names</li>
  * <li>hidden flag (only if hidden)</li>
  * <li>{@link #label}</li>
  * <li>{@link #href}</li>
@@ -69,7 +72,7 @@ public class Portal_mxJPO
         this.getProperties().setOtherPropTag("setting");
    }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -88,7 +91,7 @@ public class Portal_mxJPO
      * @return <i>true</i> if <code>_url</code> could be parsed; otherwise
      *         <i>false</i>
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -109,7 +112,7 @@ public class Portal_mxJPO
     /**
      * Order the channel references.
      */
-    @Override()
+    @Override
     protected void prepare()
     {
         this.children.prepare();
@@ -122,6 +125,7 @@ public class Portal_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flagIfTrue(    "hidden",           false,  this.isHidden(),                     this.isHidden())
