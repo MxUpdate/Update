@@ -22,6 +22,7 @@ import org.mxupdate.test.data.datamodel.AttributeDateData;
 import org.mxupdate.test.data.datamodel.AttributeIntegerData;
 import org.mxupdate.test.data.datamodel.AttributeRealData;
 import org.mxupdate.test.data.datamodel.AttributeStringData;
+import org.mxupdate.test.data.datamodel.PathTypeData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.util.FlagList.Create;
@@ -40,11 +41,11 @@ import matrix.util.MatrixException;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class RelationshipCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<Relationship_mxJPO,RelationshipData>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
@@ -258,20 +259,35 @@ public class RelationshipCI_2DeltaCalculationTest
                                         .setFlag("multiline", false, Create.ViaFlag)
                                         .setSingle("maxlength", "0")
                                         .setValue("default", "")) },
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // local path type
+
+            {"301) simple local path type",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType").def4FromSingle("cardinality", "many")) },
+            {"302) local path type with embedded local attribute",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .def4FromSingle("cardinality", "many")
+                                    .addLocalAttribute(new AttributeStringData(this, "PathType Attribute").setSingle("kind", "string"))) },
        };
     }
 
-    @Override()
-    @BeforeMethod()
+    @Override
+    @BeforeMethod
     @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException
     {
+        this.cleanup(AbstractTest.CI.DM_PATHTYPE); // as first, so that local attributes of path types are deleted!
         this.cleanup(AbstractTest.CI.DM_RELATIONSHIP);
         this.cleanup(AbstractTest.CI.DM_TYPE);
     }
 
-    @Override()
+    @Override
     protected Relationship_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                        final String _name)
     {

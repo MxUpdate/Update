@@ -20,6 +20,7 @@ import java.util.Arrays;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
+import org.mxupdate.test.data.datamodel.helper.LocalPathTypeDataList;
 import org.mxupdate.test.data.datamodel.helper.LocaleAttributeList;
 import org.mxupdate.test.data.util.DataList;
 import org.mxupdate.test.data.util.FlagList;
@@ -44,7 +45,9 @@ public class RelationshipData
     /** All rule of this data with rule instances. */
     private final DataList<RuleData> rules = new DataList<>();
     /** Local attributes. */
-    private final LocaleAttributeList attributes = new LocaleAttributeList();
+    private final LocaleAttributeList localAttributes = new LocaleAttributeList();
+    /** Local path types. */
+    private final LocalPathTypeDataList localPathTypes = new LocalPathTypeDataList();
 
     /**
      * Initialize this relationship data with given <code>_name</code>.
@@ -102,7 +105,19 @@ public class RelationshipData
      */
     public RelationshipData addLocalAttribute(final AbstractAttributeData<?>... _attributes)
     {
-        this.attributes.addAll(Arrays.asList(_attributes));
+        this.localAttributes.addAll(Arrays.asList(_attributes));
+        return this;
+    }
+
+    /**
+     * Appends given {@code _localPathTypes}.
+     *
+     * @param _localPathTypes       local path types to append
+     * @return this type data instance
+     */
+    public RelationshipData addLocalPathType(final PathTypeData... _localPathTypes)
+    {
+        this.localPathTypes.addAll(Arrays.asList(_localPathTypes));
         return this;
     }
 
@@ -111,7 +126,7 @@ public class RelationshipData
      *
      * @return TCL update file content
      */
-    @Override()
+    @Override
     public String ciFile()
     {
         final StringBuilder strg = new StringBuilder();
@@ -127,7 +142,8 @@ public class RelationshipData
         this.rules          .append4Update("    ", strg);
         this.from           .appendUpdate(strg);
         this.to             .appendUpdate(strg);
-        this.attributes     .append4Update("    ", strg);
+        this.localAttributes.append4Update("    ", strg);
+        this.localPathTypes .append4Update("    ", strg);
         this.getProperties().append4Update("    ", strg);
 
         strg.append("}");
@@ -137,12 +153,12 @@ public class RelationshipData
 
     /**
      * Create the related relationship in MX for this relationship data
-     * instance and appends the {@link #attributes}.
+     * instance and appends the {@link #localAttributes}.
      *
      * @return this relationship data instance
      * @throws MatrixException if create failed
      */
-    @Override()
+    @Override
     public RelationshipData create()
         throws MatrixException
     {
@@ -181,7 +197,7 @@ public class RelationshipData
      * @see #from
      * @see #to
      */
-    @Override()
+    @Override
     public RelationshipData createDependings()
         throws MatrixException
     {
@@ -200,15 +216,16 @@ public class RelationshipData
      *
      * @param _exportParser     parsed export
      */
-    @Override()
+    @Override
     public void checkExport(final ExportParser _exportParser)
     {
         super.checkExport(_exportParser);
 
-        this.from       .checkExport(_exportParser);
-        this.to         .checkExport(_exportParser);
-        this.rules      .check4Export(_exportParser, "");
-        this.attributes .checkExport(_exportParser);
+        this.from           .checkExport(_exportParser);
+        this.to             .checkExport(_exportParser);
+        this.rules          .check4Export(_exportParser, "");
+        this.localAttributes.checkExport(_exportParser);
+        this.localPathTypes .checkExport(_exportParser);
     }
 
     /**

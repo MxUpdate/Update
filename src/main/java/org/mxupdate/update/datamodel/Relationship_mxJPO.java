@@ -70,6 +70,8 @@ public class Relationship_mxJPO
         Relationship_mxJPO.IGNORED_URLS.add("/derivedFromRelationship/relationshipDefRefList");
         Relationship_mxJPO.IGNORED_URLS.add("/localAttributes");
         Relationship_mxJPO.IGNORED_URLS.add("/localAttributes/attributeDefList");
+        Relationship_mxJPO.IGNORED_URLS.add("/localPathTypes");
+        Relationship_mxJPO.IGNORED_URLS.add("/localPathTypes/pathDefList");
         Relationship_mxJPO.IGNORED_URLS.add("/fromSide");
         Relationship_mxJPO.IGNORED_URLS.add("/fromSide/allowAllRelationships");                     // to be ignored, because read within parse method
         Relationship_mxJPO.IGNORED_URLS.add("/fromSide/allowAllTypes");                             // to be ignored, because read within parse method
@@ -162,7 +164,7 @@ public class Relationship_mxJPO
      *         <i>false</i>
      * @see #IGNORED_URLS
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -175,9 +177,6 @@ public class Relationship_mxJPO
             parsed = true;
         } else if ("/accessRuleRef".equals(_url))  {
             this.rule = _content;
-            parsed = true;
-        } else if (_url.startsWith("/attributeDefRefList/attributeDefRef"))  {
-            this.globalAttributes.add(_content);
             parsed = true;
         } else if (_url.startsWith("/derivedFromRelationship/relationshipDefRefList/relationshipDefRef"))  {
             this.derived = _content;
@@ -202,8 +201,14 @@ public class Relationship_mxJPO
             this.from.propagateConnection = true;
             parsed = true;
 
+        } else if (_url.startsWith("/attributeDefRefList/attributeDefRef"))  {
+            this.globalAttributes.add(_content);
+            parsed = true;
         } else if (_url.startsWith("/localAttributes/attributeDefList/attributeDef"))  {
             parsed = this.localAttributes.parseAdminXMLExportEvent(_paramCache, _url.substring(46), _content);
+
+        } else if (_url.startsWith("/localPathTypes/pathDefList/pathDef"))  {
+            parsed = this.localPathTypes.parseAdminXMLExportEvent(_paramCache, _url.substring(35), _content);
 
         } else if ("/preventDuplicates".equals(_url))  {
             this.preventDuplicates = true;
@@ -294,6 +299,8 @@ public class Relationship_mxJPO
                 ErrorKey.DM_RELATION_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
                 ValueKeys.DMRelationAttrIgnore, ValueKeys.DMRelationAttrRemove,         this.globalAttributes,        _current.globalAttributes);
         this.localAttributes.calcDelta(_paramCache, _mql, EMxAdmin_mxJPO.Relationship, this.getName(), ErrorKey.DM_RELATION_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
+
+        this.localPathTypes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_RELATION_REMOVE_LOCAL_PATH_TYPE, _current.localPathTypes);
 
         // only one rule can exists maximum, but they must be technically handled like as list
         final SortedSet<String> thisRules = new TreeSet<>();

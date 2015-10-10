@@ -586,6 +586,20 @@ public class RelationshipCI_3UpdateTest
     }
 
     /**
+     * Negative test if an local path type is removed.
+     *
+     * @throws Exception if test failed
+     */
+    @Test(description = "negative test if an local path type is removed")
+    public void t24_negativeTestLocalPathTypeRemoved()
+        throws Exception
+    {
+        final RelationshipData typeDef = this.createNewData("Test").create();
+        this.mql("escape add pathtype \"MXUPDATE_Test\" owner relationship \"" + AbstractTest.convertMql(typeDef.getName()) + "\"");
+        typeDef.failureUpdate(ErrorKey.DM_RELATION_REMOVE_LOCAL_PATH_TYPE);
+    }
+
+    /**
      * Removes the MxUpdate programs, attributes and types.
      *
      * @throws Exception if MQL execution failed
@@ -595,6 +609,7 @@ public class RelationshipCI_3UpdateTest
     public void cleanup()
         throws Exception
     {
+        this.cleanup(AbstractTest.CI.DM_PATHTYPE);  // as first, so that local attributes of path types are deleted!
         this.cleanup(AbstractTest.CI.PRG_MQL);
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_BOOLEAN);
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE_DATE);
