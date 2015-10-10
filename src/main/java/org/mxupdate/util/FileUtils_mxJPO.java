@@ -167,43 +167,44 @@ public final class FileUtils_mxJPO
      *
      * @param _name     MX name to convert
      * @return converted file name
-     * @see decodeFileName
+     * @see #decodeFileName(String)
      */
     public static String encodeFileName(final String _name)
     {
-        final char[] charName = _name.toCharArray();
-        final StringBuilder fileName = new StringBuilder();
-        for (final char ch : charName) {
-            if (ch == '@')  {
-                fileName.append("@@");
-            } else if (((ch < '(') || (ch > ')'))
-                    && ((ch < '+') || (ch > '.'))
-                    && ((ch < '0') || (ch > '9'))
-                    && ((ch < 'A') || (ch > 'Z'))
-                    && ((ch < 'a') || (ch > 'z'))
-                    && (ch != ' ') && (ch != '=') && (ch != '_'))  {
+        final StringBuilder ret = new StringBuilder();
+        if (_name != null)  {
+            for (final char ch : _name.toCharArray()) {
+                if (ch == '@')  {
+                    ret.append("@@");
+                } else if (((ch < '(') || (ch > ')'))
+                        && ((ch < '+') || (ch > '.'))
+                        && ((ch < '0') || (ch > '9'))
+                        && ((ch < 'A') || (ch > 'Z'))
+                        && ((ch < 'a') || (ch > 'z'))
+                        && (ch != ' ') && (ch != '=') && (ch != '_'))  {
 
-                final String hex = String.valueOf(Integer.toHexString(ch));
-                fileName.append('@');
-                switch (hex.length())  {
-                    case 1:
-                        fileName.append('0').append(hex);
-                        break;
-                    case 3:
-                        fileName.append("u0").append(hex);
-                        break;
-                    case 4:
-                        fileName.append('u').append(hex);
-                        break;
-                    default:
-                        fileName.append(hex);
-                        break;
+                    final String hex = String.valueOf(Integer.toHexString(ch));
+                    ret.append('@');
+                    switch (hex.length())  {
+                        case 1:
+                            ret.append('0').append(hex);
+                            break;
+                        case 3:
+                            ret.append("u0").append(hex);
+                            break;
+                        case 4:
+                            ret.append('u').append(hex);
+                            break;
+                        default:
+                            ret.append(hex);
+                            break;
+                    }
+                } else  {
+                    ret.append(ch);
                 }
-            } else  {
-                fileName.append(ch);
             }
         }
-        return fileName.toString();
+        return ret.toString();
     }
 
     /**
@@ -225,36 +226,37 @@ public final class FileUtils_mxJPO
      public static String decodeFileName(final String _fileName)
         throws UpdateException_mxJPO
     {
-        final char[] charFileName = _fileName.toCharArray();
-        final StringBuilder name = new StringBuilder();
-        for (int idx = 0; idx < charFileName.length; idx++)  {
-            final char ch = charFileName[idx];
-            if (ch == '@')  {
-                switch (FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx))  {
-                    case '@':
-                        name.append('@');
-                        break;
-                    case 'u':
-                        final char[] hex4 = new char[4];
-                        hex4[0] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx);
-                        hex4[1] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx);
-                        hex4[3] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx);
-                        hex4[4] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx);
-                        name.append((char) ((int) Integer.valueOf(new String(hex4), 16)));
-                        break;
-                    default:
-                        final char[] hex2 = new char[2];
-                        hex2[0] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, idx);
-                        hex2[1] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx);
-                        name.append((char) ((int) Integer.valueOf(new String(hex2), 16)));
-                        break;
+        final StringBuilder ret = new StringBuilder();
+        if (_fileName != null)  {
+            final char[] charFileName = _fileName.toCharArray();
+            for (int idx = 0; idx < charFileName.length; idx++)  {
+                final char ch = charFileName[idx];
+                if (ch == '@')  {
+                    switch (FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx))  {
+                        case '@':
+                            ret.append('@');
+                            break;
+                        case 'u':
+                            final char[] hex4 = new char[4];
+                            hex4[0] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx);
+                            hex4[1] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx);
+                            hex4[2] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx);
+                            hex4[3] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx);
+                            ret.append((char) ((int) Integer.valueOf(new String(hex4), 16)));
+                            break;
+                        default:
+                            final char[] hex2 = new char[2];
+                            hex2[0] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, idx);
+                            hex2[1] = FileUtils_mxJPO.decodeFileNameGetChar(charFileName, ++idx);
+                            ret.append((char) ((int) Integer.valueOf(new String(hex2), 16)));
+                            break;
+                    }
+                } else  {
+                    ret.append(ch);
                 }
-            } else  {
-                name.append(ch);
             }
         }
-
-        return name.toString();
+        return ret.toString();
     }
 
     /**
