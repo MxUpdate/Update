@@ -49,7 +49,9 @@ import org.mxupdate.update.userinterface.Portal_mxJPO;
 import org.mxupdate.update.userinterface.Table_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.CacheKey;
+import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MqlBuilder;
 
 import matrix.util.MatrixException;
 
@@ -62,8 +64,7 @@ public enum EMxAdmin_mxJPO
 {
     Association(Association_mxJPO.class)
     {
-        @Override
-        public SortedSet<String> evalListWOCache(final ParameterCache_mxJPO _paramCache)
+        @Override public SortedSet<String> evalListWOCache(final ParameterCache_mxJPO _paramCache)
             throws MatrixException
         {
             final SortedSet<String> ret = new TreeSet<>();
@@ -74,7 +75,27 @@ public enum EMxAdmin_mxJPO
             return ret;
         }
     },
-    Attribute(AttributeCI_mxJPO.class),
+    Attribute(AttributeCI_mxJPO.class)
+    {
+        @Override public SortedSet<String> evalListWOCache(final ParameterCache_mxJPO _paramCache)
+            throws MatrixException
+        {
+            final SortedSet<String> ret = new TreeSet<>();
+            final MqlBuilder mql = MqlBuilderUtil_mxJPO.mql().cmd("escape list attribute ").arg("*");
+            if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsOwner))  {
+                // new enovia version => only attribute w/o defined owner...
+                mql.cmd(" where ").arg("owner==\"\"");
+            }
+            final String tmp = mql
+                    .cmd(" select ").arg("name")
+                    .cmd(" dump")
+                    .exec(_paramCache.getContext());
+            if (!tmp.isEmpty())  {
+                ret.addAll(Arrays.asList(tmp.split("\n")));
+            }
+            return ret;
+        }
+    },
     Channel(Channel_mxJPO.class),
     Command(Command_mxJPO.class),
     Dimension(Dimension_mxJPO.class),
