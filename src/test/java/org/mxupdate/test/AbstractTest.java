@@ -114,7 +114,6 @@ public abstract class AbstractTest
 
         USR_ASSOCIATION(        "association",              "association",      null,                                   false, null,                                null,                       "Association",              "user/association",                 "ASSOCIATION_",             ".mxu", false),
         USR_GROUP(              "group",                    "group",            null,                                   false, null,                                null,                       "Group",                    "user/group",                       "GROUP_",                   ".mxu", true),
-        USR_PERSON(             "person",                   "person",           "Person",                               false, "Person",                            "eService Production",      "Person",                   "user/person",                      "PERSON_",                  ".mxu", true),
         USR_PERSONADMIN(        "person",                   "person",           null,                                   false, null,                                null,                       "PersonAdmin",              "user/personadmin",                 "PERSONADMIN_",             ".mxu", true),
         USR_ROLE(               "role",                     "role",             null,                                   false, null,                                null,                      "Role",                      "user/role",                        "ROLE_",                    ".mxu", true),
 

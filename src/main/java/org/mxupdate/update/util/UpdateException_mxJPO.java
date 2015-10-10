@@ -47,7 +47,6 @@ public class UpdateException_mxJPO
      *     <li>120: {@link org.mxupdate.update.datamodel.AttributeCI_mxJPO numeric attributes}</li>
      *     <li>121: {@link org.mxupdate.update.datamodel.AbstractDMWithAttributes_mxJPO data model with attributes}</li>
      *     <li>303: {@link org.mxupdate.update.user.Group_mxJPO group}</li>
-     *     <li>306: {@link org.mxupdate.update.user.Person_mxJPO person}</li>
      *     <li>309: {@link org.mxupdate.update.user.PersonAdmin_mxJPO admin person}</li>
      *     <li>312: {@link org.mxupdate.update.user.Role_mxJPO role}</li>
      *     <li>315: {@link org.mxupdate.update.user.Group_mxJPO group}</li>
