@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
@@ -35,6 +36,14 @@ import matrix.util.MatrixException;
 
 /**
  * The class is used to export, create, delete and update forms within MX.
+ * The form specific information are:
+ * <ul>
+ * <li>uuid</li>
+ * <li>symbolic names</li>
+ * <li>description</li>
+ * <li>hidden flag (only if <i>true</i>)</li>
+ * <li>fields</li>
+ * </ul>
  *
  * @author The MxUpdate Team
  */
@@ -66,7 +75,7 @@ public class Form_mxJPO
         super(EMxAdmin_mxJPO.Form, _mxName);
     }
 
-    @Override()
+    @Override
     public void parseUpdate(final File _file,
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
@@ -75,7 +84,7 @@ public class Form_mxJPO
         this.prepare();
     }
 
-    @Override()
+    @Override
     public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
@@ -99,7 +108,7 @@ public class Form_mxJPO
      *         <i>false</i>
      * @see #IGNORED_URLS
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -118,6 +127,7 @@ public class Form_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
                 .flagIfTrue(    "hidden",           false,  this.isHidden(),                    this.isHidden())
