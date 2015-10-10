@@ -49,7 +49,7 @@ public class Group_mxJPO
     extends AbstractUser_mxJPO<Group_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for groups. */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         Group_mxJPO.IGNORED_URLS.add("/parentGroup");
     }
@@ -63,7 +63,7 @@ public class Group_mxJPO
     private static final String PARAM_IGNORE_WSO_GROUPS = "UserIgnoreWSO4Groups";
 
     /** Set to hold all parent groups. */
-    private final SortedSet<String> parentGroups = new TreeSet<String>();
+    private final SortedSet<String> parentGroups = new TreeSet<>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -146,7 +146,7 @@ public class Group_mxJPO
                              final Group_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(     _mql, "description",        this.getDescription(),  _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(      _mql, "hidden",      false, this.isHidden(),        _current.isHidden());
         DeltaUtil_mxJPO.calcValueDelta(     _mql, "site",               this.getSite(),         _current.getSite());

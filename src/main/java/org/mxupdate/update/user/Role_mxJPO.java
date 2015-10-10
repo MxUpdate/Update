@@ -24,8 +24,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
@@ -37,6 +35,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
+
+import matrix.util.MatrixException;
 
 /**
  * The class is used to export, create, delete and update roles within MX.
@@ -55,7 +55,7 @@ public class Role_mxJPO
     extends AbstractUser_mxJPO<Role_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for roles. */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         Role_mxJPO.IGNORED_URLS.add("/parentRole");
         Role_mxJPO.IGNORED_URLS.add("/roleType");   // URL to be ignored, because read within prepare method
@@ -70,7 +70,7 @@ public class Role_mxJPO
     private static final String PARAM_IGNORE_WSO_ROLES = "UserIgnoreWSO4Roles";
 
     /** Set to hold all parent roles. */
-    private final SortedSet<String> parentRoles = new TreeSet<String>();
+    private final SortedSet<String> parentRoles = new TreeSet<>();
 
     /** Stores the information about the role type. */
     private Kind kind = Kind.Role;
@@ -194,7 +194,7 @@ public class Role_mxJPO
                 _mql.newLine().cmd("asaproject");
             }
         }
-        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(     _mql, "description",        this.getDescription(),  _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(      _mql, "hidden",      false, this.isHidden(),        _current.isHidden());
         DeltaUtil_mxJPO.calcValueDelta(     _mql, "site",               this.getSite(),         _current.getSite());

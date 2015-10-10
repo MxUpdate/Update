@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.mxupdate.typedef.TypeDef_mxJPO;
+import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
@@ -44,44 +44,43 @@ public final class DeltaUtil_mxJPO
     /**
      * Calculates the delta for symbolic names.
      *
-     * @param _mql              MQL builder to append the delta
-     * @param _newSymbNames     new set of symbolic names
-     * @param _oldSymbNames     old set of symbolic names
+     * @param _paramCache   parameter cache
+     * @param _mql          MQL builder to append the delta
+     * @param _target       target ci object
+     * @param _current  current ci object
      */
     public static void calcSymbNames(final ParameterCache_mxJPO _paramCache,
                                      final MultiLineMqlBuilder _mql,
-                                     final TypeDef_mxJPO _typeDef,
-                                     final String _name,
-                                     final Set<String> _newSymbNames,
-                                     final Set<String> _oldSymbNames)
+                                     final AbstractAdminObject_mxJPO<?> _target,
+                                     final AbstractAdminObject_mxJPO<?> _current)
     {
         final String symbProg = _paramCache.getValueString(ValueKeys.RegisterSymbolicNames);
 
         _mql.pushPrefix("");
 
-        if (_oldSymbNames != null)  {
-            for (final String oldSymbName : _oldSymbNames)  {
-                if (!_newSymbNames.contains(oldSymbName))  {
+        if (_current != null)  {
+            for (final String oldSymbName : _current.getSymbolicNames())  {
+                if (!_target.getSymbolicNames().contains(oldSymbName))  {
                     _paramCache.logTrace("    - remove symbolic name '" + oldSymbName + "'");
                     _mql.newLine().cmd("escape delete property ").arg(oldSymbName)
                             .cmd(" on program ").arg(symbProg)
-                            .cmd(" to ").cmd(_typeDef.getMxAdminName()).cmd(" ")
-                            .arg(_name);
-                    if ((_typeDef.getMxAdminSuffix() != null) && !_typeDef.getMxAdminSuffix().isEmpty())  {
-                        _mql.cmd(" ").cmd(_typeDef.getMxAdminSuffix());
+                            .cmd(" to ").cmd(_target.getTypeDef().getMxAdminName()).cmd(" ")
+                            .arg(_target.getName());
+                    if ((_target.getTypeDef().getMxAdminSuffix() != null) && !_target.getTypeDef().getMxAdminSuffix().isEmpty())  {
+                        _mql.cmd(" ").cmd(_target.getTypeDef().getMxAdminSuffix());
                     }
                 }
             }
         }
-        for (final String newSymbName : _newSymbNames)  {
-            if (!_oldSymbNames.contains(newSymbName))  {
+        for (final String newSymbName : _target.getSymbolicNames())  {
+            if ((_current == null) || !_current.getSymbolicNames().contains(newSymbName))  {
                 _paramCache.logTrace("    - register symbolic name '" + newSymbName + "'");
                 _mql.newLine().cmd("escape add property ").arg(newSymbName)
                         .cmd(" on program ").arg(symbProg)
-                        .cmd(" to ").cmd(_typeDef.getMxAdminName()).cmd(" ")
-                        .arg(_name);
-                if ((_typeDef.getMxAdminSuffix() != null) && !_typeDef.getMxAdminSuffix().isEmpty())  {
-                    _mql.cmd(" ").cmd(_typeDef.getMxAdminSuffix());
+                        .cmd(" to ").cmd(_target.getTypeDef().getMxAdminName()).cmd(" ")
+                        .arg(_target.getName());
+                if ((_target.getTypeDef().getMxAdminSuffix() != null) && !_target.getTypeDef().getMxAdminSuffix().isEmpty())  {
+                    _mql.cmd(" ").cmd(_target.getTypeDef().getMxAdminSuffix());
                 }
             }
         }

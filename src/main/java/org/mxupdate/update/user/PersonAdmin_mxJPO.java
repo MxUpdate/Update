@@ -24,8 +24,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.CompareToUtil_mxJPO;
@@ -37,6 +35,8 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 
+import matrix.util.MatrixException;
+
 /**
  * The class is used to handle administration persons.
  *
@@ -46,7 +46,7 @@ public class PersonAdmin_mxJPO
     extends AbstractUser_mxJPO<PersonAdmin_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for persons. */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         PersonAdmin_mxJPO.IGNORED_URLS.add("/assignmentList");
         PersonAdmin_mxJPO.IGNORED_URLS.add("/assignmentList/assignment");
@@ -64,10 +64,10 @@ public class PersonAdmin_mxJPO
     }
 
     /** Holds all group assignments of this person. */
-    private final SortedSet<String> groups = new TreeSet<String>();
+    private final SortedSet<String> groups = new TreeSet<>();
 
     /** Holds all role assignments of this person. */
-    private final SortedSet<String> roles = new TreeSet<String>();
+    private final SortedSet<String> roles = new TreeSet<>();
 
     /** Full name of the person. */
     private String fullName = "";
@@ -100,19 +100,19 @@ public class PersonAdmin_mxJPO
     private boolean iconmail = true;
 
     /** Set of access for this person. */
-    private final SortedSet<String> access = new TreeSet<String>();
+    private final SortedSet<String> access = new TreeSet<>();
 
     /** Set of administration access for this person. */
-    private final SortedSet<String> admin = new TreeSet<String>();
+    private final SortedSet<String> admin = new TreeSet<>();
 
     /**  Defines the name of the assigned default application.  */
     private String application = "";
 
     /** All assigned products of the person. */
-    private final SortedSet<String> products = new TreeSet<String>();
+    private final SortedSet<String> products = new TreeSet<>();
 
     /** All assigned types of the person. */
-    private final Set<TypeItem> types = new TreeSet<TypeItem>();
+    private final Set<TypeItem> types = new TreeSet<>();
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -364,7 +364,7 @@ public class PersonAdmin_mxJPO
      */
     private SortedSet<String> getTypes()
     {
-        final SortedSet<String> ret = new TreeSet<String>();
+        final SortedSet<String> ret = new TreeSet<>();
         for (final TypeItem item : this.types) {
             ret.add(item.name().toLowerCase());
         }
@@ -377,7 +377,7 @@ public class PersonAdmin_mxJPO
                              final PersonAdmin_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         // type (application, full, business, system, inactive, trusted)
         if ((CompareToUtil_mxJPO.compare(0, this.types, _current.types) != 0) || (this.active != _current.active) || (this.trusted != _current.trusted))  {
             _mql.newLine().cmd("type ");

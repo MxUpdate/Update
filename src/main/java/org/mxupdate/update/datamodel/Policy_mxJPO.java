@@ -365,7 +365,7 @@ public class Policy_mxJPO
                     this.delimiter);
         }
 
-        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
 
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",                  this.getDescription(),                      _current.getDescription());
         DeltaUtil_mxJPO.calcListDelta( _mql, "type",        this.allTypes,   this.types,            _current.allTypes,   _current.types);

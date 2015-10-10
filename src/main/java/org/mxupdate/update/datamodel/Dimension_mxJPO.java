@@ -49,7 +49,7 @@ public class Dimension_mxJPO
     extends AbstractAdminObject_mxJPO<Dimension_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for dimensions. */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         Dimension_mxJPO.IGNORED_URLS.add("/unitList");
         Dimension_mxJPO.IGNORED_URLS.add("/unitList/unit/adminProperties");
@@ -61,7 +61,7 @@ public class Dimension_mxJPO
     }
 
     /** Holds the list of already parsed units of this dimension. */
-    private final Set<Unit> units = new TreeSet<Unit>();
+    private final Set<Unit> units = new TreeSet<>();
     /** Holds current parsed unit. */
     private Unit currentUnit;
 
@@ -152,16 +152,16 @@ public class Dimension_mxJPO
         for (final Unit unit : this.units)  {
             unit.properties.prepare();
             // extract settings
-            for (final AdminProperty prop : new HashSet<AdminProperty>(unit.properties.getSettings()))  {
+            for (final AdminProperty prop : new HashSet<>(unit.properties.getSettings()))  {
                 unit.settings.put(prop.getName().substring(1), prop.getValue());
                 unit.properties.getSettings().remove(prop);
             }
             // extract system information
-            for (final AdminProperty prop : new HashSet<AdminProperty>(unit.properties.getProperties()))  {
+            for (final AdminProperty prop : new HashSet<>(unit.properties.getProperties()))  {
                 if ("unit".equals(prop.getRefAdminType()))  {
                     Set<String> units = unit.systemInfos.get(prop.getName());
                     if (units == null)  {
-                        units = new TreeSet<String>();
+                        units = new TreeSet<>();
                         unit.systemInfos.put(prop.getName(), units);
                     }
                     units.add(prop.getRefAdminName());
@@ -216,16 +216,16 @@ public class Dimension_mxJPO
                              final Dimension_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(),   _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),         _current.isHidden());
 
         // prepare maps of units depending on the unit name (as key)
-        final Map<String,Unit> curUnits = new HashMap<String,Unit>();
+        final Map<String,Unit> curUnits = new HashMap<>();
         for (final Unit unit : _current.units)  {
             curUnits.put(unit.name, unit);
         }
-        final Map<String,Unit> tarUnits = new HashMap<String,Unit>();
+        final Map<String,Unit> tarUnits = new HashMap<>();
         for (final Unit unit : this.units)  {
             tarUnits.put(unit.name, unit);
         }
@@ -292,14 +292,14 @@ public class Dimension_mxJPO
          * complete dimension parsing. The key of the map is the system name,
          * the values are the related names of the units.
          */
-        private final Map<String,Set<String>> systemInfos = new TreeMap<String,Set<String>>();
+        private final Map<String,Set<String>> systemInfos = new TreeMap<>();
 
         /**
          * Holds all unit specific settings for a dimension. The settings are
          * stored internally as property. Therefore the settings could  be
          * extracted only after a complete parsing.
          */
-        private final Map<String,String> settings = new TreeMap<String,String>();
+        private final Map<String,String> settings = new TreeMap<>();
 
         /**
          * Holds all unit specific properties for a single unit. The properties

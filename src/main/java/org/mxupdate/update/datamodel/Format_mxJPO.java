@@ -55,7 +55,7 @@ public class Format_mxJPO
     extends AbstractAdminObject_mxJPO<Format_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for formats. */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         // to be ignored, because identically to fileType
         Format_mxJPO.IGNORED_URLS.add("/fileCreator");
@@ -171,7 +171,7 @@ public class Format_mxJPO
                              final Format_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",             this.getDescription(), _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",          false,  this.isHidden(),       _current.isHidden());
         DeltaUtil_mxJPO.calcValueDelta(_mql, "mime",                    this.mimeType,         _current.mimeType);

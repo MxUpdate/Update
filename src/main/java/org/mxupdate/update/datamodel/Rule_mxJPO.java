@@ -21,8 +21,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
 import java.util.Set;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO;
@@ -33,6 +31,8 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 
+import matrix.util.MatrixException;
+
 /**
  * The class is used to export and import / update rule configuration items.
  *
@@ -42,7 +42,7 @@ public class Rule_mxJPO
     extends AbstractAdminObject_mxJPO<Rule_mxJPO>
 {
     /** Set of all ignored URLs from the XML definition for rules. */
-    private static final Set<String> IGNORED_URLS = new HashSet<String>();
+    private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         Rule_mxJPO.IGNORED_URLS.add("/ownerAccess/access");
         Rule_mxJPO.IGNORED_URLS.add("/ownerRevoke/access");
@@ -146,7 +146,7 @@ public class Rule_mxJPO
                              final MultiLineMqlBuilder _mql,
                              final Rule_mxJPO _current)
     {
-        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",        this.getDescription(),   _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false, this.isHidden(),         _current.isHidden());
         if (_paramCache.getValueBoolean(ValueKeys.DMRuleSupportsEnforceReserveAccess))  {

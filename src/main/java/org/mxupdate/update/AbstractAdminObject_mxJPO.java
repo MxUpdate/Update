@@ -358,7 +358,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
      *
      * @return all defined symbolic names
      */
-    protected SortedSet<String> getSymbolicNames()
+    public SortedSet<String> getSymbolicNames()
     {
         return this.symbolicNames;
     }

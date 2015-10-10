@@ -210,7 +210,7 @@ public class PathType_mxJPO
                              final PathType_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), (_current != null) ? _current.getSymbolicNames() : null);
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(  _mql,              "description",              this.getDescription(),  (_current != null) ? _current.getDescription() : null);
 
         // from

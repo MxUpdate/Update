@@ -19,8 +19,6 @@ import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
@@ -31,6 +29,8 @@ import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+
+import matrix.util.MatrixException;
 
 /**
  * The class is used to export and import / update association configuration
@@ -149,7 +149,7 @@ public class Association_mxJPO
                              final Association_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(     _mql, "description",        this.getDescription(),  _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(      _mql, "hidden",      false, this.isHidden(),        _current.isHidden());
         DeltaUtil_mxJPO.calcValueDelta(     _mql, "definition",         this.definition,        _current.definition);

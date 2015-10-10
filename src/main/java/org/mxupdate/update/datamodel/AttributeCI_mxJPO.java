@@ -364,7 +364,7 @@ public class AttributeCI_mxJPO
     {
         final AttributeCI_mxJPO current = _current;
 
-        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), (current != null) ? current.getSymbolicNames() : null);
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(), (current != null) ? current.getDescription() : null);
         DeltaUtil_mxJPO.calcValueDelta(_mql, "default",             this.defaultValue,     (current != null) ? current.defaultValue : null);
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),       (current != null) ? current.isHidden() : null);
