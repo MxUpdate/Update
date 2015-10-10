@@ -22,7 +22,7 @@ import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.program.AbstractProgram_mxJPO;
+import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.FileHandlingUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -60,7 +60,7 @@ public class ExportAdminProgramJPO_mxJPO
         try  {
             final File path = new File(_path, _typeDef.getFilePath());
 
-            final AbstractProgram_mxJPO<?> clazz = (AbstractProgram_mxJPO<?>) _typeDef.newTypeInstance(_mxName);
+            final ProgramCI_mxJPO clazz = (ProgramCI_mxJPO) _typeDef.newTypeInstance(_mxName);
 
             clazz.parse(_paramCache);
 
@@ -84,7 +84,7 @@ public class ExportAdminProgramJPO_mxJPO
                 final int index = clazz.getName().lastIndexOf('.');
                 final String fileName = new StringBuilder()
                         .append((index >= 0) ? clazz.getName().substring(index + 1) : clazz.getName())
-                        .append(AbstractProgram_mxJPO.JPO_NAME_SUFFIX_EXTENDSION)
+                        .append(ProgramCI_mxJPO.JPO_NAME_SUFFIX_EXTENDSION)
                         .toString();
                 // prepare path
                 final StringBuilder pathStr = new StringBuilder().append(path);
@@ -140,7 +140,7 @@ public class ExportAdminProgramJPO_mxJPO
      */
     protected void writeCode(final ParameterCache_mxJPO _paramCache,
                              final Appendable _out,
-                             final AbstractProgram_mxJPO<?> _clazz)
+                             final ProgramCI_mxJPO _clazz)
         throws IOException
     {
         // define package name (if points within JPO name)
@@ -150,10 +150,10 @@ public class ExportAdminProgramJPO_mxJPO
         }
 
         // replace class names and references to other JPOs
-        final String name = _clazz.getName() + AbstractProgram_mxJPO.JPO_NAME_SUFFIX;
+        final String name = _clazz.getName() + ProgramCI_mxJPO.JPO_NAME_SUFFIX;
         final String code = _clazz.getCode()
                                 .replaceAll("\\" + "$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
-                                .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", AbstractProgram_mxJPO.JPO_NAME_SUFFIX)
+                                .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", ProgramCI_mxJPO.JPO_NAME_SUFFIX)
                                 .replaceAll("\\" + "$\\{CLASS\\:", "")
                                 .trim();
 

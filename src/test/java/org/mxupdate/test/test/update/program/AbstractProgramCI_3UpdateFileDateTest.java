@@ -21,7 +21,7 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.update.program.AbstractProgram_mxJPO;
+import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.util.MqlBuilder_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
@@ -67,10 +67,11 @@ public abstract class AbstractProgramCI_3UpdateFileDateTest
 
         final String prgName = AbstractTest.PREFIX + "test";
 
-        final AbstractProgram_mxJPO<?> prg = this.createNew(paramCache, prgName);
+        final ProgramCI_mxJPO prg = this.createNew(paramCache, prgName);
 
         prg.create(paramCache);
 
+        this.testJPO.getParentFile().getAbsoluteFile().mkdirs();
         this.testJPO.createNewFile();
 
         // first time
@@ -102,7 +103,6 @@ public abstract class AbstractProgramCI_3UpdateFileDateTest
         Assert.assertEquals(MqlBuilder_mxJPO.mql().cmd("escape print prog ").arg(prgName).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()), "D");
     }
 
-
     /**
      * Test of update without checking of file date.
      *
@@ -116,10 +116,11 @@ public abstract class AbstractProgramCI_3UpdateFileDateTest
 
         final String prgName = AbstractTest.PREFIX + "test";
 
-        final AbstractProgram_mxJPO<?> prg = this.createNew(paramCache, prgName);
+        final ProgramCI_mxJPO prg = this.createNew(paramCache, prgName);
 
         prg.create(paramCache);
 
+        this.testJPO.getParentFile().getAbsoluteFile().mkdirs();
         this.testJPO.createNewFile();
 
         // first time
@@ -158,8 +159,8 @@ public abstract class AbstractProgramCI_3UpdateFileDateTest
      * @param _prgName      program name
      * @return CI instance
      */
-    protected abstract AbstractProgram_mxJPO<?> createNew(final ParameterCache_mxJPO _paramCache,
-                                                          final String _prgName);
+    protected abstract ProgramCI_mxJPO createNew(final ParameterCache_mxJPO _paramCache,
+                                                 final String _prgName);
 
     @BeforeMethod
     @AfterClass(groups = "close" )

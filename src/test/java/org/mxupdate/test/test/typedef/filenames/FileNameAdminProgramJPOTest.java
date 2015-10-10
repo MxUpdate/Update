@@ -22,7 +22,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.update.program.JPOProgram_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -83,7 +82,7 @@ public class FileNameAdminProgramJPOTest
 
         final List<File> files = Arrays.asList(_files);
 
-        final SortedMap<String,File> expMap = new TreeMap<String,File>();
+        final SortedMap<String,File> expMap = new TreeMap<>();
         for (int idx = 0; idx < _exp.length; )  {
             expMap.put((String) _exp[idx++], (File) _exp[idx++]);
         }

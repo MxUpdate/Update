@@ -15,8 +15,7 @@
 
 package org.mxupdate.test.test.update.program;
 
-import org.mxupdate.update.program.AbstractProgram_mxJPO;
-import org.mxupdate.update.program.MQLProgram_mxJPO;
+import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.Test;
 
@@ -25,14 +24,14 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class MQLProgramCI_3UpdateFileDateTest
     extends AbstractProgramCI_3UpdateFileDateTest
 {
     @Override
-    protected AbstractProgram_mxJPO<?> createNew(final ParameterCache_mxJPO _paramCache,
-                                                 final String _prgName)
+    protected ProgramCI_mxJPO createNew(final ParameterCache_mxJPO _paramCache,
+                                        final String _prgName)
     {
-        return new MQLProgram_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_MQL.updateType), _prgName);
+        return new ProgramCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_MQL.updateType), _prgName);
     }
 }

@@ -27,7 +27,7 @@ import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.test.update.WrapperCIInstance;
 import org.mxupdate.typedef.export.ExportAdminProgramJPO_mxJPO;
-import org.mxupdate.update.program.JPOProgram_mxJPO;
+import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.util.JPOUtil_mxJPO;
 import org.testng.Assert;
@@ -145,7 +145,7 @@ public class JPOProgramCI_3ExportTest
 
         // update values
         _progData.createDependings();
-        final WrapperCIInstance<JPOProgram_mxJPO> wrapper = new WrapperCIInstance<>(new JPOProgram_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName()));
+        final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(new ProgramCI_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName()));
         wrapper.parseUpdate(_progData);
         wrapper.store((File) null, paramCache);
 
@@ -184,7 +184,7 @@ public class JPOProgramCI_3ExportTest
 
         // update values
         _progData.createDependings();
-        final WrapperCIInstance<JPOProgram_mxJPO> wrapper = new WrapperCIInstance<>(new JPOProgram_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName()));
+        final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(new ProgramCI_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName()));
         wrapper.parseUpdate(_progData);
         wrapper.store((File) null, paramCache);
 
@@ -226,7 +226,7 @@ public class JPOProgramCI_3ExportTest
 
         // update values (and the code will be also null)
         _progData.createDependings();
-        final WrapperCIInstance<JPOProgram_mxJPO> wrapper = new WrapperCIInstance<>(new JPOProgram_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName()));
+        final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(new ProgramCI_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName()));
         wrapper.parseUpdate(_progData);
         wrapper.store((File) null, paramCache);
 
@@ -265,7 +265,7 @@ public class JPOProgramCI_3ExportTest
 
         // update values (and the code will be also null)
         _progData.createDependings();
-        final WrapperCIInstance<JPOProgram_mxJPO> wrapper = new WrapperCIInstance<>(new JPOProgram_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName()));
+        final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(new ProgramCI_mxJPO(paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName()));
         wrapper.parseUpdate(_progData);
         wrapper.store((File) null, paramCache);
 
@@ -275,7 +275,7 @@ public class JPOProgramCI_3ExportTest
         Assert.assertTrue(_testMXU.exists(), "MXU file exists");
     }
 
-    @BeforeMethod()
+    @BeforeMethod
     @AfterClass(groups = "close" )
     public void cleanup()
         throws MatrixException, IOException

@@ -16,27 +16,28 @@
 package org.mxupdate.test.test.update.program;
 
 import org.mxupdate.test.data.program.MQLProgramData;
-import org.mxupdate.update.program.MQLProgram_mxJPO;
+import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link MQLProgram_mxJPO mql program CI} delta calculation.
+ * Tests the {@link ProgramCI_mxJPO program CI} delta calculation for MQL
+ * programs.
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class MQLProgramCI_2DeltaCalculationTest
-    extends AbstractProgramCI_2DeltaCalculationTest<MQLProgram_mxJPO,MQLProgramData>
+    extends AbstractProgramCI_2DeltaCalculationTest<MQLProgramData>
 {
-    @Override()
-    protected MQLProgram_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
-                                             final String _name)
+    @Override
+    protected ProgramCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
+                                            final String _name)
     {
-        return new MQLProgram_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_MQL.updateType), _name);
+        return new ProgramCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_MQL.updateType), _name);
     }
 
-    @Override()
+    @Override
     protected MQLProgramData createNewTestData(final String _name)
     {
         return new MQLProgramData(this, _name);

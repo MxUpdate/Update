@@ -15,31 +15,31 @@
 
 package org.mxupdate.test.test.update.program;
 
-import org.mxupdate.test.data.program.JPOProgramData;
 import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link ProgramCI_mxJPO program CI} delta calculation for JPO
- * programs.
+ * Tests the {@link ProgramCI_mxJPO program CI} parser for JPOs.
  *
  * @author The MxUpdate Team
  */
 @Test
-public class JPOProgramCI_2DeltaCalculationTest
-    extends AbstractProgramCI_2DeltaCalculationTest<JPOProgramData>
+public class JPOProgramCI_1ParserTest
+    extends AbstractProgramCI_1ParserTest
 {
+    @Override
+    @DataProvider(name = "data")
+    public Object[][] getData()
+    {
+        return this.getData("mql");
+    }
+
     @Override
     protected ProgramCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
                                             final String _name)
     {
         return new ProgramCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _name);
-    }
-
-    @Override
-    protected JPOProgramData createNewTestData(final String _name)
-    {
-        return new JPOProgramData(this, _name);
     }
 }

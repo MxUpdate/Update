@@ -17,8 +17,6 @@ package org.mxupdate.test.test.update.program;
 
 import java.io.File;
 
-import matrix.util.MatrixException;
-
 import org.apache.commons.io.FileUtils;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.AbstractAdminData;
@@ -27,8 +25,7 @@ import org.mxupdate.test.data.user.PersonAdminData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.test.test.update.WrapperCIInstance;
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.program.MQLProgram_mxJPO;
+import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
@@ -36,13 +33,15 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import matrix.util.MatrixException;
+
 /**
  * Tests the {@link MQLProgram_mxJPO mql program CI} delta calculation.
  *
  * @author The MxUpdate Team
  */
-public abstract class AbstractProgramCI_2DeltaCalculationTest<DATA extends AbstractAdminObject_mxJPO<?>,TESTDATA extends AbstractAdminData<?>>
-    extends AbstractDeltaCalculationTest<DATA,TESTDATA>
+public abstract class AbstractProgramCI_2DeltaCalculationTest<TESTDATA extends AbstractAdminData<?>>
+    extends AbstractDeltaCalculationTest<ProgramCI_mxJPO,TESTDATA>
 {
     @Override()
     @DataProvider(name = "data")
@@ -132,7 +131,7 @@ public abstract class AbstractProgramCI_2DeltaCalculationTest<DATA extends Abstr
         @SuppressWarnings("unchecked")
         final TESTDATA prog = (TESTDATA) this.createNewTestData("Test").create().setValue("code", _code);
 
-        final WrapperCIInstance<DATA> wrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, prog.getName()));
+        final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(this.createNewData(paramCache, prog.getName()));
         wrapper.parseUpdate(prog);
         wrapper.store((File) null, paramCache);
 
@@ -155,7 +154,7 @@ public abstract class AbstractProgramCI_2DeltaCalculationTest<DATA extends Abstr
         @SuppressWarnings("unchecked")
         final TESTDATA prog = (TESTDATA) this.createNewTestData("Test").create().setValue("file", "program/mql/test.tcl");
 
-        final WrapperCIInstance<DATA> wrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, prog.getName()));
+        final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(this.createNewData(paramCache, prog.getName()));
         wrapper.parseUpdate(prog);
         wrapper.store(new File(this.getResourcesDir(), "test.mxu"), paramCache);
 
@@ -178,7 +177,7 @@ public abstract class AbstractProgramCI_2DeltaCalculationTest<DATA extends Abstr
         @SuppressWarnings("unchecked")
         final TESTDATA prog = (TESTDATA) this.createNewTestData("Test").create().setValue("file", this.getResourcesDir() + "/program/mql/test.tcl");
 
-        final WrapperCIInstance<DATA> wrapper = new WrapperCIInstance<DATA>(this.createNewData(paramCache, prog.getName()));
+        final WrapperCIInstance<ProgramCI_mxJPO> wrapper = new WrapperCIInstance<>(this.createNewData(paramCache, prog.getName()));
         wrapper.parseUpdate(prog);
         wrapper.store(new File(this.getResourcesDir(), "test.mxu"), paramCache);
 

@@ -16,16 +16,15 @@
 package org.mxupdate.test.test.update.program;
 
 import org.mxupdate.test.test.update.AbstractParserTest;
-import org.mxupdate.update.AbstractAdminObject_mxJPO;
-import org.mxupdate.update.program.AbstractProgram_mxJPO;
+import org.mxupdate.update.program.ProgramCI_mxJPO;
 
 /**
- * Tests the {@link AbstractProgram_mxJPO program CI} parser.
+ * Tests the {@link ProgramCI_mxJPO program CI} parser.
  *
  * @author The MxUpdate Team
  */
-public abstract class AbstractProgramCI_1ParserTest<DATA extends AbstractAdminObject_mxJPO<?>>
-    extends AbstractParserTest<DATA>
+public abstract class AbstractProgramCI_1ParserTest
+    extends AbstractParserTest<ProgramCI_mxJPO>
 {
     protected Object[][] getData(final String _kind)
     {

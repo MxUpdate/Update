@@ -16,24 +16,25 @@
 package org.mxupdate.test.test.update.program;
 
 import org.mxupdate.test.data.program.EKLProgramData;
-import org.mxupdate.update.program.EKLProgram_mxJPO;
+import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link EKLProgram_mxJPO mql program CI} delta calculation.
+ * Tests the {@link ProgramCI_mxJPO program CI} delta calculation for EKL
+ * programs.
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class EKLProgramCI_2DeltaCalculationTest
-    extends AbstractProgramCI_2DeltaCalculationTest<EKLProgram_mxJPO,EKLProgramData>
+    extends AbstractProgramCI_2DeltaCalculationTest<EKLProgramData>
 {
-    @Override()
-    protected EKLProgram_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
-                                             final String _name)
+    @Override
+    protected ProgramCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
+                                          final String _name)
     {
-        return new EKLProgram_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_EKL.updateType), _name);
+        return new ProgramCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_EKL.updateType), _name);
     }
 
     @Override

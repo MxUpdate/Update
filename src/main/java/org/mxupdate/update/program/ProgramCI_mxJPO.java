@@ -41,13 +41,13 @@ import org.mxupdate.util.JPOUtil_mxJPO;
  * @author The MxUpdate Team
  * @param <CLASS> derived from this class
  */
-public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLASS>>
-    extends AbstractCode_mxJPO<CLASS>
+public class ProgramCI_mxJPO
+    extends AbstractCode_mxJPO<ProgramCI_mxJPO>
 {
     /** String with name suffix (used also from the extract routine from Matrix). */
-    public static final String JPO_NAME_SUFFIX_EXTENDSION = AbstractProgram_mxJPO.JPO_NAME_SUFFIX + ".java";
+    public static final String JPO_NAME_SUFFIX_EXTENDSION = ProgramCI_mxJPO.JPO_NAME_SUFFIX + ".java";
     /** String length of {@link #JPO_NAME_SUFFIX_EXTENDSION}. */
-    public static final int JPO_NAME_SUFFIX_EXTENDSION_LENGTH = AbstractProgram_mxJPO.JPO_NAME_SUFFIX_EXTENDSION.length();
+    public static final int JPO_NAME_SUFFIX_EXTENDSION_LENGTH = ProgramCI_mxJPO.JPO_NAME_SUFFIX_EXTENDSION.length();
     /** String with name suffix (used also from the extract routine from Matrix). */
     public static final String JPO_NAME_SUFFIX = "_" + "mxJPO";
 
@@ -90,16 +90,22 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
      * Constructor used to initialize the type definition enumeration and the
      * name.
      *
-     * @param _kind     program kind
      * @param _typeDef  type definition of the program
      * @param _mxName   MX name of the program object
      */
-    protected AbstractProgram_mxJPO(final Kind _kind,
-                                    final TypeDef_mxJPO _typeDef,
-                                    final String _mxName)
+    public ProgramCI_mxJPO(final TypeDef_mxJPO _typeDef,
+                           final String _mxName)
     {
         super(_typeDef, _mxName);
-        this.kind = _kind;
+
+        if (_typeDef != null)  {
+            for (final Kind checkKind : Kind.values())  {
+                if (checkKind.name().toLowerCase().equals(_typeDef.getMxUpdateKind()))  {
+                    this.kind = checkKind;
+                    break;
+                }
+            }
+        }
     }
 
     @Override()
@@ -232,11 +238,9 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
     @Override()
     protected void calcDelta(final ParameterCache_mxJPO _paramCache,
                              final MultiLineMqlBuilder _mql,
-                             final CLASS _current)
+                             final ProgramCI_mxJPO _current)
         throws UpdateException_mxJPO
     {
-        final AbstractProgram_mxJPO<?> current = (AbstractProgram_mxJPO<?>) _current;
-
         boolean update = true;
 
         // evaluate file incl. path (if a file in the CI is defined)
@@ -260,23 +264,23 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
                                     + StringUtil_mxJPO.formatFileDate(_paramCache, new Date(realFile.lastModified()));
             this.getProperties().setValue4KeyValue(_paramCache, PropertyDef_mxJPO.FILEDATE, fileDate);
 
-            update = !fileDate.equals(current.getProperties().getValue4KeyValue(_paramCache, PropertyDef_mxJPO.FILEDATE));
+            update = !fileDate.equals(_current.getProperties().getValue4KeyValue(_paramCache, PropertyDef_mxJPO.FILEDATE));
         }
 
         if (update)  {
 
             // execute must be defined before downloadable...
-            if (this.execute != current.execute)  {
+            if (this.execute != _current.execute)  {
                 _mql.newLine().cmd("execute ").cmd(this.execute.name().toLowerCase());
             }
 
-            DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), current.getSymbolicNames());
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "description",                 this.getDescription(),              current.getDescription());
-            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",              false,  this.isHidden(),                    current.isHidden());
-            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "needsbusinessobject", false,  this.needsBusinessObjectContext,    current.needsBusinessObjectContext);
-            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "downloadable",        false,  this.downloadable,                  current.downloadable);
-            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "pipe",                false,  this.pipe,                          current.pipe);
-            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "pooled",              false,  this.pooled,                        current.pooled);
+            DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this.getTypeDef(), this.getName(), this.getSymbolicNames(), _current.getSymbolicNames());
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "description",                 this.getDescription(),              _current.getDescription());
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",              false,  this.isHidden(),                    _current.isHidden());
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "needsbusinessobject", false,  this.needsBusinessObjectContext,    _current.needsBusinessObjectContext);
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "downloadable",        false,  this.downloadable,                  _current.downloadable);
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "pipe",                false,  this.pipe,                          _current.pipe);
+            DeltaUtil_mxJPO.calcFlagDelta(_mql,  "pooled",              false,  this.pooled,                        _current.pooled);
 
             final String newCode;
             if ((this.file != null) && !this.file.isEmpty())  {
@@ -301,12 +305,12 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
                 newCode = this.getCode();
             }
 
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "code", newCode, current.getCode());
+            DeltaUtil_mxJPO.calcValueDelta(_mql, "code", newCode, _current.getCode());
 
             // rule
-            if (CompareToUtil_mxJPO.compare(0, this.rule, current.rule) != 0)  {
-                if ((current.rule != null) && !current.rule.isEmpty())  {
-                    _mql.newLine().cmd("remove rule ").arg(current.rule);
+            if (CompareToUtil_mxJPO.compare(0, this.rule, _current.rule) != 0)  {
+                if ((_current.rule != null) && !_current.rule.isEmpty())  {
+                    _mql.newLine().cmd("remove rule ").arg(_current.rule);
                 }
                 if ((this.rule != null) && !this.rule.isEmpty())  {
                     _mql.newLine().cmd("add rule ").arg(this.rule);
@@ -314,11 +318,11 @@ public abstract class AbstractProgram_mxJPO<CLASS extends AbstractCode_mxJPO<CLA
             }
 
             // execute user
-            if (CompareToUtil_mxJPO.compare(0, this.user, current.user) != 0)  {
+            if (CompareToUtil_mxJPO.compare(0, this.user, _current.user) != 0)  {
                 _mql.newLine().cmd("execute user ").arg(this.user);
             }
 
-            this.getProperties().calcDelta(_mql, "", current.getProperties());
+            this.getProperties().calcDelta(_mql, "", _current.getProperties());
         }
     }
 

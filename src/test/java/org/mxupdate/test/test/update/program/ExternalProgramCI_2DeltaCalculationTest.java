@@ -16,25 +16,25 @@
 package org.mxupdate.test.test.update.program;
 
 import org.mxupdate.test.data.program.ExternalProgramData;
-import org.mxupdate.update.program.ExternalProgram_mxJPO;
+import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.Test;
 
 /**
- * Tests the {@link ExternalProgram_mxJPO external program CI} delta
- * calculation.
+ * Tests the {@link ProgramCI_mxJPO program CI} delta calculation for external
+ * programs.
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class ExternalProgramCI_2DeltaCalculationTest
-    extends AbstractProgramCI_2DeltaCalculationTest<ExternalProgram_mxJPO,ExternalProgramData>
+    extends AbstractProgramCI_2DeltaCalculationTest<ExternalProgramData>
 {
     @Override
-    protected ExternalProgram_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
-                                                  final String _name)
+    protected ProgramCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
+                                            final String _name)
     {
-        return new ExternalProgram_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_EXTERNAL.updateType), _name);
+        return new ProgramCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_EXTERNAL.updateType), _name);
     }
 
     @Override

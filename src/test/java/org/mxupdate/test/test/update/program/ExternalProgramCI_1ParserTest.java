@@ -15,7 +15,7 @@
 
 package org.mxupdate.test.test.update.program;
 
-import org.mxupdate.update.program.ExternalProgram_mxJPO;
+import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -25,21 +25,21 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class ExternalProgramCI_1ParserTest
-    extends AbstractProgramCI_1ParserTest<ExternalProgram_mxJPO>
+    extends AbstractProgramCI_1ParserTest
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
         return this.getData("external");
     }
 
-    @Override()
-    protected ExternalProgram_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
-                                                  final String _name)
+    @Override
+    protected ProgramCI_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
+                                            final String _name)
     {
-        return new ExternalProgram_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_EXTERNAL.updateType), _name);
+        return new ProgramCI_mxJPO(_paramCache.getMapping().getTypeDef(CI.PRG_EXTERNAL.updateType), _name);
     }
 }
