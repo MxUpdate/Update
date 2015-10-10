@@ -232,7 +232,7 @@ public class ProgramCI_mxJPO
     public void create(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
-        MqlBuilder_mxJPO.mql().cmd("escape add ").cmd(this.getTypeDef().getMxAdminName()).cmd(" ").arg(this.getName()).cmd(" ").cmd(this.kind.name().toLowerCase()).exec(_paramCache);
+        MqlBuilder_mxJPO.mql().cmd("escape add program ").arg(this.getName()).cmd(" ").cmd(this.kind.name().toLowerCase()).exec(_paramCache);
     }
 
     @Override()
