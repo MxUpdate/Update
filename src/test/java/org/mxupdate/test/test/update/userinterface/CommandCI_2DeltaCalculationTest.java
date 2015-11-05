@@ -16,6 +16,7 @@
 package org.mxupdate.test.test.update.userinterface;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.userinterface.CommandData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.userinterface.Command_mxJPO;
@@ -41,15 +42,28 @@ public class CommandCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
+            // package
+            {"1a) new package",
+                    new CommandData(this, "Test"),
+                    new CommandData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new CommandData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new CommandData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new CommandData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new CommandData(this, "Test").defKeyNotDefined("package")},
+            // uuid
             {"1) uuid",
                     new CommandData(this, "Test"),
                     new CommandData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+            // symbolic names
             {"2a) symbolic name",
                     new CommandData(this, "Test"),
                     new CommandData(this, "Test").setValue("symbolicname", "expression_123")},
             {"2b) two symbolic name",
                     new CommandData(this, "Test"),
                     new CommandData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
+            // description
             {"3) description",
                     new CommandData(this, "Test"),
                     new CommandData(this, "Test").setValue("description", "abc def")},
@@ -58,11 +72,12 @@ public class CommandCI_2DeltaCalculationTest
 
     @Override
     @BeforeMethod
-    @AfterClass(groups = "close" )
+    @AfterClass
     public void cleanup()
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.UI_COMMAND);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override
