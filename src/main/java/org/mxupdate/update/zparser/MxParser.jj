@@ -43,6 +43,8 @@ package org.mxupdate.update.zparser;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
+import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.program.Page_mxJPO;
 import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.system.IndexCI_mxJPO;
@@ -101,9 +103,14 @@ TOKEN : /** first level */
     | <GLOBAL_TRUE:                         "global">                   | <GLOBAL_FALSE:                        "!global">
     | <HIDDEN_TRUE:                         "hidden">                   | <HIDDEN_FALSE:                        "!hidden">
     | <INCONMAIL_TRUE:                      "iconmail">                 | <INCONMAIL_FALSE:                     "!iconmail">
+    | <MULTILINE_TRUE:                      "multiline">                | <MULTILINE_FALSE:                     "!multiline">
+    | <MULTIVALUE_TRUE:                     "multivalue">               | <MULTIVALUE_FALSE:                    "!multivalue">
     | <NEEDSBUSINESSOBJECT_TRUE:            "needsbusinessobject">      | <NEEDSBUSINESSOBJECT_FALSE:           "!needsbusinessobject">
     | <PIPE_TRUE:                           "pipe">                     | <PIPE_FALSE:                          "!pipe">
     | <POOLED_TRUE:                         "pooled">                   | <POOLED_FALSE:                        "!pooled">
+    | <RANGEVALUE_TRUE:                     "rangevalue">               | <RANGEVALUE_FALSE:                    "!rangevalue">
+    | <RESETONCLONE_TRUE:                   "resetonclone">             | <RESETONCLONE_FALSE:                  "!resetonclone">
+    | <RESETONREVISION_TRUE:                "resetonrevision">          | <RESETONREVISION_FALSE:               "!resetonrevision">
     | <TREEMENU_TRUE:                       "treemenu">                 | <TREEMENU_FALSE:                      "!treemenu">
     | <TRUSTED_TRUE:                        "trusted">                  | <TRUSTED_FALSE:                       "!trusted">
     | <UNIQUE_TRUE:                         "unique">                   | <UNIQUE_FALSE:                        "!unique">
@@ -114,6 +121,7 @@ TOKEN : /** first level */
     | <NEWROW:                              "newrow">                                       : DEFAULT
 
     | <HEIGHT:                              "height">                                       : NATURALNUMBER_EXPECTED
+    | <MAXLENGTH:                           "maxlength">                                    : NATURALNUMBER_EXPECTED
     | <SIZE:                                "size">                                         : NATURALNUMBER_EXPECTED
 
     | <SETTING:                             ("add" ([" ","\t","\n","\r"])+ )? "setting">    : STRING_STRING_EXPECTED
@@ -125,6 +133,7 @@ TOKEN : /** first level */
     | <CHANNEL:                             "channel">                                      : STRING_EXPECTED
     | <COMMAND:                             ("add" ([" ","\t","\n","\r"])+ )? "command">    : STRING_EXPECTED
     | <DEFINITION:                          "definition">                                   : STRING_EXPECTED
+    | <DIMENSION:                           "dimension">                                    : STRING_EXPECTED
     | <EMAILADDRESS:                        "emailaddress">                                 : STRING_EXPECTED
     | <FAX:                                 "fax">                                          : STRING_EXPECTED
     | <FILE:                                "file">                                         : STRING_EXPECTED
@@ -132,6 +141,7 @@ TOKEN : /** first level */
     | <FULLNAME:                            "fullname">                                     : STRING_EXPECTED
     | <GROUP:                               "group" >                                       : STRING_EXPECTED
     | <HREF:                                "href">                                         : STRING_EXPECTED
+    | <INPUT:                               "input">                                        : STRING_EXPECTED
     | <LABEL:                               "label">                                        : STRING_EXPECTED
     | <MENU:                                ("add" ([" ","\t","\n","\r"])+ )? "menu">       : STRING_EXPECTED
     | <MIME:                                "mime">                                         : STRING_EXPECTED
@@ -151,6 +161,7 @@ TOKEN : /** first level */
     | <CODE:                                "code">                                         : MULTILINESTRING_EXPECTED
     | <COMMENT:                             "comment">                                      : MULTILINESTRING_EXPECTED
     | <CONTENT:                             "content">                                      : MULTILINESTRING_EXPECTED
+    | <DEFAULTVALUE:                        "default">                                      : MULTILINESTRING_EXPECTED
     | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 }
 
@@ -199,8 +210,15 @@ TOKEN : /** first level */
 
 <KIND_EXPECTED> TOKEN :
 {
+    // Data Model -> Attribute
+      <KIND_BINARY:                         "binary">                                       : DEFAULT
+    | <KIND_BOOLEAN:                        "boolean">                                      : DEFAULT
+    | <KIND_DATE:                           "date">                                         : DEFAULT
+    | <KIND_INTEGER:                        "integer">                                      : DEFAULT
+    | <KIND_REAL:                           "real">                                         : DEFAULT
+    | <KIND_STRING:                         "string">                                       : DEFAULT
     // Program -> Program
-      <KIND_EKL:                            "ekl">                                          : DEFAULT
+    | <KIND_EKL:                            "ekl">                                          : DEFAULT
     | <KIND_EXTERNAL:                       "external">                                     : DEFAULT
     | <KIND_JAVA:                           "java">                                         : DEFAULT
     | <KIND_MQL:                            "mql">                                          : DEFAULT
@@ -208,6 +226,153 @@ TOKEN : /** first level */
     | <KIND_ORGANIZATION:                   "organization">                                 : DEFAULT
     | <KIND_PROJECT:                        "project">                                      : DEFAULT
     | <KIND_ROLE:                           "role">                                         : DEFAULT
+}
+
+/************************************************************ Common Triggers */
+<DEFAULT> TOKEN :
+{
+      <TRIGGER:                             "trigger">                                      : TRIGEVENT_EXPECTED
+}
+/** Trigger Event */
+<TRIGEVENT_EXPECTED> TOKEN :
+{
+      <TRIGEVENT:           (~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"])+>         : TRIGKIND_EXPECTED
+}
+/** Trigger Kind */
+<TRIGKIND_EXPECTED> TOKEN :
+{
+      <ACTION:                              "action">                                       : STRING_EXPECTED
+    | <CHECK:                               "check">                                        : STRING_EXPECTED
+    | <OVERRIDE:                            "override">                                     : STRING_EXPECTED
+}
+
+Trigger trigger() :
+{
+    String str;
+    Token tmp;
+    Trigger trigger = new Trigger();
+}
+{
+    tmp = <TRIGEVENT>           {this.setValue(trigger, "eventType", this.getSingle(tmp.image));}
+    ( <ACTION>                  {this.setValue(trigger, "kind", "action");}
+    | <CHECK>                   {this.setValue(trigger, "kind", "check");}
+    | <OVERRIDE>                {this.setValue(trigger, "kind", "override");} )
+    str = string()              {this.setValue(trigger, "program", str);}
+    ( <INPUT> str = string()    {this.setValue(trigger, "arguments",            str);} )?
+
+    {return trigger;}
+}
+
+/**************************************************** Data Model -> Attribute */
+
+/**
+ * Parses one complete attribute definition.
+ *
+ * @param _attribute    target attribute to update with parsed values
+ */
+void parseAttribute(final AttributeCI_mxJPO _attr)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    Integer number;
+    Token tmp;
+    Trigger trigger;
+    AttributeCI_mxJPO.Range range;
+    AdminProperty property;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_attr, "packageRef",             str);} )
+      | ( <KIND>                    ( <KIND_BINARY>                             {this.setValue(_attr, "kind", AttributeCI_mxJPO.Kind.Binary);}
+                                    | <KIND_BOOLEAN>                            {this.setValue(_attr, "kind", AttributeCI_mxJPO.Kind.Boolean);}
+                                    | <KIND_DATE>                               {this.setValue(_attr, "kind", AttributeCI_mxJPO.Kind.Date);}
+                                    | <KIND_INTEGER>                            {this.setValue(_attr, "kind", AttributeCI_mxJPO.Kind.Integer);}
+                                    | <KIND_REAL>                               {this.setValue(_attr, "kind", AttributeCI_mxJPO.Kind.Real);}
+                                    | <KIND_STRING>                             {this.setValue(_attr, "kind", AttributeCI_mxJPO.Kind.String);} ) )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_attr, "properties", "propertiesStack", property);} )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_attr, "symbolicNames", str);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_attr, "description", str);} )
+      | ( <DEFAULTVALUE>              str = multiLineString()                   {this.setValue(_attr, "defaultValue", str);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_attr, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_attr, "hidden", false);} )
+      | ( <MULTIVALUE_TRUE>                                                     {this.setValue(_attr, "multiValue", true);} )
+      | ( <MULTIVALUE_FALSE>                                                    {this.setValue(_attr, "multiValue", false);} )
+      | ( <RESETONCLONE_TRUE>                                                   {this.setValue(_attr, "resetOnClone", true);} )
+      | ( <RESETONCLONE_FALSE>                                                  {this.setValue(_attr, "resetOnClone", false);} )
+      | ( <RESETONREVISION_TRUE>                                                {this.setValue(_attr, "resetOnRevision", true);} )
+      | ( <RESETONREVISION_FALSE>                                               {this.setValue(_attr, "resetOnRevision", false);} )
+      | ( <RANGEVALUE_TRUE>                                                     {this.setValue(_attr, "rangeValue", true);} )
+      | ( <RANGEVALUE_FALSE>                                                    {this.setValue(_attr, "rangeValue", false);} )
+      | ( <MULTILINE_TRUE>                                                      {this.setValue(_attr, "multiline", true);} )
+      | ( <MULTILINE_FALSE>                                                     {this.setValue(_attr, "multiline", false);} )
+      | ( <MAXLENGTH>                 number = naturalNumber()                  {this.setValue(_attr, "maxLength", number);} )
+      | ( <RULE>                      str = string()                            {this.appendValue(_attr, "rules", str);} )
+      | ( <DIMENSION>                 str = string()                            {this.setValue(_attr, "dimension", str);} )
+      | ( <TRIGGER>                   trigger = trigger()                       {this.appendValue(_attr, "triggers", "triggersStack", trigger);} )
+      | ( <RANGE_EQUAL>               str = string()                            {range = new AttributeCI_mxJPO.Range();this.setValue(range, "type", "=");      this.setValue(range, "value1", str);this.appendValue(_attr, "rangesStack", range);} )
+      | ( <RANGE_GREATERTHAN>         str = string()                            {range = new AttributeCI_mxJPO.Range();this.setValue(range, "type", ">");      this.setValue(range, "value1", str);this.appendValue(_attr, "rangesStack", range);} )
+      | ( <RANGE_GREATERTHANEQUAL>    str = string()                            {range = new AttributeCI_mxJPO.Range();this.setValue(range, "type", ">=");     this.setValue(range, "value1", str);this.appendValue(_attr, "rangesStack", range);} )
+      | ( <RANGE_LESSTHAN>            str = string()                            {range = new AttributeCI_mxJPO.Range();this.setValue(range, "type", "<");      this.setValue(range, "value1", str);this.appendValue(_attr, "rangesStack", range);} )
+      | ( <RANGE_LESSTHANEQUAL>       str = string()                            {range = new AttributeCI_mxJPO.Range();this.setValue(range, "type", "<=");     this.setValue(range, "value1", str);this.appendValue(_attr, "rangesStack", range);} )
+      | ( <RANGE_NOTEQUAL>            str = string()                            {range = new AttributeCI_mxJPO.Range();this.setValue(range, "type", "!=");     this.setValue(range, "value1", str);this.appendValue(_attr, "rangesStack", range);} )
+      | ( <RANGE_MATCH>               str = string()                            {range = new AttributeCI_mxJPO.Range();this.setValue(range, "type", "match");  this.setValue(range, "value1", str);this.appendValue(_attr, "rangesStack", range);} )
+      | ( <RANGE_NOTMATCH>            str = string()                            {range = new AttributeCI_mxJPO.Range();this.setValue(range, "type", "!match"); this.setValue(range, "value1", str);this.appendValue(_attr, "rangesStack", range);} )
+      | ( <RANGE_SMATCH>              str = string()                            {range = new AttributeCI_mxJPO.Range();this.setValue(range, "type", "smatch"); this.setValue(range, "value1", str);this.appendValue(_attr, "rangesStack", range);} )
+      | ( <RANGE_NOTSMATCH>           str = string()                            {range = new AttributeCI_mxJPO.Range();this.setValue(range, "type", "!smatch");this.setValue(range, "value1", str);this.appendValue(_attr, "rangesStack", range);} )
+      | ( <RANGE_PROGRAM>             str = string()                            {range = new AttributeCI_mxJPO.Range();this.setValue(range, "type", "program");this.setValue(range, "value1", str);this.appendValue(_attr, "rangesStack", range);}
+                  ( <INPUT>           str = string()                            {this.setValue(range, "value2", str);} )? )
+      | ( <RANGE_BETWEEN>                                                       {range = new AttributeCI_mxJPO.Range();this.setValue(range, "type", "between");this.appendValue(_attr, "rangesStack", range);}
+                                    ( tmp = <BETW1_STRING>                      {this.setValue(range, "value1", this.getString(tmp.image));}
+                                    | tmp = <BETW1_SINGLE>                      {this.setValue(range, "value1", this.getSingle(tmp.image));} )
+                                    ( <BETW2_INCLUSIVE>                         {this.setValue(range, "include1", true);}
+                                    | <BETW2_EXCLUSIVE>                         {this.setValue(range, "include1", false);})
+                                    ( tmp = <BETW3_STRING>                      {this.setValue(range, "value2", this.getString(tmp.image));}
+                                    | tmp = <BETW3_SINGLE>                      {this.setValue(range, "value2", this.getSingle(tmp.image));} )
+                                    ( <BETW4_INCLUSIVE>                         {this.setValue(range, "include2", true);}
+                                    | <BETW4_EXCLUSIVE>                         {this.setValue(range, "include2", false);} ) )
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_attr, "properties", "propertiesStack", property);} )
+    )*
+}
+
+/** Data Model -> Attribute: Ranges */
+<DEFAULT> TOKEN:
+{
+      <RANGE_EQUAL:                         "range" ([" ","\t","\n","\r"])+ "=">            : STRING_EXPECTED
+    | <RANGE_GREATERTHAN:                   "range" ([" ","\t","\n","\r"])+ ">">            : STRING_EXPECTED
+    | <RANGE_GREATERTHANEQUAL:              "range" ([" ","\t","\n","\r"])+ ">=">           : STRING_EXPECTED
+    | <RANGE_LESSTHAN:                      "range" ([" ","\t","\n","\r"])+ "< ">           : STRING_EXPECTED
+    | <RANGE_LESSTHANEQUAL:                 "range" ([" ","\t","\n","\r"])+ "<=">           : STRING_EXPECTED
+    | <RANGE_NOTEQUAL:                      "range" ([" ","\t","\n","\r"])+ "!=">           : STRING_EXPECTED
+    | <RANGE_MATCH:                         "range" ([" ","\t","\n","\r"])+ "match">        : STRING_EXPECTED
+    | <RANGE_NOTMATCH:                      "range" ([" ","\t","\n","\r"])+ "!match">       : STRING_EXPECTED
+    | <RANGE_SMATCH:                        "range" ([" ","\t","\n","\r"])+ "smatch">       : STRING_EXPECTED
+    | <RANGE_NOTSMATCH:                     "range" ([" ","\t","\n","\r"])+ "!smatch">      : STRING_EXPECTED
+    | <RANGE_PROGRAM:                       "range" ([" ","\t","\n","\r"])+ "program">      : STRING_EXPECTED
+    | <RANGE_BETWEEN:                       "range" ([" ","\t","\n","\r"])+ "between">      : BETW1_EXPECTED
+}
+<BETW1_EXPECTED> TOKEN :
+{
+      <BETW1_STRING: (<BETW1_APOSTROPHE>(<BETW1_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<BETW1_APOSTROPHE>)> : BETW2_EXPECTED
+    | <BETW1_SINGLE: (<BETW1_CHAR>)+> : BETW2_EXPECTED
+    | <#BETW1_APOSTROPHE: "\"" >
+    | <#BETW1_CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+<BETW2_EXPECTED> TOKEN :
+{
+      <BETW2_INCLUSIVE: "inclusive"> : BETW3_EXPECTED
+    | <BETW2_EXCLUSIVE: "exclusive"> : BETW3_EXPECTED
+}
+<BETW3_EXPECTED> TOKEN :
+{
+      <BETW3_STRING: (<BETW3_APOSTROPHE>(<BETW3_CHAR> | "\\\"" | "\\{" | "\\}" | " ")*<BETW3_APOSTROPHE>)> : BETW4_EXPECTED
+    | <BETW3_SINGLE: (<BETW3_CHAR>)+> : BETW4_EXPECTED
+    | <#BETW3_APOSTROPHE: "\"" >
+    | <#BETW3_CHAR: ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
+}
+<BETW4_EXPECTED> TOKEN :
+{
+      <BETW4_INCLUSIVE: "inclusive"> : DEFAULT
+    | <BETW4_EXCLUSIVE: "exclusive"> : DEFAULT
 }
 
 /************************************************************ Program -> Page */

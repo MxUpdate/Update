@@ -38,6 +38,7 @@ import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateUtils_mxJPO;
+import org.mxupdate.update.zparser.MxParser_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
@@ -141,7 +142,7 @@ public class AttributeCI_mxJPO
     /** The attribute is a {@link Kind#String string} multi line attribute. */
     private boolean multiline = false;
     /** Maximum length of the value for {@link Kind#String string}  attributes. */
-    private String maxLength = "0";
+    private int maxLength = 0;
 
     // real / integer attribute
     /** Range value flag. */
@@ -174,7 +175,7 @@ public class AttributeCI_mxJPO
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-        new AttributeParser_mxJPO(new StringReader(_code)).parse(this);
+        new MxParser_mxJPO(new StringReader(_code)).parseAttribute(this);
         this.prepare();
     }
 
@@ -211,7 +212,7 @@ public class AttributeCI_mxJPO
             parsed = true;
 
         } else if ("/maxlength".equals(_url))  {
-            this.maxLength = _content;
+            this.maxLength = Integer.parseInt(_content);
             parsed = true;
         } else if ("/multiline".equals(_url))  {
             this.multiline = true;
@@ -321,7 +322,7 @@ public class AttributeCI_mxJPO
                 .flagIfTrue(    "resetonclone",      false, this.resetOnClone,                  _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnClone))
                 .flagIfTrue(    "resetonrevision",   false, this.resetOnRevision,               _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsFlagResetOnRevision))
                 .flagIfTrue(    "multiline",         false, this.multiline,                     (this.kind == Kind.String))
-                .singleIfTrue(  "maxlength",                this.maxLength,                     ((this.kind == Kind.String) && _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsPropMaxLength)))
+                .singleIfTrue(  "maxlength",                String.valueOf(this.maxLength),     ((this.kind == Kind.String) && _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsPropMaxLength)))
                 .flagIfTrue(    "rangevalue",        false, this.rangeValue,                    (((this.kind == Kind.Date) || (this.kind == Kind.Integer) || (this.kind == Kind.Real)) && _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsFlagRangeValue)))
                 .stringIfTrue(  "dimension",                this.dimension,                     ((this.dimension != null) && !this.dimension.isEmpty() && ((this.kind == Kind.Integer) || (this.kind == Kind.Real)) && _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMAttrSupportsDimension)))
                 .listIfTrue(    "rule",                     this.rules,                         (this.rules.size() == 1))
@@ -372,7 +373,7 @@ public class AttributeCI_mxJPO
             case String:
                 DeltaUtil_mxJPO.calcFlagDelta(_mql, "multiline", false, this.multiline, (current != null) ? current.multiline : null);
                 if (_paramCache.getValueBoolean(ValueKeys.DMAttrSupportsPropMaxLength))  {
-                    DeltaUtil_mxJPO.calcValueDelta(_mql, "maxlength", this.maxLength, (current != null) ? current.maxLength : null);
+                    DeltaUtil_mxJPO.calcValueDelta(_mql, "maxlength", String.valueOf(this.maxLength), (current != null) ? String.valueOf(current.maxLength) : null);
                 }
                 break;
             case Integer:
