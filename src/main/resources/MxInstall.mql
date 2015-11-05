@@ -18,233 +18,233 @@ tcl;
 
 eval  {
 
-  set VERSION "0-90-0"
+    set VERSION "0-90-0"
 
-  set ENV_NAME_MXUPDATE_PATH      "MXUPDATE_PATH"
-  set ENV_NAME_MAPPING_EXTENSION  "MXUPDATE_MAPPING_FILE"
-  set ENV_NAME_DEVELOPMENT        "MXUPDATE_DEVELOPMENT"
+    set ENV_NAME_MXUPDATE_PATH      "MXUPDATE_PATH"
+    set ENV_NAME_MAPPING_EXTENSION  "MXUPDATE_MAPPING_FILE"
+    set ENV_NAME_DEVELOPMENT        "MXUPDATE_DEVELOPMENT"
 
-  # get the installation directory
-  # is the installation directory defined as local MX environment variable?
-  if {[mql exists env "${ENV_NAME_MXUPDATE_PATH}"] > 0} {
-    set sPath [mql get env "${ENV_NAME_MXUPDATE_PATH}"]
-  # maybe as global environment variable?
-  } elseif {[mql exists env global "${ENV_NAME_MXUPDATE_PATH}"] > 0} {
-    set sPath [mql get env global "${ENV_NAME_MXUPDATE_PATH}"]
-  # or as shell enviroment variable?
-  } elseif {[info exists env(${ENV_NAME_MXUPDATE_PATH})] > 0}  {
-    set sPath $env(${ENV_NAME_MXUPDATE_PATH})
-  # otherwise error!!!!
-  } else  {
-    error "\nRequired enviroment variable '${ENV_NAME_MXUPDATE_PATH}' is not defined!"
-  }
-
-  # get mapping file extension (if defined)
-  # is the mapping file extension defined as local MX environment variable?
-  if {[mql exists env "${ENV_NAME_MAPPING_EXTENSION}"] > 0} {
-    set sMappingFileExtension [mql get env "${ENV_NAME_MAPPING_EXTENSION}"]
-  # maybe as global environment variable?
-  } elseif {[mql exists env global "${ENV_NAME_MAPPING_EXTENSION}"] > 0} {
-    set sMappingFileExtension [mql get env global "${ENV_NAME_MAPPING_EXTENSION}"]
-  # or as shell enviroment variable?
-  } elseif {[info exists env(${ENV_NAME_MAPPING_EXTENSION})] > 0}  {
-    set sMappingFileExtension $env(${ENV_NAME_MAPPING_EXTENSION})
-  } else  {
-    set sMappingFileExtension ""
-  }
-
-  # check if development mode is used
-  # is the development mode is defined as local MX environment variable?
-  if {[mql exists env "${ENV_NAME_DEVELOPMENT}"] > 0} {
-    set bDevelopmentMode [mql get env "${ENV_NAME_DEVELOPMENT}"]
-  # maybe as global environment variable?
-  } elseif {[mql exists env global "${ENV_NAME_DEVELOPMENT}"] > 0} {
-    set bDevelopmentMode [mql get env global "${ENV_NAME_DEVELOPMENT}"]
-  # or as shell enviroment variable?
-  } elseif {[info exists env(${ENV_NAME_DEVELOPMENT})] > 0}  {
-    set bDevelopmentMode $env(${ENV_NAME_DEVELOPMENT})
-  } else  {
-    set bDevelopmentMode "false"
-  }
-
-  # check if original structure is used (defined within SVN)
-  set bIsOrigStructure [expr [file exists [file join "${sPath}" org]] == 0]
-
-  # define path for mapping properties file
-  if ${bIsOrigStructure}  {
-    set sMappingFileOriginal [file join "${sPath}" "resources" "org" "mxupdate" "mapping.properties"]
-  } else  {
-    set sMappingFileOriginal [file join "${sPath}" "org" "mxupdate" "mapping.properties"]
-  }
-
-  ##############################################################################
-  # Read the mapping configuration between MX names and internal used names
-  ##############################################################################
-  proc pReadMapping {_sRoot}  {
-    global asMapping
-    global sMappingFileExtension
-    global sMappingFileOriginal
-
-    # read original mapping file
-    set pFile [open [file join "${sMappingFileOriginal}"] r]
-    set lsMapping [split [read $pFile] "\n"]
-    close $pFile
-
-    # read extension file (if defined)
-    if {"${sMappingFileExtension}" != ""}  {
-      set pFile [open [file join "${sMappingFileExtension}"] r]
-      set lsMapping [concat $lsMapping [split [read $pFile] "\n"]]
-      close $pFile
-    }
-
-    # prepare mapping
-    foreach sOneLine ${lsMapping}  {
-      set sOneLine [string trim "${sOneLine}"]
-      # check for none empty line and none comment line
-      if {([string length "${sOneLine}"] > 0) && ([string index "${sOneLine}" 0] != "#")}  {
-        # equal index position
-        set iIdx [string first "=" "${sOneLine}"]
-        if {${iIdx} > 0}  {
-          # extract key and value
-          set sKey [string trim [string range "${sOneLine}" 0 [expr ${iIdx} - 1]]]
-          set sVal [string trim [string range "${sOneLine}" [expr ${iIdx} + 1] end]]
-          set asMapping(${sKey}) "${sVal}"
-        }
-      }
-    }
-  }
-
-  ##############################################################################
-  # The procedure installs given property within the given root path.
-  ##############################################################################
-  proc pInstallProperties {_sRoot _sVersion _sProgName}  {
-    global asMapping
-    global sMappingFileExtension
-    global sMappingFileOriginal
-
-    # if a file extension exists, both file dates must be checked!
-    set sFileDate [clock format [file mtime "${sMappingFileOriginal}"]  -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
-    if {"${sMappingFileExtension}" != ""}  {
-      set sFileDate "${sFileDate}, [clock format [file mtime "${sMappingFileExtension}"]  -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]"
-    }
-
-    if {[mql list prog "${_sProgName}"] == ""}  {
-      set sDate ""
-      mql add prog "${_sProgName}"
+    # get the installation directory
+    # is the installation directory defined as local MX environment variable?
+    if {[mql exists env "${ENV_NAME_MXUPDATE_PATH}"] > 0} {
+        set sPath [mql get env "${ENV_NAME_MXUPDATE_PATH}"]
+    # maybe as global environment variable?
+    } elseif {[mql exists env global "${ENV_NAME_MXUPDATE_PATH}"] > 0} {
+        set sPath [mql get env global "${ENV_NAME_MXUPDATE_PATH}"]
+    # or as shell enviroment variable?
+    } elseif {[info exists env(${ENV_NAME_MXUPDATE_PATH})] > 0}  {
+        set sPath $env(${ENV_NAME_MXUPDATE_PATH})
+    # otherwise error!!!!
     } else  {
-      set sDate [mql print prog "${_sProgName}" select property\[$asMapping(PropertyDef.FileDate.PropertyName)\].value dump]
+        error "\nRequired enviroment variable '${ENV_NAME_MXUPDATE_PATH}' is not defined!"
     }
-    if {"${sDate}" != "${sFileDate}"}  {
-      puts "update property '${_sProgName}'"
 
-      # read original properties
-      set pFile [open [file join "${sMappingFileOriginal}"] r]
-      set sCode [read $pFile]
-      close $pFile
+    # get mapping file extension (if defined)
+    # is the mapping file extension defined as local MX environment variable?
+    if {[mql exists env "${ENV_NAME_MAPPING_EXTENSION}"] > 0} {
+        set sMappingFileExtension [mql get env "${ENV_NAME_MAPPING_EXTENSION}"]
+    # maybe as global environment variable?
+    } elseif {[mql exists env global "${ENV_NAME_MAPPING_EXTENSION}"] > 0} {
+        set sMappingFileExtension [mql get env global "${ENV_NAME_MAPPING_EXTENSION}"]
+    # or as shell enviroment variable?
+    } elseif {[info exists env(${ENV_NAME_MAPPING_EXTENSION})] > 0}  {
+        set sMappingFileExtension $env(${ENV_NAME_MAPPING_EXTENSION})
+    } else  {
+        set sMappingFileExtension ""
+    }
 
-      # read extension file
-      if {"${sMappingFileExtension}" != ""}  {
-        set pFile [open [file join "${sMappingFileExtension}"] r]
-        set sCode "${sCode}\n[read $pFile]"
+    # check if development mode is used
+    # is the development mode is defined as local MX environment variable?
+    if {[mql exists env "${ENV_NAME_DEVELOPMENT}"] > 0} {
+        set bDevelopmentMode [mql get env "${ENV_NAME_DEVELOPMENT}"]
+    # maybe as global environment variable?
+    } elseif {[mql exists env global "${ENV_NAME_DEVELOPMENT}"] > 0} {
+        set bDevelopmentMode [mql get env global "${ENV_NAME_DEVELOPMENT}"]
+    # or as shell enviroment variable?
+    } elseif {[info exists env(${ENV_NAME_DEVELOPMENT})] > 0}  {
+        set bDevelopmentMode $env(${ENV_NAME_DEVELOPMENT})
+    } else  {
+        set bDevelopmentMode "false"
+    }
+
+    # check if original structure is used (defined within SVN)
+    set bIsOrigStructure [expr [file exists [file join "${sPath}" org]] == 0]
+
+    # define path for mapping properties file
+    if ${bIsOrigStructure}  {
+        set sMappingFileOriginal [file join "${sPath}" "resources" "org" "mxupdate" "mapping.properties"]
+    } else  {
+        set sMappingFileOriginal [file join "${sPath}" "org" "mxupdate" "mapping.properties"]
+    }
+
+    ############################################################################
+    # Read the mapping configuration between MX names and internal used names
+    ############################################################################
+    proc pReadMapping {_sRoot}  {
+        global asMapping
+        global sMappingFileExtension
+        global sMappingFileOriginal
+
+        # read original mapping file
+        set pFile [open [file join "${sMappingFileOriginal}"] r]
+        set lsMapping [split [read $pFile] "\n"]
         close $pFile
-      }
 
-      # update property program (with escape on because of special characters)
-      mql set escape on
-      mql mod prog ${_sProgName} \
-            code "${sCode}" \
-            add property $asMapping(PropertyDef.FileDate.PropertyName) value "${sFileDate}"
-      mql set escape off
+        # read extension file (if defined)
+        if {"${sMappingFileExtension}" != ""}  {
+            set pFile [open [file join "${sMappingFileExtension}"] r]
+            set lsMapping [concat $lsMapping [split [read $pFile] "\n"]]
+            close $pFile
+        }
+
+        # prepare mapping
+        foreach sOneLine ${lsMapping}  {
+            set sOneLine [string trim "${sOneLine}"]
+            # check for none empty line and none comment line
+            if {([string length "${sOneLine}"] > 0) && ([string index "${sOneLine}" 0] != "#")}  {
+                # equal index position
+                set iIdx [string first "=" "${sOneLine}"]
+                if {${iIdx} > 0}  {
+                    # extract key and value
+                    set sKey [string trim [string range "${sOneLine}" 0 [expr ${iIdx} - 1]]]
+                    set sVal [string trim [string range "${sOneLine}" [expr ${iIdx} + 1] end]]
+                    set asMapping(${sKey}) "${sVal}"
+                }
+            }
+        }
     }
-  }
 
-  ##############################################################################
-  # The procedure installs given JPO within the given root path.
-  ##############################################################################
-  proc pInstallJPO {_sRoot _sJPOName _sVersion}  {
-    global asMapping
+    ##############################################################################
+    # The procedure installs given property within the given root path.
+    ##############################################################################
+    proc pInstallProperties {_sRoot _sVersion _sProgName}  {
+        global asMapping
+        global sMappingFileExtension
+        global sMappingFileOriginal
 
-    regsub -all {\.} "${_sJPOName}" {/} sFileName
-    set sFileName [file join "${_sRoot}" "${sFileName}_mxJPO.java"]
-    if {[mql list prog "${_sJPOName}"] == ""}  {
-      set sJPODate ""
+        # if a file extension exists, both file dates must be checked!
+        set sFileDate [clock format [file mtime "${sMappingFileOriginal}"]  -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
+        if {"${sMappingFileExtension}" != ""}  {
+            set sFileDate "${sFileDate}, [clock format [file mtime "${sMappingFileExtension}"]  -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]"
+        }
+
+        if {[mql list prog "${_sProgName}"] == ""}  {
+            set sDate ""
+            mql add prog "${_sProgName}"
+        } else  {
+            set sDate [mql print prog "${_sProgName}" select property\[$asMapping(PropertyDef.FileDate.PropertyName)\].value dump]
+        }
+        if {"${sDate}" != "${sFileDate}"}  {
+            puts "update property '${_sProgName}'"
+
+            # read original properties
+            set pFile [open [file join "${sMappingFileOriginal}"] r]
+            set sCode [read $pFile]
+            close $pFile
+
+            # read extension file
+            if {"${sMappingFileExtension}" != ""}  {
+                set pFile [open [file join "${sMappingFileExtension}"] r]
+                set sCode "${sCode}\n[read $pFile]"
+                close $pFile
+            }
+
+            # update property program (with escape on because of special characters)
+            mql set escape on
+            mql mod prog ${_sProgName} \
+                    code "${sCode}" \
+                    add property $asMapping(PropertyDef.FileDate.PropertyName) value "${sFileDate}"
+            mql set escape off
+        }
+    }
+
+    ##############################################################################
+    # The procedure installs given JPO within the given root path.
+    ##############################################################################
+    proc pInstallJPO {_sRoot _sJPOName _sVersion}  {
+        global asMapping
+
+        regsub -all {\.} "${_sJPOName}" {/} sFileName
+        set sFileName [file join "${_sRoot}" "${sFileName}_mxJPO.java"]
+        if {[mql list prog "${_sJPOName}"] == ""}  {
+            set sJPODate ""
+        } else  {
+            set sJPODate [mql print prog "${_sJPOName}" select property\[$asMapping(PropertyDef.FileDate.PropertyName)\].value dump]
+        }
+        # daylight saving problem... test +/- 1 hour
+        set iLastMod [file mtime "${sFileName}"]
+        set sFileDate   [clock format ${iLastMod}  -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
+        set sFileDateP1 [clock format [expr ${iLastMod} + 3600] -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
+        set sFileDateM1 [clock format [expr ${iLastMod} - 3600] -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
+        if {("${sJPODate}" != "${sFileDate}") && ("${sJPODate}" != "${sFileDateP1}") && ("${sJPODate}" != "${sFileDateM1}")}  {
+        puts "update jpo '${_sJPOName}'"
+        mql insert prog "${sFileName}"
+        mql mod prog ${_sJPOName} \
+                add property "compiled" value "false" \
+                add property $asMapping(PropertyDef.FileDate.PropertyName) value "${sFileDate}"
+        }
+    }
+
+    ############################################################################
+    # The procedure compiles all MxUpdate JPOs if required by testing property
+    # "compiled" on the MxUpdate JPOs (which all must be true, otherwise a
+    # compile with force update must be done).
+    # The compile with force update is only done if not in development mode!
+    ############################################################################
+    proc pCompileJPO {}  {
+        global bDevelopmentMode
+
+        set llsProgs [split [mql list prog org.mxupdate.*,MxUpdate select name property\[compiled\].value dump "\t"] "\n"]
+        set bCompile "false"
+        foreach lsOneProg ${llsProgs}  {
+            set lsOneProg [split ${lsOneProg} "\t"]
+            if {([llength ${lsOneProg}] == 1) || ([lindex ${lsOneProg} 1] != "true")}  {
+                set bCompile "true"
+                break
+            }
+        }
+
+        if {${bCompile} == "true"}  {
+            puts "some JPOs are changed, complete recompile needed"
+            mql verbose on
+            if {${bDevelopmentMode} == "true"}  {
+                puts "development mode! only simple compile is done!"
+                mql compile prog org.mxupdate.*,MxUpdate
+            } else  {
+                mql compile prog org.mxupdate.*,MxUpdate force update
+            }
+            mql verbose off
+            foreach lsOneProg ${llsProgs}  {
+                set lsOneProg [split ${lsOneProg} "\t"]
+                mql mod prog [lindex ${lsOneProg} 0] add property "compiled" value "true"
+            }
+        }
+    }
+
+    mql verbose off
+    mql set escape off
+
+    pReadMapping "${sPath}"
+
+    pInstallProperties "${sPath}" "${VERSION}" "org.mxupdate.mapping.properties"
+
+    if ${bIsOrigStructure}  {
+        pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.install.Insert"       "${VERSION}"
+        pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.util.JPOHandler"      "${VERSION}"
+        pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.util.MqlBuilderUtil"  "${VERSION}"
+        mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}" "java"] "${VERSION}" "$asMapping(ParameterDef.InstallFileDateFormatJava.Default)"
     } else  {
-      set sJPODate [mql print prog "${_sJPOName}" select property\[$asMapping(PropertyDef.FileDate.PropertyName)\].value dump]
-    }
-    # daylight saving problem... test +/- 1 hour
-    set iLastMod [file mtime "${sFileName}"]
-    set sFileDate   [clock format ${iLastMod}  -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
-    set sFileDateP1 [clock format [expr ${iLastMod} + 3600] -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
-    set sFileDateM1 [clock format [expr ${iLastMod} - 3600] -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
-    if {("${sJPODate}" != "${sFileDate}") && ("${sJPODate}" != "${sFileDateP1}") && ("${sJPODate}" != "${sFileDateM1}")}  {
-      puts "update jpo '${_sJPOName}'"
-      mql insert prog "${sFileName}"
-      mql mod prog ${_sJPOName} \
-            add property "compiled" value "false" \
-            add property $asMapping(PropertyDef.FileDate.PropertyName) value "${sFileDate}"
-    }
-  }
-
-  ##############################################################################
-  # The procedure compiles all MxUpdate JPOs if required by testing property
-  # "compiled" on the MxUpdate JPOs (which all must be true, otherwise a
-  # compile with force update must be done).
-  # The compile with force update is only done if not in development mode!
-  ##############################################################################
-  proc pCompileJPO {}  {
-    global bDevelopmentMode
-
-    set llsProgs [split [mql list prog org.mxupdate.*,MxUpdate select name property\[compiled\].value dump "\t"] "\n"]
-    set bCompile "false"
-    foreach lsOneProg ${llsProgs}  {
-      set lsOneProg [split ${lsOneProg} "\t"]
-      if {([llength ${lsOneProg}] == 1) || ([lindex ${lsOneProg} 1] != "true")}  {
-        set bCompile "true"
-        break
-      }
+        pInstallJPO       [file join "${sPath}"]        "org.mxupdate.install.Insert"       "${VERSION}"
+        pInstallJPO       [file join "${sPath}"]        "org.mxupdate.util.JPOHandler"      "${VERSION}"
+        pInstallJPO       [file join "${sPath}"]        "org.mxupdate.util.MqlBuilderUtil"  "${VERSION}"
+        mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}"] "${VERSION}" "$asMapping(ParameterDef.InstallFileDateFormatJava.Default)"
     }
 
-    if {${bCompile} == "true"}  {
-      puts "some JPOs are changed, complete recompile needed"
-      mql verbose on
-      if {${bDevelopmentMode} == "true"}  {
-        puts "development mode! only simple compile is done!"
-        mql compile prog org.mxupdate.*,MxUpdate
-      } else  {
-        mql compile prog org.mxupdate.*,MxUpdate force update
-      }
-      mql verbose off
-      foreach lsOneProg ${llsProgs}  {
-        set lsOneProg [split ${lsOneProg} "\t"]
-        mql mod prog [lindex ${lsOneProg} 0] add property "compiled" value "true"
-      }
+    pCompileJPO
+
+    if ${bIsOrigStructure}  {
+        mql exec prog "org.mxupdate.install.InstallDataModel" [file join "${sPath}" "resources"] "${VERSION}"
+    } else  {
+        mql exec prog "org.mxupdate.install.InstallDataModel" [file join "${sPath}"] "${VERSION}"
     }
-  }
-
-  mql verbose off
-  mql set escape off
-
-  pReadMapping "${sPath}"
-
-  pInstallProperties "${sPath}" "${VERSION}" "org.mxupdate.mapping.properties"
-
-  if ${bIsOrigStructure}  {
-    pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.install.Insert"       "${VERSION}"
-    pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.util.JPOHandler"      "${VERSION}"
-    pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.util.MqlBuilderUtil"  "${VERSION}"
-    mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}" "java"] "${VERSION}" "$asMapping(ParameterDef.InstallFileDateFormatJava.Default)"
-  } else  {
-    pInstallJPO       [file join "${sPath}"]        "org.mxupdate.install.Insert"       "${VERSION}"
-    pInstallJPO       [file join "${sPath}"]        "org.mxupdate.util.JPOHandler"      "${VERSION}"
-    pInstallJPO       [file join "${sPath}"]        "org.mxupdate.util.MqlBuilderUtil"  "${VERSION}"
-    mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}"] "${VERSION}" "$asMapping(ParameterDef.InstallFileDateFormatJava.Default)"
-  }
-
-  pCompileJPO
-
-  if ${bIsOrigStructure}  {
-    mql exec prog "org.mxupdate.install.InstallDataModel" [file join "${sPath}" "resources"] "${VERSION}"
-  } else  {
-    mql exec prog "org.mxupdate.install.InstallDataModel" [file join "${sPath}"] "${VERSION}"
-  }
 }
