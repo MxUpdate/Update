@@ -257,6 +257,7 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         this.getValues()    .append4Update("    ", strg);
         this.getSingles()   .append4Update("    ", strg);
         this.getKeyValues() .append4Update("    ", strg);
+        this.getTexts()     .append4Update("    ", strg);
         this.datas          .append4Update("    ", strg);
         this.properties     .append4Update("    ", strg);
         for (final String ciLine : this.getCILines())  {

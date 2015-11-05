@@ -5,3 +5,4 @@
 /.project
 /.settings
 /src/main/java/org/mxupdate/script/.gitignore
+/src/main/java/org/mxupdate/update/system/.gitignore

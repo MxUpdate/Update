@@ -30,6 +30,7 @@ import org.mxupdate.test.data.util.KeyNotDefinedList;
 import org.mxupdate.test.data.util.KeyValueList;
 import org.mxupdate.test.data.util.SingleValueList;
 import org.mxupdate.test.data.util.StringValueList;
+import org.mxupdate.test.data.util.TextValueList;
 import org.mxupdate.test.test.update.WrapperCIInstance;
 import org.mxupdate.test.util.Version;
 import org.mxupdate.typedef.TypeDef_mxJPO;
@@ -67,6 +68,8 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     private final KeyValueList keyValues = new KeyValueList();
     /** All not defined keys. */
     private final KeyNotDefinedList keyNotDefineds = new KeyNotDefinedList();
+    /** Text list of this data piece. */
+    private final TextValueList texts = new TextValueList();
 
     /** Flag to indicate that this data piece is created.*/
     private boolean created;
@@ -233,6 +236,31 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     {
         this.keyNotDefineds.defKeyNotDefined(_tag);
         return (DATA) this;
+    }
+
+    /**
+     * Defines a new value entry which is put into {@link #texts}.
+     *
+     * @param _key      key of the value (e.g. &quot;description&quot;)
+     * @param _text     text
+     * @return this original data instance
+     */
+    @SuppressWarnings("unchecked")
+    public DATA defText(final String _key,
+                        final String _text)
+    {
+        this.texts.def(_key, _text);
+        return (DATA) this;
+    }
+
+    /**
+     * Returns all defined {@link #texts}.
+     *
+     * @return defined texts
+     */
+    public TextValueList getTexts()
+    {
+        return this.texts;
     }
 
     /**
@@ -573,6 +601,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         this.values         .check4Export(_exportParser, "");
         this.keyValues      .check4Export(_exportParser, "");
         this.keyNotDefineds .check4Export(_exportParser, "");
+        this.texts          .check4Export(_exportParser, "");
     }
 
     /**

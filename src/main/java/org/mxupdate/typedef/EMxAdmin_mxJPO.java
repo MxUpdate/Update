@@ -190,6 +190,7 @@ public enum EMxAdmin_mxJPO
         EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Rule.name().toLowerCase(),          Rule);
         EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Table.name().toLowerCase(),         Table);
         EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Type.name().toLowerCase(),          Type);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(UniqueKey.name().toLowerCase(),     UniqueKey);
     }
 
     /** Depending class implementing this MX class definition. */

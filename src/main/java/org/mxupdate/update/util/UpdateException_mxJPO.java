@@ -34,7 +34,7 @@ public class UpdateException_mxJPO
      * administration object, following algorithm is used:
      * <ul>
      * <li>the first digit defines data model (1), program (2), user (3) or
-     *     user interface (4), integration (5) and abstract (6)</li>
+     *     user interface (4), integration (5), abstract (6) and system (7)</li>
      * <li>depending of the first digit, the second and third digit defines the
      *     kind of configuration item
      *     <ul>
@@ -55,6 +55,8 @@ public class UpdateException_mxJPO
      *     <li>602: {@link org.mxupdate.update.AbstractAdminObject_mxJPO abstract administration object}</li>
      *     <li>603: {@link org.mxupdate.update.AbstractPropertyObject_mxJPO abstract property object}</li>
      *     <li>604: {@link org.mxupdate.update.BusObject_mxJPO business object}</li>
+     *     <li>701: {@link org.mxupdate.update.system.PackageCi_mxJPO package}</li>
+     *     <li>702: {@link org.mxupdate.update.system.UniqueKeyCi_mxJPO unique key}</li>
      *     </ul></li>
      * <li>the fourth and fifth digit defines the error itself</li>
      * </ul></p>
@@ -418,6 +420,10 @@ public class UpdateException_mxJPO
          */
         USER_ROLE_NOT_ROLE_KIND(31201,
                 "The new kind ''{2}'' can not be set for role ''{0}'', because kind ''{1}'' is already set. Kinds of role can be only set for ''Role''."),
+
+        /** If the for type / relationship is changed. */
+        SYS_UNIQUEKEY_FOR_CHANGED(
+                70201, "Unique key ''{0}'' for kind is changed, but not allowed (instead unique key must be deleted and recreated)."),
 
         /** If the given file does not exists. */
         UTIL_FILEUTILS_READ_FILE_NOT_EXISTS(
