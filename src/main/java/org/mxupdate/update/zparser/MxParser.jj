@@ -44,6 +44,7 @@ package org.mxupdate.update.zparser;
 import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.AbstractField.ExpressionType;
+import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.AbstractField.SortType;
 import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.Setting;
 import org.mxupdate.update.userinterface.Channel_mxJPO;
 import org.mxupdate.update.userinterface.Command_mxJPO;
@@ -52,6 +53,8 @@ import org.mxupdate.update.userinterface.Form_mxJPO.Field;
 import org.mxupdate.update.userinterface.Inquiry_mxJPO;
 import org.mxupdate.update.userinterface.Menu_mxJPO;
 import org.mxupdate.update.userinterface.Portal_mxJPO;
+import org.mxupdate.update.userinterface.Table_mxJPO;
+import org.mxupdate.update.userinterface.Table_mxJPO.Column;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.AbstractRef;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.ChannelRef;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.CommandRef;
@@ -189,6 +192,55 @@ TOKEN : /** first level */
 
 }
 
+/*************************************************************** Table Column */
+<DEFAULT> TOKEN :
+{
+      <COLUMN:                              "column">                                       : COLUMN_OPENEXPECTED
+}
+
+<COLUMN_OPENEXPECTED> TOKEN :
+{
+      <COLUMN_OPEN:                         "{">                                            : COLUMN_EXPECTED
+}
+
+<COLUMN_EXPECTED> TOKEN :
+{
+      <COLUMN_CLOSE:                        "}">                                            : DEFAULT
+    | <COLUMN_NAME:                         "name">                                         : COLUMN_STRING_EXPECTED
+    | <COLUMN_LABEL:                        "label">                                        : COLUMN_STRING_EXPECTED
+    | <COLUMN_SELECT:                       "select">                                       : COLUMN_STRING_EXPECTED
+    | <COLUMN_BOBJ:                         "businessobject">                               : COLUMN_STRING_EXPECTED
+    | <COLUMN_REL:                          "relationship">                                 : COLUMN_STRING_EXPECTED
+    | <COLUMN_RANGE:                        "range">                                        : COLUMN_STRING_EXPECTED
+    | <COLUMN_HREF:                         "href">                                         : COLUMN_STRING_EXPECTED
+    | <COLUMN_ALT:                          "alt">                                          : COLUMN_STRING_EXPECTED
+    | <COLUMN_HIDDEN_TRUE:                  "hidden">                                       : COLUMN_EXPECTED
+    | <COLUMN_HIDDEN_FALSE:                 "!hidden">                                      : COLUMN_EXPECTED
+    | <COLUMN_USER:                         "user">                                         : COLUMN_STRING_EXPECTED
+    | <COLUMN_SORTTYPE:                     "sorttype">                                     : COLUMN_SORTTYPE_EXPECTED
+    | <COLUMN_SETTING:                      "setting">                                      : COLUMN_SETTING_STRING_EXPECTED
+}
+
+<COLUMN_STRING_EXPECTED> TOKEN :
+{
+      <COLUMN_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : COLUMN_EXPECTED
+    | <COLUMN_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : COLUMN_EXPECTED
+}
+
+<COLUMN_SETTING_STRING_EXPECTED> TOKEN :
+{
+      <SETTING_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : COLUMN_STRING_EXPECTED
+    | <SETTING_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : COLUMN_STRING_EXPECTED
+}
+
+<COLUMN_SORTTYPE_EXPECTED> TOKEN :
+{
+      <COLUMN_SORTTYPE_ALPHA:               "alpha">                                        : COLUMN_EXPECTED
+    | <COLUMN_SORTTYPE_NUMERIC:             "numeric">                                      : COLUMN_EXPECTED
+    | <COLUMN_SORTTYPE_OTHER:               "other">                                        : COLUMN_EXPECTED
+    | <COLUMN_SORTTYPE_NONE:                "none">                                         : COLUMN_EXPECTED
+}
+
 /******************************************************************* Property */
 <DEFAULT> TOKEN :
 {
@@ -197,7 +249,7 @@ TOKEN : /** first level */
     | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
 }
 
-/**************************************************************************** */
+/************************************************** User Interface -> Channel */
 
 /**
  * Parses one complete menu definition.
@@ -243,7 +295,7 @@ void parseChannel(Channel_mxJPO _channel)
     )*
 }
 
-/**************************************************************************** */
+/************************************************** User Interface -> Command */
 
 /**
  * Parses one complete command definition.
@@ -285,12 +337,12 @@ void parseCommand(Command_mxJPO _command)
     )*
 }
 
-/**************************************************************************** */
+/***************************************************** User Interface -> Form */
 
 /**
- * Parses one complete interface definition.
+ * Parses one complete form definition.
  *
- * @param _form    target interface to update with parsed values
+ * @param _form    target form to update with parsed values
  */
 void parseForm(final Form_mxJPO _form)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
@@ -345,7 +397,7 @@ void parseForm(final Form_mxJPO _form)
     )*
 }
 
-/**************************************************************************** */
+/************************************************** User Interface -> Inquiry */
 
 /**
  * Parses one complete inquiry definition.
@@ -383,7 +435,7 @@ void parseInquiry(final Inquiry_mxJPO _inquiry)
     )*
 }
 
-/**************************************************************************** */
+/***************************************************** User Interface -> Menu */
 
 /**
  * Parses one complete menu definition.
@@ -429,10 +481,10 @@ void parseMenu(Menu_mxJPO _menu)
     )*
 }
 
-/**************************************************************************** */
+/*************************************************** User Interface -> Portal */
 
 /**
- * Parses one complete menu definition.
+ * Parses one complete portal definition.
  *
  * @param _portal     target portal to update with parsed values
  */
@@ -469,6 +521,72 @@ void parsePortal(Portal_mxJPO _portal)
       | ( <NEWROW>                                                              {refRowIdx++;refColIdx = 0;} )
 
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_portal, "properties", "propertiesStack", property);} )
+    )*
+}
+
+/***************************************************** User Interface -> Table */
+
+/**
+ * Parses one complete table definition.
+ *
+ * @param _table    target table to update with parsed values
+ */
+void parseTable(final Table_mxJPO _table)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    Token tmp;
+    AdminProperty property;
+    Column column;
+    Setting setting;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_table, "packageRef", str);} )
+
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_table, "properties", "propertiesStack", property);} )
+
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_table, "symbolicNames", str);} )
+
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_table, "description", str);} )
+
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_table, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_table, "hidden", false);} )
+
+      | ( <COLUMN>                                                              {column = new Column();this.appendValue(_table, "fields", column);  }
+          <COLUMN_OPEN>
+                    ( <COLUMN_NAME>     ( tmp = <COLUMN_STRING>                 {this.setValue(column, "name",                              this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "name",                              this.getSingle(tmp.image));} )
+                    | <COLUMN_LABEL>    ( tmp = <COLUMN_STRING>                 {this.setValue(column, "label",                             this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "label",                             this.getSingle(tmp.image));} )
+                    | <COLUMN_SELECT>   ( tmp = <COLUMN_STRING>                 {this.setValue(column, "expression",                        this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "expression",                        this.getSingle(tmp.image));} )
+                    | <COLUMN_BOBJ>     ( tmp = <COLUMN_STRING>                 {this.setValue(column, "expression",                        this.getString(tmp.image));this.setValue(column, "expressionType", ExpressionType.BUSINESSOBJECT);}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "expression",                        this.getSingle(tmp.image));this.setValue(column, "expressionType", ExpressionType.BUSINESSOBJECT);} )
+                    | <COLUMN_REL>      ( tmp = <COLUMN_STRING>                 {this.setValue(column, "expression",                        this.getString(tmp.image));this.setValue(column, "expressionType", ExpressionType.RELATIONSHIP);}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "expression",                        this.getSingle(tmp.image));this.setValue(column, "expressionType", ExpressionType.RELATIONSHIP);} )
+                    | <COLUMN_RANGE>    ( tmp = <COLUMN_STRING>                 {this.setValue(column, "range",                             this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "range",                             this.getSingle(tmp.image));} )
+                    | <COLUMN_HREF>     ( tmp = <COLUMN_STRING>                 {this.setValue(column, "href",                              this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "href",                              this.getSingle(tmp.image));} )
+                    | <COLUMN_ALT>      ( tmp = <COLUMN_STRING>                 {this.setValue(column, "alt",                               this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "alt",                               this.getSingle(tmp.image));} )
+                    | <COLUMN_HIDDEN_TRUE>                                      {this.setValue(column, "hidden",                            true);}
+                    | <COLUMN_HIDDEN_FALSE>                                     {this.setValue(column, "hidden",                            false);}
+                    | <COLUMN_USER>     ( tmp = <COLUMN_STRING>                 {this.appendValue(column, "users",                          this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.appendValue(column, "users",                          this.getSingle(tmp.image));} )
+                    | <COLUMN_SORTTYPE> ( <COLUMN_SORTTYPE_ALPHA>               {this.setValue(column, "sortType",                          SortType.ALPHANUMERIC);}
+                                        | <COLUMN_SORTTYPE_NUMERIC>             {this.setValue(column, "sortType",                          SortType.NUMERIC);}
+                                        | <COLUMN_SORTTYPE_OTHER>               {this.setValue(column, "sortType",                          SortType.OTHER);}
+                                        | <COLUMN_SORTTYPE_NONE>                {this.setValue(column, "sortType",                          SortType.NONE);} )
+                    | <COLUMN_SETTING>                                          {setting = new Setting();this.appendValue(column, "settings", setting);}
+                                        ( tmp = <SETTING_STRING>                {this.setValue(setting, "name",                             this.getString(tmp.image));}
+                                        | tmp = <SETTING_SINGLE>                {this.setValue(setting, "name",                             this.getSingle(tmp.image));} )
+                                        ( tmp = <COLUMN_STRING>                 {this.setValue(setting, "value",                            this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(setting, "value",                            this.getSingle(tmp.image));} ) ) *
+          <COLUMN_CLOSE> )
+
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_table, "properties", "propertiesStack", property);} )
     )*
 }
 

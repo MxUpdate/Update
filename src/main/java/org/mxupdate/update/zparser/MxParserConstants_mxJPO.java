@@ -118,30 +118,88 @@ interface MxParserConstants_mxJPO {
   /** RegularExpression Id. */
   int FIELD_SETTING_SINGLE = 50;
   /** RegularExpression Id. */
-  int PROPERTY = 51;
+  int COLUMN = 51;
   /** RegularExpression Id. */
-  int PROPERTYTO = 52;
+  int COLUMN_OPEN = 52;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 53;
+  int COLUMN_CLOSE = 53;
+  /** RegularExpression Id. */
+  int COLUMN_NAME = 54;
+  /** RegularExpression Id. */
+  int COLUMN_LABEL = 55;
+  /** RegularExpression Id. */
+  int COLUMN_SELECT = 56;
+  /** RegularExpression Id. */
+  int COLUMN_BOBJ = 57;
+  /** RegularExpression Id. */
+  int COLUMN_REL = 58;
+  /** RegularExpression Id. */
+  int COLUMN_RANGE = 59;
+  /** RegularExpression Id. */
+  int COLUMN_HREF = 60;
+  /** RegularExpression Id. */
+  int COLUMN_ALT = 61;
+  /** RegularExpression Id. */
+  int COLUMN_HIDDEN_TRUE = 62;
+  /** RegularExpression Id. */
+  int COLUMN_HIDDEN_FALSE = 63;
+  /** RegularExpression Id. */
+  int COLUMN_USER = 64;
+  /** RegularExpression Id. */
+  int COLUMN_SORTTYPE = 65;
+  /** RegularExpression Id. */
+  int COLUMN_SETTING = 66;
+  /** RegularExpression Id. */
+  int COLUMN_STRING = 67;
+  /** RegularExpression Id. */
+  int COLUMN_SINGLE = 68;
+  /** RegularExpression Id. */
+  int SETTING_STRING = 69;
+  /** RegularExpression Id. */
+  int SETTING_SINGLE = 70;
+  /** RegularExpression Id. */
+  int COLUMN_SORTTYPE_ALPHA = 71;
+  /** RegularExpression Id. */
+  int COLUMN_SORTTYPE_NUMERIC = 72;
+  /** RegularExpression Id. */
+  int COLUMN_SORTTYPE_OTHER = 73;
+  /** RegularExpression Id. */
+  int COLUMN_SORTTYPE_NONE = 74;
+  /** RegularExpression Id. */
+  int PROPERTY = 75;
+  /** RegularExpression Id. */
+  int PROPERTYTO = 76;
+  /** RegularExpression Id. */
+  int PROPERTYVAL = 77;
 
   /** Lexical state. */
-  int FIELD_SETTING_EXPECTED = 0;
+  int COLUMN_SORTTYPE_EXPECTED = 0;
   /** Lexical state. */
-  int FIELD_STRING_EXPECTED = 1;
+  int COLUMN_SETTING_STRING_EXPECTED = 1;
   /** Lexical state. */
-  int FIELD_EXPECTED = 2;
+  int COLUMN_STRING_EXPECTED = 2;
   /** Lexical state. */
-  int FIELD_OPENEXPECTED = 3;
+  int COLUMN_EXPECTED = 3;
   /** Lexical state. */
-  int NATURALNUMBER_EXPECTED = 4;
+  int COLUMN_OPENEXPECTED = 4;
   /** Lexical state. */
-  int MULTILINESTRING_EXPECTED = 5;
+  int FIELD_SETTING_EXPECTED = 5;
   /** Lexical state. */
-  int STRING_EXPECTED = 6;
+  int FIELD_STRING_EXPECTED = 6;
   /** Lexical state. */
-  int STRING_STRING_EXPECTED = 7;
+  int FIELD_EXPECTED = 7;
   /** Lexical state. */
-  int DEFAULT = 8;
+  int FIELD_OPENEXPECTED = 8;
+  /** Lexical state. */
+  int NATURALNUMBER_EXPECTED = 9;
+  /** Lexical state. */
+  int MULTILINESTRING_EXPECTED = 10;
+  /** Lexical state. */
+  int STRING_EXPECTED = 11;
+  /** Lexical state. */
+  int STRING_STRING_EXPECTED = 12;
+  /** Lexical state. */
+  int DEFAULT = 13;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -196,6 +254,30 @@ interface MxParserConstants_mxJPO {
     "<FIELD_SINGLE>",
     "<FIELD_SETTING_STRING>",
     "<FIELD_SETTING_SINGLE>",
+    "\"column\"",
+    "\"{\"",
+    "\"}\"",
+    "\"name\"",
+    "\"label\"",
+    "\"select\"",
+    "\"businessobject\"",
+    "\"relationship\"",
+    "\"range\"",
+    "\"href\"",
+    "\"alt\"",
+    "\"hidden\"",
+    "\"!hidden\"",
+    "\"user\"",
+    "\"sorttype\"",
+    "\"setting\"",
+    "<COLUMN_STRING>",
+    "<COLUMN_SINGLE>",
+    "<SETTING_STRING>",
+    "<SETTING_SINGLE>",
+    "\"alpha\"",
+    "\"numeric\"",
+    "\"other\"",
+    "\"none\"",
     "\"property\"",
     "\"to\"",
     "\"value\"",
