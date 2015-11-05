@@ -57,6 +57,7 @@ import org.mxupdate.update.datamodel.PathType_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.datamodel.Relationship_mxJPO;
 import org.mxupdate.update.datamodel.Rule_mxJPO;
+import org.mxupdate.update.datamodel.Type_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO.LocalAttribute;
 import org.mxupdate.update.datamodel.helper.LocalPathTypeList_mxJPO.LocalPathType;
@@ -227,6 +228,7 @@ PARSER_END(MxParser)
     | <MAJORSEQUENCE:                       "majorsequence">                                : STRING_EXPECTED
     | <MEANING:                             "meaning">                                      : STRING_EXPECTED
     | <MENU:                                ("add" ([" ","\t","\n","\r"])+ )? "menu">       : STRING_EXPECTED
+    | <METHOD:                              "method">                                       : STRING_EXPECTED
     | <MIME:                                "mime">                                         : STRING_EXPECTED
     | <MINORSEQUENCE:                       "minorsequence">                                : STRING_EXPECTED
     | <PACKAGE:                             "package">                                      : STRING_EXPECTED
@@ -410,9 +412,10 @@ AdminProperty property() :
     | <KIND_ORGANIZATION:                   "organization">                                 : DEFAULT
     | <KIND_PROJECT:                        "project">                                      : DEFAULT
     | <KIND_ROLE:                           "role">                                         : DEFAULT
-    // Data Model -> Relationship
+    // Data Model -> Relationship / Type
     | <KIND_BASIC:                          "basic">                                        : DEFAULT
     | <KIND_COMPOSITIONAL:                  "compositional">                                : DEFAULT
+    | <KIND_COMPOSED:                       "composed">                                     : DEFAULT
 }
 
 /************************************************************ Common Triggers */
@@ -1242,9 +1245,8 @@ void parseRelationship(final Relationship_mxJPO _relationship)
                 )*
           "}" )
       | ( <ATTRIBUTE>                 str = string()                            {this.appendValue(_relationship, "globalAttributes", str);} )
-      | ( <LOCAL>
-                 ( <ATTRIBUTE>        localAttr = localAttribute()              {this.appendValue(_relationship, "localAttributes", localAttr);}
-                 | <PATHTYPE>         localPathType = localPathType()           {this.appendValue(_relationship, "localPathTypes", localPathType);} ) )
+      | ( <LOCAL>  ( <ATTRIBUTE>      localAttr = localAttribute()              {this.appendValue(_relationship, "localAttributes", localAttr);}
+                   | <PATHTYPE>       localPathType = localPathType()           {this.appendValue(_relationship, "localPathTypes", localPathType);} ) )
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_relationship, "properties", "propertiesStack", property);} )
     )*
 }
@@ -1281,6 +1283,44 @@ void parseRule(final Rule_mxJPO _rule)
                 | <USER>  str = string()                                        {this.setValue(access, "kind", "user");this.setValue(access, "userRef", str);} )
                                       stateAccessDef(access)                    {this.appendValue(_rule, "accessList", "accessList", access);/*reset*/access = new Access();} )
       | (<PROPERTY>                   property = property()                     {this.appendValue(_rule, "properties", "propertiesStack", property);} )
+    )*
+}
+
+/********************************************************* Data Model -> Type */
+
+/**
+ * Parses one complete type definition.
+ *
+ * @param _type     target type to update with parsed values
+ */
+void parseType(final Type_mxJPO _type)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    AdminProperty property;
+    Trigger trigger;
+    LocalAttribute localAttr;
+    LocalPathType localPathType;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_type, "packageRef", str);} )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(this.getValue(_type, "properties"), "propertiesStack", property);} )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_type, "symbolicNames", str);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_type, "description", str);} )
+      | ( <KIND>                    ( <KIND_BASIC>                              {this.setValue(_type, "kind", Type_mxJPO.Kind.Basic);}
+                                    | <KIND_COMPOSED>                           {this.setValue(_type, "kind", Type_mxJPO.Kind.Composed);} ) )
+      | ( <ABSTRACT_TRUE>                                                       {this.setValue(_type, "abstractFlag", true);} )
+      | ( <ABSTRACT_FALSE>                                                      {this.setValue(_type, "abstractFlag", false);} )
+      | ( <DERIVED>                   str = string()                            {this.setValue(_type, "derived", str);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_type, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_type, "hidden", false);} )
+      | ( <TRIGGER>                   trigger = trigger()                       {this.appendValue(_type, "triggers", "triggersStack", trigger);} )
+      | ( <METHOD>                    str = string()                            {this.appendValue(_type, "methods", str);} )
+      | ( <ATTRIBUTE>                 str = string()                            {this.appendValue(_type, "globalAttributes", str);} )
+      | ( <LOCAL>  ( <ATTRIBUTE>      localAttr = localAttribute()              {this.appendValue(_type, "localAttributes", localAttr);}
+                   | <PATHTYPE>       localPathType = localPathType()           {this.appendValue(_type, "localPathTypes", localPathType);} ) )
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_type, "properties", "propertiesStack", property);} )
     )*
 }
 

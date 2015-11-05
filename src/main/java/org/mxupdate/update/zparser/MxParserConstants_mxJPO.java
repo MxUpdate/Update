@@ -306,409 +306,413 @@ interface MxParserConstants_mxJPO {
   /** RegularExpression Id. */
   int MENU = 144;
   /** RegularExpression Id. */
-  int MIME = 145;
+  int METHOD = 145;
   /** RegularExpression Id. */
-  int MINORSEQUENCE = 146;
+  int MIME = 146;
   /** RegularExpression Id. */
-  int PACKAGE = 147;
+  int MINORSEQUENCE = 147;
   /** RegularExpression Id. */
-  int PARENT = 148;
+  int PACKAGE = 148;
   /** RegularExpression Id. */
-  int PATHTYPE = 149;
+  int PARENT = 149;
   /** RegularExpression Id. */
-  int PATTERN = 150;
+  int PATHTYPE = 150;
   /** RegularExpression Id. */
-  int PHONE = 151;
+  int PATTERN = 151;
   /** RegularExpression Id. */
-  int PRINT = 152;
+  int PHONE = 152;
   /** RegularExpression Id. */
-  int REGISTEREDNAME = 153;
+  int PRINT = 153;
   /** RegularExpression Id. */
-  int ROLE = 154;
+  int REGISTEREDNAME = 154;
   /** RegularExpression Id. */
-  int RULE = 155;
+  int ROLE = 155;
   /** RegularExpression Id. */
-  int SEQUENCE = 156;
+  int RULE = 156;
   /** RegularExpression Id. */
-  int SIGNATURE = 157;
+  int SEQUENCE = 157;
   /** RegularExpression Id. */
-  int SITE = 158;
+  int SIGNATURE = 158;
   /** RegularExpression Id. */
-  int STATE = 159;
+  int SITE = 159;
   /** RegularExpression Id. */
-  int STORE = 160;
+  int STATE = 160;
   /** RegularExpression Id. */
-  int SUFFIX = 161;
+  int STORE = 161;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 162;
+  int SUFFIX = 162;
   /** RegularExpression Id. */
-  int USESPACKAGE = 163;
+  int SYMBOLICNAME = 163;
   /** RegularExpression Id. */
-  int UUID = 164;
+  int USESPACKAGE = 164;
   /** RegularExpression Id. */
-  int VAULT = 165;
+  int UUID = 165;
   /** RegularExpression Id. */
-  int VIEW = 166;
+  int VAULT = 166;
   /** RegularExpression Id. */
-  int CODE = 167;
+  int VIEW = 167;
   /** RegularExpression Id. */
-  int COMMENT = 168;
+  int CODE = 168;
   /** RegularExpression Id. */
-  int CONTENT = 169;
+  int COMMENT = 169;
   /** RegularExpression Id. */
-  int DEFAULTVALUE = 170;
+  int CONTENT = 170;
   /** RegularExpression Id. */
-  int DESCRIPTION = 171;
+  int DEFAULTVALUE = 171;
   /** RegularExpression Id. */
-  int FILTER = 172;
+  int DESCRIPTION = 172;
   /** RegularExpression Id. */
-  int LOCALFILTER = 173;
+  int FILTER = 173;
   /** RegularExpression Id. */
-  int STRING_STRING_STRING = 174;
+  int LOCALFILTER = 174;
   /** RegularExpression Id. */
-  int STRING_STRING_SINGLE = 175;
+  int STRING_STRING_STRING = 175;
   /** RegularExpression Id. */
-  int STRING = 176;
+  int STRING_STRING_SINGLE = 176;
   /** RegularExpression Id. */
-  int SINGLE_STRING = 177;
+  int STRING = 177;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 178;
+  int SINGLE_STRING = 178;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 179;
+  int MULTILINESTRING = 179;
   /** RegularExpression Id. */
-  int LISTSTRING = 180;
+  int MULTILINESINGLE = 180;
   /** RegularExpression Id. */
-  int LISTSINGLE = 181;
+  int LISTSTRING = 181;
   /** RegularExpression Id. */
-  int LISTCLOSE = 182;
+  int LISTSINGLE = 182;
   /** RegularExpression Id. */
-  int NATURALNUMBER = 183;
+  int LISTCLOSE = 183;
   /** RegularExpression Id. */
-  int PROPERTY = 184;
+  int NATURALNUMBER = 184;
   /** RegularExpression Id. */
-  int PROPERTYTO = 185;
+  int PROPERTY = 185;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 186;
+  int PROPERTYTO = 186;
   /** RegularExpression Id. */
-  int KIND = 187;
+  int PROPERTYVAL = 187;
   /** RegularExpression Id. */
-  int KIND_BINARY = 188;
+  int KIND = 188;
   /** RegularExpression Id. */
-  int KIND_BOOLEAN = 189;
+  int KIND_BINARY = 189;
   /** RegularExpression Id. */
-  int KIND_DATE = 190;
+  int KIND_BOOLEAN = 190;
   /** RegularExpression Id. */
-  int KIND_INTEGER = 191;
+  int KIND_DATE = 191;
   /** RegularExpression Id. */
-  int KIND_REAL = 192;
+  int KIND_INTEGER = 192;
   /** RegularExpression Id. */
-  int KIND_STRING = 193;
+  int KIND_REAL = 193;
   /** RegularExpression Id. */
-  int KIND_EKL = 194;
+  int KIND_STRING = 194;
   /** RegularExpression Id. */
-  int KIND_EXTERNAL = 195;
+  int KIND_EKL = 195;
   /** RegularExpression Id. */
-  int KIND_JAVA = 196;
+  int KIND_EXTERNAL = 196;
   /** RegularExpression Id. */
-  int KIND_MQL = 197;
+  int KIND_JAVA = 197;
   /** RegularExpression Id. */
-  int KIND_ORGANIZATION = 198;
+  int KIND_MQL = 198;
   /** RegularExpression Id. */
-  int KIND_PROJECT = 199;
+  int KIND_ORGANIZATION = 199;
   /** RegularExpression Id. */
-  int KIND_ROLE = 200;
+  int KIND_PROJECT = 200;
   /** RegularExpression Id. */
-  int KIND_BASIC = 201;
+  int KIND_ROLE = 201;
   /** RegularExpression Id. */
-  int KIND_COMPOSITIONAL = 202;
+  int KIND_BASIC = 202;
   /** RegularExpression Id. */
-  int TRIGGER = 203;
+  int KIND_COMPOSITIONAL = 203;
   /** RegularExpression Id. */
-  int TRIGEVENT = 204;
+  int KIND_COMPOSED = 204;
   /** RegularExpression Id. */
-  int TRIGKIND_ACTION = 205;
+  int TRIGGER = 205;
   /** RegularExpression Id. */
-  int TRIGKIND_CHECK = 206;
+  int TRIGEVENT = 206;
   /** RegularExpression Id. */
-  int TRIGKIND_OVERRIDE = 207;
+  int TRIGKIND_ACTION = 207;
   /** RegularExpression Id. */
-  int RANGE_EQUAL = 208;
+  int TRIGKIND_CHECK = 208;
   /** RegularExpression Id. */
-  int RANGE_GREATERTHAN = 209;
+  int TRIGKIND_OVERRIDE = 209;
   /** RegularExpression Id. */
-  int RANGE_GREATERTHANEQUAL = 210;
+  int RANGE_EQUAL = 210;
   /** RegularExpression Id. */
-  int RANGE_LESSTHAN = 211;
+  int RANGE_GREATERTHAN = 211;
   /** RegularExpression Id. */
-  int RANGE_LESSTHANEQUAL = 212;
+  int RANGE_GREATERTHANEQUAL = 212;
   /** RegularExpression Id. */
-  int RANGE_NOTEQUAL = 213;
+  int RANGE_LESSTHAN = 213;
   /** RegularExpression Id. */
-  int RANGE_MATCH = 214;
+  int RANGE_LESSTHANEQUAL = 214;
   /** RegularExpression Id. */
-  int RANGE_NOTMATCH = 215;
+  int RANGE_NOTEQUAL = 215;
   /** RegularExpression Id. */
-  int RANGE_SMATCH = 216;
+  int RANGE_MATCH = 216;
   /** RegularExpression Id. */
-  int RANGE_NOTSMATCH = 217;
+  int RANGE_NOTMATCH = 217;
   /** RegularExpression Id. */
-  int RANGE_PROGRAM = 218;
+  int RANGE_SMATCH = 218;
   /** RegularExpression Id. */
-  int RANGE_BETWEEN = 219;
+  int RANGE_NOTSMATCH = 219;
   /** RegularExpression Id. */
-  int BETW1_STRING = 220;
+  int RANGE_PROGRAM = 220;
   /** RegularExpression Id. */
-  int BETW1_SINGLE = 221;
+  int RANGE_BETWEEN = 221;
   /** RegularExpression Id. */
-  int BETW1_APOSTROPHE = 222;
+  int BETW1_STRING = 222;
   /** RegularExpression Id. */
-  int BETW1_CHAR = 223;
+  int BETW1_SINGLE = 223;
   /** RegularExpression Id. */
-  int BETW2_INCLUSIVE = 224;
+  int BETW1_APOSTROPHE = 224;
   /** RegularExpression Id. */
-  int BETW2_EXCLUSIVE = 225;
+  int BETW1_CHAR = 225;
   /** RegularExpression Id. */
-  int BETW3_STRING = 226;
+  int BETW2_INCLUSIVE = 226;
   /** RegularExpression Id. */
-  int BETW3_SINGLE = 227;
+  int BETW2_EXCLUSIVE = 227;
   /** RegularExpression Id. */
-  int BETW3_APOSTROPHE = 228;
+  int BETW3_STRING = 228;
   /** RegularExpression Id. */
-  int BETW3_CHAR = 229;
+  int BETW3_SINGLE = 229;
   /** RegularExpression Id. */
-  int BETW4_INCLUSIVE = 230;
+  int BETW3_APOSTROPHE = 230;
   /** RegularExpression Id. */
-  int BETW4_EXCLUSIVE = 231;
+  int BETW3_CHAR = 231;
   /** RegularExpression Id. */
-  int UNIT = 232;
+  int BETW4_INCLUSIVE = 232;
   /** RegularExpression Id. */
-  int UNITNAME_STRING = 233;
+  int BETW4_EXCLUSIVE = 233;
   /** RegularExpression Id. */
-  int UNITNAME_SINGLE = 234;
+  int UNIT = 234;
   /** RegularExpression Id. */
-  int UNITDEF_START = 235;
+  int UNITNAME_STRING = 235;
   /** RegularExpression Id. */
-  int UNITDEF_END = 236;
+  int UNITNAME_SINGLE = 236;
   /** RegularExpression Id. */
-  int UNITDEF_UUID = 237;
+  int UNITDEF_START = 237;
   /** RegularExpression Id. */
-  int UNITDEF_DEFAULT_TRUE = 238;
+  int UNITDEF_END = 238;
   /** RegularExpression Id. */
-  int UNITDEF_DEFAULT_FALSE = 239;
+  int UNITDEF_UUID = 239;
   /** RegularExpression Id. */
-  int UNITDEF_DESCRIPTION = 240;
+  int UNITDEF_DEFAULT_TRUE = 240;
   /** RegularExpression Id. */
-  int UNITDEF_LABEL = 241;
+  int UNITDEF_DEFAULT_FALSE = 241;
   /** RegularExpression Id. */
-  int UNITDEF_MULTIPLIER = 242;
+  int UNITDEF_DESCRIPTION = 242;
   /** RegularExpression Id. */
-  int UNITDEF_OFFSET = 243;
+  int UNITDEF_LABEL = 243;
   /** RegularExpression Id. */
-  int UNITDEF_SETTING = 244;
+  int UNITDEF_MULTIPLIER = 244;
   /** RegularExpression Id. */
-  int UNITDEF_PROPERTY = 245;
+  int UNITDEF_OFFSET = 245;
   /** RegularExpression Id. */
-  int UNITDEF_PROPERTYVAL = 246;
+  int UNITDEF_SETTING = 246;
   /** RegularExpression Id. */
-  int UNITDEF_PROPERTYTO = 247;
+  int UNITDEF_PROPERTY = 247;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEM = 248;
+  int UNITDEF_PROPERTYVAL = 248;
   /** RegularExpression Id. */
-  int UNITDEF_STRING = 249;
+  int UNITDEF_PROPERTYTO = 249;
   /** RegularExpression Id. */
-  int UNITDEF_SINGLE = 250;
+  int UNITDEF_SYSTEM = 250;
   /** RegularExpression Id. */
-  int UNITDEF_STRINGSTRING_STRING = 251;
+  int UNITDEF_STRING = 251;
   /** RegularExpression Id. */
-  int UNITDEF_STRINGSTRING_SINGLE = 252;
+  int UNITDEF_SINGLE = 252;
   /** RegularExpression Id. */
-  int UNITDEF_DOUBLE_DOUBLE = 253;
+  int UNITDEF_STRINGSTRING_STRING = 253;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMNAME_STRING = 254;
+  int UNITDEF_STRINGSTRING_SINGLE = 254;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMNAME_SINGLE = 255;
+  int UNITDEF_DOUBLE_DOUBLE = 255;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMDEF_TO = 256;
+  int UNITDEF_SYSTEMNAME_STRING = 256;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMDEF_UNIT = 257;
+  int UNITDEF_SYSTEMNAME_SINGLE = 257;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMUNIT_STRING = 258;
+  int UNITDEF_SYSTEMDEF_TO = 258;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMUNIT_SINGLE = 259;
+  int UNITDEF_SYSTEMDEF_UNIT = 259;
   /** RegularExpression Id. */
-  int FOR = 260;
+  int UNITDEF_SYSTEMUNIT_STRING = 260;
   /** RegularExpression Id. */
-  int FOR_PATHTYPE_ALL = 261;
+  int UNITDEF_SYSTEMUNIT_SINGLE = 261;
   /** RegularExpression Id. */
-  int FOR_PATHTYPE = 262;
+  int FOR = 262;
   /** RegularExpression Id. */
-  int FOR_RELATIONSHIP_ALL = 263;
+  int FOR_PATHTYPE_ALL = 263;
   /** RegularExpression Id. */
-  int FOR_RELATIONSHIP = 264;
+  int FOR_PATHTYPE = 264;
   /** RegularExpression Id. */
-  int FOR_TYPE_ALL = 265;
+  int FOR_RELATIONSHIP_ALL = 265;
   /** RegularExpression Id. */
-  int FOR_TYPE = 266;
+  int FOR_RELATIONSHIP = 266;
   /** RegularExpression Id. */
-  int FROM = 267;
+  int FOR_TYPE_ALL = 267;
   /** RegularExpression Id. */
-  int TO = 268;
+  int FOR_TYPE = 268;
   /** RegularExpression Id. */
-  int CARDINALITY_ONE = 269;
+  int FROM = 269;
   /** RegularExpression Id. */
-  int CARDINALITY_MANY = 270;
+  int TO = 270;
   /** RegularExpression Id. */
-  int TYPE_ALL = 271;
+  int CARDINALITY_ONE = 271;
   /** RegularExpression Id. */
-  int RELATIONSHIP_ALL = 272;
+  int CARDINALITY_MANY = 272;
   /** RegularExpression Id. */
-  int RELATIONSHIP = 273;
+  int TYPE_ALL = 273;
   /** RegularExpression Id. */
-  int DELIMITER = 274;
+  int RELATIONSHIP_ALL = 274;
   /** RegularExpression Id. */
-  int DELIMITERSTRING = 275;
+  int RELATIONSHIP = 275;
   /** RegularExpression Id. */
-  int DELIMITERSINGLE = 276;
+  int DELIMITER = 276;
   /** RegularExpression Id. */
-  int DELIMITER_CHARSTR = 277;
+  int DELIMITERSTRING = 277;
   /** RegularExpression Id. */
-  int AC_ACCESS_STRING = 278;
+  int DELIMITERSINGLE = 278;
   /** RegularExpression Id. */
-  int ROUTE = 279;
+  int DELIMITER_CHARSTR = 279;
   /** RegularExpression Id. */
-  int ROUTEUSERSTRING = 280;
+  int AC_ACCESS_STRING = 280;
   /** RegularExpression Id. */
-  int ROUTEUSERSINGLE = 281;
+  int ROUTE = 281;
   /** RegularExpression Id. */
-  int ROUTEUSERCLOSE = 282;
+  int ROUTEUSERSTRING = 282;
   /** RegularExpression Id. */
-  int WITH = 283;
+  int ROUTEUSERSINGLE = 283;
   /** RegularExpression Id. */
-  int WITH_INTERFACE = 284;
+  int ROUTEUSERCLOSE = 284;
   /** RegularExpression Id. */
-  int ACCESS = 285;
+  int WITH = 285;
   /** RegularExpression Id. */
-  int ACCESS_ALL = 286;
+  int WITH_INTERFACE = 286;
   /** RegularExpression Id. */
-  int ACCESS_OPEN = 287;
+  int ACCESS = 287;
   /** RegularExpression Id. */
-  int ACCESS_CLOSE = 288;
+  int ACCESS_ALL = 288;
   /** RegularExpression Id. */
-  int ACCESS_EXPECTED_SINGLE = 289;
+  int ACCESS_OPEN = 289;
   /** RegularExpression Id. */
-  int ADMIN = 290;
+  int ACCESS_CLOSE = 290;
   /** RegularExpression Id. */
-  int ADMIN_ALL = 291;
+  int ACCESS_EXPECTED_SINGLE = 291;
   /** RegularExpression Id. */
-  int ADMIN_OPEN = 292;
+  int ADMIN = 292;
   /** RegularExpression Id. */
-  int ADMIN_CLOSE = 293;
+  int ADMIN_ALL = 293;
   /** RegularExpression Id. */
-  int ADMIN_EXPECTED_SINGLE = 294;
+  int ADMIN_OPEN = 294;
   /** RegularExpression Id. */
-  int PRODUCT = 295;
+  int ADMIN_CLOSE = 295;
   /** RegularExpression Id. */
-  int PRODUCT_OPEN = 296;
+  int ADMIN_EXPECTED_SINGLE = 296;
   /** RegularExpression Id. */
-  int PRODUCT_CLOSE = 297;
+  int PRODUCT = 297;
   /** RegularExpression Id. */
-  int PRODUCT_EXPECTED_SINGLE = 298;
+  int PRODUCT_OPEN = 298;
   /** RegularExpression Id. */
-  int TYPE = 299;
+  int PRODUCT_CLOSE = 299;
   /** RegularExpression Id. */
-  int TYPE_OPEN = 300;
+  int PRODUCT_EXPECTED_SINGLE = 300;
   /** RegularExpression Id. */
-  int TYPE_CLOSE = 301;
+  int TYPE = 301;
   /** RegularExpression Id. */
-  int TYPE_APPLICATION = 302;
+  int TYPE_OPEN = 302;
   /** RegularExpression Id. */
-  int TYPE_FULL = 303;
+  int TYPE_CLOSE = 303;
   /** RegularExpression Id. */
-  int TYPE_BUSINESS = 304;
+  int TYPE_APPLICATION = 304;
   /** RegularExpression Id. */
-  int TYPE_SYSTEM = 305;
+  int TYPE_FULL = 305;
   /** RegularExpression Id. */
-  int FIELD = 306;
+  int TYPE_BUSINESS = 306;
   /** RegularExpression Id. */
-  int FIELD_OPEN = 307;
+  int TYPE_SYSTEM = 307;
   /** RegularExpression Id. */
-  int FIELD_CLOSE = 308;
+  int FIELD = 308;
   /** RegularExpression Id. */
-  int FIELD_NAME = 309;
+  int FIELD_OPEN = 309;
   /** RegularExpression Id. */
-  int FIELD_LABEL = 310;
+  int FIELD_CLOSE = 310;
   /** RegularExpression Id. */
-  int FIELD_SELECT = 311;
+  int FIELD_NAME = 311;
   /** RegularExpression Id. */
-  int FIELD_BOBJ = 312;
+  int FIELD_LABEL = 312;
   /** RegularExpression Id. */
-  int FIELD_REL = 313;
+  int FIELD_SELECT = 313;
   /** RegularExpression Id. */
-  int FIELD_RANGE = 314;
+  int FIELD_BOBJ = 314;
   /** RegularExpression Id. */
-  int FIELD_HREF = 315;
+  int FIELD_REL = 315;
   /** RegularExpression Id. */
-  int FIELD_ALT = 316;
+  int FIELD_RANGE = 316;
   /** RegularExpression Id. */
-  int FIELD_USER = 317;
+  int FIELD_HREF = 317;
   /** RegularExpression Id. */
-  int FIELD_SETTING = 318;
+  int FIELD_ALT = 318;
   /** RegularExpression Id. */
-  int FIELD_STRING = 319;
+  int FIELD_USER = 319;
   /** RegularExpression Id. */
-  int FIELD_SINGLE = 320;
+  int FIELD_SETTING = 320;
   /** RegularExpression Id. */
-  int FIELD_SETTING_STRING = 321;
+  int FIELD_STRING = 321;
   /** RegularExpression Id. */
-  int FIELD_SETTING_SINGLE = 322;
+  int FIELD_SINGLE = 322;
   /** RegularExpression Id. */
-  int COLUMN = 323;
+  int FIELD_SETTING_STRING = 323;
   /** RegularExpression Id. */
-  int COLUMN_OPEN = 324;
+  int FIELD_SETTING_SINGLE = 324;
   /** RegularExpression Id. */
-  int COLUMN_CLOSE = 325;
+  int COLUMN = 325;
   /** RegularExpression Id. */
-  int COLUMN_NAME = 326;
+  int COLUMN_OPEN = 326;
   /** RegularExpression Id. */
-  int COLUMN_LABEL = 327;
+  int COLUMN_CLOSE = 327;
   /** RegularExpression Id. */
-  int COLUMN_SELECT = 328;
+  int COLUMN_NAME = 328;
   /** RegularExpression Id. */
-  int COLUMN_BOBJ = 329;
+  int COLUMN_LABEL = 329;
   /** RegularExpression Id. */
-  int COLUMN_REL = 330;
+  int COLUMN_SELECT = 330;
   /** RegularExpression Id. */
-  int COLUMN_RANGE = 331;
+  int COLUMN_BOBJ = 331;
   /** RegularExpression Id. */
-  int COLUMN_HREF = 332;
+  int COLUMN_REL = 332;
   /** RegularExpression Id. */
-  int COLUMN_ALT = 333;
+  int COLUMN_RANGE = 333;
   /** RegularExpression Id. */
-  int COLUMN_HIDDEN_TRUE = 334;
+  int COLUMN_HREF = 334;
   /** RegularExpression Id. */
-  int COLUMN_HIDDEN_FALSE = 335;
+  int COLUMN_ALT = 335;
   /** RegularExpression Id. */
-  int COLUMN_USER = 336;
+  int COLUMN_HIDDEN_TRUE = 336;
   /** RegularExpression Id. */
-  int COLUMN_SORTTYPE = 337;
+  int COLUMN_HIDDEN_FALSE = 337;
   /** RegularExpression Id. */
-  int COLUMN_SETTING = 338;
+  int COLUMN_USER = 338;
   /** RegularExpression Id. */
-  int COLUMN_STRING = 339;
+  int COLUMN_SORTTYPE = 339;
   /** RegularExpression Id. */
-  int COLUMN_SINGLE = 340;
+  int COLUMN_SETTING = 340;
   /** RegularExpression Id. */
-  int SETTING_STRING = 341;
+  int COLUMN_STRING = 341;
   /** RegularExpression Id. */
-  int SETTING_SINGLE = 342;
+  int COLUMN_SINGLE = 342;
   /** RegularExpression Id. */
-  int COLUMN_SORTTYPE_ALPHA = 343;
+  int SETTING_STRING = 343;
   /** RegularExpression Id. */
-  int COLUMN_SORTTYPE_NUMERIC = 344;
+  int SETTING_SINGLE = 344;
   /** RegularExpression Id. */
-  int COLUMN_SORTTYPE_OTHER = 345;
+  int COLUMN_SORTTYPE_ALPHA = 345;
   /** RegularExpression Id. */
-  int COLUMN_SORTTYPE_NONE = 346;
+  int COLUMN_SORTTYPE_NUMERIC = 346;
+  /** RegularExpression Id. */
+  int COLUMN_SORTTYPE_OTHER = 347;
+  /** RegularExpression Id. */
+  int COLUMN_SORTTYPE_NONE = 348;
 
   /** Lexical state. */
   int COLUMN_SORTTYPE_EXPECTED = 0;
@@ -948,6 +952,7 @@ interface MxParserConstants_mxJPO {
     "\"majorsequence\"",
     "\"meaning\"",
     "<MENU>",
+    "\"method\"",
     "\"mime\"",
     "\"minorsequence\"",
     "\"package\"",
@@ -1006,6 +1011,7 @@ interface MxParserConstants_mxJPO {
     "\"role\"",
     "\"basic\"",
     "\"compositional\"",
+    "\"composed\"",
     "\"trigger\"",
     "<TRIGEVENT>",
     "\"action\"",
