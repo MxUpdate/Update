@@ -67,17 +67,9 @@ eval  {
         set bDevelopmentMode "false"
     }
 
-    # check if original structure is used (defined within SVN)
-    set bIsOrigStructure [expr [file exists [file join "${sRoot}" org]] == 0]
-
-    # define path for mapping properties file
-    if ${bIsOrigStructure}  {
-        set sRootJPOs        [file join "${sRoot}" "java"]
-        set sRootResources   [file join "${sRoot}" "resources"]
-    } else  {
-        set sRootJPOs        [file join "${sRoot}"]
-        set sRootResources   [file join "${sRoot}"]
-    }
+    # define paths
+    set sRootJPOs            [file join "${sRoot}" "src" "main" "java"]
+    set sRootResources       [file join "${sRoot}" "src" "main" "resources"]
     set sMappingFileOriginal [file join "${sRootResources}" "org" "mxupdate" "mapping.properties"]
 
     ############################################################################
