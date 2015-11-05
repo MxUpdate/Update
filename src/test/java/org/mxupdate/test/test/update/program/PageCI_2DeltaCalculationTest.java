@@ -17,6 +17,7 @@ package org.mxupdate.test.test.update.program;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.program.PageData;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.program.Page_mxJPO;
@@ -42,15 +43,28 @@ public class PageCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
+            // package
+            {"1a) new package",
+                    new PageData(this, "Test"),
+                    new PageData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new PageData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new PageData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new PageData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new PageData(this, "Test").defKeyNotDefined("package")},
+            // uuid
             {"1) uuid",
                     new PageData(this, "Test"),
                     new PageData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+            // symbolic name
             {"2a) symbolic name",
                     new PageData(this, "Test"),
                     new PageData(this, "Test").setValue("symbolicname", "interface_123")},
             {"2b) two symbolic name",
                     new PageData(this, "Test"),
                     new PageData(this, "Test").setValue("symbolicname", "interface_123").setValue("symbolicname", "interface_345")},
+            // property
             {"3) with property",
                     new PageData(this, "Test"),
                     new PageData(this, "Test").addProperty(new PropertyDef("my test \"property\" desc\"\\\\ription"))},
@@ -64,6 +78,7 @@ public class PageCI_2DeltaCalculationTest
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.PRG_PAGE);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override

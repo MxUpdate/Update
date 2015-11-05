@@ -32,6 +32,7 @@ import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
  * The class is used to export, create, delete and update pages within MX. The
  * handled properties are
  * <ul>
+ * <li>package</li>
  * <li>uuid</li>
  * <li>symbolic names</li>
  * <li>description</li>
@@ -101,14 +102,15 @@ public class Page_mxJPO
     public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
-                //              tag            | default | value                              | write?
-                .stringNotNull( "uuid",                    this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
-                .list(          "symbolicname",            this.getSymbolicNames())
-                .string(        "description",             this.getDescription())
-                .flagIfTrue(    "hidden",           false, this.isHidden(),                     this.isHidden())
-                .string(        "mime",                    this.mimeType)
+                //              tag             | default | value                              | write?
+                .stringNotNull( "package",                  this.getPackageRef())
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
+                .list(          "symbolicname",             this.getSymbolicNames())
+                .string(        "description",              this.getDescription())
+                .flagIfTrue(    "hidden",            false, this.isHidden(),                     this.isHidden())
+                .string(        "mime",                     this.mimeType)
                 .properties(this.getProperties())
-                .codeIfTrue(    "content",                 this.getCode(),                      (this.getCode() != null) && !this.getCode().isEmpty());
+                .codeIfTrue(    "content",                  this.getCode(),                      (this.getCode() != null) && !this.getCode().isEmpty());
     }
 
     @Override
@@ -117,6 +119,7 @@ public class Page_mxJPO
                           final Page_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcPackage(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(),                      _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),                            _current.isHidden());
