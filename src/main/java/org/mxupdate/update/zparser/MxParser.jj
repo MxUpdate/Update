@@ -43,6 +43,7 @@ package org.mxupdate.update.zparser;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.mxupdate.update.system.IndexCI_mxJPO;
 import org.mxupdate.update.user.Association_mxJPO;
 import org.mxupdate.update.user.Group_mxJPO;
 import org.mxupdate.update.user.PersonCI_mxJPO;
@@ -54,7 +55,6 @@ import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.Setting;
 import org.mxupdate.update.userinterface.Channel_mxJPO;
 import org.mxupdate.update.userinterface.Command_mxJPO;
 import org.mxupdate.update.userinterface.Form_mxJPO;
-import org.mxupdate.update.userinterface.Form_mxJPO.Field;
 import org.mxupdate.update.userinterface.Inquiry_mxJPO;
 import org.mxupdate.update.userinterface.Menu_mxJPO;
 import org.mxupdate.update.userinterface.Portal_mxJPO;
@@ -89,37 +89,28 @@ PARSER_END(MxParser)
 
 TOKEN : /** first level */
 {
-      <PACKAGE:                             "package">                                      : STRING_EXPECTED
-
-    | <UUID:                                "uuid">                                         : STRING_EXPECTED
-
-    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
-
-
-    | <ACTIVE_TRUE:                         "active">    | <ACTIVE_FALSE:                        "!active">
+      <ACTIVE_TRUE:                         "active">    | <ACTIVE_FALSE:                        "!active">
+    | <EMAIL_TRUE:                          "email">     | <EMAIL_FALSE:                         "!email">
+    | <ENABLE_TRUE:                         "enable">    | <ENABLE_FALSE:                        "!enable">
     | <HIDDEN_TRUE:                         "hidden">    | <HIDDEN_FALSE:                        "!hidden">
+    | <INCONMAIL_TRUE:                      "iconmail">  | <INCONMAIL_FALSE:                     "!iconmail">
     | <TREEMENU_TRUE:                       "treemenu">  | <TREEMENU_FALSE:                      "!treemenu">
     | <TRUSTED_TRUE:                        "trusted">   | <TRUSTED_FALSE:                       "!trusted">
-    | <EMAIL_TRUE:                          "email">     | <EMAIL_FALSE:                         "!email">
-    | <INCONMAIL_TRUE:                      "iconmail">  | <INCONMAIL_FALSE:                     "!iconmail">
+    | <UNIQUE_TRUE:                         "unique">    | <UNIQUE_FALSE:                        "!unique">
 
+    | <NEWROW:                              "newrow">                                       : DEFAULT
 
     | <HEIGHT:                              "height">                                       : NATURALNUMBER_EXPECTED
-
-    | <USER:                                ("add" ([" ","\t","\n","\r"])+ )? "user">       : STRING_EXPECTED
+    | <SIZE:                                "size">                                         : NATURALNUMBER_EXPECTED
 
     | <SETTING:                             ("add" ([" ","\t","\n","\r"])+ )? "setting">    : STRING_STRING_EXPECTED
     | <ARGUMENT:                            "argument">                                     : STRING_STRING_EXPECTED
 
-    | <CHANNEL:                             "channel">                                      : STRING_EXPECTED
-    | <COMMAND:                             ("add" ([" ","\t","\n","\r"])+ )? "command">    : STRING_EXPECTED
-    | <MENU:                                ("add" ([" ","\t","\n","\r"])+ )? "menu">       : STRING_EXPECTED
-
-    | <NEWROW:                              "newrow">                                       : DEFAULT
-
     | <ADDRESS:                             "address">                                      : STRING_EXPECTED
     | <ALT:                                 "alt">                                          : STRING_EXPECTED
     | <APPLICATION:                         "application" >                                 : STRING_EXPECTED
+    | <CHANNEL:                             "channel">                                      : STRING_EXPECTED
+    | <COMMAND:                             ("add" ([" ","\t","\n","\r"])+ )? "command">    : STRING_EXPECTED
     | <DEFINITION:                          "definition">                                   : STRING_EXPECTED
     | <EMAILADDRESS:                        "emailaddress">                                 : STRING_EXPECTED
     | <FAX:                                 "fax">                                          : STRING_EXPECTED
@@ -128,11 +119,16 @@ TOKEN : /** first level */
     | <GROUP:                               "group" >                                       : STRING_EXPECTED
     | <HREF:                                "href">                                         : STRING_EXPECTED
     | <LABEL:                               "label">                                        : STRING_EXPECTED
+    | <MENU:                                ("add" ([" ","\t","\n","\r"])+ )? "menu">       : STRING_EXPECTED
+    | <PACKAGE:                             "package">                                      : STRING_EXPECTED
     | <PARENT:                              "parent">                                       : STRING_EXPECTED
     | <PATTERN:                             "pattern">                                      : STRING_EXPECTED
     | <PHONE:                               "phone">                                        : STRING_EXPECTED
     | <ROLE:                                "role" >                                        : STRING_EXPECTED
     | <SITE:                                "site">                                         : STRING_EXPECTED
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+    | <USER:                                ("add" ([" ","\t","\n","\r"])+ )? "user">       : STRING_EXPECTED
+    | <UUID:                                "uuid">                                         : STRING_EXPECTED
     | <VAULT:                               "vault" >                                       : STRING_EXPECTED
 
     | <CODE:                                "code">                                         : MULTILINESTRING_EXPECTED
@@ -150,7 +146,7 @@ TOKEN : /** first level */
 }
 
 /************************************************************** Common String */
-<STRING_EXPECTED> TOKEN :
+<STRING_EXPECTED, FIELD_START_EXPECTED> TOKEN :
 {
       <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
     | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
@@ -259,10 +255,10 @@ TOKEN : /** first level */
 /*********************************************** User Interface -> Form Field */
 <DEFAULT> TOKEN :
 {
-      <FIELD:                               "field">                                        : FIELD_OPENEXPECTED
+      <FIELD:                               "field">                                        : FIELD_START_EXPECTED
 }
 
-<FIELD_OPENEXPECTED> TOKEN :
+<FIELD_START_EXPECTED> TOKEN :
 {
       <FIELD_OPEN:                          "{">                                            : FIELD_EXPECTED
 }
@@ -295,7 +291,7 @@ TOKEN : /** first level */
 
 }
 
-/*************************************************************** Table Column */
+/********************************************* User Interface -> Table Column */
 <DEFAULT> TOKEN :
 {
       <COLUMN:                              "column">                                       : COLUMN_OPENEXPECTED
@@ -352,7 +348,48 @@ TOKEN : /** first level */
     | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
 }
 
-/******************************************************** User -> Assoication */
+/************************************************************ System -> Index */
+
+/**
+ * Parses one complete package definition.
+ *
+ * @param _uniqueKey      target package to update with parsed values
+ */
+void parseIndex(final IndexCI_mxJPO _index)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    Integer number;
+    IndexCI_mxJPO.Field field;
+    AdminProperty property;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_index, "packageRef", str);} )
+
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_index, "properties", "propertiesStack", property);} )
+
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_index, "symbolicNames", str);} )
+
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_index, "description", str);} )
+
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_index, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_index, "hidden", false);} )
+
+      | ( <ENABLE_TRUE>                                                         {this.setValue(_index, "enable", true);} )
+      | ( <ENABLE_FALSE>                                                        {this.setValue(_index, "enable", false);} )
+
+      | ( <UNIQUE_TRUE>                                                         {this.setValue(_index, "unique", true);} )
+      | ( <UNIQUE_FALSE>                                                        {this.setValue(_index, "unique", false);} )
+
+      | ( <FIELD>                     str = string()                            {field = new IndexCI_mxJPO.Field();this.appendValue(_index, "fields", field);this.setValue(field, "expression", str);}
+                    ( <SIZE>          number = naturalNumber()                  {this.setValue(field, "size", number);} )? )
+
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_index, "properties", "propertiesStack", property);} )
+    )*
+}
+
+/******************************************************** User -> Association */
 
 /**
  * Parses one complete association definition.
@@ -630,7 +667,7 @@ void parseForm(final Form_mxJPO _form)
     String str;
     Token tmp;
     AdminProperty property;
-    Field field;
+    Form_mxJPO.Field field;
     Setting setting;
 }
 {
@@ -646,7 +683,7 @@ void parseForm(final Form_mxJPO _form)
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_form, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_form, "hidden", false);} )
 
-      | ( <FIELD>                                                               {field = new Field(); this.appendValue(_form, "fields", field);  }
+      | ( <FIELD>                                                               {field = new Form_mxJPO.Field(); this.appendValue(_form, "fields", field);  }
           <FIELD_OPEN>
                     ( <FIELD_NAME>      ( tmp = <FIELD_STRING>                  {this.setValue(field, "name",           this.getString(tmp.image));}
                                         | tmp = <FIELD_SINGLE>                  {this.setValue(field, "name",           this.getSingle(tmp.image));} )
