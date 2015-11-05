@@ -35,6 +35,7 @@ import org.mxupdate.update.datamodel.Rule_mxJPO;
 import org.mxupdate.update.datamodel.Type_mxJPO;
 import org.mxupdate.update.program.Page_mxJPO;
 import org.mxupdate.update.program.ProgramCI_mxJPO;
+import org.mxupdate.update.system.IndexCI_mxJPO;
 import org.mxupdate.update.system.PackageCI_mxJPO;
 import org.mxupdate.update.system.UniqueKeyCI_mxJPO;
 import org.mxupdate.update.user.Association_mxJPO;
@@ -104,6 +105,7 @@ public enum EMxAdmin_mxJPO
     Form(Form_mxJPO.class),
     Format(Format_mxJPO.class),
     Group(Group_mxJPO.class),
+    Index(IndexCI_mxJPO.class),
     Inquiry(Inquiry_mxJPO.class),
     Interface(Interface_mxJPO.class),
     Menu(Menu_mxJPO.class),

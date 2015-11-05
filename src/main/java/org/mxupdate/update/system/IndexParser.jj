@@ -1,0 +1,185 @@
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+options {
+    JDK_VERSION = "1.7";
+    STATIC = false;
+    ERROR_REPORTING = true;
+    USER_TOKEN_MANAGER = false;
+    GENERATE_BOILERPLATE = false;
+    SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
+    UNICODE_INPUT = true;
+}
+
+PARSER_BEGIN(IndexParser)
+/*
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+ */
+
+package org.mxupdate.update.system;
+
+import java.lang.reflect.InvocationTargetException;
+
+import org.mxupdate.update.system.AbstractIndexCI_mxJPO.Field;
+import org.mxupdate.update.util.AbstractParser_mxJPO;
+import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
+import org.mxupdate.update.util.AbstractParser_mxJPO.Token;
+import org.mxupdate.update.util.AbstractParser_mxJPO.TokenMgrError;
+import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
+
+/**
+ * Parses the update format for {@link IndexCI_mxJPO}.
+ */
+@SuppressWarnings("unused")
+class IndexParser
+    extends AbstractParser_mxJPO
+{
+}
+
+PARSER_END(IndexParser)
+
+<*> SKIP :
+{
+  " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
+}
+
+<DEFAULT> TOKEN :
+{
+      <UUID:                                "uuid">                                         : STRING_EXPECTED
+
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+
+    | <HIDDEN_TRUE:                         "hidden">
+    | <HIDDEN_FALSE:                        "!hidden">
+
+    | <ENABLE_TRUE:                         "enable">
+    | <ENABLE_FALSE:                        "!enable">
+
+    | <UNIQUE_TRUE:                         "unique">
+    | <UNIQUE_FALSE:                        "!unique">
+}
+
+/************************************************************** Common Integer */
+<INTEGER_EXPECTED> TOKEN :
+{
+      <INTEGER: ( ["0"-"9"] )+> : DEFAULT
+}
+
+/************************************************************** Common String */
+<STRING_EXPECTED> TOKEN :
+{
+      <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
+    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/*************************************************** Common Multi-Line-String */
+<MULTILINESTRING_EXPECTED> TOKEN :
+{
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
+    | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/********************************************************************** Field */
+<DEFAULT> TOKEN :
+{
+      <FIELD:                               "field">                                        : STRING_EXPECTED
+    | <SIZE:                                "size">                                         : INTEGER_EXPECTED
+}
+
+/******************************************************************* Property */
+<DEFAULT> TOKEN :
+{
+      <PROPERTY:                            "property">                                     : STRING_EXPECTED
+    | <PROPERTYTO:                          "to">                                           : ADMINREF_EXPECTED
+    | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
+}
+
+<ADMINREF_EXPECTED> TOKEN :
+{
+      <ADMINTYPE_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
+}
+
+/**************************************************************************** */
+
+/**
+ * Parses one complete package definition.
+ *
+ * @param _uniqueKey      target package to update with parsed values
+ */
+void parse(final IndexCI_mxJPO _index)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+: {
+    Token tmp;
+    String str;
+    Field field;
+    AdminProperty property;
+} {
+    (   ( <UUID>                                                            {property = new AdminProperty();
+                                                                             this.appendValue(this.getValue(_index, "properties"), "propertiesStack", property);
+                                                                             this.setValue(property, "name",  "UUID");}
+                                      str = string()                        {this.setValue(property, "value", str);} )
+
+      | ( <SYMBOLICNAME>              str = string()                        {this.appendValue(_index, "symbolicNames", str);} )
+
+      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_index, "description", this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>               {this.setValue(_index, "description", this.getSingle(tmp.image));} ) )
+
+      | ( <HIDDEN_TRUE>                                                     {this.setValue(_index, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                    {this.setValue(_index, "hidden", false);} )
+
+      | ( <ENABLE_TRUE>                                                     {this.setValue(_index, "enable", true);} )
+      | ( <ENABLE_FALSE>                                                    {this.setValue(_index, "enable", false);} )
+
+      | ( <UNIQUE_TRUE>                                                     {this.setValue(_index, "unique", true);} )
+      | ( <UNIQUE_FALSE>                                                    {this.setValue(_index, "unique", false);} )
+
+      | ( <FIELD>                     str = string()                        {field = new Field();this.appendValue(_index, "fields", field);this.setValue(field, "expression", str);}
+                    ( <SIZE>          tmp = <INTEGER>                       {this.setValue(field, "size", Integer.parseInt(tmp.image));} )? )
+
+      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_index, "properties", "propertiesStack", property);}
+                                      str = string()                        {this.setValue(property, "name", str);}
+              (   ( <PROPERTYVAL>     str = string()                        {this.setValue(property, "value", str);} )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                      str = string()                        {this.setValue(property, "refAdminName", str);} ) )* )
+    )*
+}
+
+String string() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <STRING>  {ret = this.getString(tmp.image);}
+    | tmp = <SINGLE>  {ret = this.getSingle(tmp.image);} )
+    {
+        return ret;
+    }
+}
