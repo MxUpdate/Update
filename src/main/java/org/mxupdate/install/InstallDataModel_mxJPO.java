@@ -94,9 +94,10 @@ public class InstallDataModel_mxJPO
         final String installedDate = StringUtil_mxJPO.formatInstalledDate(paramCache, new Date());
 
         final SortedSet<String> attrs = this.evalAttributes(paramCache);
+        final SortedSet<String> types = this.evalTypes(paramCache);
 
         this.updateAttributes(paramCache, attrs, applVersion, fileDate, installedDate);
-        this.updateBusTypes(paramCache);
+        this.updateBusTypes(paramCache, types, attrs);
         this.registerPrograms(paramCache, applVersion, installedDate);
         this.registerMxUpdate(paramCache, applVersion);
     }
@@ -259,31 +260,23 @@ public class InstallDataModel_mxJPO
      * </ul>
      *
      * @param _paramCache   parameter cache with MX context
+     * @param _types        types where MxUpdate specific attributes must be
+     *                      appended
+     * @param _attributes   attributes to append
      * @throws Exception if the update of the business types failed
      */
-    protected void updateBusTypes(final ParameterCache_mxJPO _paramCache)
+    protected void updateBusTypes(final ParameterCache_mxJPO _paramCache,
+                                  final SortedSet<String> _types,
+                                  final SortedSet<String> _attributes)
             throws Exception
     {
-        for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
-            if ((typeDef.getMxBusType() != null) && !"".equals(typeDef.getMxBusType())
-                    && (typeDef.getMxAdminName() == null)
-                    && (!typeDef.isBusCheckExists() || typeDef.existsBusType(_paramCache)))  {
-                _paramCache.logInfo("check type "+typeDef.getMxBusType());
-                for (final PropertyDef_mxJPO propDef : PropertyDef_mxJPO.values())  {
-                    if ((propDef.getAttrName(_paramCache) != null) && !"".equals(propDef.getAttrName(_paramCache)))  {
-                        final StringBuilder cmd = new StringBuilder()
-                                .append("print type \"").append(typeDef.getMxBusType())
-                                .append("\" select attribute[").append(propDef.getAttrName(_paramCache))
-                                .append("] dump");
-                        if ("false".equalsIgnoreCase(MqlUtil_mxJPO.execMql(_paramCache, cmd)))  {
-                            _paramCache.logDebug("    - add missing attribute '"
-                                    + propDef.getAttrName(_paramCache) + "'");
-                            MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
-                                    .append("mod type \"").append(typeDef.getMxBusType())
-                                    .append("\" add attribute \"").append(propDef.getAttrName(_paramCache))
-                                    .append('\"'));
-                        }
-                    }
+        for (final String typeName : _types)  {
+            _paramCache.logInfo("check type " + typeName);
+            for (final String attrName : _attributes)  {
+                final String assigned = MqlBuilderUtil_mxJPO.mql().cmd("escape print type ").arg(typeName).cmd(" select ").arg("attribute[" + attrName + "]").cmd(" dump").exec(_paramCache.getContext());
+                if ("false".equalsIgnoreCase(assigned))  {
+                    _paramCache.logDebug("    - add missing attribute '" + attrName + "'");
+                    MqlBuilderUtil_mxJPO.mql().cmd("escape modify type ").arg(typeName).cmd(" add attribute ").arg(attrName).exec(_paramCache.getContext());
                 }
             }
         }
