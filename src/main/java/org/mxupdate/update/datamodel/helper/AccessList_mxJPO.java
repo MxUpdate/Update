@@ -30,6 +30,7 @@ import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
+import org.mxupdate.util.StringUtils_mxJPO;
 
 /**
  * Handles list of access definitions.
@@ -317,28 +318,28 @@ public class AccessList_mxJPO
                 _updateBuilder.stepSingle("{" + StringUtil_mxJPO.convertUpdate(false, access.access, null) + "}");
 
                 // user items
-                if ((access.organization != null) && !access.organization.isEmpty() && !"any".equals(access.organization))  {
+                if (!StringUtils_mxJPO.isEmpty(access.organization) && !"any".equals(access.organization))  {
                     _updateBuilder.stepSingle(access.organization).stepSingle("organization");
                 }
-                if ((access.project != null) && !access.project.isEmpty() && !"any".equals(access.project))  {
+                if (!StringUtils_mxJPO.isEmpty(access.project) && !"any".equals(access.project))  {
                     _updateBuilder.stepSingle(access.project).stepSingle("project");
                 }
-                if ((access.owner != null) && !access.owner.isEmpty() && !"any".equals(access.owner))  {
+                if (!StringUtils_mxJPO.isEmpty(access.owner) && !"any".equals(access.owner))  {
                     _updateBuilder.stepSingle(access.owner).stepSingle("owner");
                 }
-                if ((access.reserve != null) && !access.reserve.isEmpty() && !"any".equals(access.reserve))  {
+                if (!StringUtils_mxJPO.isEmpty(access.reserve) && !"any".equals(access.reserve))  {
                     _updateBuilder.stepSingle(access.reserve).stepSingle("reserve");
                 }
-                if ((access.maturity != null) && !access.maturity.isEmpty() && !"any".equals(access.maturity))  {
+                if (!StringUtils_mxJPO.isEmpty(access.maturity) && !"any".equals(access.maturity))  {
                     _updateBuilder.stepSingle(access.maturity).stepSingle("maturity");
                 }
-                if ((access.category != null) && !access.category.isEmpty() && !"any".equals(access.category))  {
+                if (!StringUtils_mxJPO.isEmpty(access.category) && !"any".equals(access.category))  {
                     _updateBuilder.stepSingle(access.category).stepSingle("category");
                 }
-                if ((access.filter != null) && !access.filter.isEmpty())  {
+                if (!StringUtils_mxJPO.isEmpty(access.filter))  {
                     _updateBuilder.stepSingle("filter").stepString(access.filter);
                 }
-                if ((access.localfilter != null) && !access.localfilter.isEmpty())  {
+                if (!StringUtils_mxJPO.isEmpty(access.localfilter))  {
                     _updateBuilder.stepSingle("localfilter").stepString(access.localfilter);
                 }
 

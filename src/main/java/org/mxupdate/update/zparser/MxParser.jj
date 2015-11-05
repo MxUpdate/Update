@@ -21,6 +21,8 @@ options {
     GENERATE_BOILERPLATE = false;
     SUPPORT_CLASS_VISIBILITY_PUBLIC = false;
     UNICODE_INPUT = true;
+//    DEBUG_PARSER = true;
+//    DEBUG_TOKEN_MANAGER = true;
 }
 
 PARSER_BEGIN(MxParser)
@@ -42,7 +44,9 @@ PARSER_BEGIN(MxParser)
 package org.mxupdate.update.zparser;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Set;
+import java.util.HashSet;
 
 import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
@@ -50,6 +54,8 @@ import org.mxupdate.update.datamodel.Expression_mxJPO;
 import org.mxupdate.update.datamodel.Format_mxJPO;
 import org.mxupdate.update.datamodel.Interface_mxJPO;
 import org.mxupdate.update.datamodel.PathType_mxJPO;
+import org.mxupdate.update.datamodel.Policy_mxJPO;
+import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO.LocalAttribute;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.program.Page_mxJPO;
@@ -100,34 +106,81 @@ PARSER_END(MxParser)
   " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
-TOKEN : /** first level */
+<DEFAULT, BRACE_OPEN_EXPECTED, VERSION_EXPECTED> TOKEN : /** first level */
 {
-      <ABSTRACT_TRUE:                       "abstract">                 | <ABSTRACT_FALSE:                      "!abstract">
-    | <ACTIVE_TRUE:                         "active">                   | <ACTIVE_FALSE:                        "!active">
-    | <CUSTOM_TRUE:                         "custom">                   | <CUSTOM_FALSE:                        "!custom">
-    | <DOWNLOADABLE_TRUE:                   "downloadable">             | <DOWNLOADABLE_FALSE:                  "!downloadable">
-    | <EMAIL_TRUE:                          "email">                    | <EMAIL_FALSE:                         "!email">
-    | <ENABLE_TRUE:                         "enable">                   | <ENABLE_FALSE:                        "!enable">
-    | <GLOBAL_TRUE:                         "global">                   | <GLOBAL_FALSE:                        "!global">
-    | <HIDDEN_TRUE:                         "hidden">                   | <HIDDEN_FALSE:                        "!hidden">
-    | <INCONMAIL_TRUE:                      "iconmail">                 | <INCONMAIL_FALSE:                     "!iconmail">
-    | <MULTILINE_TRUE:                      "multiline">                | <MULTILINE_FALSE:                     "!multiline">
-    | <MULTIVALUE_TRUE:                     "multivalue">               | <MULTIVALUE_FALSE:                    "!multivalue">
-    | <NEEDSBUSINESSOBJECT_TRUE:            "needsbusinessobject">      | <NEEDSBUSINESSOBJECT_FALSE:           "!needsbusinessobject">
-    | <PIPE_TRUE:                           "pipe">                     | <PIPE_FALSE:                          "!pipe">
-    | <POOLED_TRUE:                         "pooled">                   | <POOLED_FALSE:                        "!pooled">
-    | <RANGEVALUE_TRUE:                     "rangevalue">               | <RANGEVALUE_FALSE:                    "!rangevalue">
-    | <RESETONCLONE_TRUE:                   "resetonclone">             | <RESETONCLONE_FALSE:                  "!resetonclone">
-    | <RESETONREVISION_TRUE:                "resetonrevision">          | <RESETONREVISION_FALSE:               "!resetonrevision">
-    | <TREEMENU_TRUE:                       "treemenu">                 | <TREEMENU_FALSE:                      "!treemenu">
-    | <TRUSTED_TRUE:                        "trusted">                  | <TRUSTED_FALSE:                       "!trusted">
-    | <UNIQUE_TRUE:                         "unique">                   | <UNIQUE_FALSE:                        "!unique">
+      <ABSTRACT_TRUE:                       "abstract">             : DEFAULT           | <ABSTRACT_FALSE:                      "!abstract">            : DEFAULT
+    | <ACTIVE_TRUE:                         "active">               : DEFAULT           | <ACTIVE_FALSE:                        "!active">              : DEFAULT
+    | <CHECKOUTHISTORY_TRUE:                "checkouthistory">      : DEFAULT           | <CHECKOUTHISTORY_FALSE:               "!checkouthistory">     : DEFAULT
+    | <CUSTOM_TRUE:                         "custom">               : DEFAULT           | <CUSTOM_FALSE:                        "!custom">              : DEFAULT
+    | <DOWNLOADABLE_TRUE:                   "downloadable">         : DEFAULT           | <DOWNLOADABLE_FALSE:                  "!downloadable">        : DEFAULT
+    | <EMAIL_TRUE:                          "email">                : DEFAULT           | <EMAIL_FALSE:                         "!email">               : DEFAULT
+    | <ENABLE_TRUE:                         "enable">               : DEFAULT           | <ENABLE_FALSE:                        "!enable">              : DEFAULT
+    | <ENFORCE_TRUE:                        "enforce">              : DEFAULT           | <ENFORCE_FALSE:                       "!enforce">             : DEFAULT
+    | <ENFORCERESERVEACCESS_TRUE:           "enforcereserveaccess"> : DEFAULT           | <ENFORCERESERVEACCESS_FALSE:          "!enforcereserveaccess">: DEFAULT
+    | <GLOBAL_TRUE:                         "global">               : DEFAULT           | <GLOBAL_FALSE:                        "!global">              : DEFAULT
+    | <HIDDEN_TRUE:                         "hidden">               : DEFAULT           | <HIDDEN_FALSE:                        "!hidden">              : DEFAULT
+    | <INCONMAIL_TRUE:                      "iconmail">             : DEFAULT           | <INCONMAIL_FALSE:                     "!iconmail">            : DEFAULT
+    | <MAJORREVISION_TRUE:                  "majorrevision">        : DEFAULT           | <MAJORREVISION_FALSE:                 "!majorrevision">       : DEFAULT
+    | <MINORREVISION_TRUE:                  "minorrevision">        : DEFAULT           | <MINORREVISION_FALSE:                 "!minorrevision">       : DEFAULT
+    | <MULTILINE_TRUE:                      "multiline">            : DEFAULT           | <MULTILINE_FALSE:                     "!multiline">           : DEFAULT
+    | <MULTIVALUE_TRUE:                     "multivalue">           : DEFAULT           | <MULTIVALUE_FALSE:                    "!multivalue">          : DEFAULT
+    | <NEEDSBUSINESSOBJECT_TRUE:            "needsbusinessobject">  : DEFAULT           | <NEEDSBUSINESSOBJECT_FALSE:           "!needsbusinessobject"> : DEFAULT
+    | <PIPE_TRUE:                           "pipe">                 : DEFAULT           | <PIPE_FALSE:                          "!pipe">                : DEFAULT
+    | <POOLED_TRUE:                         "pooled">               : DEFAULT           | <POOLED_FALSE:                        "!pooled">              : DEFAULT
+    | <PROMOTE_TRUE:                        "promote">              : DEFAULT           | <PROMOTE_FALSE:                       "!promote">             : DEFAULT
+    | <PUBLISHED_TRUE:                      "published">            : DEFAULT           | <PUBLISHED_FALSE:                     "!published">           : DEFAULT
+    | <RANGEVALUE_TRUE:                     "rangevalue">           : DEFAULT           | <RANGEVALUE_FALSE:                    "!rangevalue">          : DEFAULT
+    | <RESETONCLONE_TRUE:                   "resetonclone">         : DEFAULT           | <RESETONCLONE_FALSE:                  "!resetonclone">        : DEFAULT
+    | <RESETONREVISION_TRUE:                "resetonrevision">      : DEFAULT           | <RESETONREVISION_FALSE:               "!resetonrevision">     : DEFAULT
+    | <REVISION_TRUE:                       "revision">             : DEFAULT           | <REVISION_FALSE:                      "!revision">            : DEFAULT
+    | <TREEMENU_TRUE:                       "treemenu">             : DEFAULT           | <TREEMENU_FALSE:                      "!treemenu">            : DEFAULT
+    | <TRUSTED_TRUE:                        "trusted">              : DEFAULT           | <TRUSTED_FALSE:                       "!trusted">             : DEFAULT
+    | <UNIQUE_TRUE:                         "unique">               : DEFAULT           | <UNIQUE_FALSE:                        "!unique">              : DEFAULT
+    | <VERSION:                             "version">              : VERSION_EXPECTED  | <VERSION_FALSE:                       "!version">             : DEFAULT
 
+    | <ALLSTATE:                            "allstate">                                     : DEFAULT
     | <DEFERRED:                            "deferred">                                     : DEFAULT
     | <EXECUTE:                             "execute">                                      : DEFAULT
     | <IMMEDIATE:                           "immediate">                                    : DEFAULT
     | <LOCAL:                               "local">                                        : DEFAULT
+    | <LOGIN:                               "login">                                        : DEFAULT
     | <NEWROW:                              "newrow">                                       : DEFAULT
+    | <OWNER:                               "owner">                                        : DEFAULT
+    | <PUBLIC:                              "public">                                       : DEFAULT
+    | <REVOKE:                              "revoke">                                       : DEFAULT
+    | <ANY:                                 "any">                                          : DEFAULT
+    | <SINGLE:                              "single">                                       : DEFAULT
+    | <ANCESTOR:                            "ancestor">                                     : DEFAULT
+    | <DESCENDANT:                          "descendant">                                   : DEFAULT
+    | <RELATED:                             "related">                                      : DEFAULT
+    | <ORGANIZATION:                        "organization">                                 : DEFAULT
+    | <PROJECT:                             "project">                                      : DEFAULT
+    | <CONTEXT:                             "context">                                      : DEFAULT
+    | <RESERVE:                             "reserve">                                      : DEFAULT
+    | <NO:                                  "no">                                           : DEFAULT
+    | <INCLUSIVE:                           "inclusive">                                    : DEFAULT
+    | <MATURITY:                            "maturity">                                     : DEFAULT
+    | <PROTECTED:                           "protected">                                    : DEFAULT
+    | <PRIVATE:                             "private">                                      : DEFAULT
+    | <NOTPRIVATE:                          "notprivate">                                   : DEFAULT
+    | <PPP:                                 "ppp">                                          : DEFAULT
+    | <CATEGORY:                            "category">                                     : DEFAULT
+    | <OEM:                                 "oem">                                          : DEFAULT
+    | <GOLDPARTNER:                         "goldpartner">                                  : DEFAULT
+    | <PARTNER:                             "partner">                                      : DEFAULT
+    | <SUPPLIER:                            "supplier">                                     : DEFAULT
+    | <CUSTOMER:                            "customer">                                     : DEFAULT
+    | <CONTRACTOR:                          "contractor">                                   : DEFAULT
+
+    // special cases
+    | <FORMAT_ALL:                          "format" ([" ","\t","\n"])+ "all">              : DEFAULT
+    | <USER:                                ("add" ([" ","\t","\n","\r"])+ )? "user">       : USER_EXPECTED
+    | <BRACE_OPEN:                          "{">                                            : BRACE_OPEN_EXPECTED
+    | <BRACE_CLOSE:                         "}">                                            : DEFAULT
+
+    | <APPROVE_LIST:                        "approve" ([" ","\t","\n"])+ "{">               : LISTOLD_EXPECTED
+    | <IGNORE_LIST:                         "ignore" ([" ","\t","\n"])+ "{">                : LISTOLD_EXPECTED
+    | <REJECT_LIST:                         "reject" ([" ","\t","\n"])+ "{">                : LISTOLD_EXPECTED
 
     | <HEIGHT:                              "height">                                       : NATURALNUMBER_EXPECTED
     | <MAXLENGTH:                           "maxlength">                                    : NATURALNUMBER_EXPECTED
@@ -136,12 +189,17 @@ TOKEN : /** first level */
     | <SETTING:                             ("add" ([" ","\t","\n","\r"])+ )? "setting">    : STRING_STRING_EXPECTED
     | <ARGUMENT:                            "argument">                                     : STRING_STRING_EXPECTED
 
+
+    | <ACTION:                              "action">                                       : STRING_EXPECTED
     | <ADDRESS:                             "address">                                      : STRING_EXPECTED
     | <ALT:                                 "alt">                                          : STRING_EXPECTED
     | <APPLICATION:                         "application" >                                 : STRING_EXPECTED
     | <ATTRIBUTE:                           "attribute">                                    : STRING_EXPECTED
+    | <BRANCH:                              "branch">                                       : STRING_EXPECTED
     | <CHANNEL:                             "channel">                                      : STRING_EXPECTED
+    | <CHECK:                               "check">                                        : STRING_EXPECTED
     | <COMMAND:                             ("add" ([" ","\t","\n","\r"])+ )? "command">    : STRING_EXPECTED
+    | <DEFAULTFORMAT:                       "defaultformat">                                : STRING_EXPECTED
     | <DEFINITION:                          "definition">                                   : STRING_EXPECTED
     | <DERIVED:                             "derived">                                      : STRING_EXPECTED
     | <DIMENSION:                           "dimension">                                    : STRING_EXPECTED
@@ -149,29 +207,37 @@ TOKEN : /** first level */
     | <EMAILADDRESS:                        "emailaddress">                                 : STRING_EXPECTED
     | <FAX:                                 "fax">                                          : STRING_EXPECTED
     | <FILE:                                "file">                                         : STRING_EXPECTED
+    | <FILTER:                              "filter">                                       : STRING_EXPECTED
     | <FORMAT:                              "format">                                       : STRING_EXPECTED
     | <FULLNAME:                            "fullname">                                     : STRING_EXPECTED
     | <GROUP:                               "group" >                                       : STRING_EXPECTED
     | <HREF:                                "href">                                         : STRING_EXPECTED
     | <INPUT:                               "input">                                        : STRING_EXPECTED
+    | <KEY:                                 "key" >                                         : STRING_EXPECTED
     | <LABEL:                               "label">                                        : STRING_EXPECTED
+    | <LOCALFILTER:                         "localfilter">                                  : STRING_EXPECTED
+    | <MAJORSEQUENCE:                       "majorsequence">                                : STRING_EXPECTED
     | <MENU:                                ("add" ([" ","\t","\n","\r"])+ )? "menu">       : STRING_EXPECTED
     | <MIME:                                "mime">                                         : STRING_EXPECTED
+    | <MINORSEQUENCE:                       "minorsequence">                                : STRING_EXPECTED
     | <PACKAGE:                             "package">                                      : STRING_EXPECTED
     | <PARENT:                              "parent">                                       : STRING_EXPECTED
     | <PATTERN:                             "pattern">                                      : STRING_EXPECTED
     | <PHONE:                               "phone">                                        : STRING_EXPECTED
     | <PRINT:                               "print">                                        : STRING_EXPECTED
+    | <REGISTEREDNAME:                      "registeredname">                               : STRING_EXPECTED
     | <ROLE:                                "role" >                                        : STRING_EXPECTED
     | <RULE:                                "rule">                                         : STRING_EXPECTED
+    | <SEQUENCE:                            "sequence">                                     : STRING_EXPECTED
+    | <SIGNATURE:                           "signature">                                    : STRING_EXPECTED
     | <SITE:                                "site">                                         : STRING_EXPECTED
+    | <STATE:                               "state">                                        : STRING_EXPECTED
+    | <STORE:                               "store">                                        : STRING_EXPECTED
     | <SUFFIX:                              "suffix">                                       : STRING_EXPECTED
     | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
-    | <USER:                                ("add" ([" ","\t","\n","\r"])+ )? "user">       : STRING_EXPECTED
     | <USESPACKAGE:                         "usespackage">                                  : STRING_EXPECTED
     | <UUID:                                "uuid">                                         : STRING_EXPECTED
     | <VAULT:                               "vault" >                                       : STRING_EXPECTED
-    | <VERSION:                             "version">                                      : STRING_EXPECTED
     | <VIEW:                                "view">                                         : STRING_EXPECTED
 
     | <CODE:                                "code">                                         : MULTILINESTRING_EXPECTED
@@ -202,10 +268,10 @@ String stringString() :
 }
 
 /************************************************************** Common String */
-<STRING_EXPECTED, FIELD_OPEN_EXPECTED, TYPE_OPEN_EXPECTED> TOKEN :
+<STRING_EXPECTED, FIELD_OPEN_EXPECTED, TYPE_OPEN_EXPECTED, USER_EXPECTED, VERSION_EXPECTED> TOKEN :
 {
       <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
-    | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+    | <SINGLE_STRING: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
 String string() :
@@ -214,8 +280,8 @@ String string() :
     String ret = null;
 }
 {
-    ( tmp = <STRING>  {ret = this.getString(tmp.image);}
-    | tmp = <SINGLE>  {ret = this.getSingle(tmp.image);} )
+    ( tmp = <STRING>         {ret = this.getString(tmp.image);}
+    | tmp = <SINGLE_STRING>  {ret = this.getSingle(tmp.image);} )
     {return ret;}
 }
 
@@ -237,6 +303,14 @@ String multiLineString() :
     {return ret;}
 }
 
+/***************************************************** Common List of Strings */
+<LISTOLD_EXPECTED> TOKEN :
+{
+      <LISTSTRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : LISTOLD_EXPECTED
+    | <LISTSINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : LISTOLD_EXPECTED
+    | <LISTCLOSE : "}">   : DEFAULT
+}
+
 /************************************************************* Common Integer */
 <NATURALNUMBER_EXPECTED> TOKEN :
 {
@@ -253,7 +327,7 @@ Integer naturalNumber() :
 }
 
 /************************************************************ Common Property */
-<DEFAULT> TOKEN :
+<DEFAULT, BRACE_OPEN_EXPECTED> TOKEN :
 {
       <PROPERTY:                            "property">                                     : STRING_EXPECTED
     | <PROPERTYTO:                          "to">                                           : STRING_STRING_EXPECTED
@@ -301,7 +375,7 @@ AdminProperty property() :
 }
 
 /**************************************************************** Common Kind */
-<DEFAULT> TOKEN :
+<DEFAULT, BRACE_OPEN_EXPECTED> TOKEN :
 {
       <KIND:                                "kind">                                         : KIND_EXPECTED
 }
@@ -327,7 +401,7 @@ AdminProperty property() :
 }
 
 /************************************************************ Common Triggers */
-<DEFAULT> TOKEN :
+<DEFAULT, BRACE_OPEN_EXPECTED> TOKEN :
 {
       <TRIGGER:                             "trigger">                                      : TRIGEVENT_EXPECTED
 }
@@ -339,9 +413,9 @@ AdminProperty property() :
 /** Trigger Kind */
 <TRIGKIND_EXPECTED> TOKEN :
 {
-      <ACTION:                              "action">                                       : STRING_EXPECTED
-    | <CHECK:                               "check">                                        : STRING_EXPECTED
-    | <OVERRIDE:                            "override">                                     : STRING_EXPECTED
+      <TRIGKIND_ACTION:                     "action">                                       : STRING_EXPECTED
+    | <TRIGKIND_CHECK:                      "check">                                        : STRING_EXPECTED
+    | <TRIGKIND_OVERRIDE:                   "override">                                     : STRING_EXPECTED
 }
 
 Trigger trigger() :
@@ -352,9 +426,9 @@ Trigger trigger() :
 }
 {
     tmp = <TRIGEVENT>           {this.setValue(trigger, "eventType", this.getSingle(tmp.image));}
-    ( <ACTION>                  {this.setValue(trigger, "kind", "action");}
-    | <CHECK>                   {this.setValue(trigger, "kind", "check");}
-    | <OVERRIDE>                {this.setValue(trigger, "kind", "override");} )
+    ( <TRIGKIND_ACTION>         {this.setValue(trigger, "kind", "action");}
+    | <TRIGKIND_CHECK>          {this.setValue(trigger, "kind", "check");}
+    | <TRIGKIND_OVERRIDE>       {this.setValue(trigger, "kind", "override");} )
     str = string()              {this.setValue(trigger, "program", str);}
     ( <INPUT> str = string()    {this.setValue(trigger, "arguments",            str);} )?
 
@@ -373,9 +447,9 @@ LocalAttribute localAttribute()
 }
 {
     str = string()                                                              {localAttr.setLocalName(str);}
-    "{"
+    <BRACE_OPEN>
         parseAttribute(localAttr)
-    "}"
+    <BRACE_CLOSE>
     {return localAttr;}
 }
 
@@ -873,6 +947,203 @@ void parsePathType(final PathType_mxJPO _pathType)
     | <TYPE_ALL:                            "type" ([" ","\t","\n"])+ "all">                : DEFAULT
     | <RELATIONSHIP_ALL:                    "relationship" ([" ","\t","\n"])+ "all">        : DEFAULT
     | <RELATIONSHIP:                        "relationship">                                 : STRING_EXPECTED
+}
+
+/******************************************************* Data Model -> Policy */
+
+/**
+ * Parses one complete policy definition.
+ *
+ * @param _policy   target policy to update with parsed values
+ */
+void parsePolicy(final Policy_mxJPO _policy)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    Token tmp;
+    AdminProperty property;
+    Policy_mxJPO.State state;
+    Access access = new Access();
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_policy, "packageRef", str);} )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_policy, "properties", "propertiesStack", property);} )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_policy, "symbolicNames", str);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_policy, "description", str);} )
+      | ( <FORMAT_ALL>                                                          {this.setValue(_policy, "allFormats",                           true);} )
+      | ( <FORMAT>                    str = string()                            {this.appendValue(_policy, "formats",                           str);} )
+      | ( <TYPE_ALL>                                                            {this.setValue(_policy, "allTypes",                             true);} )
+      | ( <TYPE>                      str = string()                            {this.appendValue(_policy, "types",                             str);} )
+      | ( <DEFAULTFORMAT>             str = string()                            {this.setValue(_policy, "defaultFormat",                        str);} )
+      | ( <ENFORCE_TRUE>                                                        {this.setValue(_policy, "enforce",                              true);} )
+      | ( <ENFORCE_FALSE>                                                       {this.setValue(_policy, "enforce",                              false);} )
+      | ( <DELIMITER>               ( tmp = <DELIMITERSTRING>                   {this.setValue(_policy, "delimiter",                            this.getString(tmp.image));}
+                                    | tmp = <DELIMITERSINGLE>                   {this.setValue(_policy, "delimiter",                            this.getSingle(tmp.image));} ) )
+      | ( ( <SEQUENCE> | <MINORSEQUENCE> ) str = string()                       {this.setValue(_policy, "minorsequence",                        str);} )
+      | ( <MAJORSEQUENCE>             str = string()                            {this.setValue(_policy, "majorsequence",                        str);} )
+      | ( <STORE>                     str = string()                            {this.setValue(_policy, "store",                                str);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_policy, "hidden",                               true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_policy, "hidden",                               false);} )
+      | ( <ALLSTATE> "{"                                                        {this.setValue(_policy, "allState",                             true);}
+               ( ( <REVOKE>                                                     {this.setValue(access, "revoke",                                true);} ) ?
+                 ( <LOGIN>                                                      {this.setValue(access, "login",                                 true);} ) ?
+                        ( <OWNER>                                               {this.setValue(access, "kind", "owner");}
+                        | <PUBLIC>                                              {this.setValue(access, "kind", "public");}
+                        | <USER>      str = string()                            {this.setValue(access, "kind", "user");this.setValue(access, "userRef", str);} )
+                                                stateAccessDef(access)          {this.appendValue(_policy, "allStateAccess", "accessList", access);/*reset*/access = new Access();} )*
+                                                        "}" )
+      | ( <STATE>                     state = state()                           {this.appendValue(_policy, "states", state);} )
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_policy, "properties", "propertiesStack", property);} )
+    )*
+}
+
+/** Delimiter Character */
+<DEFAULT> TOKEN:
+{
+      <DELIMITER:                           "delimiter">                                    : DELIMITER_EXPECTED
+}
+<DELIMITER_EXPECTED> TOKEN :
+{
+      <DELIMITERSTRING : ( "\"" <DELIMITER_CHARSTR> "\"" )>  : DEFAULT
+    | <DELIMITERSINGLE : ( <DELIMITER_CHARSTR> )>  : DEFAULT
+    | <#DELIMITER_CHARSTR : ~["\u0000"-"\u0020","0"-"9","a"-"z","A"-"Z","?","*","'","\"","[","]","(",")"]>
+}
+
+/**
+ * Parses one state definition.
+ *
+ * @return state
+ */
+Policy_mxJPO.State state() :
+{
+    String str;
+    final Policy_mxJPO.State state = new Policy_mxJPO.State();
+    Set<String> tmpSet;
+    Token tmp;
+    Trigger trigger;
+    Policy_mxJPO.Signature signature;
+    AdminProperty property;
+    Access access = new Access();
+}
+{
+    ( str = string()                                                              {this.setValue(state, "name", str);} )
+    <BRACE_OPEN>
+      ( ( <REGISTEREDNAME>            str = string()                            {this.appendValue(state, "symbolicNames", str);} )
+      | ( ( <MINORREVISION_TRUE>  | <REVISION_TRUE> )                           {this.setValue(state, "minorrevisionable", true);} )
+      | ( ( <MINORREVISION_FALSE> | <REVISION_FALSE> )                          {this.setValue(state, "minorrevisionable", false);} )
+      | ( <MAJORREVISION_TRUE>                                                  {this.setValue(state, "majorrevisionable", true);} )
+      | ( <MAJORREVISION_FALSE>                                                 {this.setValue(state, "majorrevisionable", false);} )
+      | ( <VERSION>                                                             {this.setValue(state, "versionable", true);} )
+      | ( <VERSION_FALSE>                                                       {this.setValue(state, "versionable", false);} )
+      | ( <PROMOTE_TRUE>                                                        {this.setValue(state, "autoPromotion", true);} )
+      | ( <PROMOTE_FALSE>                                                       {this.setValue(state, "autoPromotion", false);} )
+      | ( <CHECKOUTHISTORY_TRUE>                                                {this.setValue(state, "checkoutHistory", true);} )
+      | ( <CHECKOUTHISTORY_FALSE>                                               {this.setValue(state, "checkoutHistory", false);} )
+      | ( <ENFORCERESERVEACCESS_TRUE>                                           {this.setValue(state, "enforcereserveaccess", true);} )
+      | ( <ENFORCERESERVEACCESS_FALSE>                                          {this.setValue(state, "enforcereserveaccess", false);} )
+      | ( <PUBLISHED_TRUE>                                                      {this.setValue(state, "published", true);} )
+      | ( <PUBLISHED_FALSE>                                                     {this.setValue(state, "published", false);} )
+      | ( ( <REVOKE>                                                            {this.setValue(access, "revoke", true);} ) ?
+          ( <LOGIN>                                                             {this.setValue(access, "login", true);} ) ?
+                    ( <OWNER>                                                   {this.setValue(access, "kind", "owner");}
+                    | <PUBLIC>                                                  {this.setValue(access, "kind", "public");}
+                    | <USER>    str = string()                                  {this.setValue(access, "kind", "user");this.setValue(access, "userRef", str);} )
+                                            stateAccessDef(access)              {this.appendValue(state, "access", "accessList", access);/*reset*/access = new Access();} )
+      | ( <ACTION>              str = string()                                  {this.setValue(state, "actionProgram", str);}
+                     <INPUT>    str = string()                                  {this.setValue(state, "actionInput", str);} )
+      | ( <CHECK>               str = string()                                  {this.setValue(state, "checkProgram", str);}
+                     <INPUT>    str = string()                                  {this.setValue(state, "checkInput", str);} )
+      | ( <ROUTE>      ( tmp = <ROUTEUSERSTRING>                                {this.appendValue(state, "routeUsers",                          this.getString(tmp.image));}
+                       | tmp = <ROUTEUSERSINGLE>                                {this.appendValue(state, "routeUsers",                          this.getSingle(tmp.image));} )* <ROUTEUSERCLOSE>
+                                      str = string()                            {this.setValue(state, "routeMessage", str);} )
+      | ( <TRIGGER>                   trigger = trigger()                       {this.appendValue(state, "triggers", "triggersStack", trigger);} )
+      | ( <SIGNATURE>                                                           {signature = new Policy_mxJPO.Signature();this.appendValue(state, "signatures", signature);}
+                  str = string()                                                {this.setValue(signature, "name", str);}
+                    <BRACE_OPEN>
+                        ( (<BRANCH>           str = string()                    {this.setValue(signature, "branch", str);} )
+                        | (<APPROVE_LIST>   ( tmp = <LISTSTRING>                {this.appendValue(signature, "approverUsers",                   this.getString(tmp.image));}
+                                            | tmp = <LISTSINGLE>                {this.appendValue(signature, "approverUsers",                   this.getSingle(tmp.image));} )* <LISTCLOSE>)
+                        | (<IGNORE_LIST>    ( tmp = <LISTSTRING>                {this.appendValue(signature, "ignoreUsers",                     this.getString(tmp.image));}
+                                            | tmp = <LISTSINGLE>                {this.appendValue(signature, "ignoreUsers",                     this.getSingle(tmp.image));} )* <LISTCLOSE>)
+                        | (<REJECT_LIST>    ( tmp = <LISTSTRING>                {this.appendValue(signature, "rejectUsers",                     this.getString(tmp.image));}
+                                            | tmp = <LISTSINGLE>                {this.appendValue(signature, "rejectUsers",                     this.getSingle(tmp.image));} )* <LISTCLOSE>)
+                        | (<FILTER>           str = string()                    {this.setValue(signature, "filter", str);} ) )*
+                    <BRACE_CLOSE> )
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(state, "properties", "propertiesStack", property);} )
+    )*
+    <BRACE_CLOSE>
+
+    {return state;}
+}
+
+
+<BRACE_OPEN_EXPECTED> TOKEN :
+{
+    <AC_ACCESS_STRING: (["a"-"z"])+>
+}
+
+void stateAccessDef(final Access _access) :
+{
+    String str;
+    Token tmp;
+    Set access = new HashSet();
+}
+{
+    // choice conflict for public can be ignore, because public is used outside of the access statement
+    (
+          ( <BRACE_OPEN> ( tmp = <AC_ACCESS_STRING> {access.add(tmp.image);} )* <BRACE_CLOSE> )
+
+        | ( <KEY> str = string()  {this.setValue(_access, "key", str);} )
+
+        | ( <FILTER>                  str = string()                        {this.setValue(_access, "filter", str);} )
+        | ( <LOCALFILTER>             str = string()                        {this.setValue(_access, "localfilter", str);} )
+        | ( <ANCESTOR>              ( tmp = <ORGANIZATION>
+                                    | tmp = <PROJECT> )                     {this.setValue(_access, tmp.image, "ancestor");} )
+        | ( <ANY>                   ( tmp = <CATEGORY>
+                                    | tmp = <MATURITY>
+                                    | tmp = <ORGANIZATION>
+                                    | tmp = <OWNER>
+                                    | tmp = <PROJECT>
+                                    | tmp = <RESERVE> )                     {this.setValue(_access, tmp.image, "any");} )
+        | ( <CONTEXT >              ( tmp = <OWNER>
+                                    | tmp = <RESERVE> )                     {this.setValue(_access, tmp.image, "context");} )
+        | ( <CONTRACTOR>            ( tmp = <CATEGORY> )                    {this.setValue(_access, tmp.image, "contractor");} )
+        | ( <CUSTOMER>              ( tmp = <CATEGORY> )                    {this.setValue(_access, tmp.image, "customer");} )
+        | ( <DESCENDANT>            ( tmp = <ORGANIZATION>
+                                    | tmp = <PROJECT> )                     {this.setValue(_access, tmp.image, "descendant");} )
+        | ( <GOLDPARTNER>           ( tmp = <CATEGORY> )                    {this.setValue(_access, tmp.image, "goldpartner");} )
+        | ( <INCLUSIVE>             ( tmp = <RESERVE> )                     {this.setValue(_access, tmp.image, "inclusive");} )
+        | ( <NO>                    ( tmp = <MATURITY>
+                                    | tmp = <RESERVE> )                     {this.setValue(_access, tmp.image, "no");} )
+        | ( <NOTPRIVATE>            ( tmp = <MATURITY> )                    {this.setValue(_access, tmp.image, "notprivate");} )
+        | ( <OEM>                   ( tmp = <CATEGORY> )                    {this.setValue(_access, tmp.image, "oem");} )
+        | ( <PARTNER>               ( tmp = <CATEGORY> )                    {this.setValue(_access, tmp.image, "partner");} )
+        | ( <PPP>                   ( tmp = <MATURITY> )                    {this.setValue(_access, tmp.image, "ppp");} )
+        | ( <PRIVATE>               ( tmp = <MATURITY> )                    {this.setValue(_access, tmp.image, "private");} )
+        | ( <PROTECTED>             ( tmp = <MATURITY> )                    {this.setValue(_access, tmp.image, "protected");} )
+        | ( <PUBLIC>                ( tmp = <MATURITY> )                    {this.setValue(_access, tmp.image, "public");} )
+        | ( <RELATED>               ( tmp = <ORGANIZATION>
+                                    | tmp = <PROJECT> )                     {this.setValue(_access, tmp.image, "related");} )
+        | ( <SINGLE>                ( tmp = <ORGANIZATION>
+                                    | tmp = <PROJECT> )                     {this.setValue(_access, tmp.image, "single");} )
+        | ( <SUPPLIER>              ( tmp = <CATEGORY> )                    {this.setValue(_access, tmp.image, "supplier");} )
+    )*
+    {
+        this.appendValues(_access, "access", access);
+    }
+}
+/** Route */
+<DEFAULT> TOKEN :
+{
+      <ROUTE:                               "route" ([" ","\t","\n"])+ "{">                 : ROUTEUSER_EXPECTED
+}
+
+<ROUTEUSER_EXPECTED> TOKEN :
+{
+      <ROUTEUSERSTRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : ROUTEUSER_EXPECTED
+    | <ROUTEUSERSINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : ROUTEUSER_EXPECTED
+    | <ROUTEUSERCLOSE : "}">   : STRING_EXPECTED
 }
 
 /************************************************************ Program -> Page */
