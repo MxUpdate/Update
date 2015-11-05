@@ -47,6 +47,7 @@ import java.util.Set;
 import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
 import org.mxupdate.update.datamodel.Expression_mxJPO;
+import org.mxupdate.update.datamodel.Format_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.program.Page_mxJPO;
 import org.mxupdate.update.program.ProgramCI_mxJPO;
@@ -137,6 +138,7 @@ TOKEN : /** first level */
     | <COMMAND:                             ("add" ([" ","\t","\n","\r"])+ )? "command">    : STRING_EXPECTED
     | <DEFINITION:                          "definition">                                   : STRING_EXPECTED
     | <DIMENSION:                           "dimension">                                    : STRING_EXPECTED
+    | <EDIT:                                "edit">                                         : STRING_EXPECTED
     | <EMAILADDRESS:                        "emailaddress">                                 : STRING_EXPECTED
     | <FAX:                                 "fax">                                          : STRING_EXPECTED
     | <FILE:                                "file">                                         : STRING_EXPECTED
@@ -152,14 +154,18 @@ TOKEN : /** first level */
     | <PARENT:                              "parent">                                       : STRING_EXPECTED
     | <PATTERN:                             "pattern">                                      : STRING_EXPECTED
     | <PHONE:                               "phone">                                        : STRING_EXPECTED
+    | <PRINT:                               "print">                                        : STRING_EXPECTED
     | <ROLE:                                "role" >                                        : STRING_EXPECTED
     | <RULE:                                "rule">                                         : STRING_EXPECTED
     | <SITE:                                "site">                                         : STRING_EXPECTED
+    | <SUFFIX:                              "suffix">                                       : STRING_EXPECTED
     | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
     | <USER:                                ("add" ([" ","\t","\n","\r"])+ )? "user">       : STRING_EXPECTED
     | <USESPACKAGE:                         "usespackage">                                  : STRING_EXPECTED
     | <UUID:                                "uuid">                                         : STRING_EXPECTED
     | <VAULT:                               "vault" >                                       : STRING_EXPECTED
+    | <VERSION:                             "version">                                      : STRING_EXPECTED
+    | <VIEW:                                "view">                                         : STRING_EXPECTED
 
     | <CODE:                                "code">                                         : MULTILINESTRING_EXPECTED
     | <COMMENT:                             "comment">                                      : MULTILINESTRING_EXPECTED
@@ -177,11 +183,33 @@ TOKEN : /** first level */
 
 }
 
+String stringString() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <STRING_STRING_STRING>  {ret = this.getString(tmp.image);}
+    | tmp = <STRING_STRING_SINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
+}
+
 /************************************************************** Common String */
-<STRING_EXPECTED, FIELD_START_EXPECTED> TOKEN :
+<STRING_EXPECTED, FIELD_OPEN_EXPECTED, TYPE_OPEN_EXPECTED> TOKEN :
 {
       <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
     | <SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+String string() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <STRING>  {ret = this.getString(tmp.image);}
+    | tmp = <SINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
 }
 
 /*************************************************** Common Multi-Line-String */
@@ -208,12 +236,48 @@ String multiLineString() :
       <NATURALNUMBER: (("0") | (["1"-"9"](["0"-"9"])*))> : DEFAULT
 }
 
+Integer naturalNumber() :
+{
+    Token tmp;
+}
+{
+    tmp = <NATURALNUMBER>
+    {return Integer.valueOf(tmp.image);}
+}
+
 /************************************************************ Common Property */
 <DEFAULT> TOKEN :
 {
       <PROPERTY:                            "property">                                     : STRING_EXPECTED
     | <PROPERTYTO:                          "to">                                           : STRING_STRING_EXPECTED
     | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
+}
+
+AdminProperty uuidProperty() :
+{
+    String str;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()
+    {this.setValue(property, "value", str);}
+    {this.setValue(property, "name",  "UUID");}
+    {return property;}
+}
+
+AdminProperty settingProperty() :
+{
+    String name, value;
+    Token tmp;
+    AdminProperty property = new AdminProperty();
+}
+{
+    name = stringString()
+    value = string()
+
+    {this.setValue(property, "name", "%" + name);}
+    {this.setValue(property, "value", value);}
+    {return property;}
 }
 
 AdminProperty property() :
@@ -646,6 +710,38 @@ void parseExpression(final Expression_mxJPO _expression)
     )*
 }
 
+/******************************************************* Data Model -> Format */
+
+/**
+ * Parses one complete format definition.
+ *
+ * @param _format   target format to update with parsed values
+ */
+void parseFormat(final Format_mxJPO _format)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    AdminProperty property;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_format, "packageRef",   str);} )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_format, "properties", "propertiesStack", property);} )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_format, "symbolicNames", str);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_format, "description", str);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_format, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_format, "hidden", false);} )
+      | ( <MIME>                      str = string()                            {this.setValue(_format, "mimeType", str);} )
+      | ( <SUFFIX>                    str = string()                            {this.setValue(_format, "fileSuffix", str);} )
+      | ( <TYPE>                      str = string()                            {this.setValue(_format, "type", str);} )
+      | ( <VERSION>                   str = string()                            {this.setValue(_format, "version", str);} )
+      | ( <VIEW>                      str = string()                            {this.setValue(_format, "commandView",  str);} )
+      | ( <EDIT>                      str = string()                            {this.setValue(_format, "commandEdit",  str);} )
+      | ( <PRINT>                     str = string()                            {this.setValue(_format, "commandPrint", str);} )
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_format, "properties", "propertiesStack", property);} )
+    )*
+}
+
 /************************************************************ Program -> Page */
 
 /**
@@ -664,9 +760,9 @@ void parsePage(final Page_mxJPO _page)
 {
     (
         ( <PACKAGE>                   str = string()                            {this.setValue(_page, "packageRef", str);} )
-      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_page, "description", str);} )
       | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_page, "properties", "propertiesStack", property);} )
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_page, "symbolicNames", str);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_page, "description", str);} )
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_page, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_page, "hidden", false);} )
       | ( <MIME>                      str = string()                            {this.setValue(_page, "mimeType", str);} )
@@ -967,9 +1063,9 @@ void parsePerson(final PersonCI_mxJPO _person)
 /** User -> Person: Admin */
 <DEFAULT> TOKEN :
 {
-       <ADMIN:                              "admin">                                        : ADMIN_OPENEXPECTED
+       <ADMIN:                              "admin">                                        : ADMIN_OPEN_EXPECTED
 }
-<ADMIN_OPENEXPECTED> TOKEN :
+<ADMIN_OPEN_EXPECTED> TOKEN :
 {
       <ADMIN_ALL:                           "all" >                                         : DEFAULT
     | <ADMIN_OPEN:                          "{">                                            : ADMIN_EXPECTED
@@ -983,9 +1079,9 @@ void parsePerson(final PersonCI_mxJPO _person)
 /** User -> Person: Product */
 <DEFAULT> TOKEN :
 {
-      <PRODUCT:                              "product">                                    : PRODUCT_OPENEXPECTED
+      <PRODUCT:                              "product">                                    : PRODUCT_OPEN_EXPECTED
 }
-<PRODUCT_OPENEXPECTED> TOKEN :
+<PRODUCT_OPEN_EXPECTED> TOKEN :
 {
       <PRODUCT_OPEN:                         "{">                                          : PRODUCT_EXPECTED
 }
@@ -998,9 +1094,9 @@ void parsePerson(final PersonCI_mxJPO _person)
 /** User -> Person: Type */
 <DEFAULT> TOKEN :
 {
-       <TYPE:                                "type">                                        : TYPE_OPENEXPECTED
+       <TYPE:                                "type">                                        : TYPE_OPEN_EXPECTED
 }
-<TYPE_OPENEXPECTED> TOKEN :
+<TYPE_OPEN_EXPECTED> TOKEN :
 {
       <TYPE_OPEN:                            "{">                                          : TYPE_EXPECTED
 }
@@ -1165,10 +1261,10 @@ void parseForm(final Form_mxJPO _form)
 
 <DEFAULT> TOKEN :
 {
-      <FIELD:                               "field">                            : FIELD_START_EXPECTED
+      <FIELD:                               "field">                            : FIELD_OPEN_EXPECTED
 }
 
-<FIELD_START_EXPECTED> TOKEN :
+<FIELD_OPEN_EXPECTED> TOKEN :
 {
       <FIELD_OPEN:                          "{">                                : FIELD_EXPECTED
 }
@@ -1407,82 +1503,3 @@ void parseTable(final Table_mxJPO _table)
 }
 
 /**************************************************************************** */
-
-/**
- * Parses the UUID property definition.
- */
-AdminProperty uuidProperty() :
-{
-    String str;
-    AdminProperty property = new AdminProperty();
-}
-{
-    str = string()
-    {this.setValue(property, "value", str);}
-    {this.setValue(property, "name",  "UUID");}
-    {return property;}
-}
-
-/**
- * Parses one setting.
- */
-AdminProperty settingProperty() :
-{
-    String name, value;
-    Token tmp;
-    AdminProperty property = new AdminProperty();
-}
-{
-    name = stringString()
-    value = string()
-
-    {this.setValue(property, "name", "%" + name);}
-    {this.setValue(property, "value", value);}
-    {return property;}
-}
-
-/**
- * Evaluates integer value.
- *
- * @return integer
- */
-Integer naturalNumber() :
-{
-    Token tmp;
-}
-{
-    tmp = <NATURALNUMBER>
-    {return Integer.valueOf(tmp.image);}
-}
-
-/**
- * Evaluates prefixed single-line string.
- *
- * @return string
- */
-String stringString() :
-{
-    Token tmp;
-    String ret = null;
-}
-{
-    ( tmp = <STRING_STRING_STRING>  {ret = this.getString(tmp.image);}
-    | tmp = <STRING_STRING_SINGLE>  {ret = this.getSingle(tmp.image);} )
-    {return ret;}
-}
-
-/**
- * Evaluates single-line string.
- *
- * @return string
- */
-String string() :
-{
-    Token tmp;
-    String ret = null;
-}
-{
-    ( tmp = <STRING>  {ret = this.getString(tmp.image);}
-    | tmp = <SINGLE>  {ret = this.getSingle(tmp.image);} )
-    {return ret;}
-}
