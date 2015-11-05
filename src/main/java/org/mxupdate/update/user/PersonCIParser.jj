@@ -16,7 +16,7 @@
  */
 
 options {
-    JDK_VERSION = "1.6";
+    JDK_VERSION = "1.7";
     STATIC = false;
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
@@ -70,11 +70,13 @@ PARSER_END(PersonCIParser)
 
 <DEFAULT> TOKEN : /** first level */
 {
-      <UUID:                                "uuid">                                        : STRING_EXPECTED
+      <PACKAGE:                             "package">                                      : STRING_EXPECTED
 
-    | <SYMBOLICNAME:                        "symbolicname">                                : STRING_EXPECTED
+    | <UUID:                                "uuid">                                         : STRING_EXPECTED
 
-    | <COMMENT:                             "comment">                                     : MULTILINESTRING_EXPECTED
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
+    | <COMMENT:                             "comment">                                      : MULTILINESTRING_EXPECTED
 
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_FALSE:                        "!hidden">
@@ -219,88 +221,134 @@ PARSER_END(PersonCIParser)
 /**
  * Parses one complete person definition.
  *
- * @param _personAdmin  target admin person to update with parsed values
+ * @param _person  target admin person to update with parsed values
  */
-void parse(final PersonCI_mxJPO _personAdmin)
-    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
-: {
+void parse(final PersonCI_mxJPO _person)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
     Token tmp;
     AdminProperty property;
-} {
-    (   ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_personAdmin, "symbolicNames",                this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.appendValue(_personAdmin, "symbolicNames",                this.getSingle(tmp.image));} ) )
+} 
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_person, "packageRef", str);} )
 
-      | ( <UUID>                                                            {property = new AdminProperty();
-                                                                             this.appendValue(this.getValue(_personAdmin, "properties"), "propertiesStack", property);
-                                                                             this.setValue(property, "name",  "UUID");}
-                                    ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_person, "properties", "propertiesStack", property);} )
 
-      | ( <COMMENT>                 ( tmp = <MULTILINESTRING>               {this.setValue(_personAdmin, "description",                     this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>               {this.setValue(_personAdmin, "description",                     this.getSingle(tmp.image));} ) )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_person, "symbolicNames", str);} )
 
-      | ( <HIDDEN_TRUE>                                                     {this.setValue(_personAdmin, "hidden",                          true);} )
-      | ( <HIDDEN_FALSE>                                                    {this.setValue(_personAdmin, "hidden",                          false);} )
+      | ( <COMMENT>                   str = multiLineString()                   {this.setValue(_person, "description", str);} )
 
-      | ( <ACTIVE_TRUE>                                                     {this.setValue(_personAdmin, "active",                          true);} )
-      | ( <ACTIVE_FALSE>                                                    {this.setValue(_personAdmin, "active",                          false);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_person, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_person, "hidden", false);} )
 
-      | ( <TRUSTED_TRUE>                                                    {this.setValue(_personAdmin, "trusted",                         true);} )
-      | ( <TRUSTED_FALSE>                                                   {this.setValue(_personAdmin, "trusted",                         false);} )
+      | ( <ACTIVE_TRUE>                                                         {this.setValue(_person, "active", true);} )
+      | ( <ACTIVE_FALSE>                                                        {this.setValue(_person, "active", false);} )
 
-      | ( <ACCESS>      ( <ACCESS_ALL>                                      {this.clearValues(_personAdmin, "access");this.appendValue(_personAdmin, "access", "all");}
-                        | <ACCESS_OPEN>                                     {this.clearValues(_personAdmin, "access");}
-                                        ( tmp = <ACCESS_EXPECTED_SINGLE>    {this.appendValue(_personAdmin, "access",                       this.getString(tmp.image));} )* <ACCESS_CLOSE > ) )
+      | ( <TRUSTED_TRUE>                                                        {this.setValue(_person, "trusted", true);} )
+      | ( <TRUSTED_FALSE>                                                       {this.setValue(_person, "trusted", false);} )
 
-      | ( <ADMIN>       ( <ADMIN_ALL>                                       {this.clearValues(_personAdmin, "admin");this.appendValue(_personAdmin, "admin", "all");}
-                        | <ADMIN_OPEN>                                      {this.clearValues(_personAdmin, "admin");}
-                                        ( tmp = <ADMIN_EXPECTED_SINGLE>     {this.appendValue(_personAdmin, "admin",                        this.getString(tmp.image));} )* <ADMIN_CLOSE > ) )
+      | ( <ACCESS>      ( <ACCESS_ALL>                                          {this.clearValues(_person, "access");this.appendValue(_person, "access", "all");}
+                        | <ACCESS_OPEN>                                         {this.clearValues(_person, "access");}
+                                        ( tmp = <ACCESS_EXPECTED_SINGLE>        {this.appendValue(_person, "access", this.getString(tmp.image));} )* <ACCESS_CLOSE > ) )
 
-      | ( <EMAIL_TRUE>                                                      {this.setValue(_personAdmin, "email",                           true);} )
-      | ( <EMAIL_FALSE>                                                     {this.setValue(_personAdmin, "email",                           false);} )
-      | ( <INCONMAIL_TRUE>                                                  {this.setValue(_personAdmin, "iconmail",                        true);} )
-      | ( <INCONMAIL_FALSE>                                                 {this.setValue(_personAdmin, "iconmail",                        false);} )
+      | ( <ADMIN>       ( <ADMIN_ALL>                                           {this.clearValues(_person, "admin");this.appendValue(_person, "admin", "all");}
+                        | <ADMIN_OPEN>                                          {this.clearValues(_person, "admin");}
+                                        ( tmp = <ADMIN_EXPECTED_SINGLE>         {this.appendValue(_person, "admin", this.getString(tmp.image));} )* <ADMIN_CLOSE > ) )
 
-      | ( <ADDRESS>                 ( tmp = <STRING>                        {this.setValue(_personAdmin, "address",                         this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "address",                         this.getSingle(tmp.image));} ) )
-      | ( <EMAILADDRESS>            ( tmp = <STRING>                        {this.setValue(_personAdmin, "emailAddress",                    this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "emailAddress",                    this.getSingle(tmp.image));} ) )
-      | ( <FAX>                     ( tmp = <STRING>                        {this.setValue(_personAdmin, "fax",                             this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "fax",                             this.getSingle(tmp.image));} ) )
-      | ( <FULLNAME>                ( tmp = <STRING>                        {this.setValue(_personAdmin, "fullName",                        this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "fullName",                        this.getSingle(tmp.image));} ) )
-      | ( <PHONE>                   ( tmp = <STRING>                        {this.setValue(_personAdmin, "phone",                           this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "phone",                           this.getSingle(tmp.image));} ) )
+      | ( <EMAIL_TRUE>                                                          {this.setValue(_person, "email", true);} )
+      | ( <EMAIL_FALSE>                                                         {this.setValue(_person, "email", false);} )
+      | ( <INCONMAIL_TRUE>                                                      {this.setValue(_person, "iconmail", true);} )
+      | ( <INCONMAIL_FALSE>                                                     {this.setValue(_person, "iconmail", false);} )
 
-      | ( <PRODUCT> <PRODUCT_OPEN>  ( tmp = <PRODUCT_EXPECTED_SINGLE>       {this.appendValue(_personAdmin, "products",                     this.getString(tmp.image));} )* <PRODUCT_CLOSE> )
+      | ( <ADDRESS>                   str = string()                            {this.setValue(_person, "address", str);} )
+      | ( <EMAILADDRESS>              str = string()                            {this.setValue(_person, "emailAddress", str);} )
+      | ( <FAX>                       str = string()                            {this.setValue(_person, "fax", str);} )
+      | ( <FULLNAME>                  str = string()                            {this.setValue(_person, "fullName", str);} )
+      | ( <PHONE>                     str = string()                            {this.setValue(_person, "phone", str);} )
 
-      | ( <TYPE> <TYPE_OPEN>                                                {this.clearValues(_personAdmin, "types");}
-                                    ( ( <TYPE_APPLICATION>                  {this.appendValue(_personAdmin, "types",                        TypeItem.APPLICATION);} )
-                                    | ( <TYPE_FULL>                         {this.appendValue(_personAdmin, "types",                        TypeItem.FULL);} )
-                                    | ( <TYPE_BUSINESS>                     {this.appendValue(_personAdmin, "types",                        TypeItem.BUSINESS);} )
-                                    | ( <TYPE_SYSTEM>                       {this.appendValue(_personAdmin, "types",                        TypeItem.SYSTEM);} ) )* <TYPE_CLOSE > )
+      | ( <PRODUCT> <PRODUCT_OPEN>  ( tmp = <PRODUCT_EXPECTED_SINGLE>           {this.appendValue(_person, "products", this.getString(tmp.image));} )* <PRODUCT_CLOSE> )
 
-      | (<VAULT>                    ( tmp = <STRING>                        {this.setValue(_personAdmin, "vault",                           this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "vault",                           this.getSingle(tmp.image));} ) )
-      | (<APPLICATION>              ( tmp = <STRING>                        {this.setValue(_personAdmin, "application",                     this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "application",                     this.getSingle(tmp.image));} ) )
-      | (<SITE>                     ( tmp = <STRING>                        {this.setValue(_personAdmin, "site",                            this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_personAdmin, "site",                            this.getSingle(tmp.image));} ) )
+      | ( <TYPE> <TYPE_OPEN>                                                    {this.clearValues(_person, "types");}
+                                    ( ( <TYPE_APPLICATION>                      {this.appendValue(_person, "types", TypeItem.APPLICATION);} )
+                                    | ( <TYPE_FULL>                             {this.appendValue(_person, "types", TypeItem.FULL);} )
+                                    | ( <TYPE_BUSINESS>                         {this.appendValue(_person, "types", TypeItem.BUSINESS);} )
+                                    | ( <TYPE_SYSTEM>                           {this.appendValue(_person, "types", TypeItem.SYSTEM);} ) )* <TYPE_CLOSE > )
 
-      | (<GROUP>                    ( tmp = <STRING>                        {this.appendValue(_personAdmin, "groups",                       this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.appendValue(_personAdmin, "groups",                       this.getSingle(tmp.image));} ) )
+      | (<VAULT>                      str = string()                            {this.setValue(_person, "vault", str);} )
+      | (<APPLICATION>                str = string()                            {this.setValue(_person, "application", str);} )
+      | (<SITE>                       str = string()                            {this.setValue(_person, "site", str);} )
 
-      | (<ROLE>                     ( tmp = <STRING>                        {this.appendValue(_personAdmin, "roles",                        this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.appendValue(_personAdmin, "roles",                        this.getSingle(tmp.image));} ) )
+      | (<GROUP>                      str = string()                            {this.appendValue(_person, "groups", str);} )
 
-      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_personAdmin, "properties", "propertiesStack", property);}
-                                    ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
-              (   ( <PROPERTYVAL>   ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+      | (<ROLE>                       str = string()                            {this.appendValue(_person, "roles", str);} )
+
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_person, "properties", "propertiesStack", property);} )
     )*
+}
+
+/**
+ * Parses the UUID property definition.
+ */
+AdminProperty uuidProperty() :
+{
+    String str;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()
+    {this.setValue(property, "value", str);}
+    {this.setValue(property, "name",  "UUID");}
+    {return property;}
+}
+
+/**
+ * Parses the properties definition.
+ */
+AdminProperty property() :
+{
+    String str;
+    Token tmp;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()                                 {this.setValue(property, "name", str);}
+    ( ( <PROPERTYVAL>  str = string()              {this.setValue(property, "value", str);} )
+    | ( <PROPERTYTO>   ( tmp = <ADMINTYPE_STRING>  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                       | tmp = <ADMINTYPE_SINGLE>  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                   str = string()  {this.setValue(property, "refAdminName", str);} ) )*
+    {return property;}
+}
+
+/**
+ * Evaluates multi-line string.
+ *
+ * @return string
+ */
+String multiLineString() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <MULTILINESTRING>  {ret = this.getString(tmp.image);}
+    | tmp = <MULTILINESINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
+}
+
+/**
+ * Evaluates single-line string.
+ *
+ * @return string
+ */
+String string() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <STRING>  {ret = this.getString(tmp.image);}
+    | tmp = <SINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
 }

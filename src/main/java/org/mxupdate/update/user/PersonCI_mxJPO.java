@@ -42,6 +42,7 @@ import matrix.util.MatrixException;
  * The class is used to handle administration persons.
  * Following properties are supported:
  * <ul>
+ * <li>package</li>
  * <li>uuid</li>
  * <li>symbolic names</li>
  * <li>description</li>
@@ -352,7 +353,8 @@ public class PersonCI_mxJPO
     {
         _updateBuilder
                 //                  tag              | default | value                     | write?
-                .stringNotNull( "uuid",                          this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
+                .stringNotNull(          "package",              this.getPackageRef())
+                .stringNotNull(          "uuid",                 this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(                   "symbolicname",         this.getSymbolicNames())
                 .string(                 "comment",              this.getDescription())
                 .flag(                   "active",        false, this.active)
@@ -397,7 +399,9 @@ public class PersonCI_mxJPO
                           final PersonCI_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcPackage(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
+
         // type (application, full, business, system, inactive, trusted)
         if ((CompareToUtil_mxJPO.compare(0, this.types, _current.types) != 0) || (this.active != _current.active) || (this.trusted != _current.trusted))  {
             _mql.newLine().cmd("type ");
