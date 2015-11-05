@@ -180,7 +180,8 @@ public class InterfaceData
     {
         super.createDependings();
 
-        this.fors         .createDependings();
+        this.fors      .createDependings();
+        this.attributes.createDependings();
 
         return this;
     }

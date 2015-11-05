@@ -26,6 +26,8 @@ import org.mxupdate.test.ExportParser.Line;
 import org.mxupdate.test.data.datamodel.AttributeData;
 import org.testng.Assert;
 
+import matrix.util.MatrixException;
+
 /**
  * List of attributes used locally.
  *
@@ -82,6 +84,19 @@ public class LocaleAttributeList
             final AttributeData defAttr = defIter.next();
             final Line lineAttr = lineIter.next();
             defAttr.checkExport(new ExportParser("attr", new Line[]{lineAttr}));
+        }
+    }
+
+    /**
+     * Creates depending objects defined through this list.
+     *
+     * @throws MatrixException if create failed
+     */
+    public void createDependings()
+        throws MatrixException
+    {
+        for (final AttributeData attr : this)  {
+            attr.createDependings();
         }
     }
 }

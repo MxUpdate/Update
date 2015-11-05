@@ -55,9 +55,9 @@ public final class DeltaUtil_mxJPO
                                    final AbstractAdminObject_mxJPO<?> _target,
                                    final AbstractAdminObject_mxJPO<?> _current)
     {
-        if (CompareToUtil_mxJPO.compare(0, _target.getPackageRef(), _current.getPackageRef()) != 0)  {
+        if ((_current == null) || (CompareToUtil_mxJPO.compare(0, _target.getPackageRef(), _current.getPackageRef()) != 0))  {
             _mql.pushPrefix("");
-            if (!StringUtils_mxJPO.isEmpty(_current.getPackageRef()))  {
+            if ((_current != null) && !StringUtils_mxJPO.isEmpty(_current.getPackageRef()))  {
                 _paramCache.logTrace("    - remove package '" + _current + "'");
                 _mql.newLine().cmd("escape modify package ").arg(_current.getPackageRef()).cmd(" remove member ").cmd(_current.mxClassDef().mxClass()).cmd(" ").arg(_current.getName());
             }

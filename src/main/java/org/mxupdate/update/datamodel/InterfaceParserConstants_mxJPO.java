@@ -26,161 +26,163 @@ interface InterfaceParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int UUID = 5;
+  int PACKAGE = 5;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 6;
+  int UUID = 6;
   /** RegularExpression Id. */
-  int DESCRIPTION = 7;
+  int SYMBOLICNAME = 7;
   /** RegularExpression Id. */
-  int ABSTRACT_TRUE = 8;
+  int DESCRIPTION = 8;
   /** RegularExpression Id. */
-  int ABSTRACT_FALSE = 9;
+  int ABSTRACT_TRUE = 9;
   /** RegularExpression Id. */
-  int DERIVED = 10;
+  int ABSTRACT_FALSE = 10;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 11;
+  int DERIVED = 11;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 12;
+  int HIDDEN_TRUE = 12;
   /** RegularExpression Id. */
-  int LOCAL = 13;
+  int HIDDEN_FALSE = 13;
   /** RegularExpression Id. */
-  int ATTRIBUTE = 14;
+  int LOCAL = 14;
   /** RegularExpression Id. */
-  int STRING = 15;
+  int ATTRIBUTE = 15;
   /** RegularExpression Id. */
-  int SINGLE = 16;
+  int STRING = 16;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 17;
+  int SINGLE = 17;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 18;
+  int MULTILINESTRING = 18;
   /** RegularExpression Id. */
-  int FOR = 19;
+  int MULTILINESINGLE = 19;
   /** RegularExpression Id. */
-  int FOR_PATHTYPE_ALL = 20;
+  int FOR = 20;
   /** RegularExpression Id. */
-  int FOR_PATHTYPE = 21;
+  int FOR_PATHTYPE_ALL = 21;
   /** RegularExpression Id. */
-  int FOR_RELATIONSHIP_ALL = 22;
+  int FOR_PATHTYPE = 22;
   /** RegularExpression Id. */
-  int FOR_RELATIONSHIP = 23;
+  int FOR_RELATIONSHIP_ALL = 23;
   /** RegularExpression Id. */
-  int FOR_TYPE_ALL = 24;
+  int FOR_RELATIONSHIP = 24;
   /** RegularExpression Id. */
-  int FOR_TYPE = 25;
+  int FOR_TYPE_ALL = 25;
   /** RegularExpression Id. */
-  int DEFAULTVALUE = 26;
+  int FOR_TYPE = 26;
   /** RegularExpression Id. */
-  int MULTIVALUE_TRUE = 27;
+  int DEFAULTVALUE = 27;
   /** RegularExpression Id. */
-  int MULTIVALUE_FALSE = 28;
+  int MULTIVALUE_TRUE = 28;
   /** RegularExpression Id. */
-  int RESETONCLONE_TRUE = 29;
+  int MULTIVALUE_FALSE = 29;
   /** RegularExpression Id. */
-  int RESETONCLONE_FALSE = 30;
+  int RESETONCLONE_TRUE = 30;
   /** RegularExpression Id. */
-  int RESETONREVISION_TRUE = 31;
+  int RESETONCLONE_FALSE = 31;
   /** RegularExpression Id. */
-  int RESETONREVISION_FALSE = 32;
+  int RESETONREVISION_TRUE = 32;
   /** RegularExpression Id. */
-  int RANGEVALUE_TRUE = 33;
+  int RESETONREVISION_FALSE = 33;
   /** RegularExpression Id. */
-  int RANGEVALUE_FALSE = 34;
+  int RANGEVALUE_TRUE = 34;
   /** RegularExpression Id. */
-  int MULTILINE_TRUE = 35;
+  int RANGEVALUE_FALSE = 35;
   /** RegularExpression Id. */
-  int MULTILINE_FALSE = 36;
+  int MULTILINE_TRUE = 36;
   /** RegularExpression Id. */
-  int RULE = 37;
+  int MULTILINE_FALSE = 37;
   /** RegularExpression Id. */
-  int DIMENSION = 38;
+  int RULE = 38;
   /** RegularExpression Id. */
-  int KIND = 39;
+  int DIMENSION = 39;
   /** RegularExpression Id. */
-  int KIND_BINARY = 40;
+  int KIND = 40;
   /** RegularExpression Id. */
-  int KIND_BOOLEAN = 41;
+  int KIND_BINARY = 41;
   /** RegularExpression Id. */
-  int KIND_DATE = 42;
+  int KIND_BOOLEAN = 42;
   /** RegularExpression Id. */
-  int KIND_INTEGER = 43;
+  int KIND_DATE = 43;
   /** RegularExpression Id. */
-  int KIND_REAL = 44;
+  int KIND_INTEGER = 44;
   /** RegularExpression Id. */
-  int KIND_STRING = 45;
+  int KIND_REAL = 45;
   /** RegularExpression Id. */
-  int MAXLENGTH = 46;
+  int KIND_STRING = 46;
   /** RegularExpression Id. */
-  int MAXLENGTH_NUMBER = 47;
+  int MAXLENGTH = 47;
   /** RegularExpression Id. */
-  int RANGE_EQUAL = 48;
+  int MAXLENGTH_NUMBER = 48;
   /** RegularExpression Id. */
-  int RANGE_GREATERTHAN = 49;
+  int RANGE_EQUAL = 49;
   /** RegularExpression Id. */
-  int RANGE_GREATERTHANEQUAL = 50;
+  int RANGE_GREATERTHAN = 50;
   /** RegularExpression Id. */
-  int RANGE_LESSTHAN = 51;
+  int RANGE_GREATERTHANEQUAL = 51;
   /** RegularExpression Id. */
-  int RANGE_LESSTHANEQUAL = 52;
+  int RANGE_LESSTHAN = 52;
   /** RegularExpression Id. */
-  int RANGE_NOTEQUAL = 53;
+  int RANGE_LESSTHANEQUAL = 53;
   /** RegularExpression Id. */
-  int RANGE_MATCH = 54;
+  int RANGE_NOTEQUAL = 54;
   /** RegularExpression Id. */
-  int RANGE_NOTMATCH = 55;
+  int RANGE_MATCH = 55;
   /** RegularExpression Id. */
-  int RANGE_SMATCH = 56;
+  int RANGE_NOTMATCH = 56;
   /** RegularExpression Id. */
-  int RANGE_NOTSMATCH = 57;
+  int RANGE_SMATCH = 57;
   /** RegularExpression Id. */
-  int RANGE_PROGRAM = 58;
+  int RANGE_NOTSMATCH = 58;
   /** RegularExpression Id. */
-  int RANGE_BETWEEN = 59;
+  int RANGE_PROGRAM = 59;
   /** RegularExpression Id. */
-  int BETW1_STRING = 60;
+  int RANGE_BETWEEN = 60;
   /** RegularExpression Id. */
-  int BETW1_SINGLE = 61;
+  int BETW1_STRING = 61;
   /** RegularExpression Id. */
-  int BETW1_APOSTROPHE = 62;
+  int BETW1_SINGLE = 62;
   /** RegularExpression Id. */
-  int BETW1_CHAR = 63;
+  int BETW1_APOSTROPHE = 63;
   /** RegularExpression Id. */
-  int BETW2_INCLUSIVE = 64;
+  int BETW1_CHAR = 64;
   /** RegularExpression Id. */
-  int BETW2_EXCLUSIVE = 65;
+  int BETW2_INCLUSIVE = 65;
   /** RegularExpression Id. */
-  int BETW3_STRING = 66;
+  int BETW2_EXCLUSIVE = 66;
   /** RegularExpression Id. */
-  int BETW3_SINGLE = 67;
+  int BETW3_STRING = 67;
   /** RegularExpression Id. */
-  int BETW3_APOSTROPHE = 68;
+  int BETW3_SINGLE = 68;
   /** RegularExpression Id. */
-  int BETW3_CHAR = 69;
+  int BETW3_APOSTROPHE = 69;
   /** RegularExpression Id. */
-  int BETW4_INCLUSIVE = 70;
+  int BETW3_CHAR = 70;
   /** RegularExpression Id. */
-  int BETW4_EXCLUSIVE = 71;
+  int BETW4_INCLUSIVE = 71;
   /** RegularExpression Id. */
-  int TRIGGER = 72;
+  int BETW4_EXCLUSIVE = 72;
   /** RegularExpression Id. */
-  int INPUT = 73;
+  int TRIGGER = 73;
   /** RegularExpression Id. */
-  int TRIGEVENT = 74;
+  int INPUT = 74;
   /** RegularExpression Id. */
-  int ACTION = 75;
+  int TRIGEVENT = 75;
   /** RegularExpression Id. */
-  int CHECK = 76;
+  int ACTION = 76;
   /** RegularExpression Id. */
-  int OVERRIDE = 77;
+  int CHECK = 77;
   /** RegularExpression Id. */
-  int PROPERTY = 78;
+  int OVERRIDE = 78;
   /** RegularExpression Id. */
-  int PROPERTYTO = 79;
+  int PROPERTY = 79;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 80;
+  int PROPERTYTO = 80;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 81;
+  int PROPERTYVAL = 81;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 82;
+  int ADMINTYPE_STRING = 82;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 83;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -216,6 +218,7 @@ interface InterfaceParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"package\"",
     "\"uuid\"",
     "\"symbolicname\"",
     "\"description\"",

@@ -41,6 +41,7 @@ import matrix.util.MatrixException;
 /**
  * Data model interface class. The handled properties are:
  * <ul>
+ * <li>package</li>
  * <li>uuid</li>
  * <li>symbolic name</li>
  * <li>description</li>
@@ -191,6 +192,7 @@ public class Interface_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                 | write?
+                .stringNotNull( "package",                  this.getPackageRef())
                 .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
@@ -214,6 +216,7 @@ public class Interface_mxJPO
                           final Interface_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcPackage(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(            _mql, "description",                 this.getDescription(),              _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(             _mql, "hidden",              false,  this.isHidden(),                    _current.isHidden());

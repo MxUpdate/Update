@@ -21,6 +21,7 @@ import org.mxupdate.test.data.datamodel.InterfaceData;
 import org.mxupdate.test.data.datamodel.PathTypeData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -55,19 +56,28 @@ public class InterfaceCI_2DeltaCalculationTest
             {"0b) with escaped name",
                     new InterfaceData(this, "TestInterface \" 1"),
                     new InterfaceData(this, "TestInterface \" 1")},
-            {"1) uuid",
+            {"1a) new package",
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new InterfaceData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new InterfaceData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new InterfaceData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new InterfaceData(this, "Test").defKeyNotDefined("package")},
+            {"2) uuid",
                     new InterfaceData(this, "Test"),
                     new InterfaceData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
-            {"2a) symbolic name",
+            {"3a) symbolic name",
                     new InterfaceData(this, "Test"),
                     new InterfaceData(this, "Test").setValue("symbolicname", "interface_123")},
-            {"2b) two symbolic name",
+            {"3b) two symbolic name",
                     new InterfaceData(this, "Test"),
                     new InterfaceData(this, "Test").setValue("symbolicname", "interface_123").setValue("symbolicname", "interface_345")},
-            {"3) issue #123: interface which is abstract",
+            {"4) issue #123: interface which is abstract",
                     new InterfaceData(this, "Test"),
                     new InterfaceData(this, "Test").setFlag("abstract", true, Create.ViaValue)},
-            {"4) with property",
+            {"5) with property",
                     new InterfaceData(this, "Test"),
                     new InterfaceData(this, "Test").addProperty(new PropertyDef("my test \"property\" desc\"\\\\ription"))},
 
@@ -183,7 +193,65 @@ public class InterfaceCI_2DeltaCalculationTest
                                         .setFlag("multiline", false, Create.ViaFlag)
                                         .setSingle("maxlength", "0")
                                         .setValue("default", "")) },
-            {"207) attribute with uuid",
+            {"207a) attribute with new package",
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .defData("package", new PackageData(this, "TestPackage"))
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", ""))},
+            {"207b) attribute with package update",
+                    new InterfaceData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .defData("package", new PackageData(this, "TestPackage1"))
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")),
+                    new InterfaceData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .defData("package", new PackageData(this, "TestPackage2"))
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", ""))},
+            {"207c) attribute with package remove",
+                    new InterfaceData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .defData("package", new PackageData(this, "TestPackage"))
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")),
+                    new InterfaceData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", ""))},
+            {"208) attribute with uuid",
                     new InterfaceData(this, "Test"),
                     new InterfaceData(this, "Test")
                             .addLocalAttribute(
@@ -196,7 +264,7 @@ public class InterfaceCI_2DeltaCalculationTest
                                         .setFlag("resetonclone", false, Create.ViaFlag)
                                         .setFlag("resetonrevision", false, Create.ViaFlag)
                                         .setValue("default", "")) },
-            {"208) attribute with symbolic name",
+            {"209) attribute with symbolic name",
                     new InterfaceData(this, "Test"),
                     new InterfaceData(this, "Test")
                             .addLocalAttribute(
@@ -223,6 +291,7 @@ public class InterfaceCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.DM_PATHTYPE);
         this.cleanup(AbstractTest.CI.DM_RELATIONSHIP);
         this.cleanup(AbstractTest.CI.DM_TYPE);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override
