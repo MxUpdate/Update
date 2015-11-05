@@ -36,6 +36,8 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
+import matrix.util.MatrixException;
+
 /**
  * Data model type class.
  * The handled properties are:
@@ -85,7 +87,7 @@ public class PathType_mxJPO
     /** Global attributes. */
     private final SortedSet<String> globalAttributes = new TreeSet<>();
     /** Local attributes. */
-    private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO();
+    private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO(this);
 
     /**
      * Constructor used to initialize the path type definition.
@@ -164,6 +166,14 @@ public class PathType_mxJPO
         return parsed;
     }
 
+    @Override
+    protected void parseSymbolicNames(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException
+    {
+        super.parseSymbolicNames(_paramCache);
+        this.localAttributes.parseSymbolicNames(_paramCache);
+    }
+
     /**
      * After the path type is parsed, the path type and local attributes must be
      * prepared.
@@ -232,7 +242,7 @@ public class PathType_mxJPO
                 ErrorKey.DM_PATHTYPE_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
                 ValueKeys.DMPathTypeAttrIgnore, ValueKeys.DMPathTypeAttrRemove,
                 this.globalAttributes, (_current != null) ? _current.globalAttributes : null);
-        this.localAttributes.calcDelta(_paramCache, _mql, this,
+        this.localAttributes.calcDelta(_paramCache, _mql,
                 ErrorKey.DM_PATHTYPE_REMOVE_LOCAL_ATTRIBUTE,
                 (_current != null) ? _current.localAttributes : null);
 

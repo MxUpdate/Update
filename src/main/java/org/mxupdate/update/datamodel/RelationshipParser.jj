@@ -364,8 +364,8 @@ void parse(final Relationship_mxJPO _relationship)
                                     | tmp = <SINGLE>                                            {this.appendValue(_relationship, "globalAttributes",            this.getSingle(tmp.image));} ) )
 
       | ( <LOCAL_ATTRIBUTE>
-            ( tmp = <STRING>                                                                    {localAttr = new LocalAttribute(this.getString(tmp.image));this.appendValue(_relationship, "localAttributes", localAttr);}
-            | tmp = <SINGLE>                                                                    {localAttr = new LocalAttribute(this.getSingle(tmp.image));this.appendValue(_relationship, "localAttributes", localAttr);} )
+            ( tmp = <STRING>                                                                    {localAttr = new LocalAttribute().setLocalName(this.getString(tmp.image));this.appendValue(_relationship, "localAttributes", localAttr);}
+            | tmp = <SINGLE>                                                                    {localAttr = new LocalAttribute().setLocalName(this.getSingle(tmp.image));this.appendValue(_relationship, "localAttributes", localAttr);} )
                  ( "{"
                       (   ( <KIND>          ( <KIND_BINARY>                                     {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Binary);}
                                             | <KIND_BOOLEAN>                                    {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Boolean);}
@@ -491,8 +491,8 @@ void parse(final Relationship_mxJPO _relationship)
                         | ( <GLOBAL_ATTRIBUTE>  ( tmp = <STRING>                                {this.appendValue(localPathType, "globalAttributes", this.getString(tmp.image));}
                                                 | tmp = <SINGLE>                                {this.appendValue(localPathType, "globalAttributes", this.getSingle(tmp.image));} ) )
                         | ( <LOCAL_ATTRIBUTE>
-                              ( tmp = <STRING>                                                  {localAttr = new LocalAttribute(this.getString(tmp.image));this.appendValue(localPathType, "localAttributes", localAttr);}
-                              | tmp = <SINGLE>                                                  {localAttr = new LocalAttribute(this.getSingle(tmp.image));this.appendValue(localPathType, "localAttributes", localAttr);} )
+                              ( tmp = <STRING>                                                  {localAttr = new LocalAttribute().setLocalName(this.getString(tmp.image));this.appendValue(localPathType, "localAttributes", localAttr);}
+                              | tmp = <SINGLE>                                                  {localAttr = new LocalAttribute().setLocalName(this.getSingle(tmp.image));this.appendValue(localPathType, "localAttributes", localAttr);} )
                                    ( "{"
                                           ( ( <KIND>          ( <KIND_BINARY>                   {this.setValue(localAttr, "kind",             AttributeCI_mxJPO.Kind.Binary);}
                                                               | <KIND_BOOLEAN>                  {this.setValue(localAttr, "kind",             AttributeCI_mxJPO.Kind.Boolean);}

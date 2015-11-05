@@ -36,6 +36,8 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
+import matrix.util.MatrixException;
+
 /**
  * Data model interface class. The handled properties are:
  * <ul>
@@ -81,7 +83,7 @@ public class Interface_mxJPO
     /** Global attributes. */
     private final SortedSet<String> globalAttributes = new TreeSet<>();
     /** Local attributes. */
-    private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO();
+    private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO(this);
 
     /** Are all path types / relationships / types allowed for this interface? */
     private boolean pathTypeAll = false, relationAll = false, typeAll = false;
@@ -165,6 +167,14 @@ public class Interface_mxJPO
         return parsed;
     }
 
+    @Override
+    protected void parseSymbolicNames(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException
+    {
+        super.parseSymbolicNames(_paramCache);
+        this.localAttributes.parseSymbolicNames(_paramCache);
+    }
+
     /**
      * After the interface is parsed, the interface and local attributes must be
      * prepared.
@@ -215,7 +225,7 @@ public class Interface_mxJPO
         DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql, "attribute",
                 ErrorKey.DM_INTERFACE_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
                 ValueKeys.DMInterfaceAttrIgnore, ValueKeys.DMInterfaceAttrRemove,       this.globalAttributes,              _current.globalAttributes);
-        this.localAttributes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_INTERFACE_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
+        this.localAttributes.calcDelta(_paramCache, _mql, ErrorKey.DM_INTERFACE_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
 
         DeltaUtil_mxJPO.calcLstOneCallDelta(_paramCache, _mql, "derived",
                 ErrorKey.DM_INTERFACE_REMOVE_PARENT, this.getName(),

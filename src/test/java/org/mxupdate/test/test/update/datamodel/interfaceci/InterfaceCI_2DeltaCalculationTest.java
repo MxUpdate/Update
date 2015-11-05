@@ -75,127 +75,140 @@ public class InterfaceCI_2DeltaCalculationTest
             // for relationship / type / interface
 
             {"101) for pathtype all",
-                        new InterfaceData(this, "Test"),
-                        new InterfaceData(this, "Test").setSingle("for pathtype", "all")},
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test").setSingle("for pathtype", "all")},
             {"102) for one pathtype",
-                        new InterfaceData(this, "Test"),
-                        new InterfaceData(this, "Test").defData("for pathtype", new PathTypeData(this, "Test"))},
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test").defData("for pathtype", new PathTypeData(this, "Test"))},
             {"103) for two pathtypes",
-                        new InterfaceData(this, "Test"),
-                        new InterfaceData(this, "Test").defData("for pathtype", new PathTypeData(this, "Test \"1\"")).defData("for pathtype", new PathTypeData(this, "Test \"2\""))},
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test").defData("for pathtype", new PathTypeData(this, "Test \"1\"")).defData("for pathtype", new PathTypeData(this, "Test \"2\""))},
 
             {"111) for relation all",
-                        new InterfaceData(this, "Test"),
-                        new InterfaceData(this, "Test").setSingle("for relationship", "all")},
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test").setSingle("for relationship", "all")},
             {"112) for one relation",
-                        new InterfaceData(this, "Test"),
-                        new InterfaceData(this, "Test").defData("for relationship", new RelationshipData(this, "Test"))},
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test").defData("for relationship", new RelationshipData(this, "Test"))},
             {"113) for two relations",
-                        new InterfaceData(this, "Test"),
-                        new InterfaceData(this, "Test").defData("for relationship", new RelationshipData(this, "Test \"1\"")).defData("for relationship", new RelationshipData(this, "Test \"2\""))},
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test").defData("for relationship", new RelationshipData(this, "Test \"1\"")).defData("for relationship", new RelationshipData(this, "Test \"2\""))},
 
             {"121) for type all",
-                        new InterfaceData(this, "Test"),
-                        new InterfaceData(this, "Test").setSingle("for type", "all")},
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test").setSingle("for type", "all")},
             {"122) for one type",
-                        new InterfaceData(this, "Test"),
-                        new InterfaceData(this, "Test").defData("for type", new TypeData(this, "Test"))},
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test").defData("for type", new TypeData(this, "Test"))},
             {"123) for two types",
-                        new InterfaceData(this, "Test"),
-                        new InterfaceData(this, "Test").defData("for type", new TypeData(this, "Test \"1\"")).defData("for type", new TypeData(this, "Test \"2\""))},
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test").defData("for type", new TypeData(this, "Test \"1\"")).defData("for type", new TypeData(this, "Test \"2\""))},
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // local attribute
 
             {"201) binary attribute",
-                new InterfaceData(this, "Test"),
-                new InterfaceData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "binary")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "binary")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
             {"202) boolean attribute",
-                new InterfaceData(this, "Test"),
-                new InterfaceData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "boolean")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
             {"203) date attribute",
-                new InterfaceData(this, "Test"),
-                new InterfaceData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "date")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setFlag("rangevalue", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "date")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("rangevalue", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
             {"204) integer attribute",
-                new InterfaceData(this, "Test"),
-                new InterfaceData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "integer")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setFlag("rangevalue", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "integer")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("rangevalue", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
             {"205) real attribute",
-                new InterfaceData(this, "Test"),
-                new InterfaceData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "real")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setFlag("rangevalue", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "real")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("rangevalue", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
             {"206) string attribute",
-                new InterfaceData(this, "Test"),
-                new InterfaceData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "string")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setFlag("multiline", false, Create.ViaFlag)
-                                    .setSingle("maxlength", "0")
-                                    .setValue("default", "")) },
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "string")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("multiline", false, Create.ViaFlag)
+                                        .setSingle("maxlength", "0")
+                                        .setValue("default", "")) },
             {"207) attribute with uuid",
-                new InterfaceData(this, "Test"),
-                new InterfaceData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "boolean")
-                                    .setValue("uuid", "UUID")
-                                    .setValue("description", "")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "boolean")
+                                        .setValue("uuid", "UUID")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
+            {"208) attribute with symbolic name",
+                    new InterfaceData(this, "Test"),
+                    new InterfaceData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "boolean")
+                                        .setValue("symbolicname", "attribute_" + AbstractTest.PREFIX + "Test." + AbstractTest.PREFIX + "ATTR1")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
        };
     }
 

@@ -77,179 +77,192 @@ public class PathTypeCI_2DeltaCalculationTest
             // from / to direction
 
             {"101a) from cardinality one",
-                        new PathTypeData(this, "Test"),
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "one")},
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "one")},
             {"101b) from cardinality many",
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "one"),
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")},
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "one"),
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")},
 
             {"102a) from type all",
-                        new PathTypeData(this, "Test"),
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4FromSingle("type", "all")},
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4FromSingle("type", "all")},
             {"102b) from specific type",
-                        new PathTypeData(this, "Test"),
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4FromData("type", new TypeData(this, "Type"))},
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4FromData("type", new TypeData(this, "Type"))},
             {"102c) from changing from type all to specific type",
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4FromSingle("type", "all"),
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4FromData("type", new TypeData(this, "Type"))},
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4FromSingle("type", "all"),
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4FromData("type", new TypeData(this, "Type"))},
 
             {"103a) from relation all",
-                        new PathTypeData(this, "Test"),
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4FromSingle("relationship", "all")},
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4FromSingle("relationship", "all")},
             {"103b) from specific relation",
-                        new PathTypeData(this, "Test"),
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4FromData("relationship", new RelationshipData(this, "Relationship"))},
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4FromData("relationship", new RelationshipData(this, "Relationship"))},
             {"103c) from changing from relation all to specific relation",
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4FromSingle("type", "all"),
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4FromData("relationship", new RelationshipData(this, "Relationship"))},
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4FromSingle("type", "all"),
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4FromData("relationship", new RelationshipData(this, "Relationship"))},
 
             {"112a) to type all",
-                        new PathTypeData(this, "Test"),
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4ToSingle("type", "all")},
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4ToSingle("type", "all")},
             {"112b) to specific type",
-                        new PathTypeData(this, "Test"),
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4ToData("type", new TypeData(this, "Type"))},
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4ToData("type", new TypeData(this, "Type"))},
             {"112c) to changing from type all to specific type",
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4ToSingle("type", "all"),
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4ToData("type", new TypeData(this, "Type"))},
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4ToSingle("type", "all"),
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4ToData("type", new TypeData(this, "Type"))},
 
             {"113a) to relation all",
-                        new PathTypeData(this, "Test"),
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4ToSingle("relationship", "all")},
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4ToSingle("relationship", "all")},
             {"113b) to specific relation",
-                        new PathTypeData(this, "Test"),
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4ToData("relationship", new RelationshipData(this, "Relationship"))},
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4ToData("relationship", new RelationshipData(this, "Relationship"))},
             {"113c) to changing from relation all to specific relation",
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4ToSingle("type", "all"),
-                        new PathTypeData(this, "Test")
-                                .def4FromSingle("cardinality", "many")
-                                .def4ToData("relationship", new RelationshipData(this, "Relationship"))},
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4ToSingle("type", "all"),
+                    new PathTypeData(this, "Test")
+                            .def4FromSingle("cardinality", "many")
+                            .def4ToData("relationship", new RelationshipData(this, "Relationship"))},
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // local attribute
 
             {"201) local binary attribute",
-                new PathTypeData(this, "Test"),
-                new PathTypeData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "binary")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "binary")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
             {"202) local boolean attribute",
-                new PathTypeData(this, "Test"),
-                new PathTypeData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "boolean")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
             {"203) local date attribute",
-                new PathTypeData(this, "Test"),
-                new PathTypeData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "date")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setFlag("rangevalue", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "date")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("rangevalue", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
             {"204) local integer attribute",
-                new PathTypeData(this, "Test"),
-                new PathTypeData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "integer")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setFlag("rangevalue", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "integer")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("rangevalue", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
             {"205) local real attribute",
-                new PathTypeData(this, "Test"),
-                new PathTypeData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "real")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setFlag("rangevalue", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "real")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("rangevalue", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
             {"206) local string attribute",
-                new PathTypeData(this, "Test"),
-                new PathTypeData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "string")
-                                    .setValue("description", "abc def")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setFlag("multiline", false, Create.ViaFlag)
-                                    .setSingle("maxlength", "0")
-                                    .setValue("default", "")) },
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "string")
+                                        .setValue("description", "abc def")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setFlag("multiline", false, Create.ViaFlag)
+                                        .setSingle("maxlength", "0")
+                                        .setValue("default", "")) },
             {"207) attribute with uuid",
-                new PathTypeData(this, "Test"),
-                new PathTypeData(this, "Test")
-                        .addLocalAttribute(
-                                new AttributeData(this, "ATTR1")
-                                    .setSingle("kind", "boolean")
-                                    .setValue("uuid", "UUID")
-                                    .setValue("description", "")
-                                    .setFlag("hidden", false, Create.ViaFlag)
-                                    .setFlag("multivalue", false, Create.ViaFlag)
-                                    .setFlag("resetonclone", false, Create.ViaFlag)
-                                    .setFlag("resetonrevision", false, Create.ViaFlag)
-                                    .setValue("default", "")) },
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "boolean")
+                                        .setValue("uuid", "UUID")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
+            {"208) attribute with symbolic name",
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "boolean")
+                                        .setValue("symbolicname", "attribute_" + AbstractTest.PREFIX + "Test." + AbstractTest.PREFIX + "ATTR1")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")) },
        };
     }
 

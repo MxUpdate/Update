@@ -296,8 +296,8 @@ void parse(final PathType_mxJPO _pathType)
                                     | tmp = <SINGLE>                        {this.appendValue(_pathType, "globalAttributes",                this.getSingle(tmp.image));} ) )
 
       | ( <LOCAL> <ATTRIBUTE>
-            ( tmp = <STRING>                                                {localAttr = new LocalAttribute(this.getString(tmp.image));this.appendValue(_pathType, "localAttributes", localAttr);}
-            | tmp = <SINGLE>                                                {localAttr = new LocalAttribute(this.getSingle(tmp.image));this.appendValue(_pathType, "localAttributes", localAttr);} )
+            ( tmp = <STRING>                                                {localAttr = new LocalAttribute().setLocalName(this.getString(tmp.image));this.appendValue(_pathType, "localAttributes", localAttr);}
+            | tmp = <SINGLE>                                                {localAttr = new LocalAttribute().setLocalName(this.getSingle(tmp.image));this.appendValue(_pathType, "localAttributes", localAttr);} )
                  ( "{"
                       (   ( <KIND>          ( <KIND_BINARY>                 {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Binary);}
                                             | <KIND_BOOLEAN>                {this.setValue(localAttr, "kind",                               AttributeCI_mxJPO.Kind.Boolean);}

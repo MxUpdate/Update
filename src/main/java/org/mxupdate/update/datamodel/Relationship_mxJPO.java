@@ -110,7 +110,7 @@ public class Relationship_mxJPO
     /** Global attributes. */
     private final SortedSet<String> globalAttributes = new TreeSet<>();
     /** Local attributes. */
-    private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO();
+    private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO(this);
 
     /** Local path types. */
     private final LocalPathTypeList_mxJPO localPathTypes = new LocalPathTypeList_mxJPO();
@@ -249,6 +249,14 @@ public class Relationship_mxJPO
         return parsed;
     }
 
+    @Override
+    protected void parseSymbolicNames(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException
+    {
+        super.parseSymbolicNames(_paramCache);
+        this.localAttributes.parseSymbolicNames(_paramCache);
+    }
+
     /**
      * After the relationship is parsed, the relationship and local attributes
      * must be prepared.
@@ -299,7 +307,7 @@ public class Relationship_mxJPO
         DeltaUtil_mxJPO.calcListDelta(_paramCache, _mql,    "attribute",
                 ErrorKey.DM_RELATION_REMOVE_GLOBAL_ATTRIBUTE, this.getName(),
                 ValueKeys.DMRelationAttrIgnore, ValueKeys.DMRelationAttrRemove,         this.globalAttributes,        _current.globalAttributes);
-        this.localAttributes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_RELATION_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
+        this.localAttributes.calcDelta(_paramCache, _mql, ErrorKey.DM_RELATION_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
 
         this.localPathTypes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_RELATION_REMOVE_LOCAL_PATH_TYPE, _current.localPathTypes);
 

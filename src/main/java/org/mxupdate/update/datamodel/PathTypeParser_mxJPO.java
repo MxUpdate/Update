@@ -334,12 +334,12 @@ this.appendValue(_pathType, "globalAttributes",                this.getSingle(tm
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case STRING:{
           tmp = jj_consume_token(STRING);
-localAttr = new LocalAttribute(this.getString(tmp.image));this.appendValue(_pathType, "localAttributes", localAttr);
+localAttr = new LocalAttribute().setLocalName(this.getString(tmp.image));this.appendValue(_pathType, "localAttributes", localAttr);
           break;
           }
         case SINGLE:{
           tmp = jj_consume_token(SINGLE);
-localAttr = new LocalAttribute(this.getSingle(tmp.image));this.appendValue(_pathType, "localAttributes", localAttr);
+localAttr = new LocalAttribute().setLocalName(this.getSingle(tmp.image));this.appendValue(_pathType, "localAttributes", localAttr);
           break;
           }
         default:

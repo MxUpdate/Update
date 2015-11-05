@@ -31,6 +31,8 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
+import matrix.util.MatrixException;
+
 /**
  * Handles list of local attribute definitions.
  *
@@ -43,21 +45,20 @@ public class LocalAttributeList_mxJPO
     /** Generated serial version UID. */
     private static final long serialVersionUID = 5355483487463244678L;
 
+    /** Owner of this attribute. */
+    private final AbstractAdminObject_mxJPO<? extends AbstractAdminObject_mxJPO<?>> owner;
+
     /** Stack with all attributes for this type used within parsing. */
     private LocalAttribute curParsedAttr;
 
     /**
-     * All attributes must be prepared.
+     * Constructor.
+     *
+     * @param _owner    owner of this attribute list
      */
-    public void prepare()
+    public LocalAttributeList_mxJPO(final AbstractAdminObject_mxJPO<? extends AbstractAdminObject_mxJPO<?>> _owner)
     {
-        for (final LocalAttribute attr : this)  {
-            attr.prepare();
-        }
-        // sort local attributes (because name is set after parsing!)
-        final Set<LocalAttribute> localAttributes = new HashSet<>(this);
-        this.clear();
-        this.addAll(localAttributes);
+        this.owner = _owner;
     }
 
     /**
@@ -76,11 +77,11 @@ public class LocalAttributeList_mxJPO
         boolean parsed = false;
 
         if ("".equals(_url))  {
-            this.curParsedAttr = new LocalAttribute(null);
+            this.curParsedAttr = new LocalAttribute();
             this.add(this.curParsedAttr);
             parsed = true;
         } else if ("/adminProperties/name".equals(_url))  {
-            this.curParsedAttr.setName(_content);
+            this.curParsedAttr.setLocalName(_content);
             parsed = true;
         } else  {
             parsed = this.curParsedAttr.parseAdminXMLExportEvent(_paramCache, _url, _content);
@@ -89,13 +90,41 @@ public class LocalAttributeList_mxJPO
         return parsed;
     }
 
+    /**
+     * Parses the symbolic names of all attributes.
+     *
+     * @param _paramCache   parameter cache
+     * @throws MatrixException if parse of symbolic names failed
+     */
+    public void parseSymbolicNames(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException
+    {
+        for (final LocalAttribute attr : this)  {
+            attr.parseSymbolicNames(_paramCache);
+        }
+    }
+
+    /**
+     * All attributes must be prepared.
+     */
+    public void prepare()
+    {
+        for (final LocalAttribute attr : this)  {
+            attr.prepare(this.owner);
+        }
+        // sort local attributes (because name is set after parsing!)
+        final Set<LocalAttribute> localAttributes = new HashSet<>(this);
+        this.clear();
+        this.addAll(localAttributes);
+    }
+
     @Override
     public void write(final UpdateBuilder_mxJPO _updateBuilder)
     {
         for (final LocalAttribute attr : this)  {
             _updateBuilder
                     .stepStartNewLine()
-                    .stepSingle("local attribute").stepString(attr.getName()).stepEndLineWithStartChild();
+                    .stepSingle("local attribute").stepString(attr.localName).stepEndLineWithStartChild();
 
             attr.writeUpdate(_updateBuilder);
 
@@ -109,7 +138,6 @@ public class LocalAttributeList_mxJPO
      *
      * @param _paramCache           parameter cache
      * @param _mql                  MQL builder to append the delta
-     * @param _owner                owner of the attributes
      * @param _errorKeyAttrRemoved  error key for the case that an attribute is
      *                              removed
      * @param _current              current properties
@@ -117,7 +145,6 @@ public class LocalAttributeList_mxJPO
      */
     public void calcDelta(final ParameterCache_mxJPO _paramCache,
                           final MultiLineMqlBuilder _mql,
-                          final AbstractAdminObject_mxJPO<? extends AbstractAdminObject_mxJPO<?>> _owner,
                           final ErrorKey _errorKeyAttrRemoved,
                           final LocalAttributeList_mxJPO _current)
         throws UpdateException_mxJPO
@@ -133,7 +160,7 @@ public class LocalAttributeList_mxJPO
                     }
                 }
                 if (!found)  {
-                    throw new UpdateException_mxJPO(_errorKeyAttrRemoved, tmpAttr.getName(), _owner.getName());
+                    throw new UpdateException_mxJPO(_errorKeyAttrRemoved, tmpAttr.getName(), this.owner.getName());
                 }
             }
         }
@@ -152,16 +179,16 @@ public class LocalAttributeList_mxJPO
 
             // create if no current attribute exists
             if (curAttr == null)  {
-                _paramCache.logDebug("    - local attribute '" + targetAttr.getName() + "' is added (to '" + _owner.getName() + "')");
+                _paramCache.logDebug("    - local attribute '" + targetAttr.getName() + "' is added");
                 _mql.pushPrefix("")
-                    .newLine().cmd("escape add ").cmd(EMxAdmin_mxJPO.Attribute.mxClass()).cmd(" ").arg(targetAttr.getName())
+                    .newLine().cmd("escape add ").cmd(EMxAdmin_mxJPO.Attribute.mxClass()).cmd(" ").arg(targetAttr.localName)
                                         .cmd(" type ").arg(targetAttr.getKind().getAttrTypeCreate())
-                                        .cmd(" owner ").cmd(_owner.mxClassDef().mxClass()).cmd(" ").arg(_owner.getName())
+                                        .cmd(" owner ").cmd(this.owner.mxClassDef().mxClass()).cmd(" ").arg(this.owner.getName())
                     .popPrefix();
             }
 
             // update attribute
-            _mql.pushPrefix("escape mod " + EMxAdmin_mxJPO.Attribute.mxClass() + " $1", _owner.getName() + "." + targetAttr.getName());
+            _mql.pushPrefix("escape mod " + EMxAdmin_mxJPO.Attribute.mxClass() + " $1", targetAttr.getName());
             targetAttr.calcDelta(_paramCache, _mql, curAttr);
             _mql.popPrefix();
         }
@@ -174,33 +201,44 @@ public class LocalAttributeList_mxJPO
         extends AttributeCI_mxJPO
         implements Comparable<LocalAttribute>
     {
+        /** Local attribute name. */
+        private String localName;
+
         /**
          * Constructor used to initialize the type definition.
-         *
-         * @param _mxName   MX name of the attribute object
          */
-        public LocalAttribute(final String _mxName)
+        public LocalAttribute()
         {
-            super(_mxName);
+            super((String) null);
         }
 
         /**
          * Defines the MX name of the local attribute.
          *
          * @param _mxName   MX name
+         * @return this local attribute instance
          */
-        @Override()
-        protected void setName(final String _mxName)
+        public LocalAttribute setLocalName(final String _mxName)
         {
-            super.setName(_mxName);
+            this.localName = _mxName;
+            return this;
+        }
+
+        @Override
+        protected void parseSymbolicNames(final ParameterCache_mxJPO _paramCache)
+            throws MatrixException
+        {
+            super.parseSymbolicNames(_paramCache);
         }
 
         /**
          * Method is defined to be called from the locale attribute list.
+         *
+         * @param _owner    owner of this attribute
          */
-        @Override()
-        protected void prepare()
+        protected void prepare(final AbstractAdminObject_mxJPO<? extends AbstractAdminObject_mxJPO<?>> _owner)
         {
+            this.setName(_owner.getName() + "." + this.localName);
             super.prepare();
         }
 
@@ -222,11 +260,11 @@ public class LocalAttributeList_mxJPO
             super.calcDelta(_paramCache, _mql, _current);
         }
 
-        @Override()
+        @Override
         public int compareTo(final LocalAttribute _compareTo)
         {
             int ret = 0;
-            ret = CompareToUtil_mxJPO.compare(ret, this.getName(),           _compareTo.getName());
+            ret = CompareToUtil_mxJPO.compare(ret, this.localName, _compareTo.localName);
             return ret;
         }
     }

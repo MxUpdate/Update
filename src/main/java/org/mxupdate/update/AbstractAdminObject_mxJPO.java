@@ -144,7 +144,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
      *                          parsed
      * @see PadSaxHandler                   SAX handler to parse the XML file
      */
-    @Override()
+    @Override
     public void parse(final ParameterCache_mxJPO _paramCache)
         throws MatrixException, ParseException
     {
@@ -153,6 +153,19 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
         // prepare post preparation
         this.prepare();
 
+        // reads symbolic names of the administration objects
+        this.parseSymbolicNames(_paramCache);
+    }
+
+    /**
+     * Parse symbolic names.
+     *
+     * @param _paramCache   parameter cache
+     * @throws MatrixException  if the export of the admin object failed
+     */
+    protected void parseSymbolicNames(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException
+    {
         // reads symbolic names of the administration objects
         final String symbProg = _paramCache.getValueString(ValueKeys.RegisterSymbolicNames);
         final String symbProgIdxOf = new StringBuilder().append(" on program ").append(symbProg).append(' ').toString();
