@@ -215,6 +215,7 @@ public class AttributeData
         this.getFlags()     .append4Update(_prefix, _cmd);
         this.getValues()    .append4Update(_prefix, _cmd);
         this.getSingles()   .append4Update(_prefix, _cmd);
+        this.getDatas()     .append4Update(_prefix, _cmd);
         this.getTriggers()  .append4Update(_prefix, _cmd);
         this.getProperties().append4Update(_prefix, _cmd);
 

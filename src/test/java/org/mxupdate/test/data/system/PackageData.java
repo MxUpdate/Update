@@ -15,12 +15,12 @@
 
 package org.mxupdate.test.data.system;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.util.DataList;
+
+import matrix.util.MatrixException;
 
 /**
  * Defines the data for package configuration items.
@@ -31,9 +31,9 @@ public class PackageData
     extends AbstractAdminData<PackageData>
 {
     /** All used packages. */
-    private final DataList<PackageData> usePackages = new DataList<PackageData>("uses", "uses", true);
+    private final DataList<PackageData> usePackages = new DataList<>("uses", "uses", true);
     /** All members. */
-    private final DataList<AbstractAdminData<?>> members = new DataList<AbstractAdminData<?>>("member ", "member ", true);
+    private final DataList<AbstractAdminData<?>> members = new DataList<>("member ", "member ", true);
 
     /**
      * Initialize this package with given {@code _name}.
@@ -72,7 +72,7 @@ public class PackageData
         return this;
     }
 
-    @Override()
+    @Override
     public String ciFile()
     {
         final StringBuilder strg = new StringBuilder();
@@ -93,7 +93,7 @@ public class PackageData
         return strg.toString();
     }
 
-    @Override()
+    @Override
     public PackageData create()
         throws MatrixException
     {
@@ -102,23 +102,21 @@ public class PackageData
 
             this.createDependings();
 
-            final StringBuilder cmd = new StringBuilder();
-            cmd.append("escape add package \"").append(AbstractTest.convertMql(this.getName())).append("\" ");
+            final StringBuilder cmdCreate = new StringBuilder();
+            cmdCreate.append("escape add package \"").append(AbstractTest.convertMql(this.getName())).append("\" ");
+            this.usePackages.append4Create(cmdCreate);
+            this.append4Create(cmdCreate);
+            this.getTest().mql(cmdCreate);
 
-            this.usePackages.append4Create(cmd);
-
-            this.append4Create(cmd);
-
-            cmd.append(";escape mod package \"").append(AbstractTest.convertMql(this.getName())).append('\"');
-
-            this.members.append4CreateViaAdd(cmd);
-
-            this.getTest().mql(cmd);
+            final StringBuilder modCreate = new StringBuilder();
+            modCreate.append("escape mod package \"").append(AbstractTest.convertMql(this.getName())).append('\"');
+            this.members.append4CreateViaAdd(modCreate);
+            this.getTest().mql(modCreate);
         }
         return this;
     }
 
-    @Override()
+    @Override
     public PackageData createDependings()
         throws MatrixException
     {
@@ -128,7 +126,7 @@ public class PackageData
         return this;
     }
 
-    @Override()
+    @Override
     public void checkExport(final ExportParser _exportParser)
     {
         super.checkExport(_exportParser);

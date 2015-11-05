@@ -34,6 +34,7 @@ import org.mxupdate.update.zparser.AdminXMLExportObject_mxJPO;
 import org.mxupdate.update.zparser.AdminXMLExportParser_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MqlBuilder;
+import org.mxupdate.util.StringUtils_mxJPO;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
@@ -82,6 +83,9 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     /** MX class definition. */
     private final EMxAdmin_mxJPO mxClassDef;
 
+    /** Referenced package name. */
+    private String packageRef;
+
     /** Is the MX object hidden? */
     private boolean hidden = false;
 
@@ -115,10 +119,20 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
     }
 
     /**
+     * Returns the {@link #packageRef name of referenced package}.
+     *
+     * @return name of referenced package
+     */
+    public String getPackageRef()
+    {
+        return this.packageRef;
+    }
+
+    /**
      * {@inheritDoc}
      * <p>A print on the property with a key is internally done.</p>
      */
-    @Override()
+    @Override
     public String getPropValue(final ParameterCache_mxJPO _paramCache,
                                final PropertyDef_mxJPO _prop)
         throws MatrixException
@@ -154,32 +168,37 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
         this.prepare();
 
         // reads symbolic names of the administration objects
-        this.parseSymbolicNames(_paramCache);
+        this.parseDBFinish(_paramCache);
     }
 
     /**
-     * Parse symbolic names.
+     * Finishes the DB parsing by reading the symbolic names and package names.
      *
      * @param _paramCache   parameter cache
      * @throws MatrixException  if the export of the admin object failed
      */
-    protected void parseSymbolicNames(final ParameterCache_mxJPO _paramCache)
+    protected void parseDBFinish(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
         // reads symbolic names of the administration objects
         final String symbProg = _paramCache.getValueString(ValueKeys.RegisterSymbolicNames);
         final String symbProgIdxOf = new StringBuilder().append(" on program ").append(symbProg).append(' ').toString();
         final String symbNames = MqlBuilderUtil_mxJPO.mql()
-                .cmd("escape list property on program ").arg(symbProg)
-                .cmd(" to ").cmd(this.mxClassDef().mxClass())
-                .cmd(" ").arg(this.getName())
-                .cmd(" ").cmd(this.mxClassDef().mxClassSuffix())
+                .cmd("escape list property on program ").arg(symbProg).cmd(" ")
+                .cmd("to ").cmd(this.mxClassDef().mxClass()).cmd(" ").arg(this.getName()).cmd(" ").cmd(this.mxClassDef().mxClassSuffix())
                 .exec(_paramCache.getContext());
         if (!symbNames.isEmpty())  {
             for (final String symbName : symbNames.split("\n"))  {
                 this.symbolicNames.add(symbName.substring(0, symbName.indexOf(symbProgIdxOf)));
             }
         }
+
+        // evaluate package
+        final String pckTmp = MqlBuilderUtil_mxJPO.mql()
+                .cmd("escape print ").cmd(this.mxClassDef().mxClass()).cmd(" ").arg(this.getName()).cmd(" ").cmd(this.mxClassDef().mxClassSuffix()).cmd(" ")
+                .cmd("select ").arg("package").cmd(" dump")
+                .exec(_paramCache.getContext());
+        this.packageRef = StringUtils_mxJPO.isEmpty(pckTmp) ? (String) null : pckTmp;
     }
 
     /**
@@ -212,7 +231,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
      *         <i>false</i>
      * @see #IGNORED_URLS
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -253,7 +272,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
      * @param _paramCache   parameter cache
      * @throws Exception if delete failed
      */
-    @Override()
+    @Override
     public void delete(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
@@ -270,7 +289,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
      * @param _paramCache   parameter cache
      * @throws Exception if the new administration object could not be created
      */
-    @Override()
+    @Override
     public void createOld(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
@@ -414,7 +433,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
          * @return input source where only the &quot;ematrixProductDtd&quot;
          *         entity is defined
          */
-        @Override()
+        @Override
         public InputSource resolveEntity(final String _publicId,
                                          final String _systemId)
         {
@@ -430,7 +449,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
          * @param _length   length of characters within the array of characters
          * @see #content
          */
-        @Override()
+        @Override
         public void characters(final char[] _ch,
                                final int _start,
                                final int _length)
@@ -457,7 +476,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
          * @see #evaluated
          * @see #evaluate()
          */
-        @Override()
+        @Override
         public void startElement(final String _uri,
                                  final String _localName,
                                  final String _qName,
@@ -485,7 +504,7 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
          * @see #evaluated
          * @see #evaluate()
          */
-        @Override()
+        @Override
         public void endElement(final String _uri,
                                final String _localName,
                                final String _qName)

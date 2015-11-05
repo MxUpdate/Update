@@ -42,6 +42,13 @@ public class AttributeBooleanCI_1ParserTest
             {"0b) simple w/o anything to test default values",
                     "kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"",
                     "kind boolean"},
+            // package
+            {"1a) package string",
+                    "",
+                    "package \"abc\" kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\""},
+            {"1b) package single",
+                    "package \"abc\" kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\"",
+                    "package abc     kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\""},
             // uuid
             {"1a) uuid with minus separator",
                     "",

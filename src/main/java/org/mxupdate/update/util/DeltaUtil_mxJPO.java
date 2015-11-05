@@ -25,6 +25,7 @@ import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
+import org.mxupdate.util.StringUtils_mxJPO;
 
 /**
  * The JPO class holds utilities for calculating delta's.
@@ -42,12 +43,39 @@ public final class DeltaUtil_mxJPO
     }
 
     /**
+     * Calculates delta for packages.
+     *
+     * @param _paramCache   parameter cache
+     * @param _mql          MQL builder to append the delta
+     * @param _target       target ci object
+     * @param _current      current ci object
+     */
+    public static void calcPackage(final ParameterCache_mxJPO _paramCache,
+                                   final MultiLineMqlBuilder _mql,
+                                   final AbstractAdminObject_mxJPO<?> _target,
+                                   final AbstractAdminObject_mxJPO<?> _current)
+    {
+        if (CompareToUtil_mxJPO.compare(0, _target.getPackageRef(), _current.getPackageRef()) != 0)  {
+            _mql.pushPrefix("");
+            if (!StringUtils_mxJPO.isEmpty(_current.getPackageRef()))  {
+                _paramCache.logTrace("    - remove package '" + _current + "'");
+                _mql.newLine().cmd("escape modify package ").arg(_current.getPackageRef()).cmd(" remove member ").cmd(_current.mxClassDef().mxClass()).cmd(" ").arg(_current.getName());
+            }
+            if (!StringUtils_mxJPO.isEmpty(_target.getPackageRef()))  {
+                _paramCache.logTrace("    - assign to package '" + _target.getPackageRef() + "'");
+                _mql.newLine().cmd("escape modify package ").arg(_target.getPackageRef()).cmd(" add member ").cmd(_target.mxClassDef().mxClass()).cmd(" ").arg(_target.getName());
+            }
+            _mql.popPrefix();
+        }
+    }
+
+    /**
      * Calculates the delta for symbolic names.
      *
      * @param _paramCache   parameter cache
      * @param _mql          MQL builder to append the delta
      * @param _target       target ci object
-     * @param _current  current ci object
+     * @param _current      current ci object
      */
     public static void calcSymbNames(final ParameterCache_mxJPO _paramCache,
                                      final MultiLineMqlBuilder _mql,

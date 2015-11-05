@@ -175,10 +175,10 @@ public class Type_mxJPO
     }
 
     @Override
-    protected void parseSymbolicNames(final ParameterCache_mxJPO _paramCache)
+    protected void parseDBFinish(final ParameterCache_mxJPO _paramCache)
         throws MatrixException
     {
-        super.parseSymbolicNames(_paramCache);
+        super.parseDBFinish(_paramCache);
         this.localAttributes.parseSymbolicNames(_paramCache);
         this.localPathTypes.parseSymbolicNames(_paramCache);
     }

@@ -46,6 +46,7 @@ import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
  * The class is used to evaluate information from attributes within MX used to
  * export, delete and update an attribute. Following properties are handled:
  * <ul>
+ * <li>package</li>
  * <li>{@link #kind}</li>
  * <li>uuid</li>
  * <li>symbolic names</li>
@@ -312,6 +313,7 @@ public class AttributeCI_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .stringNotNull( "package",                  this.getPackageRef())
                 .single(        "kind",                     this.kind.name().toLowerCase())
                 .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
@@ -362,6 +364,7 @@ public class AttributeCI_mxJPO
     {
         final AttributeCI_mxJPO current = _current;
 
+        DeltaUtil_mxJPO.calcPackage(_paramCache, _mql, this, current);
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(), (current != null) ? current.getDescription() : null);
         DeltaUtil_mxJPO.calcValueDelta(_mql, "default",             this.defaultValue,     (current != null) ? current.defaultValue : null);

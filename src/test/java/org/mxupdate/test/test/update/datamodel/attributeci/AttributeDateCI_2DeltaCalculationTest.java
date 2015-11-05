@@ -17,6 +17,7 @@ package org.mxupdate.test.test.update.datamodel.attributeci;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.AttributeData;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -42,13 +43,22 @@ public class AttributeDateCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1) uuid",
-                    new AttributeData(this, "Test").setSingle("kind", "binary"),
-                    new AttributeData(this, "Test").setSingle("kind", "binary").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
-            {"2a) symbolic name",
+            {"1a) new package",
+                    new AttributeData(this, "Test").setSingle("kind", "date"),
+                    new AttributeData(this, "Test").setSingle("kind", "date").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new AttributeData(this, "Test").setSingle("kind", "date").defData("package", new PackageData(this, "TestPackage1")),
+                    new AttributeData(this, "Test").setSingle("kind", "date").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new AttributeData(this, "Test").setSingle("kind", "date").defData("package", new PackageData(this, "TestPackage")),
+                    new AttributeData(this, "Test").setSingle("kind", "date").defKeyNotDefined("package")},
+            {"2) uuid",
+                    new AttributeData(this, "Test").setSingle("kind", "date"),
+                    new AttributeData(this, "Test").setSingle("kind", "date").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+            {"3a) symbolic name",
                     new AttributeData(this, "Test").setSingle("kind", "date"),
                     new AttributeData(this, "Test").setSingle("kind", "date").setValue("symbolicname", "attribute_123")},
-            {"2b) two symbolic name",
+            {"3b) two symbolic name",
                     new AttributeData(this, "Test").setSingle("kind", "date"),
                     new AttributeData(this, "Test").setSingle("kind", "date").setValue("symbolicname", "attribute_123").setValue("symbolicname", "attribute_345")},
        };
@@ -61,6 +71,7 @@ public class AttributeDateCI_2DeltaCalculationTest
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override
