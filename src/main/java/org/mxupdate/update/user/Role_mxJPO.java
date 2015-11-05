@@ -43,6 +43,7 @@ import matrix.util.MatrixException;
  * The class is used to export, create, delete and update roles within MX.
  * Following properties are supported:
  * <ul>
+ * <li>package</li>
  * <li>uuid</li>
  * <li>symbolic names</li>
  * <li>description</li>
@@ -145,6 +146,7 @@ public class Role_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .stringNotNull( "package",                  this.getPackageRef())
                 .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .singleIfTrue(  "kind",                     this.kind.name().toLowerCase(),     (this.kind != Kind.Role))
                 .list(          "symbolicname",             this.getSymbolicNames())
@@ -196,6 +198,7 @@ public class Role_mxJPO
                 _mql.newLine().cmd("asaproject");
             }
         }
+        DeltaUtil_mxJPO.calcPackage(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(     _mql, "description",        this.getDescription(),  _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(      _mql, "hidden",      false, this.isHidden(),        _current.isHidden());
