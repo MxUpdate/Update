@@ -26,67 +26,69 @@ interface FormParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int UUID = 5;
+  int PACKAGE = 5;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 6;
+  int UUID = 6;
   /** RegularExpression Id. */
-  int DESCRIPTION = 7;
+  int SYMBOLICNAME = 7;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 8;
+  int DESCRIPTION = 8;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 9;
+  int HIDDEN_TRUE = 9;
   /** RegularExpression Id. */
-  int STRING = 10;
+  int HIDDEN_FALSE = 10;
   /** RegularExpression Id. */
-  int SINGLE = 11;
+  int STRING = 11;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 12;
+  int SINGLE = 12;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 13;
+  int MULTILINESTRING = 13;
   /** RegularExpression Id. */
-  int FIELD = 14;
+  int MULTILINESINGLE = 14;
   /** RegularExpression Id. */
-  int FIELD_OPEN = 15;
+  int FIELD = 15;
   /** RegularExpression Id. */
-  int FIELD_CLOSE = 16;
+  int FIELD_OPEN = 16;
   /** RegularExpression Id. */
-  int FIELD_NAME = 17;
+  int FIELD_CLOSE = 17;
   /** RegularExpression Id. */
-  int FIELD_LABEL = 18;
+  int FIELD_NAME = 18;
   /** RegularExpression Id. */
-  int FIELD_SELECT = 19;
+  int FIELD_LABEL = 19;
   /** RegularExpression Id. */
-  int FIELD_BOBJ = 20;
+  int FIELD_SELECT = 20;
   /** RegularExpression Id. */
-  int FIELD_REL = 21;
+  int FIELD_BOBJ = 21;
   /** RegularExpression Id. */
-  int FIELD_RANGE = 22;
+  int FIELD_REL = 22;
   /** RegularExpression Id. */
-  int FIELD_HREF = 23;
+  int FIELD_RANGE = 23;
   /** RegularExpression Id. */
-  int FIELD_ALT = 24;
+  int FIELD_HREF = 24;
   /** RegularExpression Id. */
-  int FIELD_USER = 25;
+  int FIELD_ALT = 25;
   /** RegularExpression Id. */
-  int FIELD_SETTING = 26;
+  int FIELD_USER = 26;
   /** RegularExpression Id. */
-  int FIELD_STRING = 27;
+  int FIELD_SETTING = 27;
   /** RegularExpression Id. */
-  int FIELD_SINGLE = 28;
+  int FIELD_STRING = 28;
   /** RegularExpression Id. */
-  int SETTING_STRING = 29;
+  int FIELD_SINGLE = 29;
   /** RegularExpression Id. */
-  int SETTING_SINGLE = 30;
+  int SETTING_STRING = 30;
   /** RegularExpression Id. */
-  int PROPERTY = 31;
+  int SETTING_SINGLE = 31;
   /** RegularExpression Id. */
-  int PROPERTYTO = 32;
+  int PROPERTY = 32;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 33;
+  int PROPERTYTO = 33;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 34;
+  int PROPERTYVAL = 34;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 35;
+  int ADMINTYPE_STRING = 35;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 36;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -112,6 +114,7 @@ interface FormParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"package\"",
     "\"uuid\"",
     "\"symbolicname\"",
     "\"description\"",

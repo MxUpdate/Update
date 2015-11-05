@@ -38,6 +38,7 @@ import matrix.util.MatrixException;
  * The class is used to export, create, delete and update forms within MX.
  * The form specific information are:
  * <ul>
+ * <li>package</li>
  * <li>uuid</li>
  * <li>symbolic names</li>
  * <li>description</li>
@@ -127,6 +128,7 @@ public class Form_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .stringNotNull( "package",                  this.getPackageRef())
                 .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
@@ -143,7 +145,7 @@ public class Form_mxJPO
      * @param _paramCache   parameter cache
      * @throws Exception if the web form could not be created within MX
      */
-    @Override()
+    @Override
     public void createOld(final ParameterCache_mxJPO _paramCache)
         throws Exception
     {
@@ -156,6 +158,7 @@ public class Form_mxJPO
                           final Form_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcPackage(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(  _mql,              "description",              this.getDescription(),  _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "hidden",            false, this.isHidden(),        _current.isHidden());

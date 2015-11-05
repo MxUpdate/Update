@@ -16,6 +16,7 @@
 package org.mxupdate.test.test.update.userinterface;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.user.PersonData;
 import org.mxupdate.test.data.userinterface.FormData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -42,9 +43,21 @@ public class FormCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
+            // package
+            {"1a) new package",
+                    new FormData(this, "Test"),
+                    new FormData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new FormData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new FormData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new FormData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new FormData(this, "Test").defKeyNotDefined("package")},
+            // uuid
             {"1) uuid",
                     new FormData(this, "Test"),
                     new FormData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+            // symbolic names
             {"2a) symbolic name",
                     new FormData(this, "Test"),
                     new FormData(this, "Test")
@@ -171,12 +184,13 @@ public class FormCI_2DeltaCalculationTest
 
     @Override
     @BeforeMethod
-    @AfterClass(groups = "close")
+    @AfterClass
     public void cleanup()
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.USR_PERSON);
         this.cleanup(AbstractTest.CI.UI_FORM);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override

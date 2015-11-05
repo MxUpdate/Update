@@ -14,7 +14,7 @@
  */
 
 options {
-    JDK_VERSION = "1.6";
+    JDK_VERSION = "1.7";
     STATIC = false;
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
@@ -71,7 +71,9 @@ PARSER_END(FormParser)
 
 <DEFAULT> TOKEN :
 {
-      <UUID:                                "uuid">                                         : STRING_EXPECTED
+      <PACKAGE:                             "package">                                      : STRING_EXPECTED
+
+    | <UUID:                                "uuid">                                         : STRING_EXPECTED
 
     | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
@@ -158,61 +160,116 @@ PARSER_END(FormParser)
 void parse(final Form_mxJPO _form)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
+    String str;
     Token tmp;
     AdminProperty property;
     Field field;
     Setting setting;
 } {
-    (   ( <UUID>                                                            {property = new AdminProperty();
-                                                                             this.appendValue(this.getValue(_form, "properties"), "propertiesStack", property);
-                                                                             this.setValue(property, "name",  "UUID");}
-                                    ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_form, "packageRef", str);} )
 
-      | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_form, "symbolicNames", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.appendValue(_form, "symbolicNames", this.getSingle(tmp.image));} ) )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_form, "properties", "propertiesStack", property);} )
 
-      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_form, "description",    this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>               {this.setValue(_form, "description",    this.getSingle(tmp.image));} ) )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_form, "symbolicNames", str);} )
 
-      | ( <HIDDEN_TRUE>                                                     {this.setValue(_form, "hidden",         true);} )
-      | ( <HIDDEN_FALSE>                                                    {this.setValue(_form, "hidden",         false);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_form, "description", str);} )
 
-      | ( <FIELD>                                                           {field = new Field(); this.appendValue(_form, "fields", field);  }
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_form, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_form, "hidden", false);} )
+
+      | ( <FIELD>                                                               {field = new Field(); this.appendValue(_form, "fields", field);  }
           <FIELD_OPEN>
-                    ( <FIELD_NAME>      ( tmp = <FIELD_STRING>              {this.setValue(field, "name",           this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>              {this.setValue(field, "name",           this.getSingle(tmp.image));} )
-                    | <FIELD_LABEL>     ( tmp = <FIELD_STRING>              {this.setValue(field, "label",          this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>              {this.setValue(field, "label",          this.getSingle(tmp.image));} )
-                    | <FIELD_SELECT>    ( tmp = <FIELD_STRING>              {this.setValue(field, "expression",     this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>              {this.setValue(field, "expression",     this.getSingle(tmp.image));} )
-                    | <FIELD_BOBJ>      ( tmp = <FIELD_STRING>              {this.setValue(field, "expression",     this.getString(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.BUSINESSOBJECT);}
-                                        | tmp = <FIELD_SINGLE>              {this.setValue(field, "expression",     this.getSingle(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.BUSINESSOBJECT);} )
-                    | <FIELD_REL>       ( tmp = <FIELD_STRING>              {this.setValue(field, "expression",     this.getString(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.RELATIONSHIP);}
-                                        | tmp = <FIELD_SINGLE>              {this.setValue(field, "expression",     this.getSingle(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.RELATIONSHIP);} )
-                    | <FIELD_RANGE>     ( tmp = <FIELD_STRING>              {this.setValue(field, "range",          this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>              {this.setValue(field, "range",          this.getSingle(tmp.image));} )
-                    | <FIELD_HREF>      ( tmp = <FIELD_STRING>              {this.setValue(field, "href",           this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>              {this.setValue(field, "href",           this.getSingle(tmp.image));} )
-                    | <FIELD_ALT>       ( tmp = <FIELD_STRING>              {this.setValue(field, "alt",            this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>              {this.setValue(field, "alt",            this.getSingle(tmp.image));} )
-                    | <FIELD_USER>      ( tmp = <FIELD_STRING>              {this.appendValue(field, "users",       this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>              {this.appendValue(field, "users",       this.getSingle(tmp.image));} )
-                    | <FIELD_SETTING>                                       {setting = new Setting();this.appendValue(field, "settings", setting);}
-                                        ( tmp = <SETTING_STRING>            {this.setValue(setting, "name",         this.getString(tmp.image));}
-                                        | tmp = <SETTING_SINGLE>            {this.setValue(setting, "name",         this.getSingle(tmp.image));} )
-                                        ( tmp = <FIELD_STRING>              {this.setValue(setting, "value",        this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>              {this.setValue(setting, "value",        this.getSingle(tmp.image));} ) ) *
+                    ( <FIELD_NAME>      ( tmp = <FIELD_STRING>                  {this.setValue(field, "name",           this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "name",           this.getSingle(tmp.image));} )
+                    | <FIELD_LABEL>     ( tmp = <FIELD_STRING>                  {this.setValue(field, "label",          this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "label",          this.getSingle(tmp.image));} )
+                    | <FIELD_SELECT>    ( tmp = <FIELD_STRING>                  {this.setValue(field, "expression",     this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "expression",     this.getSingle(tmp.image));} )
+                    | <FIELD_BOBJ>      ( tmp = <FIELD_STRING>                  {this.setValue(field, "expression",     this.getString(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.BUSINESSOBJECT);}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "expression",     this.getSingle(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.BUSINESSOBJECT);} )
+                    | <FIELD_REL>       ( tmp = <FIELD_STRING>                  {this.setValue(field, "expression",     this.getString(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.RELATIONSHIP);}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "expression",     this.getSingle(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.RELATIONSHIP);} )
+                    | <FIELD_RANGE>     ( tmp = <FIELD_STRING>                  {this.setValue(field, "range",          this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "range",          this.getSingle(tmp.image));} )
+                    | <FIELD_HREF>      ( tmp = <FIELD_STRING>                  {this.setValue(field, "href",           this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "href",           this.getSingle(tmp.image));} )
+                    | <FIELD_ALT>       ( tmp = <FIELD_STRING>                  {this.setValue(field, "alt",            this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "alt",            this.getSingle(tmp.image));} )
+                    | <FIELD_USER>      ( tmp = <FIELD_STRING>                  {this.appendValue(field, "users",       this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.appendValue(field, "users",       this.getSingle(tmp.image));} )
+                    | <FIELD_SETTING>                                           {setting = new Setting();this.appendValue(field, "settings", setting);}
+                                        ( tmp = <SETTING_STRING>                {this.setValue(setting, "name",         this.getString(tmp.image));}
+                                        | tmp = <SETTING_SINGLE>                {this.setValue(setting, "name",         this.getSingle(tmp.image));} )
+                                        ( tmp = <FIELD_STRING>                  {this.setValue(setting, "value",        this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(setting, "value",        this.getSingle(tmp.image));} ) ) *
           <FIELD_CLOSE> )
 
-      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_form, "properties", "propertiesStack", property);}
-                                    ( tmp = <STRING>                        {this.setValue(property, "name",         this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "name",         this.getSingle(tmp.image));} )
-              (   ( <PROPERTYVAL>   ( tmp = <STRING>                        {this.setValue(property, "value",        this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "value",        this.getSingle(tmp.image));} ) )
-                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_form, "properties", "propertiesStack", property);} )
     )*
+}
+
+/**
+ * Parses the UUID property definition.
+ */
+AdminProperty uuidProperty() :
+{
+    String str;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()
+    {this.setValue(property, "value", str);}
+    {this.setValue(property, "name",  "UUID");}
+    {return property;}
+}
+
+/**
+ * Parses the properties definition.
+ */
+AdminProperty property() :
+{
+    String str;
+    Token tmp;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()                                 {this.setValue(property, "name", str);}
+    ( ( <PROPERTYVAL>  str = string()              {this.setValue(property, "value", str);} )
+    | ( <PROPERTYTO>   ( tmp = <ADMINTYPE_STRING>  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                       | tmp = <ADMINTYPE_SINGLE>  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                   str = string()  {this.setValue(property, "refAdminName", str);} ) )*
+    {return property;}
+}
+
+/**
+ * Evaluates multi-line string.
+ *
+ * @return string
+ */
+String multiLineString() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <MULTILINESTRING>  {ret = this.getString(tmp.image);}
+    | tmp = <MULTILINESINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
+}
+
+/**
+ * Evaluates single-line string.
+ *
+ * @return string
+ */
+String string() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <STRING>  {ret = this.getString(tmp.image);}
+    | tmp = <SINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
 }
