@@ -16,6 +16,7 @@
 package org.mxupdate.test.test.update.user;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.system.SiteData;
 import org.mxupdate.test.data.user.GroupData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -42,18 +43,32 @@ public class GroupCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
+            // package
+            {"1a) new package",
+                    new GroupData(this, "Test"),
+                    new GroupData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new GroupData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new GroupData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new GroupData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new GroupData(this, "Test").defKeyNotDefined("package")},
+            // uuid
             {"1) uuid",
                     new GroupData(this, "Test"),
                     new GroupData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+            // symbolic names
             {"2a) symbolic name",
                     new GroupData(this, "Test"),
                     new GroupData(this, "Test").setValue("symbolicname", "group_123")},
             {"2b) two symbolic name",
                     new GroupData(this, "Test"),
                     new GroupData(this, "Test").setValue("symbolicname", "group_123").setValue("symbolicname", "group_345")},
+            // description
             {"3) description",
                     new GroupData(this, "Test"),
                     new GroupData(this, "Test").setValue("description", "abc def")},
+            // site
             {"4) group with assigned site",
                     new GroupData(this, "Test"),
                     new GroupData(this, "Test")
@@ -63,12 +78,13 @@ public class GroupCI_2DeltaCalculationTest
 
     @Override
     @BeforeMethod
-    @AfterClass(groups = "close" )
+    @AfterClass
     public void cleanup()
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.USR_GROUP);
         this.cleanup(AbstractTest.CI.SYS_SITE);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override

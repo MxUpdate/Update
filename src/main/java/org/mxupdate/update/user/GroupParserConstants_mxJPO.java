@@ -26,37 +26,39 @@ interface GroupParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int UUID = 5;
+  int PACKAGE = 5;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 6;
+  int UUID = 6;
   /** RegularExpression Id. */
-  int DESCRIPTION = 7;
+  int SYMBOLICNAME = 7;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 8;
+  int DESCRIPTION = 8;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 9;
+  int HIDDEN_TRUE = 9;
   /** RegularExpression Id. */
-  int PARENT = 10;
+  int HIDDEN_FALSE = 10;
   /** RegularExpression Id. */
-  int SITE = 11;
+  int PARENT = 11;
   /** RegularExpression Id. */
-  int STRING = 12;
+  int SITE = 12;
   /** RegularExpression Id. */
-  int SINGLE = 13;
+  int STRING = 13;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 14;
+  int SINGLE = 14;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 15;
+  int MULTILINESTRING = 15;
   /** RegularExpression Id. */
-  int PROPERTY = 16;
+  int MULTILINESINGLE = 16;
   /** RegularExpression Id. */
-  int PROPERTYTO = 17;
+  int PROPERTY = 17;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 18;
+  int PROPERTYTO = 18;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 19;
+  int PROPERTYVAL = 19;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 20;
+  int ADMINTYPE_STRING = 20;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 21;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -74,6 +76,7 @@ interface GroupParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"package\"",
     "\"uuid\"",
     "\"symbolicname\"",
     "\"description\"",

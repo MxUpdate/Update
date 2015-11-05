@@ -34,11 +34,17 @@ public class GroupCI_1ParserTest
     @DataProvider(name = "data")
     public Object[][] getData()
     {
-        return new Object[][]
-        {
+        return new Object[][]  {
             {"0) simple",
                     "",
                     "description \"\" !hidden"},
+            // package
+            {"1a) package string",
+                    "",
+                    "package \"abc\" description \"\" !hidden"},
+            {"1b) package single",
+                    "package \"abc\" description \"\" !hidden",
+                    "package abc     description \"\" !hidden"},
             // uuid
             {"1a) uuid with minus separator",
                     "",
