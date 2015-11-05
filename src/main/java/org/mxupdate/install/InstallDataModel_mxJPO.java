@@ -21,6 +21,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TimeZone;
 import java.util.TreeSet;
 
@@ -174,9 +175,28 @@ public class InstallDataModel_mxJPO
     }
 
     /**
+     * Evaluates all MxUpdate specific defined attributes.
+     *
+     * @param _paramCache       parameter cache
+     * @return list of all custom MxUpdate attributes
+     */
+    protected SortedSet<String> evalAttributes(final ParameterCache_mxJPO _paramCache)
+    {
+        final SortedSet<String> ret = new TreeSet<>();
+        for (final PropertyDef_mxJPO propDef : PropertyDef_mxJPO.values())  {
+            final String attrName = propDef.getAttrName(_paramCache);
+            if (!StringUtils_mxJPO.isEmpty(attrName))  {
+                ret.add(attrName);
+            }
+        }
+        return ret;
+    }
+
+    /**
      * Creates / updates all needed attributes used as MxUpdate properties.
      *
      * @param _paramCache       parameter cache
+     * @param _attributes       list of needed attributes
      * @param _applVersion      new MxUpdate version
      * @param _authorName       used author name
      * @param _installerName    used installer name
