@@ -229,6 +229,28 @@ public class InstallDataModel_mxJPO
     }
 
     /**
+     * Evaluates all MX types handled from MxUpdate.
+     *
+     * @param _paramCache       parameter cache
+     * @return list of all custom MxUpdate attributes
+     * @throws MatrixException if evaluate failed
+     */
+    protected SortedSet<String> evalTypes(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException
+    {
+        final SortedSet<String> ret = new TreeSet<>();
+        for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
+            final String typeName = typeDef.getMxBusType();
+            if (!StringUtils_mxJPO.isEmpty(typeName)
+                    && StringUtils_mxJPO.isEmpty(typeDef.getMxAdminName())
+                    && (!typeDef.isBusCheckExists() || typeDef.existsBusType(_paramCache)))  {
+                ret.add(typeName);
+            }
+        }
+        return ret;
+    }
+
+    /**
      * Updates all business type for which no defined administration type
      * exists. This includes:
      * <ul>
