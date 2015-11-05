@@ -45,6 +45,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.update.system.IndexCI_mxJPO;
 import org.mxupdate.update.system.PackageCI_mxJPO;
+import org.mxupdate.update.system.UniqueKeyCI_mxJPO;
 import org.mxupdate.update.user.Association_mxJPO;
 import org.mxupdate.update.user.Group_mxJPO;
 import org.mxupdate.update.user.PersonCI_mxJPO;
@@ -94,6 +95,7 @@ TOKEN : /** first level */
     | <CUSTOM_TRUE:                         "custom">    | <CUSTOM_FALSE:                        "!custom">
     | <EMAIL_TRUE:                          "email">     | <EMAIL_FALSE:                         "!email">
     | <ENABLE_TRUE:                         "enable">    | <ENABLE_FALSE:                        "!enable">
+    | <GLOBAL_TRUE:                         "global">    | <GLOBAL_FALSE:                        "!global">
     | <HIDDEN_TRUE:                         "hidden">    | <HIDDEN_FALSE:                        "!hidden">
     | <INCONMAIL_TRUE:                      "iconmail">  | <INCONMAIL_FALSE:                     "!iconmail">
     | <TREEMENU_TRUE:                       "treemenu">  | <TREEMENU_FALSE:                      "!treemenu">
@@ -168,6 +170,14 @@ TOKEN : /** first level */
       <NATURALNUMBER: (("0") | (["1"-"9"](["0"-"9"])*))> : DEFAULT
 }
 
+/************************************************************ Common Property */
+<DEFAULT> TOKEN :
+{
+      <PROPERTY:                            "property">                                     : STRING_EXPECTED
+    | <PROPERTYTO:                          "to">                                           : STRING_STRING_EXPECTED
+    | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
+}
+
 /*********************************************************************** Kind */
 <DEFAULT> TOKEN :
 {
@@ -181,7 +191,30 @@ TOKEN : /** first level */
     | <KIND_ROLE:                           "role">                                         : DEFAULT
 }
 
-/****************************************************** User -> Person Access */
+/****************************** System -> Unique Key: For Relationship / Type */
+<DEFAULT> TOKEN :
+{
+      <FOR:                                 "for">                                          : FOR_EXPECTED
+}
+
+<FOR_EXPECTED> TOKEN :
+{
+      <FOR_RELATIONSHIP:                    "relationship">                                 : STRING_EXPECTED
+    | <FOR_TYPE:                            "type">                                         : STRING_EXPECTED
+}
+
+/*************************************** System -> Unique Key: With Interface */
+<DEFAULT> TOKEN :
+{
+      <WITH:                                "with">                                         : WITH_EXPECTED
+}
+
+<WITH_EXPECTED> TOKEN :
+{
+      <WITH_INTERFACE:                      "interface">                                    : STRING_EXPECTED
+}
+
+/***************************************************** User -> Person: Access */
 <DEFAULT> TOKEN :
 {
        <ACCESS:                              "access">                                     : ACCESS_OPENEXPECTED
@@ -199,7 +232,7 @@ TOKEN : /** first level */
     | <ACCESS_EXPECTED_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>
 }
 
-/******************************************************* User -> Person Admin */
+/****************************************************** User -> Person: Admin */
 <DEFAULT> TOKEN :
 {
        <ADMIN:                              "admin">                                        : ADMIN_OPENEXPECTED
@@ -217,7 +250,7 @@ TOKEN : /** first level */
     | <ADMIN_EXPECTED_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>
 }
 
-/***************************************************** User -> Person Product */
+/**************************************************** User -> Person: Product */
 
 <DEFAULT> TOKEN :
 {
@@ -235,7 +268,7 @@ TOKEN : /** first level */
     | <PRODUCT_EXPECTED_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>
 }
 
-/******************************************************** User -> Person Type */
+/******************************************************* User -> Person: Type */
 <DEFAULT> TOKEN :
 {
        <TYPE:                                "type">                                        : TYPE_OPENEXPECTED
@@ -255,7 +288,7 @@ TOKEN : /** first level */
     | <TYPE_SYSTEM:                          "system">                                      : TYPE_EXPECTED
 }
 
-/*********************************************** User Interface -> Form Field */
+/********************************************** User Interface -> Form: Field */
 <DEFAULT> TOKEN :
 {
       <FIELD:                               "field">                                        : FIELD_START_EXPECTED
@@ -294,7 +327,7 @@ TOKEN : /** first level */
 
 }
 
-/********************************************* User Interface -> Table Column */
+/******************************************** User Interface -> Table: Column */
 <DEFAULT> TOKEN :
 {
       <COLUMN:                              "column">                                       : COLUMN_OPENEXPECTED
@@ -341,14 +374,6 @@ TOKEN : /** first level */
     | <COLUMN_SORTTYPE_NUMERIC:             "numeric">                                      : COLUMN_EXPECTED
     | <COLUMN_SORTTYPE_OTHER:               "other">                                        : COLUMN_EXPECTED
     | <COLUMN_SORTTYPE_NONE:                "none">                                         : COLUMN_EXPECTED
-}
-
-/******************************************************************* Property */
-<DEFAULT> TOKEN :
-{
-      <PROPERTY:                            "property">                                     : STRING_EXPECTED
-    | <PROPERTYTO:                          "to">                                           : STRING_STRING_EXPECTED
-    | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
 }
 
 /************************************************************ System -> Index */
@@ -422,6 +447,53 @@ void parsePackage(final PackageCI_mxJPO _package)
       | ( <USESPACKAGE>               str = string()                            {this.appendValue(_package, "usesPackages", str);} )
 
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_package, "properties", "propertiesStack", property);} )
+    )*
+}
+
+/******************************************************* System -> Unique Key */
+
+/**
+ * Parses one complete unique key definition.
+ *
+ * @param _uniqueKey      target unique key to update with parsed values
+ */
+void parseUniqueKey(final UniqueKeyCI_mxJPO _uniqueKey)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    Integer number;
+    UniqueKeyCI_mxJPO.Field field;
+    AdminProperty property;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_uniqueKey, "packageRef", str);} )
+
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_uniqueKey, "properties", "propertiesStack", property);} )
+
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_uniqueKey, "symbolicNames", str);} )
+
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_uniqueKey, "description", str);} )
+
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_uniqueKey, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_uniqueKey, "hidden", false);} )
+
+      | ( <ENABLE_TRUE>                                                         {this.setValue(_uniqueKey, "enable", true);} )
+      | ( <ENABLE_FALSE>                                                        {this.setValue(_uniqueKey, "enable", false);} )
+
+      | ( <GLOBAL_TRUE>                                                         {this.setValue(_uniqueKey, "global", true);} )
+      | ( <GLOBAL_FALSE>                                                        {this.setValue(_uniqueKey, "global", false);} )
+
+      | ( <FOR>
+            ( <FOR_RELATIONSHIP>      str = string()                            {this.setValue(_uniqueKey, "forRelation", str);}
+            | <FOR_TYPE>              str = string()                            {this.setValue(_uniqueKey, "forType", str);} ) )
+
+      | ( <WITH> <WITH_INTERFACE>     str = string()                            {this.setValue(_uniqueKey, "withInterface", str);} )
+
+      | ( <FIELD>                     str = string()                            {field = new UniqueKeyCI_mxJPO.Field();this.appendValue(_uniqueKey, "fields", field);this.setValue(field, "expression", str);}
+                    ( <SIZE>          number = naturalNumber()                  {this.setValue(field, "size", number);} )? )
+
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_uniqueKey, "properties", "propertiesStack", property);} )
     )*
 }
 
@@ -890,7 +962,7 @@ void parseTable(final Table_mxJPO _table)
     String str;
     Token tmp;
     AdminProperty property;
-    Column column;
+    Table_mxJPO.Column column;
     Setting setting;
 }
 {
@@ -906,7 +978,7 @@ void parseTable(final Table_mxJPO _table)
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_table, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_table, "hidden", false);} )
 
-      | ( <COLUMN>                                                              {column = new Column();this.appendValue(_table, "fields", column);  }
+      | ( <COLUMN>                                                              {column = new Table_mxJPO.Column();this.appendValue(_table, "fields", column);  }
           <COLUMN_OPEN>
                     ( <COLUMN_NAME>     ( tmp = <COLUMN_STRING>                 {this.setValue(column, "name",                              this.getString(tmp.image));}
                                         | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "name",                              this.getSingle(tmp.image));} )
