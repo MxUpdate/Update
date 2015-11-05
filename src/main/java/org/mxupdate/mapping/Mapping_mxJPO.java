@@ -55,8 +55,8 @@ public class Mapping_mxJPO
     /** Properties holding all mapping definitions. */
     private final Properties properties = new Properties();
 
-    /** Maps from the mode enumeration {@link Mode_mxJPO} to the related instance holding the parameter names and description. */
-    private final Map<Mode_mxJPO,AbstractValue_mxJPO> modeMap = new HashMap<>();
+    /** Maps from the mode enumeration {@link Action_mxJPO} to the related instance holding the parameter names and description. */
+    private final Map<Action_mxJPO,AbstractValue_mxJPO> modeMap = new HashMap<>();
 
     /** Maps from the name of the parameter to the parameter instance. */
     private final Map<String,ParameterDef_mxJPO> parameterDefMap = new HashMap<>();
@@ -117,8 +117,8 @@ public class Mapping_mxJPO
                                 final String _value)
         throws Exception
     {
-        if (_key.startsWith("Mode."))  {
-            Mode_mxJPO.defineValue(this, _key.substring(5), _value);
+        if (_key.startsWith("Action."))  {
+            Action_mxJPO.defineValue(this, _key.substring(7), _value);
         } else if (_key.startsWith(Mapping_mxJPO.PREFIX_PARAMETERDEF))  {
             ParameterDef_mxJPO.defineValue(this, _key.substring(Mapping_mxJPO.LENGTH_PARAMETERDEF), _value);
         } else if (_key.startsWith(Mapping_mxJPO.PREFIX_PROPERTYDEF))  {
@@ -175,7 +175,7 @@ public class Mapping_mxJPO
      * @return mapping between mode enumeration and related instance
      * @see #modeMap
      */
-    protected Map<Mode_mxJPO,AbstractValue_mxJPO> getModeMap()
+    protected Map<Action_mxJPO,AbstractValue_mxJPO> getModeMap()
     {
         return this.modeMap;
     }

@@ -24,7 +24,7 @@ import java.util.TreeMap;
 
 import matrix.util.MatrixException;
 
-import org.mxupdate.mapping.Mode_mxJPO;
+import org.mxupdate.mapping.Action_mxJPO;
 import org.mxupdate.mapping.ParameterDef_mxJPO;
 import org.mxupdate.mapping.TypeDefGroup_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
@@ -88,7 +88,7 @@ public class HelpAction_mxJPO
            .append(this.paramCache.getValueString(ValueKeys.HelpUsage).trim())
            .append(' ');
         boolean first = true;
-        for (final Mode_mxJPO mode : Mode_mxJPO.values())  {
+        for (final Action_mxJPO mode : Action_mxJPO.values())  {
             final String param = mode.getParameterList(this.paramCache).iterator().next();
             if (first)  {
                 first = false;
@@ -194,7 +194,7 @@ public class HelpAction_mxJPO
         ////////////////////////////////////////////////////////////////////////
         // modes
 
-        for (final Mode_mxJPO mode : Mode_mxJPO.values())  {
+        for (final Action_mxJPO mode : Action_mxJPO.values())  {
             this.appendDescription(mode.getParameterDesc(this.paramCache), mode.getParameterList(this.paramCache), null);
         }
 

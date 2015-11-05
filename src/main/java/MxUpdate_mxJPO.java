@@ -19,20 +19,16 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import matrix.db.Context;
-import matrix.util.MatrixException;
-
-import org.mxupdate.action.DeleteAction_mxJPO;
-import org.mxupdate.action.ExportAction_mxJPO;
-import org.mxupdate.action.HelpAction_mxJPO;
 import org.mxupdate.action.SelectTypeDefUtil_mxJPO;
-import org.mxupdate.action.UpdateAction_mxJPO;
-import org.mxupdate.mapping.Mode_mxJPO;
+import org.mxupdate.mapping.Action_mxJPO;
 import org.mxupdate.mapping.ParameterDef_mxJPO;
 import org.mxupdate.mapping.TypeDefGroup_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+
+import matrix.db.Context;
+import matrix.util.MatrixException;
 
 /**
  * <tr>
@@ -44,22 +40,22 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 public class MxUpdate_mxJPO
 {
     /** Holds the mapping between the parameter and mode. */
-    private final Map<String,Mode_mxJPO> paramsModes = new HashMap<String,Mode_mxJPO>();
+    private final Map<String,Action_mxJPO> paramsModes = new HashMap<>();
     /** Holds the mapping between the parameters and the related parameters. */
-    private final Map<String,ParameterDef_mxJPO> paramsParameters = new HashMap<String,ParameterDef_mxJPO>();
+    private final Map<String,ParameterDef_mxJPO> paramsParameters = new HashMap<>();
 
     /**
      * All parameters related to export / import are stored in this map. The
      * key is the parameter (including the '-'), the value the related class.
      */
-    private final Map<String,Collection<TypeDef_mxJPO>> paramsTypeDefs = new HashMap<String,Collection<TypeDef_mxJPO>>();
+    private final Map<String,Collection<TypeDef_mxJPO>> paramsTypeDefs = new HashMap<>();
 
     /**
      * All opposite parameters related to export / import are stored in this
      * map. The key is the opposite parameter (including the '-'), the value
      * the related class.
      */
-    private final Map<String,TypeDef_mxJPO> paramsTypeDefsOpp = new HashMap<String,TypeDef_mxJPO>();
+    private final Map<String,TypeDef_mxJPO> paramsTypeDefsOpp = new HashMap<>();
 
     /**
      * Prepares the parameters depending on the <code>_paramCache</code>.
@@ -102,7 +98,7 @@ public class MxUpdate_mxJPO
         ////////////////////////////////////////////////////////////////////////
         // modes
 
-        for (final Mode_mxJPO mode : Mode_mxJPO.values())  {
+        for (final Action_mxJPO mode : Action_mxJPO.values())  {
             for (final String param : mode.getParameterList(_paramCache))  {
                 final String paramStr = (param.length() > 1)
                                         ? "--" + param
@@ -115,7 +111,7 @@ public class MxUpdate_mxJPO
         // type definitions
 
         // first create list all type definitions which could be used...
-        final Set<TypeDef_mxJPO> all = new HashSet<TypeDef_mxJPO>();
+        final Set<TypeDef_mxJPO> all = new HashSet<>();
         for (final TypeDef_mxJPO typeDef : _paramCache.getMapping().getAllTypeDefsSorted())  {
             if (!typeDef.isBusCheckExists() || typeDef.existsBusType(_paramCache))  {
                 all.add(typeDef);
@@ -140,7 +136,7 @@ public class MxUpdate_mxJPO
         // definitions (and only if at minimum one type definition of the
         // groups exists...)
         for (final TypeDefGroup_mxJPO group : _paramCache.getMapping().getAllTypeDefGroups())  {
-            final Set<TypeDef_mxJPO> curTypeDefs = new HashSet<TypeDef_mxJPO>();
+            final Set<TypeDef_mxJPO> curTypeDefs = new HashSet<>();
             for (final String typeDefName : group.getTypeDefList())  {
                 final TypeDef_mxJPO typeDef = _paramCache.getMapping().getTypeDef(typeDefName);
                 if (all.contains(typeDef))  {
@@ -175,7 +171,7 @@ public class MxUpdate_mxJPO
         if (_clazz == null)  {
             tmp = _paramsList;
         } else  {
-            tmp = new HashSet<TypeDef_mxJPO>();
+            tmp = new HashSet<>();
             // add to given set of parameters
             if (_paramsList != null)  {
                 _paramsList.add(_clazz);
@@ -202,9 +198,9 @@ public class MxUpdate_mxJPO
             this.prepareParams(paramCache);
 
             // to be sure....
-            MqlUtil_mxJPO.execMql(_context, "verbose off", false);
+            MqlBuilderUtil_mxJPO.mql().cmd("escape verbose off").exec(_context);
 
-            Mode_mxJPO mode = null;
+            Action_mxJPO action = null;
 
             final SelectTypeDefUtil_mxJPO selectHandler = new SelectTypeDefUtil_mxJPO();
 
@@ -217,15 +213,15 @@ public class MxUpdate_mxJPO
                 } else if (this.paramsTypeDefsOpp.containsKey(arg))  {
                     selectHandler.ignore(this.paramsTypeDefsOpp.get(arg), _args[++idx]);
                 } else if (this.paramsModes.containsKey(arg)) {
-                    final Mode_mxJPO tmpMode = this.paramsModes.get(arg);
-                    if (mode != null)  {
-                        if ((mode == Mode_mxJPO.HELP) || (tmpMode == Mode_mxJPO.HELP))  {
-                            mode = Mode_mxJPO.HELP;
+                    final Action_mxJPO tmpMode = this.paramsModes.get(arg);
+                    if (action != null)  {
+                        if ((action == Action_mxJPO.HELP) || (tmpMode == Action_mxJPO.HELP))  {
+                            action = Action_mxJPO.HELP;
                         } else  {
-                            throw new Error("A mode is already defined and could not be defined twice!");
+                            throw new Error("An action is already defined and could not be defined twice!");
                         }
                     } else  {
-                        mode = tmpMode;
+                        action = tmpMode;
                     }
                 } else if (this.paramsParameters.containsKey(arg))  {
                     idx = paramCache.evalParameter(this.paramsParameters.get(arg), _args, idx);
@@ -235,14 +231,10 @@ public class MxUpdate_mxJPO
                 }
             }
 
-            if (unknown || (Mode_mxJPO.HELP == mode) || (mode == null))  {
-                new HelpAction_mxJPO(paramCache).execute();
-            } else if (Mode_mxJPO.EXPORT == mode)  {
-                new ExportAction_mxJPO(paramCache, selectHandler).execute();
-            } else if (Mode_mxJPO.IMPORT == mode)  {
-                new UpdateAction_mxJPO(paramCache, selectHandler).execute();
-            } else if (Mode_mxJPO.DELETE == mode)  {
-                new DeleteAction_mxJPO(paramCache, selectHandler).execute();
+            if (unknown || (action == null))  {
+                Action_mxJPO.HELP.execute(paramCache, selectHandler);;
+            } else  {
+                action.execute(paramCache, selectHandler);
             }
 
         } catch (final Exception e)  {

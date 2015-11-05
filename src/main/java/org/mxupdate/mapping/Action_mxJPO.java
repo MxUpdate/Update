@@ -17,6 +17,11 @@ package org.mxupdate.mapping;
 
 import java.util.Collection;
 
+import org.mxupdate.action.DeleteAction_mxJPO;
+import org.mxupdate.action.ExportAction_mxJPO;
+import org.mxupdate.action.HelpAction_mxJPO;
+import org.mxupdate.action.SelectTypeDefUtil_mxJPO;
+import org.mxupdate.action.UpdateAction_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
@@ -24,27 +29,47 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
  *
  * @author The MxUpdate Team
  */
-public enum Mode_mxJPO
+public enum Action_mxJPO
 {
-    /**
-     * Mode 'import' used to import defined administration objects from
-     * file system into Matrix.
-     */
-    IMPORT,
-    /**
-     * Mode 'export' used to export defined administration objects from
-     * Matrix into a file system.
-     */
-    EXPORT,
-    /**
-     * Mode 'delete' used to delete in Mx objects which are not defined
-     * in the repository (file system).
-     */
-    DELETE,
-    /**
-     * Prints out the help description.
-     */
-    HELP;
+    /** Deletes in MX objects which are not defined in the repository (file system). */
+    DELETE()  {
+        @Override
+        public void execute(final ParameterCache_mxJPO _paramCache,
+                            final SelectTypeDefUtil_mxJPO _selects)
+            throws Exception
+        {
+            new DeleteAction_mxJPO(_paramCache, _selects).execute();
+        }
+    },
+    /** Exports defined administration objects from MX into a file system. */
+    EXPORT()  {
+        @Override
+        public void execute(final ParameterCache_mxJPO _paramCache,
+                            final SelectTypeDefUtil_mxJPO _selects)
+            throws Exception
+        {
+            new ExportAction_mxJPO(_paramCache, _selects).execute();
+        }
+    },
+    /** Prints out the help description. */
+    HELP()  {
+        @Override public void execute(final ParameterCache_mxJPO _paramCache,
+                                      final SelectTypeDefUtil_mxJPO _selects)
+            throws Exception
+        {
+            new HelpAction_mxJPO(_paramCache).execute();
+        }
+    },
+    /** Updates defined administration objects from file system into MX. */
+    UPDATE()  {
+        @Override
+        public void execute(final ParameterCache_mxJPO _paramCache,
+                            final SelectTypeDefUtil_mxJPO _selects)
+            throws Exception
+        {
+            new UpdateAction_mxJPO(_paramCache, _selects).execute();
+        }
+    };
 
     /**
      * Defines the values of the mode enumerations.
@@ -64,7 +89,7 @@ public enum Mode_mxJPO
         final String enumName = _key.replaceAll("\\..*", "").toUpperCase();
         final String key = _key.substring(enumName.length() + 1);
 
-        final Mode_mxJPO modeEnum = Mode_mxJPO.valueOf(enumName);
+        final Action_mxJPO modeEnum = Action_mxJPO.valueOf(enumName);
         AbstractValue_mxJPO mode = _mapping.getModeMap().get(modeEnum);
         if (mode == null)  {
             mode = new AbstractValue_mxJPO(enumName);
@@ -99,4 +124,15 @@ public enum Mode_mxJPO
     {
         return _paramCache.getMapping().getModeMap().get(this).getParameterList();
     }
+
+    /**
+     * Executes this action.
+     *
+     * @param _paramCache   parameter cache
+     * @param _selects      selected matched files
+     * @throws Exception if execute failed
+     */
+    public abstract void execute(final ParameterCache_mxJPO _paramCache,
+                                 final SelectTypeDefUtil_mxJPO _selects)
+        throws Exception;
 }
