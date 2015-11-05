@@ -44,6 +44,7 @@ package org.mxupdate.update.zparser;
 import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.update.user.Association_mxJPO;
+import org.mxupdate.update.user.Group_mxJPO;
 import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.AbstractField.ExpressionType;
 import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.AbstractField.SortType;
 import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.Setting;
@@ -113,12 +114,14 @@ TOKEN : /** first level */
 
     | <NEWROW:                              "newrow">                                       : DEFAULT
 
-    | <LABEL:                               "label">                                        : STRING_EXPECTED
     | <ALT:                                 "alt">                                          : STRING_EXPECTED
-    | <HREF:                                "href">                                         : STRING_EXPECTED
-    | <PATTERN:                             "pattern">                                      : STRING_EXPECTED
     | <DEFINITION:                          "definition">                                   : STRING_EXPECTED
     | <FORMAT:                              "format">                                       : STRING_EXPECTED
+    | <HREF:                                "href">                                         : STRING_EXPECTED
+    | <LABEL:                               "label">                                        : STRING_EXPECTED
+    | <PARENT:                              "parent">                                       : STRING_EXPECTED
+    | <PATTERN:                             "pattern">                                      : STRING_EXPECTED
+    | <SITE:                                "site">                                         : STRING_EXPECTED
 
     | <CODE:                                "code">                                         : MULTILINESTRING_EXPECTED
 }
@@ -277,6 +280,41 @@ void parseAssociation(final Association_mxJPO _role)
       | ( <DEFINITION>                str = string()                            {this.setValue(_role, "definition", str);} )
 
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_role, "properties", "propertiesStack", property);} )
+    )*
+}
+
+
+/************************************************************** User -> Group */
+
+/**
+ * Parses one complete group definition.
+ *
+ * @param _group    target group to update with parsed values
+ */
+void parseGroup(final Group_mxJPO _group)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    AdminProperty property;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_group, "packageRef", str);} )
+
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_group, "properties", "propertiesStack", property);} )
+
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_group, "symbolicNames", str);} )
+
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_group, "description", str);} )
+
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_group, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_group, "hidden", false);} )
+
+      | ( <SITE>                      str = string()                            {this.setValue(_group, "site", str);} )
+
+      | ( <PARENT>                    str = string()                            {this.appendValue(_group, "parentGroups", str);} )
+
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_group, "properties", "propertiesStack", property);} )
     )*
 }
 
