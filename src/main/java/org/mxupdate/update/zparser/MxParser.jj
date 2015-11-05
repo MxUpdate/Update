@@ -23,7 +23,7 @@ options {
     UNICODE_INPUT = true;
 }
 
-PARSER_BEGIN(ChannelParser)
+PARSER_BEGIN(MxParser)
 /*
  *  This file is part of MxUpdate <http://www.mxupdate.org>.
  *
@@ -39,10 +39,11 @@ PARSER_BEGIN(ChannelParser)
  *
  */
 
-package org.mxupdate.update.userinterface;
+package org.mxupdate.update.zparser;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.mxupdate.update.userinterface.Channel_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.CommandRef;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -55,12 +56,12 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
  * Parses the update format for {@link Channel_mxJPO}.
  */
 @SuppressWarnings("unused")
-class ChannelParser
+public class MxParser
     extends AbstractParser_mxJPO
 {
 }
 
-PARSER_END(ChannelParser)
+PARSER_END(MxParser)
 
 <*> SKIP :
 {
