@@ -1,0 +1,30 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+
+<!--
+ *
+ *  This file is part of MxUpdate <http://www.mxupdate.org>.
+ *
+ *  MxUpdate is a deployment tool for a PLM platform to handle
+ *  administration objects as single update files (configuration item).
+ *
+ *  Copyright (C) 2008-2016 The MxUpdate Team - All Rights Reserved
+ *
+ *  You may use, distribute and modify MxUpdate under the terms of the
+ *  MxUpdate license. You should have received a copy of the MxUpdate
+ *  license with this file. If not, please write to <info@mxupdate.org>,
+ *  or visit <www.mxupdate.org>.
+ *
+-->
+
+<suite name="MxUpdate-Parsers">
+    <test name="Parsers">
+        <groups>
+            <run>
+                <include name="parser"/>
+            </run>
+        </groups>
+        <packages>
+            <package name="org.mxupdate.test.test.update.*"/>
+        </packages>
+    </test>
+</suite>

@@ -333,7 +333,7 @@ public abstract class AbstractTest
      * @param _password password for the MX connection
      * @throws Exception if connect failed
      */
-    @BeforeClass()
+    @BeforeClass(groups = {"parser"})
     @Parameters({AbstractTest.PROP_URL, AbstractTest.PROP_USER, AbstractTest.PROP_PASSWORD})
     public void connect(@Optional() final String _url,
                         @Optional() final String _user,

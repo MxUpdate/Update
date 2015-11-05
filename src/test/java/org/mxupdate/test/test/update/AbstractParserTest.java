@@ -59,7 +59,8 @@ public abstract class AbstractParserTest<DATA extends AbstractObject_mxJPO<?>>
      * @param _definition   text of the definition to test
      * @throws Exception if {@code _definition} could not parsed
      */
-    @Test(dataProvider = "data")
+    @Test(dataProvider = "data",
+          groups = {"parser"})
     public void positiveTest(final String _description,
                              final String _toTest,
                              final String _definition)
