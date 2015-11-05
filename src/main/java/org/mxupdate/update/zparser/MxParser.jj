@@ -49,6 +49,7 @@ import org.mxupdate.update.datamodel.Dimension_mxJPO;
 import org.mxupdate.update.datamodel.Expression_mxJPO;
 import org.mxupdate.update.datamodel.Format_mxJPO;
 import org.mxupdate.update.datamodel.Interface_mxJPO;
+import org.mxupdate.update.datamodel.PathType_mxJPO;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO.LocalAttribute;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.program.Page_mxJPO;
@@ -789,16 +790,16 @@ void parseInterface(final Interface_mxJPO _interface)
       | ( <ABSTRACT_TRUE>                                                       {this.setValue(_interface, "abstractFlag", true);} )
       | ( <ABSTRACT_FALSE>                                                      {this.setValue(_interface, "abstractFlag", false);} )
       | ( <DERIVED>                   str = string()                            {this.appendValue(_interface, "derived", str);} )
-      | ( <HIDDEN_TRUE>                                                         {this.setValue(_interface, "hidden",                         true);} )
-      | ( <HIDDEN_FALSE>                                                        {this.setValue(_interface, "hidden",                         false);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_interface, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_interface, "hidden", false);} )
       | ( <ATTRIBUTE>                 str = string()                            {this.appendValue(_interface, "globalAttributes",            str);} )
       | ( <FOR>
-            ( <FOR_PATHTYPE_ALL>                                                {this.setValue(_interface, "pathTypeAll",                    true);}
-            | <FOR_PATHTYPE>          str = string()                            {this.appendValue(_interface, "pathTypes",                   str);}
-            | <FOR_RELATIONSHIP_ALL>                                            {this.setValue(_interface, "relationAll",                    true);}
-            | <FOR_RELATIONSHIP>      str = string()                            {this.appendValue(_interface, "relations",                   str);}
-            | <FOR_TYPE_ALL>                                                    {this.setValue(_interface, "typeAll",                        true);}
-            | <FOR_TYPE>              str = string()                            {this.appendValue(_interface, "types",                       str);} ) )
+            ( <FOR_PATHTYPE_ALL>                                                {this.setValue(_interface, "pathTypeAll", true);}
+            | <FOR_PATHTYPE>          str = string()                            {this.appendValue(_interface, "pathTypes", str);}
+            | <FOR_RELATIONSHIP_ALL>                                            {this.setValue(_interface, "relationAll", true);}
+            | <FOR_RELATIONSHIP>      str = string()                            {this.appendValue(_interface, "relations", str);}
+            | <FOR_TYPE_ALL>                                                    {this.setValue(_interface, "typeAll", true);}
+            | <FOR_TYPE>              str = string()                            {this.appendValue(_interface, "types", str);} ) )
       | ( <LOCAL> <ATTRIBUTE>         localAttr = localAttribute()              {this.appendValue(_interface, "localAttributes", localAttr);} )
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_interface, "properties", "propertiesStack", property);} )
     )*
@@ -817,6 +818,61 @@ void parseInterface(final Interface_mxJPO _interface)
     | <FOR_RELATIONSHIP:                    "relationship">                                 : STRING_EXPECTED
     | <FOR_TYPE_ALL:                        "type" ([" ","\t","\n","\r"])+ "all">           : DEFAULT
     | <FOR_TYPE:                            "type">                                         : STRING_EXPECTED
+}
+
+/**************************************************** Data Model -> Path Type */
+
+/**
+ * Parses one complete path type definition.
+ *
+ * @param _pathType     target path type to update with parsed values
+ */
+void parsePathType(final PathType_mxJPO _pathType)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    AdminProperty property;
+    LocalAttribute localAttr;
+    Trigger trigger;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_pathType, "packageRef", str);} )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_pathType, "properties", "propertiesStack", property);} )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_pathType, "symbolicNames", str);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_pathType, "description", str);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_pathType, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_pathType, "hidden", false);} )
+      | ( <FROM>
+                       (   ( <CARDINALITY_ONE>                                  {this.setValue(_pathType, "fromCardinality", PathType_mxJPO.Cardinality.One);} )
+                         | ( <CARDINALITY_MANY>                                 {this.setValue(_pathType, "fromCardinality", PathType_mxJPO.Cardinality.Many);} )
+                         | ( <TYPE>             str = string()                  {this.appendValue(_pathType, "fromTypes", str);} )
+                         | ( <TYPE_ALL>                                         {this.setValue(_pathType, "fromTypeAll", true);} )
+                         | ( <RELATIONSHIP>     str = string()                  {this.appendValue(_pathType, "fromRelations", str);} )
+                         | ( <RELATIONSHIP_ALL>                                 {this.setValue(_pathType, "fromRelationAll", true);} ) )*
+                  "}" )
+      | ( <TO>
+                       (   ( <TYPE>             str = string()                  {this.appendValue(_pathType, "toTypes", str);} )
+                         | ( <TYPE_ALL>                                         {this.setValue(_pathType, "toTypeAll", true);} )
+                         | ( <RELATIONSHIP>     str = string()                  {this.appendValue(_pathType, "toRelations", str);} )
+                         | ( <RELATIONSHIP_ALL>                                 {this.setValue(_pathType, "toRelationAll", true);} ) )*
+                  "}" )
+      | ( <ATTRIBUTE>                 str = string()                            {this.appendValue(_pathType, "globalAttributes", str);} )
+      | ( <LOCAL> <ATTRIBUTE>         localAttr = localAttribute()              {this.appendValue(_pathType, "localAttributes", localAttr);} )
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_pathType, "properties", "propertiesStack", property);} )
+    )*
+}
+
+/** From / To Information */
+<DEFAULT> TOKEN :
+{
+      <FROM:                                "from" ([" ","\t","\n"])+ "{">                  : DEFAULT
+    | <TO:                                  "to"   ([" ","\t","\n"])+ "{">                  : DEFAULT
+    | <CARDINALITY_ONE:                     "cardinality" ([" ","\t","\n"])+ "one">         : DEFAULT
+    | <CARDINALITY_MANY:                    "cardinality" ([" ","\t","\n"])+ "many">        : DEFAULT
+    | <TYPE_ALL:                            "type" ([" ","\t","\n"])+ "all">                : DEFAULT
+    | <RELATIONSHIP_ALL:                    "relationship" ([" ","\t","\n"])+ "all">        : DEFAULT
+    | <RELATIONSHIP:                        "relationship">                                 : STRING_EXPECTED
 }
 
 /************************************************************ Program -> Page */
