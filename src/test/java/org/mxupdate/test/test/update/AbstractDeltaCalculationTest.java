@@ -20,7 +20,6 @@ import java.io.File;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.AbstractData;
-import org.mxupdate.test.data.datamodel.PolicyData;
 import org.mxupdate.update.AbstractObject_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
@@ -87,10 +86,6 @@ public abstract class AbstractDeltaCalculationTest<DATA extends AbstractObject_m
 
             Assert.assertEquals(_currentData.getName(), _targetData.getName(), "check that ci names are equal");
 
-            // work-around: policies must be created manually...
-            if (_currentData instanceof PolicyData)  {
-                new PolicyData(this, _currentData.getName().substring(AbstractTest.PREFIX.length())).create();
-            }
             // create the depending objects to be able to connect to them
             _currentData.createDependings();
             _targetData.createDependings();

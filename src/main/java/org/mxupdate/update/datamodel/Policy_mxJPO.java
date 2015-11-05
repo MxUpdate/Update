@@ -59,6 +59,7 @@ import matrix.util.MatrixException;
  * The class is used to export and import / update policy configuration items.
  * The handled properties are:
  * <ul>
+ * <li>package</li>
  * <li>uuid</li>
  * <li>symbolic names</li>
  * <li>description</li>
@@ -289,6 +290,7 @@ public class Policy_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                                                                 | write?
+                .stringNotNull( "package",                  this.getPackageRef())
                 .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
@@ -362,6 +364,7 @@ public class Policy_mxJPO
                     this.delimiter);
         }
 
+        DeltaUtil_mxJPO.calcPackage(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
 
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",                  this.getDescription(),                      _current.getDescription());

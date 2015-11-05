@@ -22,6 +22,7 @@ import org.mxupdate.test.data.datamodel.PolicyData.AllState;
 import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.datamodel.helper.Access;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -47,14 +48,24 @@ public class PolicyCI_2DeltaCalculationTest
     {
         return new Object[][] {
 
-            {"1) uuid",
+            {"1a) new package",
+                    new PolicyData(this, "Test"),
+                    new PolicyData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new PolicyData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new PolicyData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new PolicyData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new PolicyData(this, "Test").defKeyNotDefined("package")},
+
+            {"2) uuid",
                     new PolicyData(this, "Test"),
                     new PolicyData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
 
-            {"2a) symbolic name",
+            {"3a) symbolic name",
                     new PolicyData(this, "Test"),
                     new PolicyData(this, "Test").setValue("symbolicname", "policy_123")},
-            {"2b) two symbolic name",
+            {"3b) two symbolic name",
                     new PolicyData(this, "Test"),
                     new PolicyData(this, "Test").setValue("symbolicname", "policy_123").setValue("symbolicname", "policy_345")},
 
@@ -135,13 +146,14 @@ public class PolicyCI_2DeltaCalculationTest
 
     @Override
     @BeforeMethod
-    @AfterClass(groups = "close" )
+    @AfterClass
     public void cleanup()
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.DM_POLICY);
         this.cleanup(AbstractTest.CI.DM_FORMAT);
         this.cleanup(AbstractTest.CI.DM_TYPE);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override
