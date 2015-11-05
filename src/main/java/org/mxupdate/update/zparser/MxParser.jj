@@ -152,6 +152,7 @@ PARSER_END(MxParser)
     | <CARDINALITY:                         "cardinality">                                  : DEFAULT
     | <CATEGORY:                            "category">                                     : DEFAULT
     | <CLONE:                               "clone">                                        : DEFAULT
+    | <COLUMN:                              "column">                                       : DEFAULT
     | <CONTEXT:                             "context">                                      : DEFAULT
     | <CONTRACTOR:                          "contractor">                                   : DEFAULT
     | <CUSTOMER:                            "customer">                                     : DEFAULT
@@ -1922,7 +1923,7 @@ void parsePortal(Portal_mxJPO _portal)
 void parseTable(final Table_mxJPO _table)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
 {
-    String str;
+    String str,str2;
     Token tmp;
     AdminProperty property;
     Table_mxJPO.Column column;
@@ -1937,87 +1938,39 @@ void parseTable(final Table_mxJPO _table)
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_table, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_table, "hidden", false);} )
       | ( <COLUMN>                                                              {column = new Table_mxJPO.Column();this.appendValue(_table, "fields", column);  }
-          <COLUMN_OPEN>
-                    ( <COLUMN_NAME>     ( tmp = <COLUMN_STRING>                 {this.setValue(column, "name",                              this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "name",                              this.getSingle(tmp.image));} )
-                    | <COLUMN_LABEL>    ( tmp = <COLUMN_STRING>                 {this.setValue(column, "label",                             this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "label",                             this.getSingle(tmp.image));} )
-                    | <COLUMN_SELECT>   ( tmp = <COLUMN_STRING>                 {this.setValue(column, "expression",                        this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "expression",                        this.getSingle(tmp.image));} )
-                    | <COLUMN_BOBJ>     ( tmp = <COLUMN_STRING>                 {this.setValue(column, "expression",                        this.getString(tmp.image));this.setValue(column, "expressionType", ExpressionType.BUSINESSOBJECT);}
-                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "expression",                        this.getSingle(tmp.image));this.setValue(column, "expressionType", ExpressionType.BUSINESSOBJECT);} )
-                    | <COLUMN_REL>      ( tmp = <COLUMN_STRING>                 {this.setValue(column, "expression",                        this.getString(tmp.image));this.setValue(column, "expressionType", ExpressionType.RELATIONSHIP);}
-                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "expression",                        this.getSingle(tmp.image));this.setValue(column, "expressionType", ExpressionType.RELATIONSHIP);} )
-                    | <COLUMN_RANGE>    ( tmp = <COLUMN_STRING>                 {this.setValue(column, "range",                             this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "range",                             this.getSingle(tmp.image));} )
-                    | <COLUMN_HREF>     ( tmp = <COLUMN_STRING>                 {this.setValue(column, "href",                              this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "href",                              this.getSingle(tmp.image));} )
-                    | <COLUMN_ALT>      ( tmp = <COLUMN_STRING>                 {this.setValue(column, "alt",                               this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "alt",                               this.getSingle(tmp.image));} )
-                    | <COLUMN_HIDDEN_TRUE>                                      {this.setValue(column, "hidden",                            true);}
-                    | <COLUMN_HIDDEN_FALSE>                                     {this.setValue(column, "hidden",                            false);}
-                    | <COLUMN_USER>     ( tmp = <COLUMN_STRING>                 {this.appendValue(column, "users",                          this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>                 {this.appendValue(column, "users",                          this.getSingle(tmp.image));} )
-                    | <COLUMN_SORTTYPE> ( <COLUMN_SORTTYPE_ALPHA>               {this.setValue(column, "sortType",                          SortType.ALPHANUMERIC);}
-                                        | <COLUMN_SORTTYPE_NUMERIC>             {this.setValue(column, "sortType",                          SortType.NUMERIC);}
-                                        | <COLUMN_SORTTYPE_OTHER>               {this.setValue(column, "sortType",                          SortType.OTHER);}
-                                        | <COLUMN_SORTTYPE_NONE>                {this.setValue(column, "sortType",                          SortType.NONE);} )
-                    | <COLUMN_SETTING>                                          {setting = new Setting();this.appendValue(column, "settings", setting);}
-                                        ( tmp = <SETTING_STRING>                {this.setValue(setting, "name",                             this.getString(tmp.image));}
-                                        | tmp = <SETTING_SINGLE>                {this.setValue(setting, "name",                             this.getSingle(tmp.image));} )
-                                        ( tmp = <COLUMN_STRING>                 {this.setValue(setting, "value",                            this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(setting, "value",                            this.getSingle(tmp.image));} ) ) *
-          <COLUMN_CLOSE> )
+          <BRACE_OPEN>
+                  ( <NAME>            str = string()                            {this.setValue(column, "name", str);}
+                  | <LABEL>           str = string()                            {this.setValue(column, "label", str);}
+                  | <SELECT>          str = string()                            {this.setValue(column, "expression", str);this.setValue(column, "expressionType", ExpressionType.SELECT);}
+                  | <BUSINESSOBJECT>  str = string()                            {this.setValue(column, "expression", str);this.setValue(column, "expressionType", ExpressionType.BUSINESSOBJECT);}
+                  | <RELATIONSHIP>    str = string()                            {this.setValue(column, "expression", str);this.setValue(column, "expressionType", ExpressionType.RELATIONSHIP);}
+                  | <RANGE>           str = string()                            {this.setValue(column, "range", str);}
+                  | <HREF>            str = string()                            {this.setValue(column, "href", str);}
+                  | <ALT>             str = string()                            {this.setValue(column, "alt", str);}
+                  | <HIDDEN_TRUE>                                               {this.setValue(column, "hidden", true);}
+                  | <HIDDEN_FALSE>                                              {this.setValue(column, "hidden", false);}
+                  | <USER>            str = string()                            {this.appendValue(column, "users", str);}
+                  | <SORTTYPE>      ( <SORTTYPE_ALPHA>                          {this.setValue(column, "sortType", SortType.ALPHANUMERIC);}
+                                    | <SORTTYPE_NUMERIC>                        {this.setValue(column, "sortType", SortType.NUMERIC);}
+                                    | <SORTTYPE_OTHER>                          {this.setValue(column, "sortType", SortType.OTHER);}
+                                    | <SORTTYPE_NONE>                           {this.setValue(column, "sortType", SortType.NONE);} )
+                  | <SETTING>         str = stringString()  str2 = string()     {setting = new Setting();this.appendValue(column, "settings", setting);this.setValue(setting, "name", str);this.setValue(setting, "value", str2);} ) *
+          <BRACE_CLOSE> )
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_table, "properties", "propertiesStack", property);} )
     )*
 }
 
 <DEFAULT> TOKEN :
 {
-      <COLUMN:                              "column">                           : COLUMN_OPENEXPECTED
+      <SORTTYPE:                     "sorttype">                         : SORTTYPE_EXPECTED
 }
 
-<COLUMN_OPENEXPECTED> TOKEN :
+<SORTTYPE_EXPECTED> TOKEN :
 {
-      <COLUMN_OPEN:                         "{">                                : COLUMN_EXPECTED
-}
-
-<COLUMN_EXPECTED> TOKEN :
-{
-      <COLUMN_CLOSE:                        "}">                                : DEFAULT
-    | <COLUMN_NAME:                         "name">                             : COLUMN_STRING_EXPECTED
-    | <COLUMN_LABEL:                        "label">                            : COLUMN_STRING_EXPECTED
-    | <COLUMN_SELECT:                       "select">                           : COLUMN_STRING_EXPECTED
-    | <COLUMN_BOBJ:                         "businessobject">                   : COLUMN_STRING_EXPECTED
-    | <COLUMN_REL:                          "relationship">                     : COLUMN_STRING_EXPECTED
-    | <COLUMN_RANGE:                        "range">                            : COLUMN_STRING_EXPECTED
-    | <COLUMN_HREF:                         "href">                             : COLUMN_STRING_EXPECTED
-    | <COLUMN_ALT:                          "alt">                              : COLUMN_STRING_EXPECTED
-    | <COLUMN_HIDDEN_TRUE:                  "hidden">                           : COLUMN_EXPECTED
-    | <COLUMN_HIDDEN_FALSE:                 "!hidden">                          : COLUMN_EXPECTED
-    | <COLUMN_USER:                         "user">                             : COLUMN_STRING_EXPECTED
-    | <COLUMN_SORTTYPE:                     "sorttype">                         : COLUMN_SORTTYPE_EXPECTED
-    | <COLUMN_SETTING:                      "setting">                          : COLUMN_SETTING_STRING_EXPECTED
-}
-
-<COLUMN_STRING_EXPECTED> TOKEN :
-{
-      <COLUMN_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : COLUMN_EXPECTED
-    | <COLUMN_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : COLUMN_EXPECTED
-}
-
-<COLUMN_SETTING_STRING_EXPECTED> TOKEN :
-{
-      <SETTING_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : COLUMN_STRING_EXPECTED
-    | <SETTING_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : COLUMN_STRING_EXPECTED
-}
-
-<COLUMN_SORTTYPE_EXPECTED> TOKEN :
-{
-      <COLUMN_SORTTYPE_ALPHA:               "alpha">                            : COLUMN_EXPECTED
-    | <COLUMN_SORTTYPE_NUMERIC:             "numeric">                          : COLUMN_EXPECTED
-    | <COLUMN_SORTTYPE_OTHER:               "other">                            : COLUMN_EXPECTED
-    | <COLUMN_SORTTYPE_NONE:                "none">                             : COLUMN_EXPECTED
+      <SORTTYPE_ALPHA:               "alpha">                            : DEFAULT
+    | <SORTTYPE_NUMERIC:             "numeric">                          : DEFAULT
+    | <SORTTYPE_OTHER:               "other">                            : DEFAULT
+    | <SORTTYPE_NONE:                "none">                             : DEFAULT
 }
 
 /**************************************************************************** */

@@ -106,6 +106,9 @@ public class TableCI_1ParserTest
             {"8b) column value for select",
                     "",
                     "description \"\" column { name \"ANAME\" label \"ALABEL\" select \"ASELECT\" }"},
+            {"8c) column value for select after businessobject",
+                    "description \"\" column { name \"ANAME\" label \"ALABEL\"                            select \"ASELECT\" }",
+                    "description \"\" column { name \"ANAME\" label \"ALABEL\" businessobject \"$<type>\" select \"ASELECT\" }"},
             // column businessobject
             {"9a) column empty businessobject",
                     "description \"\" column { name \"ANAME\" label \"ALABEL\" }",
