@@ -47,6 +47,7 @@ import org.mxupdate.update.user.Association_mxJPO;
 import org.mxupdate.update.user.Group_mxJPO;
 import org.mxupdate.update.user.PersonCI_mxJPO;
 import org.mxupdate.update.user.PersonCI_mxJPO.TypeItem;
+import org.mxupdate.update.user.Role_mxJPO;
 import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.AbstractField.ExpressionType;
 import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.AbstractField.SortType;
 import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.Setting;
@@ -166,6 +167,19 @@ TOKEN : /** first level */
 <NATURALNUMBER_EXPECTED> TOKEN :
 {
       <NATURALNUMBER: (("0") | (["1"-"9"](["0"-"9"])*))> : DEFAULT
+}
+
+/*********************************************************************** Kind */
+<DEFAULT> TOKEN :
+{
+      <KIND:                                "kind">                                         : KIND_EXPECTED
+}
+
+<KIND_EXPECTED> TOKEN :
+{
+      <KIND_ORGANIZATION:                   "organization">                                 : DEFAULT
+    | <KIND_PROJECT:                        "project">                                      : DEFAULT
+    | <KIND_ROLE:                           "role">                                         : DEFAULT
 }
 
 /****************************************************** User -> Person Access */
@@ -418,7 +432,7 @@ void parsePerson(final PersonCI_mxJPO _person)
     String str;
     Token tmp;
     AdminProperty property;
-} 
+}
 {
     (
         ( <PACKAGE>                   str = string()                            {this.setValue(_person, "packageRef", str);} )
@@ -474,6 +488,44 @@ void parsePerson(final PersonCI_mxJPO _person)
       | (<ROLE>                       str = string()                            {this.appendValue(_person, "roles", str);} )
 
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_person, "properties", "propertiesStack", property);} )
+    )*
+}
+
+/************************************************************* User -> Role * */
+
+/**
+ * Parses one complete role definition.
+ *
+ * @param _role     target role to update with parsed values
+ */
+void parseRole(final Role_mxJPO _role)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    AdminProperty property;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_role, "packageRef", str);} )
+
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_role, "properties", "propertiesStack", property);} )
+
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_role, "symbolicNames", str);} )
+
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_role, "description", str);} )
+
+      | ( <KIND>                    ( <KIND_ORGANIZATION>                       {this.setValue(_role, "kind", Role_mxJPO.Kind.Organization);}
+                                    | <KIND_PROJECT>                            {this.setValue(_role, "kind", Role_mxJPO.Kind.Project);}
+                                    | <KIND_ROLE>                               {this.setValue(_role, "kind", Role_mxJPO.Kind.Role);} ) )
+
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_role, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_role, "hidden", false);} )
+
+      | ( <SITE>                      str = string()                            {this.setValue(_role, "site", str);} )
+
+      | ( <PARENT>                    str = string()                            {this.appendValue(_role, "parentRoles", str);} )
+
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_role, "properties", "propertiesStack", property);} )
     )*
 }
 
