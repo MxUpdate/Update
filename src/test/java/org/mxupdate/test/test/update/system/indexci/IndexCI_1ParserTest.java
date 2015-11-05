@@ -34,54 +34,60 @@ public class IndexCI_1ParserTest
     @DataProvider(name = "data")
     public Object[][] getData()
     {
-        return new Object[][]
-        {
+        return new Object[][]  {
             {"0) simple",
                     "",
                     "description \"\" !hidden !enable"},
+            // package
+            {"1a) package string",
+                    "",
+                    "package \"abc\" description \"\" !hidden !enable"},
+            {"1b) package single",
+                    "package \"abc\" description \"\" !hidden !enable",
+                    "package abc     description \"\" !hidden !enable"},
             // uuid
-            {"1a) uuid with minus separator",
+            {"2a) uuid with minus separator",
                     "",
                     "uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" !hidden !enable"},
-            {"1b) uuid w/o minus separator",
+            {"2b) uuid w/o minus separator",
                     "",
                     "uuid \"FDA75674979211E6AE2256B6B6499611\"     description \"\" !hidden !enable"},
-            {"1c) uuid convert from single to string",
+            {"2c) uuid convert from single to string",
                     "uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" !hidden !enable",
                     "uuid   FDA7-5674979211-E6AE2256B6-B6499611    description \"\" !hidden !enable"},
             // registered name
-            {"2a) symbolic name",
+            {"3a) symbolic name",
                     "",
                     "symbolicname \"channel_abc\" description \"\" !hidden !enable"},
-            {"2b) two symbolic names",
+            {"3b) two symbolic names",
                     "symbolicname \"channel_abc\" symbolicname \"channel_def\" description \"\" !hidden !enable",
                     "symbolicname \"channel_def\" symbolicname \"channel_abc\" description \"\" !hidden !enable"},
             // description
-            {"3a) description",
+            {"4a) description",
                     "",
                     "description \"abc def\" !hidden !enable"},
-            {"3b) description not defined",
+            {"4b) description not defined",
                     "description \"\" !hidden !enable",
                     "!hidden"},
             // hidden flag
-            {"4a) hidden",
+            {"5a) hidden",
                     "",
                     "description \"\" hidden !enable"},
-            {"4b) not hidden (not defined)",
+            {"5b) not hidden (not defined)",
                     "description \"\" !hidden !enable",
                     "description \"\"         !enable"},
             // enable flag
-            {"5a) enable",
+            {"6a) enable",
                     "",
                     "description \"\" !hidden enable"},
-            {"5b) not enable (not defined)",
+            {"6b) not enable (not defined)",
                     "description \"\" !hidden !enable",
                     "description \"\" !hidden"},
             // unique flag
-            {"6a) unique",
+            {"7a) unique",
                     "",
                     "description \"\" !hidden !enable unique"},
-            {"6b) not unique (defined)",
+            {"7b) not unique (defined)",
                     "description \"\" !hidden !enable",
                     "description \"\" !hidden !enable !unique"},
             // properties

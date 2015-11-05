@@ -42,11 +42,13 @@ class IndexParser_mxJPO
  */
   final public void parse(final IndexCI_mxJPO _index) throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {Token tmp;
     String str;
+    Integer number;
     Field field;
     AdminProperty property;
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case PACKAGE:
       case UUID:
       case SYMBOLICNAME:
       case DESCRIPTION:
@@ -66,13 +68,16 @@ class IndexParser_mxJPO
         break label_1;
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case PACKAGE:{
+        jj_consume_token(PACKAGE);
+        str = string();
+this.setValue(_index, "packageRef", str);
+        break;
+        }
       case UUID:{
         jj_consume_token(UUID);
-property = new AdminProperty();
-                                                                             this.appendValue(this.getValue(_index, "properties"), "propertiesStack", property);
-                                                                             this.setValue(property, "name",  "UUID");
-        str = string();
-this.setValue(property, "value", str);
+        property = uuidProperty();
+this.appendValue(_index, "properties", "propertiesStack", property);
         break;
         }
       case SYMBOLICNAME:{
@@ -83,22 +88,8 @@ this.appendValue(_index, "symbolicNames", str);
         }
       case DESCRIPTION:{
         jj_consume_token(DESCRIPTION);
-        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-        case MULTILINESTRING:{
-          tmp = jj_consume_token(MULTILINESTRING);
-this.setValue(_index, "description", this.getString(tmp.image));
-          break;
-          }
-        case MULTILINESINGLE:{
-          tmp = jj_consume_token(MULTILINESINGLE);
-this.setValue(_index, "description", this.getSingle(tmp.image));
-          break;
-          }
-        default:
-          jj_la1[1] = jj_gen;
-          jj_consume_token(-1);
-          throw new ParseException();
-        }
+        str = multiLineString();
+this.setValue(_index, "description", str);
         break;
         }
       case HIDDEN_TRUE:{
@@ -138,78 +129,144 @@ field = new Field();this.appendValue(_index, "fields", field);this.setValue(fiel
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case SIZE:{
           jj_consume_token(SIZE);
-          tmp = jj_consume_token(INTEGER);
-this.setValue(field, "size", Integer.parseInt(tmp.image));
+          number = naturalNumber();
+this.setValue(field, "size", number);
           break;
           }
         default:
-          jj_la1[2] = jj_gen;
+          jj_la1[1] = jj_gen;
           ;
         }
         break;
         }
       case PROPERTY:{
         jj_consume_token(PROPERTY);
-property = new AdminProperty();this.appendValue(_index, "properties", "propertiesStack", property);
-        str = string();
-this.setValue(property, "name", str);
-        label_2:
-        while (true) {
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case PROPERTYTO:
-          case PROPERTYVAL:{
-            ;
-            break;
-            }
-          default:
-            jj_la1[3] = jj_gen;
-            break label_2;
-          }
-          switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-          case PROPERTYVAL:{
-            jj_consume_token(PROPERTYVAL);
-            str = string();
-this.setValue(property, "value", str);
-            break;
-            }
-          case PROPERTYTO:{
-            jj_consume_token(PROPERTYTO);
-            switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
-            case ADMINTYPE_STRING:{
-              tmp = jj_consume_token(ADMINTYPE_STRING);
-this.setValue(property, "refAdminType", this.getString(tmp.image));
-              break;
-              }
-            case ADMINTYPE_SINGLE:{
-              tmp = jj_consume_token(ADMINTYPE_SINGLE);
-this.setValue(property, "refAdminType", this.getSingle(tmp.image));
-              break;
-              }
-            default:
-              jj_la1[4] = jj_gen;
-              jj_consume_token(-1);
-              throw new ParseException();
-            }
-            str = string();
-this.setValue(property, "refAdminName", str);
-            break;
-            }
-          default:
-            jj_la1[5] = jj_gen;
-            jj_consume_token(-1);
-            throw new ParseException();
-          }
-        }
+        property = property();
+this.appendValue(_index, "properties", "propertiesStack", property);
         break;
         }
       default:
-        jj_la1[6] = jj_gen;
+        jj_la1[2] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
     }
   }
 
+/**
+ * Parses the UUID property definition.
+ */
+  final public AdminProperty uuidProperty() throws ParseException {String str;
+    AdminProperty property = new AdminProperty();
+    str = string();
+this.setValue(property, "value", str);
+this.setValue(property, "name",  "UUID");
+{if ("" != null) return property;}
+    throw new Error("Missing return statement in function");
+  }
+
+/**
+ * Parses the properties definition.
+ */
+  final public AdminProperty property() throws ParseException {String str;
+    Token tmp;
+    AdminProperty property = new AdminProperty();
+    str = string();
+this.setValue(property, "name", str);
+    label_2:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case PROPERTYTO:
+      case PROPERTYVAL:{
+        ;
+        break;
+        }
+      default:
+        jj_la1[3] = jj_gen;
+        break label_2;
+      }
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case PROPERTYVAL:{
+        jj_consume_token(PROPERTYVAL);
+        str = string();
+this.setValue(property, "value", str);
+        break;
+        }
+      case PROPERTYTO:{
+        jj_consume_token(PROPERTYTO);
+        switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+        case ADMINTYPE_STRING:{
+          tmp = jj_consume_token(ADMINTYPE_STRING);
+this.setValue(property, "refAdminType", this.getString(tmp.image));
+          break;
+          }
+        case ADMINTYPE_SINGLE:{
+          tmp = jj_consume_token(ADMINTYPE_SINGLE);
+this.setValue(property, "refAdminType", this.getSingle(tmp.image));
+          break;
+          }
+        default:
+          jj_la1[4] = jj_gen;
+          jj_consume_token(-1);
+          throw new ParseException();
+        }
+        str = string();
+this.setValue(property, "refAdminName", str);
+        break;
+        }
+      default:
+        jj_la1[5] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+{if ("" != null) return property;}
+    throw new Error("Missing return statement in function");
+  }
+
+/**
+ * Evaluates integer value.
+ *
+ * @return integer
+ */
+  final public Integer naturalNumber() throws ParseException {Token tmp;
+    tmp = jj_consume_token(NATURALNUMBER);
+{if ("" != null) return Integer.valueOf(tmp.image);}
+    throw new Error("Missing return statement in function");
+  }
+
+/**
+ * Evaluates multi-line string.
+ *
+ * @return string
+ */
+  final public String multiLineString() throws ParseException {Token tmp;
+    String ret = null;
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case MULTILINESTRING:{
+      tmp = jj_consume_token(MULTILINESTRING);
+ret = this.getString(tmp.image);
+      break;
+      }
+    case MULTILINESINGLE:{
+      tmp = jj_consume_token(MULTILINESINGLE);
+ret = this.getSingle(tmp.image);
+      break;
+      }
+    default:
+      jj_la1[6] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+{if ("" != null) return ret;}
+    throw new Error("Missing return statement in function");
+  }
+
+/**
+ * Evaluates single-line string.
+ *
+ * @return string
+ */
   final public String string() throws ParseException {Token tmp;
     String ret = null;
     switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
@@ -247,7 +304,7 @@ ret = this.getSingle(tmp.image);
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x283fe0,0x60000,0x100000,0xc00000,0x3000000,0xc00000,0x283fe0,0x18000,};
+      jj_la1_0 = new int[] {0x507fe0,0x200000,0x507fe0,0x1800000,0x6000000,0x1800000,0xc0000,0x30000,};
    }
 
   /** Constructor with InputStream. */
@@ -372,7 +429,7 @@ ret = this.getSingle(tmp.image);
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[26];
+    boolean[] la1tokens = new boolean[27];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -386,7 +443,7 @@ ret = this.getSingle(tmp.image);
         }
       }
     }
-    for (int i = 0; i < 26; i++) {
+    for (int i = 0; i < 27; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

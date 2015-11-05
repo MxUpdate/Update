@@ -138,6 +138,7 @@ abstract class AbstractIndexCI_mxJPO<CLASS extends AbstractIndexCI_mxJPO<CLASS>>
     {
         final AbstractIndexCI_mxJPO<CLASS> current = _current;
 
+        DeltaUtil_mxJPO.calcPackage(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(  _mql,              "description",              this.getDescription(),  _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "hidden",            false, this.isHidden(),        _current.isHidden());

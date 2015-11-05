@@ -68,7 +68,9 @@ PARSER_END(IndexParser)
 
 <DEFAULT> TOKEN :
 {
-      <UUID:                                "uuid">                                         : STRING_EXPECTED
+      <PACKAGE:                             "package">                                      : STRING_EXPECTED
+
+    | <UUID:                                "uuid">                                         : STRING_EXPECTED
 
     | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
@@ -84,10 +86,10 @@ PARSER_END(IndexParser)
     | <UNIQUE_FALSE:                        "!unique">
 }
 
-/************************************************************** Common Integer */
-<INTEGER_EXPECTED> TOKEN :
+/************************************************************* Common Integer */
+<NATURALNUMBER_EXPECTED> TOKEN :
 {
-      <INTEGER: ( ["0"-"9"] )+> : DEFAULT
+      <NATURALNUMBER: (("0") | (["1"-"9"](["0"-"9"])*))> : DEFAULT
 }
 
 /************************************************************** Common String */
@@ -108,7 +110,7 @@ PARSER_END(IndexParser)
 <DEFAULT> TOKEN :
 {
       <FIELD:                               "field">                                        : STRING_EXPECTED
-    | <SIZE:                                "size">                                         : INTEGER_EXPECTED
+    | <SIZE:                                "size">                                         : NATURALNUMBER_EXPECTED
 }
 
 /******************************************************************* Property */
@@ -133,44 +135,108 @@ PARSER_END(IndexParser)
  * @param _uniqueKey      target package to update with parsed values
  */
 void parse(final IndexCI_mxJPO _index)
-    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
-: {
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
     Token tmp;
     String str;
+    Integer number;
     Field field;
     AdminProperty property;
-} {
-    (   ( <UUID>                                                            {property = new AdminProperty();
-                                                                             this.appendValue(this.getValue(_index, "properties"), "propertiesStack", property);
-                                                                             this.setValue(property, "name",  "UUID");}
-                                      str = string()                        {this.setValue(property, "value", str);} )
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_index, "packageRef", str);} )
 
-      | ( <SYMBOLICNAME>              str = string()                        {this.appendValue(_index, "symbolicNames", str);} )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_index, "properties", "propertiesStack", property);} )
 
-      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_index, "description", this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>               {this.setValue(_index, "description", this.getSingle(tmp.image));} ) )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_index, "symbolicNames", str);} )
 
-      | ( <HIDDEN_TRUE>                                                     {this.setValue(_index, "hidden", true);} )
-      | ( <HIDDEN_FALSE>                                                    {this.setValue(_index, "hidden", false);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_index, "description", str);} )
 
-      | ( <ENABLE_TRUE>                                                     {this.setValue(_index, "enable", true);} )
-      | ( <ENABLE_FALSE>                                                    {this.setValue(_index, "enable", false);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_index, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_index, "hidden", false);} )
 
-      | ( <UNIQUE_TRUE>                                                     {this.setValue(_index, "unique", true);} )
-      | ( <UNIQUE_FALSE>                                                    {this.setValue(_index, "unique", false);} )
+      | ( <ENABLE_TRUE>                                                         {this.setValue(_index, "enable", true);} )
+      | ( <ENABLE_FALSE>                                                        {this.setValue(_index, "enable", false);} )
 
-      | ( <FIELD>                     str = string()                        {field = new Field();this.appendValue(_index, "fields", field);this.setValue(field, "expression", str);}
-                    ( <SIZE>          tmp = <INTEGER>                       {this.setValue(field, "size", Integer.parseInt(tmp.image));} )? )
+      | ( <UNIQUE_TRUE>                                                         {this.setValue(_index, "unique", true);} )
+      | ( <UNIQUE_FALSE>                                                        {this.setValue(_index, "unique", false);} )
 
-      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_index, "properties", "propertiesStack", property);}
-                                      str = string()                        {this.setValue(property, "name", str);}
-              (   ( <PROPERTYVAL>     str = string()                        {this.setValue(property, "value", str);} )
-                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                      str = string()                        {this.setValue(property, "refAdminName", str);} ) )* )
+      | ( <FIELD>                     str = string()                            {field = new Field();this.appendValue(_index, "fields", field);this.setValue(field, "expression", str);}
+                    ( <SIZE>          number = naturalNumber()                  {this.setValue(field, "size", number);} )? )
+
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_index, "properties", "propertiesStack", property);} )
     )*
 }
 
+/**
+ * Parses the UUID property definition.
+ */
+AdminProperty uuidProperty() :
+{
+    String str;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()
+    {this.setValue(property, "value", str);}
+    {this.setValue(property, "name",  "UUID");}
+    {return property;}
+}
+
+/**
+ * Parses the properties definition.
+ */
+AdminProperty property() :
+{
+    String str;
+    Token tmp;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()                                 {this.setValue(property, "name", str);}
+    ( ( <PROPERTYVAL>  str = string()              {this.setValue(property, "value", str);} )
+    | ( <PROPERTYTO>   ( tmp = <ADMINTYPE_STRING>  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                       | tmp = <ADMINTYPE_SINGLE>  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                   str = string()  {this.setValue(property, "refAdminName", str);} ) )*
+    {return property;}
+}
+
+/**
+ * Evaluates integer value.
+ *
+ * @return integer
+ */
+Integer naturalNumber() :
+{
+    Token tmp;
+}
+{
+    tmp = <NATURALNUMBER>
+    {return Integer.valueOf(tmp.image);}
+}
+
+/**
+ * Evaluates multi-line string.
+ *
+ * @return string
+ */
+String multiLineString() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <MULTILINESTRING>  {ret = this.getString(tmp.image);}
+    | tmp = <MULTILINESINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
+}
+
+/**
+ * Evaluates single-line string.
+ *
+ * @return string
+ */
 String string() :
 {
     Token tmp;
@@ -179,7 +245,5 @@ String string() :
 {
     ( tmp = <STRING>  {ret = this.getString(tmp.image);}
     | tmp = <SINGLE>  {ret = this.getSingle(tmp.image);} )
-    {
-        return ret;
-    }
+    {return ret;}
 }

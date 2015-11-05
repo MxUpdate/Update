@@ -17,6 +17,7 @@ package org.mxupdate.test.test.update.system.indexci;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.system.IndexData;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.system.IndexCI_mxJPO;
@@ -50,6 +51,16 @@ public class IndexCI_2DeltaCalculationTest
                     new IndexData(this, "Test"),
                     new IndexData(this, "Test")
                             .setFlag("unique", true)},
+            // package
+            {"1a) new package",
+                    new IndexData(this, "Test"),
+                    new IndexData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new IndexData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new IndexData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new IndexData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new IndexData(this, "Test").defKeyNotDefined("package")},
             // uuid
             {"2a) uuid with type",
                     new IndexData(this, "Test"),
@@ -189,6 +200,7 @@ public class IndexCI_2DeltaCalculationTest
     {
         this.cleanup(AbstractTest.CI.SYS_INDEX);
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override

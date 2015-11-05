@@ -35,6 +35,7 @@ import matrix.util.MatrixException;
  * Handles the export and update of &quot;system indexs&quot;.
  * The handled properties are:
  * <ul>
+ * <li>package</li>
  * <li>uuid</li>
  * <li>description</li>
  * <li>hidden flag</li>
@@ -86,13 +87,14 @@ public class IndexCI_mxJPO
     public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
-                //              tag            | default | value                              | write?
-                .stringNotNull( "uuid",                    this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
-                .list(          "symbolicname",            this.getSymbolicNames())
-                .string(        "description",             this.getDescription())
-                .flag(          "hidden",           false, this.isHidden())
-                .flag(          "enable",           false, this.isEnable())
-                .flagIfTrue(    "unique",           false, this.unique,                         this.unique)
+                //              tag             | default | value                              | write?
+                .stringNotNull( "package",                  this.getPackageRef())
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
+                .list(          "symbolicname",             this.getSymbolicNames())
+                .string(        "description",              this.getDescription())
+                .flag(          "hidden",           false,  this.isHidden())
+                .flag(          "enable",           false,  this.isEnable())
+                .flagIfTrue(    "unique",           false,  this.unique,                         this.unique)
                 .list(this.getFields())
                 .properties(this.getProperties());
     }

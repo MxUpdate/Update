@@ -26,47 +26,49 @@ interface IndexParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int UUID = 5;
+  int PACKAGE = 5;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 6;
+  int UUID = 6;
   /** RegularExpression Id. */
-  int DESCRIPTION = 7;
+  int SYMBOLICNAME = 7;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 8;
+  int DESCRIPTION = 8;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 9;
+  int HIDDEN_TRUE = 9;
   /** RegularExpression Id. */
-  int ENABLE_TRUE = 10;
+  int HIDDEN_FALSE = 10;
   /** RegularExpression Id. */
-  int ENABLE_FALSE = 11;
+  int ENABLE_TRUE = 11;
   /** RegularExpression Id. */
-  int UNIQUE_TRUE = 12;
+  int ENABLE_FALSE = 12;
   /** RegularExpression Id. */
-  int UNIQUE_FALSE = 13;
+  int UNIQUE_TRUE = 13;
   /** RegularExpression Id. */
-  int INTEGER = 14;
+  int UNIQUE_FALSE = 14;
   /** RegularExpression Id. */
-  int STRING = 15;
+  int NATURALNUMBER = 15;
   /** RegularExpression Id. */
-  int SINGLE = 16;
+  int STRING = 16;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 17;
+  int SINGLE = 17;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 18;
+  int MULTILINESTRING = 18;
   /** RegularExpression Id. */
-  int FIELD = 19;
+  int MULTILINESINGLE = 19;
   /** RegularExpression Id. */
-  int SIZE = 20;
+  int FIELD = 20;
   /** RegularExpression Id. */
-  int PROPERTY = 21;
+  int SIZE = 21;
   /** RegularExpression Id. */
-  int PROPERTYTO = 22;
+  int PROPERTY = 22;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 23;
+  int PROPERTYTO = 23;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 24;
+  int PROPERTYVAL = 24;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 25;
+  int ADMINTYPE_STRING = 25;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 26;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -75,7 +77,7 @@ interface IndexParserConstants_mxJPO {
   /** Lexical state. */
   int STRING_EXPECTED = 2;
   /** Lexical state. */
-  int INTEGER_EXPECTED = 3;
+  int NATURALNUMBER_EXPECTED = 3;
   /** Lexical state. */
   int DEFAULT = 4;
 
@@ -86,6 +88,7 @@ interface IndexParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"package\"",
     "\"uuid\"",
     "\"symbolicname\"",
     "\"description\"",
@@ -95,7 +98,7 @@ interface IndexParserConstants_mxJPO {
     "\"!enable\"",
     "\"unique\"",
     "\"!unique\"",
-    "<INTEGER>",
+    "<NATURALNUMBER>",
     "<STRING>",
     "<SINGLE>",
     "<MULTILINESTRING>",
