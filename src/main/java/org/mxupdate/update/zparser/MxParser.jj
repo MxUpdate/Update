@@ -43,6 +43,7 @@ package org.mxupdate.update.zparser;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.mxupdate.update.program.Page_mxJPO;
 import org.mxupdate.update.system.IndexCI_mxJPO;
 import org.mxupdate.update.system.PackageCI_mxJPO;
 import org.mxupdate.update.system.UniqueKeyCI_mxJPO;
@@ -118,12 +119,14 @@ TOKEN : /** first level */
     | <DEFINITION:                          "definition">                                   : STRING_EXPECTED
     | <EMAILADDRESS:                        "emailaddress">                                 : STRING_EXPECTED
     | <FAX:                                 "fax">                                          : STRING_EXPECTED
+    | <FILE:                                "file">                                         : STRING_EXPECTED
     | <FORMAT:                              "format">                                       : STRING_EXPECTED
     | <FULLNAME:                            "fullname">                                     : STRING_EXPECTED
     | <GROUP:                               "group" >                                       : STRING_EXPECTED
     | <HREF:                                "href">                                         : STRING_EXPECTED
     | <LABEL:                               "label">                                        : STRING_EXPECTED
     | <MENU:                                ("add" ([" ","\t","\n","\r"])+ )? "menu">       : STRING_EXPECTED
+    | <MIME:                                "mime">                                         : STRING_EXPECTED
     | <PACKAGE:                             "package">                                      : STRING_EXPECTED
     | <PARENT:                              "parent">                                       : STRING_EXPECTED
     | <PATTERN:                             "pattern">                                      : STRING_EXPECTED
@@ -138,6 +141,7 @@ TOKEN : /** first level */
 
     | <CODE:                                "code">                                         : MULTILINESTRING_EXPECTED
     | <COMMENT:                             "comment">                                      : MULTILINESTRING_EXPECTED
+    | <CONTENT:                             "content">                                      : MULTILINESTRING_EXPECTED
     | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 }
 
@@ -376,6 +380,36 @@ TOKEN : /** first level */
     | <COLUMN_SORTTYPE_NONE:                "none">                                         : COLUMN_EXPECTED
 }
 
+/************************************************************ Program -> Page */
+
+/**
+ * Parses one complete page definition.
+ *
+ * @param _file     parsed file
+ * @param _page     target page to update with parsed values
+ */
+void parsePage(final Page_mxJPO _page)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    Token tmp;
+    AdminProperty property;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_page, "packageRef", str);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_page, "description", str);} )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_page, "properties", "propertiesStack", property);} )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_page, "symbolicNames", str);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_page, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_page, "hidden", false);} )
+      | ( <MIME>                      str = string()                            {this.setValue(_page, "mimeType", str);} )
+      | ( <CONTENT>                   str = multiLineString()                   {this.setValue(_page, "code", str);} )
+      | ( <FILE>                      str = string()                            {this.setValue(_page, "file", str);} )
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_page, "properties", "propertiesStack", property);} )
+    )*
+}
+
 /************************************************************ System -> Index */
 
 /**
@@ -394,25 +428,17 @@ void parseIndex(final IndexCI_mxJPO _index)
 {
     (
         ( <PACKAGE>                   str = string()                            {this.setValue(_index, "packageRef", str);} )
-
       | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_index, "properties", "propertiesStack", property);} )
-
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_index, "symbolicNames", str);} )
-
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_index, "description", str);} )
-
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_index, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_index, "hidden", false);} )
-
       | ( <ENABLE_TRUE>                                                         {this.setValue(_index, "enable", true);} )
       | ( <ENABLE_FALSE>                                                        {this.setValue(_index, "enable", false);} )
-
       | ( <UNIQUE_TRUE>                                                         {this.setValue(_index, "unique", true);} )
       | ( <UNIQUE_FALSE>                                                        {this.setValue(_index, "unique", false);} )
-
       | ( <FIELD>                     str = string()                            {field = new IndexCI_mxJPO.Field();this.appendValue(_index, "fields", field);this.setValue(field, "expression", str);}
                     ( <SIZE>          number = naturalNumber()                  {this.setValue(field, "size", number);} )? )
-
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_index, "properties", "propertiesStack", property);} )
     )*
 }
@@ -433,19 +459,13 @@ void parsePackage(final PackageCI_mxJPO _package)
 {
     (
         ( <UUID>                      property = uuidProperty()                 {this.appendValue(_package, "properties", "propertiesStack", property);} )
-
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_package, "symbolicNames", str);} )
-
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_package, "description", str);} )
-
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_package, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_package, "hidden", false);} )
-
       | ( <CUSTOM_TRUE>                                                         {this.setValue(_package, "custom", true);} )
       | ( <CUSTOM_FALSE>                                                        {this.setValue(_package, "custom", false);} )
-
       | ( <USESPACKAGE>               str = string()                            {this.appendValue(_package, "usesPackages", str);} )
-
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_package, "properties", "propertiesStack", property);} )
     )*
 }
@@ -468,31 +488,21 @@ void parseUniqueKey(final UniqueKeyCI_mxJPO _uniqueKey)
 {
     (
         ( <PACKAGE>                   str = string()                            {this.setValue(_uniqueKey, "packageRef", str);} )
-
       | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_uniqueKey, "properties", "propertiesStack", property);} )
-
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_uniqueKey, "symbolicNames", str);} )
-
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_uniqueKey, "description", str);} )
-
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_uniqueKey, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_uniqueKey, "hidden", false);} )
-
       | ( <ENABLE_TRUE>                                                         {this.setValue(_uniqueKey, "enable", true);} )
       | ( <ENABLE_FALSE>                                                        {this.setValue(_uniqueKey, "enable", false);} )
-
       | ( <GLOBAL_TRUE>                                                         {this.setValue(_uniqueKey, "global", true);} )
       | ( <GLOBAL_FALSE>                                                        {this.setValue(_uniqueKey, "global", false);} )
-
       | ( <FOR>
             ( <FOR_RELATIONSHIP>      str = string()                            {this.setValue(_uniqueKey, "forRelation", str);}
             | <FOR_TYPE>              str = string()                            {this.setValue(_uniqueKey, "forType", str);} ) )
-
       | ( <WITH> <WITH_INTERFACE>     str = string()                            {this.setValue(_uniqueKey, "withInterface", str);} )
-
       | ( <FIELD>                     str = string()                            {field = new UniqueKeyCI_mxJPO.Field();this.appendValue(_uniqueKey, "fields", field);this.setValue(field, "expression", str);}
                     ( <SIZE>          number = naturalNumber()                  {this.setValue(field, "size", number);} )? )
-
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_uniqueKey, "properties", "propertiesStack", property);} )
     )*
 }
@@ -513,18 +523,12 @@ void parseAssociation(final Association_mxJPO _role)
 {
     (
         ( <PACKAGE>                   str = string()                            {this.setValue(_role, "packageRef", str);} )
-
       | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_role, "properties", "propertiesStack", property);} )
-
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_role, "symbolicNames", str);} )
-
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_role, "description", str);} )
-
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_role, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_role, "hidden", false);} )
-
       | ( <DEFINITION>                str = string()                            {this.setValue(_role, "definition", str);} )
-
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_role, "properties", "propertiesStack", property);} )
     )*
 }
@@ -546,20 +550,13 @@ void parseGroup(final Group_mxJPO _group)
 {
     (
         ( <PACKAGE>                   str = string()                            {this.setValue(_group, "packageRef", str);} )
-
       | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_group, "properties", "propertiesStack", property);} )
-
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_group, "symbolicNames", str);} )
-
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_group, "description", str);} )
-
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_group, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_group, "hidden", false);} )
-
       | ( <SITE>                      str = string()                            {this.setValue(_group, "site", str);} )
-
       | ( <PARENT>                    str = string()                            {this.appendValue(_group, "parentGroups", str);} )
-
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_group, "properties", "propertiesStack", property);} )
     )*
 }
@@ -652,24 +649,16 @@ void parseRole(final Role_mxJPO _role)
 {
     (
         ( <PACKAGE>                   str = string()                            {this.setValue(_role, "packageRef", str);} )
-
       | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_role, "properties", "propertiesStack", property);} )
-
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_role, "symbolicNames", str);} )
-
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_role, "description", str);} )
-
       | ( <KIND>                    ( <KIND_ORGANIZATION>                       {this.setValue(_role, "kind", Role_mxJPO.Kind.Organization);}
                                     | <KIND_PROJECT>                            {this.setValue(_role, "kind", Role_mxJPO.Kind.Project);}
                                     | <KIND_ROLE>                               {this.setValue(_role, "kind", Role_mxJPO.Kind.Role);} ) )
-
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_role, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_role, "hidden", false);} )
-
       | ( <SITE>                      str = string()                            {this.setValue(_role, "site", str);} )
-
       | ( <PARENT>                    str = string()                            {this.appendValue(_role, "parentRoles", str);} )
-
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_role, "properties", "propertiesStack", property);} )
     )*
 }
@@ -694,28 +683,17 @@ void parseChannel(Channel_mxJPO _channel)
 {
     (
         ( <PACKAGE>                   str = string()                            {this.setValue(_channel, "packageRef", str);} )
-
       | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_channel, "properties", "propertiesStack", property);} )
-
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_channel, "symbolicNames", str);} )
-
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_channel, "description", str);} )
-
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_channel, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_channel, "hidden", false);} )
-
       | ( <LABEL>                     str = string()                            {this.setValue(_channel, "label", str);} )
-
       | ( <ALT>                       str = string()                            {this.setValue(_channel, "alt", str);} )
-
       | ( <HREF>                      str = string()                            {this.setValue(_channel, "href", str);} )
-
       | ( <HEIGHT>                    number = naturalNumber()                  {this.setValue(_channel, "height", number);} )
-
       | ( <SETTING>                   property = settingProperty()              {this.appendValue(_channel, "properties", "propertiesStack", property);} )
-
       | ( <COMMAND>                   str = string()                            {ref = new CommandRef();this.setValue(ref, "column", refIdx++);this.appendValue(_channel, "children", "childrenStack", ref);this.setValue(ref, "name", str);} )
-
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_channel, "properties", "propertiesStack", property);} )
     )*
 }
@@ -736,28 +714,17 @@ void parseCommand(Command_mxJPO _command)
 {
     (
         ( <PACKAGE>                   str = string()                            {this.setValue(_command, "packageRef", str);} )
-
       | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_command, "properties", "propertiesStack", property);} )
-
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_command, "symbolicNames", str);} )
-
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_command, "description", str);} )
-
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_command, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_command, "hidden", false);} )
-
       | ( <ALT>                       str = string()                            {this.setValue(_command, "alt", str);} )
-
       | ( <HREF>                      str = string()                            {this.setValue(_command, "href", str);} )
-
       | ( <LABEL>                     str = string()                            {this.setValue(_command, "label", str);} )
-
       | ( <USER>                      str = string()                            {this.appendValue(_command, "users", str);} )
-
       | ( <SETTING>                   property = settingProperty()              {this.appendValue(_command, "properties", "propertiesStack", property);} )
-
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_command, "properties", "propertiesStack", property);} )
-
       | ( <CODE>                      str = multiLineString()                   {this.setValue(_command, "code", str);} )
     )*
 }
@@ -781,16 +748,11 @@ void parseForm(final Form_mxJPO _form)
 {
     (
         ( <PACKAGE>                   str = string()                            {this.setValue(_form, "packageRef", str);} )
-
       | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_form, "properties", "propertiesStack", property);} )
-
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_form, "symbolicNames", str);} )
-
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_form, "description", str);} )
-
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_form, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_form, "hidden", false);} )
-
       | ( <FIELD>                                                               {field = new Form_mxJPO.Field(); this.appendValue(_form, "fields", field);  }
           <FIELD_OPEN>
                     ( <FIELD_NAME>      ( tmp = <FIELD_STRING>                  {this.setValue(field, "name",           this.getString(tmp.image));}
@@ -817,7 +779,6 @@ void parseForm(final Form_mxJPO _form)
                                         ( tmp = <FIELD_STRING>                  {this.setValue(setting, "value",        this.getString(tmp.image));}
                                         | tmp = <FIELD_SINGLE>                  {this.setValue(setting, "value",        this.getSingle(tmp.image));} ) ) *
           <FIELD_CLOSE> )
-
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_form, "properties", "propertiesStack", property);} )
     )*
 }
@@ -838,24 +799,15 @@ void parseInquiry(final Inquiry_mxJPO _inquiry)
 {
     (
         ( <PACKAGE>                   str = string()                            {this.setValue(_inquiry, "packageRef", str);} )
-
       | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_inquiry, "properties", "propertiesStack", property);} )
-
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_inquiry, "symbolicNames", str);} )
-
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_inquiry, "description", str);} )
-
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_inquiry, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_inquiry, "hidden", false);} )
-
       | ( <PATTERN>                   str = string()                            {this.setValue(_inquiry, "pattern", str);} )
-
       | ( <FORMAT>                    str = string()                            {this.setValue(_inquiry, "format", str);} )
-
       | ( <CODE>                      str = multiLineString()                   {this.setValue(_inquiry, "code", str);} )
-
       | ( <ARGUMENT>                  property = settingProperty()              {this.appendValue(_inquiry, "properties", "propertiesStack", property);} )
-
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_inquiry, "properties", "propertiesStack", property);} )
     )*
 }
@@ -878,30 +830,19 @@ void parseMenu(Menu_mxJPO _menu)
 {
     (
         ( <PACKAGE>                   str = string()                            {this.setValue(_menu, "packageRef", str);} )
-
       | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_menu, "properties", "propertiesStack", property);} )
-
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_menu, "symbolicNames", str);} )
-
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_menu, "description", str);} )
-
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_menu, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_menu, "hidden", false);} )
-
       | ( <TREEMENU_TRUE>                                                       {this.setValue(_menu, "treeMenu", true);} )
       | ( <TREEMENU_FALSE>                                                      {this.setValue(_menu, "treeMenu", false);} )
-
       | ( <ALT>                       str = string()                            {this.setValue(_menu, "alt", str);} )
-
       | ( <HREF>                      str = string()                            {this.setValue(_menu, "href", str);} )
-
       | ( <LABEL>                     str = string()                            {this.setValue(_menu, "label", str);} )
-
       | ( <SETTING>                   property = settingProperty()              {this.appendValue(_menu, "properties", "propertiesStack", property);} )
-
       | ( <COMMAND>                   str = string()                            {ref = new CommandRef();this.setValue(ref, "column", refIdx++);this.appendValue(_menu, "children", "childrenStack", ref);this.setValue(ref, "name", str);} )
       | ( <MENU>                      str = string()                            {ref = new MenuRef();   this.setValue(ref, "column", refIdx++);this.appendValue(_menu, "children", "childrenStack", ref);this.setValue(ref, "name", str);} )
-
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_menu, "properties", "propertiesStack", property);} )
     )*
 }
@@ -924,27 +865,17 @@ void parsePortal(Portal_mxJPO _portal)
 {
     (
         ( <PACKAGE>                   str = string()                            {this.setValue(_portal, "packageRef", str);} )
-
       | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_portal, "properties", "propertiesStack", property);} )
-
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_portal, "symbolicNames", str);} )
-
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_portal, "description", str);} )
-
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_portal, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_portal, "hidden", false);} )
-
       | ( <ALT>                       str = string()                            {this.setValue(_portal, "alt", str);} )
-
       | ( <HREF>                      str = string()                            {this.setValue(_portal, "href", str);} )
-
       | ( <LABEL>                     str = string()                            {this.setValue(_portal, "label", str);} )
-
       | ( <SETTING>                   property = settingProperty()              {this.appendValue(_portal, "properties", "propertiesStack", property);} )
-
       | ( <CHANNEL>                   str = string()                            {ref = new ChannelRef();this.setValue(ref, "column", refColIdx++);this.setValue(ref, "row", refRowIdx);this.appendValue(_portal, "children", "childrenStack", ref);this.setValue(ref, "name", str);} )
       | ( <NEWROW>                                                              {refRowIdx++;refColIdx = 0;} )
-
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_portal, "properties", "propertiesStack", property);} )
     )*
 }
@@ -968,16 +899,11 @@ void parseTable(final Table_mxJPO _table)
 {
     (
         ( <PACKAGE>                   str = string()                            {this.setValue(_table, "packageRef", str);} )
-
       | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_table, "properties", "propertiesStack", property);} )
-
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_table, "symbolicNames", str);} )
-
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_table, "description", str);} )
-
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_table, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_table, "hidden", false);} )
-
       | ( <COLUMN>                                                              {column = new Table_mxJPO.Column();this.appendValue(_table, "fields", column);  }
           <COLUMN_OPEN>
                     ( <COLUMN_NAME>     ( tmp = <COLUMN_STRING>                 {this.setValue(column, "name",                              this.getString(tmp.image));}
@@ -1010,7 +936,6 @@ void parseTable(final Table_mxJPO _table)
                                         ( tmp = <COLUMN_STRING>                 {this.setValue(setting, "value",                            this.getString(tmp.image));}
                                         | tmp = <COLUMN_SINGLE>                 {this.setValue(setting, "value",                            this.getSingle(tmp.image));} ) ) *
           <COLUMN_CLOSE> )
-
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_table, "properties", "propertiesStack", property);} )
     )*
 }
