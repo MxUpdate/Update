@@ -31,6 +31,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.StringUtils_mxJPO;
 
 import matrix.db.Context;
 import matrix.util.MatrixException;
@@ -334,33 +335,35 @@ public class InstallDataModel_mxJPO
 
         // reads symbolic names of the administration objects
         final String symbProgIdxOf = new StringBuilder().append(" on program ").append(symbProg).append(' ').toString();
-        final StringBuilder cmd = new StringBuilder()
-                .append("escape list property on program \"").append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
-                    .append(_mxClass).append(" \"").append(_name).append("\"");
-        for (final String symbName : MqlUtil_mxJPO.execMql(_paramCache, cmd).split("\n"))  {
-            if (!"".equals(symbName))  {
+        final String symbNameStr = MqlBuilderUtil_mxJPO.mql()
+                .cmd("escape list property ")
+                        .cmd("on program ").arg(symbProg).cmd(" ")
+                        .cmd("to ").cmd(_mxClass).cmd(" ").arg(_name)
+                .exec(_paramCache.getContext());
+        if (!StringUtils_mxJPO.isEmpty(symbNameStr))  {
+            for (final String symbName : symbNameStr.split("\n"))  {
                 symbolicNames.add(symbName.substring(0, symbName.indexOf(symbProgIdxOf)));
             }
         }
-        // check symbolic names
-        final StringBuilder update = new StringBuilder();
+        // append missing names
         if (!symbolicNames.contains(newSymbName))  {
             _paramCache.logDebug("    - register symbolic name '" + newSymbName + "'");
-            update.append("escape add property \"").append(StringUtil_mxJPO.convertMql(newSymbName)).append("\" ")
-                    .append(" on program \"").append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
-                    .append(_mxClass)
-                    .append(" \"").append(StringUtil_mxJPO.convertMql(_name)).append("\";\n");
+            MqlBuilderUtil_mxJPO.mql()
+                    .cmd("escape add property ").arg(newSymbName).cmd(" ")
+                            .cmd("on program ").arg(symbProg).cmd(" ")
+                            .cmd("to ").cmd(_mxClass).cmd(" ").arg(_name)
+                    .exec(_paramCache.getContext());
         }
+        // remove obsolete names
         for (final String exSymbName : symbolicNames)  {
             if (!newSymbName.equals(exSymbName))  {
                 _paramCache.logDebug("    - remove symbolic name '" + exSymbName + "'");
-                update.append("escape delete property \"")
-                                .append(StringUtil_mxJPO.convertMql(exSymbName)).append("\" ")
-                        .append(" on program \"").append(StringUtil_mxJPO.convertMql(symbProg)).append("\" to ")
-                        .append(_mxClass).append(" \"").append(StringUtil_mxJPO.convertMql(_name)).append("\";\n");
+                MqlBuilderUtil_mxJPO.mql()
+                        .cmd("escape delete property ").arg(exSymbName).cmd(" ")
+                                .cmd("on program ").arg(symbProg).cmd(" ")
+                                .cmd("to ").cmd(_mxClass).cmd(" ").arg(_name)
+                        .exec(_paramCache.getContext());
             }
         }
-
-        MqlUtil_mxJPO.execMql(_paramCache, update);
     }
 }

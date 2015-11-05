@@ -15,6 +15,7 @@
 
 package org.mxupdate.test.data.program;
 
+import org.apache.commons.lang3.StringUtils;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.AbstractTest.CI;
 import org.mxupdate.test.data.AbstractAdminData;
@@ -71,10 +72,13 @@ public abstract class AbstractProgramData<DATA extends AbstractProgramData<?>>
 
             this.getTest().mql(cmd);
 
-            this.getTest().mql(new  StringBuilder()
-               .append("escape add property ").append(this.getSymbolicName())
-               .append(" on program eServiceSchemaVariableMapping.tcl")
-               .append(" to " + this.getCI().getMxType() + " \"").append(AbstractTest.convertMql(this.getName())).append("\""));
+            if (!StringUtils.isEmpty(this.getSymbolicName()))  {
+                this.getTest().mql()
+                        .cmd("escape add property ").arg(this.getSymbolicName())
+                        .cmd(" on program ").arg("eServiceSchemaVariableMapping.tcl")
+                        .cmd(" to " + this.getCI().getMxType() + " ").arg(this.getName())
+                        .exec(this.getTest().getContext());
+            }
 
             this.setCreated(true);
 
