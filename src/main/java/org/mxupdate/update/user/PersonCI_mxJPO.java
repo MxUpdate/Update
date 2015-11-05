@@ -32,6 +32,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.zparser.MxParser_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
@@ -157,7 +158,7 @@ public class PersonCI_mxJPO
         this.admin.clear();
         this.admin.add("dummy");
 
-        new PersonCIParser_mxJPO(new StringReader(_code)).parse(this);
+        new MxParser_mxJPO(new StringReader(_code)).parsePerson(this);
 
         // fix none admin access
         if ((this.admin.size() == 1) && this.admin.iterator().next().equals("none")) {

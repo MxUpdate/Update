@@ -45,6 +45,8 @@ import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.update.user.Association_mxJPO;
 import org.mxupdate.update.user.Group_mxJPO;
+import org.mxupdate.update.user.PersonCI_mxJPO;
+import org.mxupdate.update.user.PersonCI_mxJPO.TypeItem;
 import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.AbstractField.ExpressionType;
 import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.AbstractField.SortType;
 import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.Setting;
@@ -92,13 +94,13 @@ TOKEN : /** first level */
 
     | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
-    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
-    | <HIDDEN_TRUE:                         "hidden">
-    | <HIDDEN_FALSE:                        "!hidden">
-
-    | <TREEMENU_TRUE:                       "treemenu">
-    | <TREEMENU_FALSE:                      "!treemenu">
+    | <ACTIVE_TRUE:                         "active">    | <ACTIVE_FALSE:                        "!active">
+    | <HIDDEN_TRUE:                         "hidden">    | <HIDDEN_FALSE:                        "!hidden">
+    | <TREEMENU_TRUE:                       "treemenu">  | <TREEMENU_FALSE:                      "!treemenu">
+    | <TRUSTED_TRUE:                        "trusted">   | <TRUSTED_FALSE:                       "!trusted">
+    | <EMAIL_TRUE:                          "email">     | <EMAIL_FALSE:                         "!email">
+    | <INCONMAIL_TRUE:                      "iconmail">  | <INCONMAIL_FALSE:                     "!iconmail">
 
 
     | <HEIGHT:                              "height">                                       : NATURALNUMBER_EXPECTED
@@ -114,16 +116,27 @@ TOKEN : /** first level */
 
     | <NEWROW:                              "newrow">                                       : DEFAULT
 
+    | <ADDRESS:                             "address">                                      : STRING_EXPECTED
     | <ALT:                                 "alt">                                          : STRING_EXPECTED
+    | <APPLICATION:                         "application" >                                 : STRING_EXPECTED
     | <DEFINITION:                          "definition">                                   : STRING_EXPECTED
+    | <EMAILADDRESS:                        "emailaddress">                                 : STRING_EXPECTED
+    | <FAX:                                 "fax">                                          : STRING_EXPECTED
     | <FORMAT:                              "format">                                       : STRING_EXPECTED
+    | <FULLNAME:                            "fullname">                                     : STRING_EXPECTED
+    | <GROUP:                               "group" >                                       : STRING_EXPECTED
     | <HREF:                                "href">                                         : STRING_EXPECTED
     | <LABEL:                               "label">                                        : STRING_EXPECTED
     | <PARENT:                              "parent">                                       : STRING_EXPECTED
     | <PATTERN:                             "pattern">                                      : STRING_EXPECTED
+    | <PHONE:                               "phone">                                        : STRING_EXPECTED
+    | <ROLE:                                "role" >                                        : STRING_EXPECTED
     | <SITE:                                "site">                                         : STRING_EXPECTED
+    | <VAULT:                               "vault" >                                       : STRING_EXPECTED
 
     | <CODE:                                "code">                                         : MULTILINESTRING_EXPECTED
+    | <COMMENT:                             "comment">                                      : MULTILINESTRING_EXPECTED
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 }
 
 /******************************************************* Common String String */
@@ -155,7 +168,81 @@ TOKEN : /** first level */
       <NATURALNUMBER: (("0") | (["1"-"9"](["0"-"9"])*))> : DEFAULT
 }
 
-/***************************************************************** Form Field */
+/****************************************************** User -> Person Access */
+<DEFAULT> TOKEN :
+{
+       <ACCESS:                              "access">                                     : ACCESS_OPENEXPECTED
+}
+
+<ACCESS_OPENEXPECTED> TOKEN :
+{
+      <ACCESS_ALL:                           "all" >                                       : DEFAULT
+    | <ACCESS_OPEN:                          "{">                                          : ACCESS_EXPECTED
+}
+
+<ACCESS_EXPECTED> TOKEN :
+{
+      <ACCESS_CLOSE:                         "}">                                           : DEFAULT
+    | <ACCESS_EXPECTED_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>
+}
+
+/******************************************************* User -> Person Admin */
+<DEFAULT> TOKEN :
+{
+       <ADMIN:                              "admin">                                        : ADMIN_OPENEXPECTED
+}
+
+<ADMIN_OPENEXPECTED> TOKEN :
+{
+      <ADMIN_ALL:                           "all" >                                         : DEFAULT
+    | <ADMIN_OPEN:                          "{">                                            : ADMIN_EXPECTED
+}
+
+<ADMIN_EXPECTED> TOKEN :
+{
+      <ADMIN_CLOSE:                         "}">                                           : DEFAULT
+    | <ADMIN_EXPECTED_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>
+}
+
+/***************************************************** User -> Person Product */
+
+<DEFAULT> TOKEN :
+{
+      <PRODUCT:                              "product">                                    : PRODUCT_OPENEXPECTED
+}
+
+<PRODUCT_OPENEXPECTED> TOKEN :
+{
+      <PRODUCT_OPEN:                         "{">                                          : PRODUCT_EXPECTED
+}
+
+<PRODUCT_EXPECTED> TOKEN :
+{
+      <PRODUCT_CLOSE:                        "}">                                           : DEFAULT
+    | <PRODUCT_EXPECTED_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>
+}
+
+/******************************************************** User -> Person Type */
+<DEFAULT> TOKEN :
+{
+       <TYPE:                                "type">                                        : TYPE_OPENEXPECTED
+}
+
+<TYPE_OPENEXPECTED> TOKEN :
+{
+      <TYPE_OPEN:                            "{">                                          : TYPE_EXPECTED
+}
+
+<TYPE_EXPECTED> TOKEN :
+{
+      <TYPE_CLOSE:                           "}">                                           : DEFAULT
+    | <TYPE_APPLICATION:                     "application">                                 : TYPE_EXPECTED
+    | <TYPE_FULL:                            "full">                                        : TYPE_EXPECTED
+    | <TYPE_BUSINESS:                        "business">                                    : TYPE_EXPECTED
+    | <TYPE_SYSTEM:                          "system">                                      : TYPE_EXPECTED
+}
+
+/*********************************************** User Interface -> Form Field */
 <DEFAULT> TOKEN :
 {
       <FIELD:                               "field">                                        : FIELD_OPENEXPECTED
@@ -315,6 +402,78 @@ void parseGroup(final Group_mxJPO _group)
       | ( <PARENT>                    str = string()                            {this.appendValue(_group, "parentGroups", str);} )
 
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_group, "properties", "propertiesStack", property);} )
+    )*
+}
+
+/************************************************************* User -> Person */
+
+/**
+ * Parses one complete person definition.
+ *
+ * @param _person  target admin person to update with parsed values
+ */
+void parsePerson(final PersonCI_mxJPO _person)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    Token tmp;
+    AdminProperty property;
+} 
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_person, "packageRef", str);} )
+
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_person, "properties", "propertiesStack", property);} )
+
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_person, "symbolicNames", str);} )
+
+      | ( <COMMENT>                   str = multiLineString()                   {this.setValue(_person, "description", str);} )
+
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_person, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_person, "hidden", false);} )
+
+      | ( <ACTIVE_TRUE>                                                         {this.setValue(_person, "active", true);} )
+      | ( <ACTIVE_FALSE>                                                        {this.setValue(_person, "active", false);} )
+
+      | ( <TRUSTED_TRUE>                                                        {this.setValue(_person, "trusted", true);} )
+      | ( <TRUSTED_FALSE>                                                       {this.setValue(_person, "trusted", false);} )
+
+      | ( <ACCESS>      ( <ACCESS_ALL>                                          {this.clearValues(_person, "access");this.appendValue(_person, "access", "all");}
+                        | <ACCESS_OPEN>                                         {this.clearValues(_person, "access");}
+                                        ( tmp = <ACCESS_EXPECTED_SINGLE>        {this.appendValue(_person, "access", this.getString(tmp.image));} )* <ACCESS_CLOSE > ) )
+
+      | ( <ADMIN>       ( <ADMIN_ALL>                                           {this.clearValues(_person, "admin");this.appendValue(_person, "admin", "all");}
+                        | <ADMIN_OPEN>                                          {this.clearValues(_person, "admin");}
+                                        ( tmp = <ADMIN_EXPECTED_SINGLE>         {this.appendValue(_person, "admin", this.getString(tmp.image));} )* <ADMIN_CLOSE > ) )
+
+      | ( <EMAIL_TRUE>                                                          {this.setValue(_person, "email", true);} )
+      | ( <EMAIL_FALSE>                                                         {this.setValue(_person, "email", false);} )
+      | ( <INCONMAIL_TRUE>                                                      {this.setValue(_person, "iconmail", true);} )
+      | ( <INCONMAIL_FALSE>                                                     {this.setValue(_person, "iconmail", false);} )
+
+      | ( <ADDRESS>                   str = string()                            {this.setValue(_person, "address", str);} )
+      | ( <EMAILADDRESS>              str = string()                            {this.setValue(_person, "emailAddress", str);} )
+      | ( <FAX>                       str = string()                            {this.setValue(_person, "fax", str);} )
+      | ( <FULLNAME>                  str = string()                            {this.setValue(_person, "fullName", str);} )
+      | ( <PHONE>                     str = string()                            {this.setValue(_person, "phone", str);} )
+
+      | ( <PRODUCT> <PRODUCT_OPEN>  ( tmp = <PRODUCT_EXPECTED_SINGLE>           {this.appendValue(_person, "products", this.getString(tmp.image));} )* <PRODUCT_CLOSE> )
+
+      | ( <TYPE> <TYPE_OPEN>                                                    {this.clearValues(_person, "types");}
+                                    ( ( <TYPE_APPLICATION>                      {this.appendValue(_person, "types", TypeItem.APPLICATION);} )
+                                    | ( <TYPE_FULL>                             {this.appendValue(_person, "types", TypeItem.FULL);} )
+                                    | ( <TYPE_BUSINESS>                         {this.appendValue(_person, "types", TypeItem.BUSINESS);} )
+                                    | ( <TYPE_SYSTEM>                           {this.appendValue(_person, "types", TypeItem.SYSTEM);} ) )* <TYPE_CLOSE > )
+
+      | (<VAULT>                      str = string()                            {this.setValue(_person, "vault", str);} )
+      | (<APPLICATION>                str = string()                            {this.setValue(_person, "application", str);} )
+      | (<SITE>                       str = string()                            {this.setValue(_person, "site", str);} )
+
+      | (<GROUP>                      str = string()                            {this.appendValue(_person, "groups", str);} )
+
+      | (<ROLE>                       str = string()                            {this.appendValue(_person, "roles", str);} )
+
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_person, "properties", "propertiesStack", property);} )
     )*
 }
 
