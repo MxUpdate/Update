@@ -42,135 +42,137 @@ interface MxParserConstants_mxJPO {
   /** RegularExpression Id. */
   int TREEMENU_FALSE = 12;
   /** RegularExpression Id. */
-  int LABEL = 13;
+  int HEIGHT = 13;
   /** RegularExpression Id. */
-  int ALT = 14;
+  int USER = 14;
   /** RegularExpression Id. */
-  int HREF = 15;
+  int SETTING = 15;
   /** RegularExpression Id. */
-  int HEIGHT = 16;
+  int ARGUMENT = 16;
   /** RegularExpression Id. */
-  int USER = 17;
+  int CHANNEL = 17;
   /** RegularExpression Id. */
-  int SETTING = 18;
+  int COMMAND = 18;
   /** RegularExpression Id. */
-  int ARGUMENT = 19;
+  int MENU = 19;
   /** RegularExpression Id. */
-  int CHANNEL = 20;
+  int NEWROW = 20;
   /** RegularExpression Id. */
-  int COMMAND = 21;
+  int LABEL = 21;
   /** RegularExpression Id. */
-  int MENU = 22;
+  int ALT = 22;
   /** RegularExpression Id. */
-  int NEWROW = 23;
+  int HREF = 23;
   /** RegularExpression Id. */
   int PATTERN = 24;
   /** RegularExpression Id. */
-  int FORMAT = 25;
+  int DEFINITION = 25;
   /** RegularExpression Id. */
-  int CODE = 26;
+  int FORMAT = 26;
   /** RegularExpression Id. */
-  int STRING_STRING_STRING = 27;
+  int CODE = 27;
   /** RegularExpression Id. */
-  int STRING_STRING_SINGLE = 28;
+  int STRING_STRING_STRING = 28;
   /** RegularExpression Id. */
-  int STRING = 29;
+  int STRING_STRING_SINGLE = 29;
   /** RegularExpression Id. */
-  int SINGLE = 30;
+  int STRING = 30;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 31;
+  int SINGLE = 31;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 32;
+  int MULTILINESTRING = 32;
   /** RegularExpression Id. */
-  int NATURALNUMBER = 33;
+  int MULTILINESINGLE = 33;
   /** RegularExpression Id. */
-  int FIELD = 34;
+  int NATURALNUMBER = 34;
   /** RegularExpression Id. */
-  int FIELD_OPEN = 35;
+  int FIELD = 35;
   /** RegularExpression Id. */
-  int FIELD_CLOSE = 36;
+  int FIELD_OPEN = 36;
   /** RegularExpression Id. */
-  int FIELD_NAME = 37;
+  int FIELD_CLOSE = 37;
   /** RegularExpression Id. */
-  int FIELD_LABEL = 38;
+  int FIELD_NAME = 38;
   /** RegularExpression Id. */
-  int FIELD_SELECT = 39;
+  int FIELD_LABEL = 39;
   /** RegularExpression Id. */
-  int FIELD_BOBJ = 40;
+  int FIELD_SELECT = 40;
   /** RegularExpression Id. */
-  int FIELD_REL = 41;
+  int FIELD_BOBJ = 41;
   /** RegularExpression Id. */
-  int FIELD_RANGE = 42;
+  int FIELD_REL = 42;
   /** RegularExpression Id. */
-  int FIELD_HREF = 43;
+  int FIELD_RANGE = 43;
   /** RegularExpression Id. */
-  int FIELD_ALT = 44;
+  int FIELD_HREF = 44;
   /** RegularExpression Id. */
-  int FIELD_USER = 45;
+  int FIELD_ALT = 45;
   /** RegularExpression Id. */
-  int FIELD_SETTING = 46;
+  int FIELD_USER = 46;
   /** RegularExpression Id. */
-  int FIELD_STRING = 47;
+  int FIELD_SETTING = 47;
   /** RegularExpression Id. */
-  int FIELD_SINGLE = 48;
+  int FIELD_STRING = 48;
   /** RegularExpression Id. */
-  int FIELD_SETTING_STRING = 49;
+  int FIELD_SINGLE = 49;
   /** RegularExpression Id. */
-  int FIELD_SETTING_SINGLE = 50;
+  int FIELD_SETTING_STRING = 50;
   /** RegularExpression Id. */
-  int COLUMN = 51;
+  int FIELD_SETTING_SINGLE = 51;
   /** RegularExpression Id. */
-  int COLUMN_OPEN = 52;
+  int COLUMN = 52;
   /** RegularExpression Id. */
-  int COLUMN_CLOSE = 53;
+  int COLUMN_OPEN = 53;
   /** RegularExpression Id. */
-  int COLUMN_NAME = 54;
+  int COLUMN_CLOSE = 54;
   /** RegularExpression Id. */
-  int COLUMN_LABEL = 55;
+  int COLUMN_NAME = 55;
   /** RegularExpression Id. */
-  int COLUMN_SELECT = 56;
+  int COLUMN_LABEL = 56;
   /** RegularExpression Id. */
-  int COLUMN_BOBJ = 57;
+  int COLUMN_SELECT = 57;
   /** RegularExpression Id. */
-  int COLUMN_REL = 58;
+  int COLUMN_BOBJ = 58;
   /** RegularExpression Id. */
-  int COLUMN_RANGE = 59;
+  int COLUMN_REL = 59;
   /** RegularExpression Id. */
-  int COLUMN_HREF = 60;
+  int COLUMN_RANGE = 60;
   /** RegularExpression Id. */
-  int COLUMN_ALT = 61;
+  int COLUMN_HREF = 61;
   /** RegularExpression Id. */
-  int COLUMN_HIDDEN_TRUE = 62;
+  int COLUMN_ALT = 62;
   /** RegularExpression Id. */
-  int COLUMN_HIDDEN_FALSE = 63;
+  int COLUMN_HIDDEN_TRUE = 63;
   /** RegularExpression Id. */
-  int COLUMN_USER = 64;
+  int COLUMN_HIDDEN_FALSE = 64;
   /** RegularExpression Id. */
-  int COLUMN_SORTTYPE = 65;
+  int COLUMN_USER = 65;
   /** RegularExpression Id. */
-  int COLUMN_SETTING = 66;
+  int COLUMN_SORTTYPE = 66;
   /** RegularExpression Id. */
-  int COLUMN_STRING = 67;
+  int COLUMN_SETTING = 67;
   /** RegularExpression Id. */
-  int COLUMN_SINGLE = 68;
+  int COLUMN_STRING = 68;
   /** RegularExpression Id. */
-  int SETTING_STRING = 69;
+  int COLUMN_SINGLE = 69;
   /** RegularExpression Id. */
-  int SETTING_SINGLE = 70;
+  int SETTING_STRING = 70;
   /** RegularExpression Id. */
-  int COLUMN_SORTTYPE_ALPHA = 71;
+  int SETTING_SINGLE = 71;
   /** RegularExpression Id. */
-  int COLUMN_SORTTYPE_NUMERIC = 72;
+  int COLUMN_SORTTYPE_ALPHA = 72;
   /** RegularExpression Id. */
-  int COLUMN_SORTTYPE_OTHER = 73;
+  int COLUMN_SORTTYPE_NUMERIC = 73;
   /** RegularExpression Id. */
-  int COLUMN_SORTTYPE_NONE = 74;
+  int COLUMN_SORTTYPE_OTHER = 74;
   /** RegularExpression Id. */
-  int PROPERTY = 75;
+  int COLUMN_SORTTYPE_NONE = 75;
   /** RegularExpression Id. */
-  int PROPERTYTO = 76;
+  int PROPERTY = 76;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 77;
+  int PROPERTYTO = 77;
+  /** RegularExpression Id. */
+  int PROPERTYVAL = 78;
 
   /** Lexical state. */
   int COLUMN_SORTTYPE_EXPECTED = 0;
@@ -216,9 +218,6 @@ interface MxParserConstants_mxJPO {
     "\"!hidden\"",
     "\"treemenu\"",
     "\"!treemenu\"",
-    "\"label\"",
-    "\"alt\"",
-    "\"href\"",
     "\"height\"",
     "<USER>",
     "<SETTING>",
@@ -227,7 +226,11 @@ interface MxParserConstants_mxJPO {
     "<COMMAND>",
     "<MENU>",
     "\"newrow\"",
+    "\"label\"",
+    "\"alt\"",
+    "\"href\"",
     "\"pattern\"",
+    "\"definition\"",
     "\"format\"",
     "\"code\"",
     "<STRING_STRING_STRING>",

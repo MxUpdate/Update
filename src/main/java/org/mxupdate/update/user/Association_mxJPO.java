@@ -27,6 +27,7 @@ import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.zparser.MxParser_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 import matrix.util.MatrixException;
@@ -66,7 +67,7 @@ public class Association_mxJPO
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-        new AssociationParser_mxJPO(new StringReader(_code)).parse(this);
+        new MxParser_mxJPO(new StringReader(_code)).parseAssociation(this);
         this.prepare();
     }
 
