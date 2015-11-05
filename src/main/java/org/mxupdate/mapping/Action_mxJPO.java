@@ -22,6 +22,7 @@ import org.mxupdate.action.ExportAction_mxJPO;
 import org.mxupdate.action.HelpAction_mxJPO;
 import org.mxupdate.action.SelectTypeDefUtil_mxJPO;
 import org.mxupdate.action.UpdateAction_mxJPO;
+import org.mxupdate.action.VersionAction_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 
 /**
@@ -68,6 +69,16 @@ public enum Action_mxJPO
             throws Exception
         {
             new UpdateAction_mxJPO(_paramCache, _selects).execute();
+        }
+    },
+    /** Show informations about current installed MxUdpate version. */
+    VERSION()  {
+        @Override
+        public void execute(final ParameterCache_mxJPO _paramCache,
+                            final SelectTypeDefUtil_mxJPO _selects)
+            throws Exception
+        {
+            new VersionAction_mxJPO(_paramCache).execute();
         }
     };
 

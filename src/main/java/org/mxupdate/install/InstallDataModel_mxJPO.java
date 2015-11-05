@@ -30,6 +30,7 @@ import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 
 import matrix.db.Context;
 import matrix.util.MatrixException;
@@ -43,10 +44,6 @@ import matrix.util.MatrixException;
  */
 public class InstallDataModel_mxJPO
 {
-    /** Name of the parameter defining the program name where applications must be registered. */
-    private static final String PARAM_PROGAPPL          = "RegisterApplicationProg";
-    /** Name of the parameter defining the application name. */
-    private static final String PARAM_APPLNAME          = "RegisterApplicationName";
     /** Name of the parameter defining the author name. */
     private static final String PARAM_AUTHOR            = "RegisterAuthorName";
     /** Name of the parameter defining the installer name. */
@@ -93,7 +90,6 @@ public class InstallDataModel_mxJPO
         // initialize mapping
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, false);
 
-        final String applName = paramCache.getValueString(InstallDataModel_mxJPO.PARAM_APPLNAME);
         final String authorName = paramCache.getValueString(InstallDataModel_mxJPO.PARAM_AUTHOR);
         final String installerName = paramCache.getValueString(InstallDataModel_mxJPO.PARAM_INSTALLER);
         final SimpleDateFormat dateFormat = new SimpleDateFormat(paramCache.getValueString(InstallDataModel_mxJPO.PARAM_INSTALLFILEDATEFORMAT));
@@ -102,16 +98,10 @@ public class InstallDataModel_mxJPO
         final String fileDate = dateFormat.format(new Date());
         final String installedDate = StringUtil_mxJPO.formatInstalledDate(paramCache, new Date());
 
-        this.updateAttributes(paramCache,
-                applName, applVersion,
-                authorName, installerName,
-                fileDate, installedDate);
+        this.updateAttributes(paramCache, applVersion, authorName, installerName, fileDate, installedDate);
         this.updateBusTypes(paramCache);
-        this.registerPrograms(paramCache,
-                applName, applVersion,
-                authorName, installerName,
-                installedDate);
-        this.registerMxUpdate(paramCache, applName, applVersion);
+        this.registerPrograms(paramCache, applVersion, authorName, installerName, installedDate);
+        this.registerMxUpdate(paramCache, applVersion);
     }
 
     /**
@@ -122,8 +112,6 @@ public class InstallDataModel_mxJPO
      * properties are set only if they are not already set.
      *
      * @param _paramCache       parameter cache
-     * @param _applName         used application name of the MxUpdate Update
-     *                          deployment tool
      * @param _applVersion      Mx Update version
      * @param _authorName       used author name
      * @param _installerName    used installer name
@@ -133,13 +121,13 @@ public class InstallDataModel_mxJPO
      * @see #LIST_MXUPDATE_PROGRAMS
      */
     protected void registerPrograms(final ParameterCache_mxJPO _paramCache,
-                                    final String _applName,
                                     final String _applVersion,
                                     final String _authorName,
                                     final String _installerName,
                                     final String _installedDate)
         throws Exception
     {
+        final String applName = _paramCache.getValueString(ValueKeys.RegisterApplicationName);
         final String progs = MqlUtil_mxJPO.execMql(_paramCache, InstallDataModel_mxJPO.LIST_MXUPDATE_PROGRAMS);
         for (final String progLine : new TreeSet<>(Arrays.asList(progs.split("\n"))))  {
             final String[] progLineArr = progLine.split("@");
@@ -151,7 +139,7 @@ public class InstallDataModel_mxJPO
                     .append("escape mod program \"").append(StringUtil_mxJPO.convertMql(progName)).append("\" ");
 
             // check for correct property entries
-            this.checkProperty(_paramCache, "program", progName, "application",        _applName,      cmd, false);
+            this.checkProperty(_paramCache, "program", progName, "application",        applName,       cmd, false);
             this.checkProperty(_paramCache, "program", progName, "installer",          _installerName, cmd, false);
             this.checkProperty(_paramCache, "program", progName, "installed date",     _installedDate, cmd, true);
             this.checkProperty(_paramCache, "program", progName, "version",            _applVersion,   cmd, false);
@@ -166,32 +154,32 @@ public class InstallDataModel_mxJPO
      * Makes the registration of MxUpdate as application.
      *
      * @param _paramCache   parameter cache with MX context
-     * @param _applName     used application name of the MxUpdate Update
-     *                      deployment tool
      * @param _version      MxUpdate version
      * @throws MatrixException if registration of MxUpdate failed
-     * @see #PARAM_PROGAPPL
      */
     protected void registerMxUpdate(final ParameterCache_mxJPO _paramCache,
-                                    final String _applName,
                                     final String _version)
             throws MatrixException
     {
-        final String progName = _paramCache.getValueString(InstallDataModel_mxJPO.PARAM_PROGAPPL);
+        final String applName = _paramCache.getValueString(ValueKeys.RegisterApplicationName);
+        final String progName = _paramCache.getValueString(ValueKeys.RegisterApplicationProg);
 
-        _paramCache.logInfo("register MxUpdate " + _version);
-        MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
-                .append("escape mod prog \"").append(StringUtil_mxJPO.convertMql(progName)).append("\" ")
-                .append("add property \"appVersion").append(StringUtil_mxJPO.convertMql(_applName)).append("\" ")
-                .append("value \"").append(StringUtil_mxJPO.convertMql(_version)).append("\""));
+        final String curVers = MqlBuilderUtil_mxJPO.mql()
+                .cmd("escape print program ").arg(progName).cmd(" ")
+                        .cmd("select ").arg("property[appVersion" + applName + "].value").cmd(" dump")
+                        .exec(_paramCache.getContext());
+        if (!_version.equals(curVers))  {
+            MqlBuilderUtil_mxJPO.mql()
+                    .cmd("escape modify program ").arg(progName).cmd(" ")
+                            .cmd("add property ").arg("appVersion" + applName).cmd(" value ").arg(_version)
+                            .exec(_paramCache.getContext());
+        }
     }
 
     /**
      * Creates / updates all needed attributes used as MxUpdate properties.
      *
      * @param _paramCache       parameter cache
-     * @param _applName         used application name of the MxUpdate Update
-     *                          deployment tool
      * @param _applVersion      new MxUpdate version
      * @param _authorName       used author name
      * @param _installerName    used installer name
@@ -200,7 +188,6 @@ public class InstallDataModel_mxJPO
      * @throws Exception if update of attribute failed
      */
     protected void updateAttributes(final ParameterCache_mxJPO _paramCache,
-                                    final String _applName,
                                     final String _applVersion,
                                     final String _authorName,
                                     final String _installerName,
@@ -208,6 +195,7 @@ public class InstallDataModel_mxJPO
                                     final String _installedDate)
             throws Exception
     {
+        final String applName = _paramCache.getValueString(ValueKeys.RegisterApplicationName);
         for (final PropertyDef_mxJPO propDef : PropertyDef_mxJPO.values())  {
             if ((propDef.getAttrName(_paramCache) != null) && !propDef.getAttrName(_paramCache).isEmpty())  {
                 final String attrName = propDef.getAttrName(_paramCache);
@@ -230,7 +218,7 @@ public class InstallDataModel_mxJPO
                     .append(StringUtil_mxJPO.convertMql(attrName)).append("\" ");
 
                 // check for correct property entries
-                this.checkProperty(_paramCache, "attribute", attrName, "application",                                        _applName,                          cmd, false);
+                this.checkProperty(_paramCache, "attribute", attrName, "application",                                        applName,                           cmd, false);
                 this.checkProperty(_paramCache, "attribute", attrName, "installer",                                          _installerName,                     cmd, false);
                 this.checkProperty(_paramCache, "attribute", attrName, "installed date",                                     _installedDate,                     cmd, true);
                 this.checkProperty(_paramCache, "attribute", attrName, "version",                                            _applVersion,                       cmd, false);

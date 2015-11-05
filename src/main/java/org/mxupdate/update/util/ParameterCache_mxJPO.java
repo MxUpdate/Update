@@ -59,11 +59,6 @@ public class ParameterCache_mxJPO
      */
     public static final String KEY_DEFAULTAUTHOR = "DefaultAuthor";
 
-    /**
-     * String of the key within the parameter cache for the version parameter.
-     */
-    public static final String KEY_VERSION = "Version";
-
     /** Mapping between parameter definition and the related boolean value. */
     private final Map<String,Boolean> mapBoolean;
     /** Mapping between parameter definition and the related integer value. */
@@ -719,11 +714,14 @@ public class ParameterCache_mxJPO
         /** Check if an update is required by comparing the defined last modified date against the value of the file date property. */
         UpdateCheckFileDate,
 
-        /**
-         * Key used to store the name of the program where all administration
-         * objects must be registered with symbolic names. For an OOTB installation
-         * the value is typically &quot;eServiceSchemaVariableMapping.tcl&quot;.
-         */
+        /** Info text used for the version print out. */
+        VersionActionInfoText,
+
+        /** Defines the application name. */
+        RegisterApplicationName,
+        /** Defines the program name where applications must be registered. */
+        RegisterApplicationProg,
+        /** Defines the program where all administration objects must be registered with symbolic names. */
         RegisterSymbolicNames,
 
         ////////////////////////////////////////////////////////////////////////
