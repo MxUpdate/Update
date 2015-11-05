@@ -129,8 +129,9 @@ public class PathTypeData
     {
         super.createDependings();
 
-        this.fromDatas.createDependings();
-        this.toDatas  .createDependings();
+        this.fromDatas .createDependings();
+        this.toDatas   .createDependings();
+        this.attributes.createDependings();
 
         return this;
     }

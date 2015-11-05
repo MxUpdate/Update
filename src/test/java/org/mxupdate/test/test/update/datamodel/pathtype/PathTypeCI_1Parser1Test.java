@@ -40,18 +40,31 @@ public class PathTypeCI_1Parser1Test
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }"},
+            // package
+            {"1a) package string",
+                    "",
+                    "package \"abc\" description \"\" !hidden "
+                            + "from { cardinality many } "
+                            + "to   { }"},
+            {"1b) package single",
+                    "package \"abc\" description \"\" !hidden "
+                            + "from { cardinality many } "
+                            + "to   { }",
+                    "package abc     description \"\" !hidden "
+                            + "from { cardinality many } "
+                            + "to   { }"},
             // uuid
-            {"1a) uuid with minus separator",
+            {"2a) uuid with minus separator",
                     "",
                     "uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }"},
-            {"1b) uuid w/o minus separator",
+            {"2b) uuid w/o minus separator",
                     "",
                     "uuid \"FDA75674979211E6AE2256B6B6499611\"     description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }"},
-            {"1c) uuid convert from single to string",
+            {"2c) uuid convert from single to string",
                     "uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }",
@@ -59,12 +72,12 @@ public class PathTypeCI_1Parser1Test
                             + "from { cardinality many } "
                             + "to   { }"},
             // registered name
-            {"2a) symbolic name",
+            {"3a) symbolic name",
                     "",
                     "symbolicname \"channel_abc\" description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }"},
-            {"2b) two symbolic names",
+            {"3b) two symbolic names",
                     "symbolicname \"channel_abc\" symbolicname \"channel_def\" description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }",
@@ -72,24 +85,24 @@ public class PathTypeCI_1Parser1Test
                             + "from { cardinality many } "
                             + "to   { }"},
             // description
-            {"3a) description",
+            {"4a) description",
                     "",
                     "description \"abc def\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }"},
-            {"3b) description not defined",
+            {"4b) description not defined",
                     "description \"\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }",
                     "!hidden "
                             + "from { cardinality many } "
                             + "to   { }"},
-            {"3c) multi-line description ",
+            {"4c) multi-line description ",
                     "",
                     "description \"abc\ndef\" !hidden "
                             + "from { cardinality many } "
                             + "to   { }"},
-            {"3d) tab's in description",
+            {"4d) tab's in description",
                     "",
                     "description \"abc\\tdef\" !hidden "
                             + "from { cardinality many } "

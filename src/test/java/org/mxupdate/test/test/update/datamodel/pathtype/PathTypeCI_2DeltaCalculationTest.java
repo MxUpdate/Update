@@ -20,6 +20,7 @@ import org.mxupdate.test.data.datamodel.AttributeData;
 import org.mxupdate.test.data.datamodel.PathTypeData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -50,26 +51,36 @@ public class PathTypeCI_2DeltaCalculationTest
                     new PathTypeData(this, "Test"),
                     new PathTypeData(this, "Test")},
 
-            {"1) uuid",
+            {"1a) new package",
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new PathTypeData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new PathTypeData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new PathTypeData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new PathTypeData(this, "Test").defKeyNotDefined("package")},
+
+            {"2) uuid",
                     new PathTypeData(this, "Test"),
                     new PathTypeData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
 
-            {"2a) symbolic name",
+            {"3a) symbolic name",
                     new PathTypeData(this, "Test"),
                     new PathTypeData(this, "Test").setValue("symbolicname", "expression_123")},
-            {"2b) two symbolic name",
+            {"3b) two symbolic name",
                     new PathTypeData(this, "Test"),
                     new PathTypeData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
 
-            {"3) description",
+            {"4) description",
                     new PathTypeData(this, "Test"),
                     new PathTypeData(this, "Test").setValue("description", "abc def")},
 
-            {"4) global attribute",
+            {"5) global attribute",
                     new PathTypeData(this, "Test"),
                     new PathTypeData(this, "Test").defData("attribute", new AttributeData(this, "Test Attribute").setSingle("kind", "string"))},
 
-            {"5) with property",
+            {"6) with property",
                     new PathTypeData(this, "Test"),
                     new PathTypeData(this, "Test").addProperty(new PropertyDef("property"))},
 
@@ -237,7 +248,65 @@ public class PathTypeCI_2DeltaCalculationTest
                                         .setFlag("multiline", false, Create.ViaFlag)
                                         .setSingle("maxlength", "0")
                                         .setValue("default", "")) },
-            {"207) attribute with uuid",
+            {"207a) attribute with new package",
+                    new PathTypeData(this, "Test"),
+                    new PathTypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .defData("package", new PackageData(this, "TestPackage"))
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", ""))},
+            {"207b) attribute with package update",
+                    new PathTypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .defData("package", new PackageData(this, "TestPackage1"))
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")),
+                    new PathTypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .defData("package", new PackageData(this, "TestPackage2"))
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", ""))},
+            {"207c) attribute with package remove",
+                    new PathTypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .defData("package", new PackageData(this, "TestPackage"))
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")),
+                    new PathTypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", ""))},
+            {"208) attribute with uuid",
                     new PathTypeData(this, "Test"),
                     new PathTypeData(this, "Test")
                             .addLocalAttribute(
@@ -250,7 +319,7 @@ public class PathTypeCI_2DeltaCalculationTest
                                         .setFlag("resetonclone", false, Create.ViaFlag)
                                         .setFlag("resetonrevision", false, Create.ViaFlag)
                                         .setValue("default", "")) },
-            {"208) attribute with symbolic name",
+            {"209) attribute with symbolic name",
                     new PathTypeData(this, "Test"),
                     new PathTypeData(this, "Test")
                             .addLocalAttribute(
@@ -276,6 +345,7 @@ public class PathTypeCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE);
         this.cleanup(AbstractTest.CI.DM_TYPE);
         this.cleanup(AbstractTest.CI.DM_RELATIONSHIP);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override
