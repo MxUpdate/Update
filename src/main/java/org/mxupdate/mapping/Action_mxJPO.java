@@ -20,6 +20,7 @@ import java.util.Collection;
 import org.mxupdate.action.DeleteAction_mxJPO;
 import org.mxupdate.action.ExportAction_mxJPO;
 import org.mxupdate.action.HelpAction_mxJPO;
+import org.mxupdate.action.LicenseAction_mxJPO;
 import org.mxupdate.action.SelectTypeDefUtil_mxJPO;
 import org.mxupdate.action.UpdateAction_mxJPO;
 import org.mxupdate.action.VersionAction_mxJPO;
@@ -59,6 +60,15 @@ public enum Action_mxJPO
             throws Exception
         {
             new HelpAction_mxJPO(_paramCache).execute();
+        }
+    },
+    /** Prints out the license information. */
+    LICENSE()  {
+        @Override public void execute(final ParameterCache_mxJPO _paramCache,
+                                      final SelectTypeDefUtil_mxJPO _selects)
+            throws Exception
+        {
+            new LicenseAction_mxJPO(_paramCache).execute();
         }
     },
     /** Updates defined administration objects from file system into MX. */

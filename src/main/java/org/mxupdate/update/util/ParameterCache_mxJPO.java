@@ -642,6 +642,23 @@ public class ParameterCache_mxJPO
         /** Boolean that the update continues if a error was thrown. */
         ParamContinueOnError,
 
+        /** License text. */
+        ActionLicenseText,
+        /** License text separator. */
+        ActionLicenseTextSeparator,
+        /** Length of one license line. */
+        ActionLicenseLengthLine,
+        /** Public key of the license signature. */
+        ActionLicensePublicKey,
+        /** Text that the signature is NOT valid. */
+        ActionLicenseSignatureIsNotValid,
+        /** Text that the signature is valid. */
+        ActionLicenseSignatureIsValid,
+        /** Text that the installed version is NOT valid. */
+        ActionLicenseVersionIsNotValid,
+        /** Text that the installed version is valid. */
+        ActionLicenseVersionIsValid,
+
         /** Parameter for copyright used for the help description. */
         HelpCopyright,
         /** Parameter for the description used for the help description. */
