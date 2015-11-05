@@ -68,7 +68,9 @@ PARSER_END(UniqueKeyParser)
 
 <DEFAULT> TOKEN :
 {
-      <UUID:                                "uuid">                                         : STRING_EXPECTED
+      <PACKAGE:                             "package">                                      : STRING_EXPECTED
+
+    | <UUID:                                "uuid">                                         : STRING_EXPECTED
 
     | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
@@ -85,9 +87,9 @@ PARSER_END(UniqueKeyParser)
 }
 
 /************************************************************** Common Integer */
-<INTEGER_EXPECTED> TOKEN :
+<NATURALNUMBER_EXPECTED> TOKEN :
 {
-      <INTEGER: ( ["0"-"9"] )+> : DEFAULT
+      <NATURALNUMBER: (("0") | (["1"-"9"](["0"-"9"])*))> : DEFAULT
 }
 
 /************************************************************** Common String */
@@ -126,7 +128,7 @@ PARSER_END(UniqueKeyParser)
 <DEFAULT> TOKEN :
 {
       <FIELD:                               "field">                                        : STRING_EXPECTED
-    | <SIZE:                                "size">                                         : INTEGER_EXPECTED
+    | <SIZE:                                "size">                                         : NATURALNUMBER_EXPECTED
 }
 
 /******************************************************************* Property */
@@ -151,50 +153,113 @@ PARSER_END(UniqueKeyParser)
  * @param _uniqueKey      target package to update with parsed values
  */
 void parse(final UniqueKeyCI_mxJPO _uniqueKey)
-    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
-: {
-    Token tmp;
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
     String str;
+    Integer number;
     Field field;
     AdminProperty property;
-} {
-    (   ( <UUID>                                                            {property = new AdminProperty();
-                                                                             this.appendValue(this.getValue(_uniqueKey, "properties"), "propertiesStack", property);
-                                                                             this.setValue(property, "name",  "UUID");}
-                                      str = string()                        {this.setValue(property, "value", str);} )
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_uniqueKey, "packageRef", str);} )
 
-      | ( <SYMBOLICNAME>              str = string()                        {this.appendValue(_uniqueKey, "symbolicNames", str);} )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_uniqueKey, "properties", "propertiesStack", property);} )
 
-      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_uniqueKey, "description", this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>               {this.setValue(_uniqueKey, "description", this.getSingle(tmp.image));} ) )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_uniqueKey, "symbolicNames", str);} )
 
-      | ( <HIDDEN_TRUE>                                                     {this.setValue(_uniqueKey, "hidden", true);} )
-      | ( <HIDDEN_FALSE>                                                    {this.setValue(_uniqueKey, "hidden", false);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_uniqueKey, "description", str);} )
 
-      | ( <ENABLE_TRUE>                                                     {this.setValue(_uniqueKey, "enable", true);} )
-      | ( <ENABLE_FALSE>                                                    {this.setValue(_uniqueKey, "enable", false);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_uniqueKey, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_uniqueKey, "hidden", false);} )
 
-      | ( <GLOBAL_TRUE>                                                     {this.setValue(_uniqueKey, "global", true);} )
-      | ( <GLOBAL_FALSE>                                                    {this.setValue(_uniqueKey, "global", false);} )
+      | ( <ENABLE_TRUE>                                                         {this.setValue(_uniqueKey, "enable", true);} )
+      | ( <ENABLE_FALSE>                                                        {this.setValue(_uniqueKey, "enable", false);} )
+
+      | ( <GLOBAL_TRUE>                                                         {this.setValue(_uniqueKey, "global", true);} )
+      | ( <GLOBAL_FALSE>                                                        {this.setValue(_uniqueKey, "global", false);} )
 
       | ( <FOR>
-            ( <FOR_RELATIONSHIP>      str = string()                        {this.setValue(_uniqueKey, "forRelation", str);}
-            | <FOR_TYPE>              str = string()                        {this.setValue(_uniqueKey, "forType", str);} ) )
+            ( <FOR_RELATIONSHIP>      str = string()                            {this.setValue(_uniqueKey, "forRelation", str);}
+            | <FOR_TYPE>              str = string()                            {this.setValue(_uniqueKey, "forType", str);} ) )
 
-      | ( <WITH> <WITH_INTERFACE>     str = string()                        {this.setValue(_uniqueKey, "withInterface", str);} )
+      | ( <WITH> <WITH_INTERFACE>     str = string()                            {this.setValue(_uniqueKey, "withInterface", str);} )
 
-      | ( <FIELD>                     str = string()                        {field = new Field();this.appendValue(_uniqueKey, "fields", field);this.setValue(field, "expression", str);}
-                    ( <SIZE>          tmp = <INTEGER>                       {this.setValue(field, "size", Integer.parseInt(tmp.image));} )? )
+      | ( <FIELD>                     str = string()                            {field = new Field();this.appendValue(_uniqueKey, "fields", field);this.setValue(field, "expression", str);}
+                    ( <SIZE>          number = naturalNumber()                  {this.setValue(field, "size", number);} )? )
 
-      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_uniqueKey, "properties", "propertiesStack", property);}
-                                      str = string()                        {this.setValue(property, "name", str);}
-              (   ( <PROPERTYVAL>     str = string()                        {this.setValue(property, "value", str);} )
-                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                      str = string()                        {this.setValue(property, "refAdminName", str);} ) )* )
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_uniqueKey, "properties", "propertiesStack", property);} )
     )*
 }
 
+/**
+ * Parses the UUID property definition.
+ */
+AdminProperty uuidProperty() :
+{
+    String str;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()
+    {this.setValue(property, "value", str);}
+    {this.setValue(property, "name",  "UUID");}
+    {return property;}
+}
+
+/**
+ * Parses the properties definition.
+ */
+AdminProperty property() :
+{
+    String str;
+    Token tmp;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()                                 {this.setValue(property, "name", str);}
+    ( ( <PROPERTYVAL>  str = string()              {this.setValue(property, "value", str);} )
+    | ( <PROPERTYTO>   ( tmp = <ADMINTYPE_STRING>  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                       | tmp = <ADMINTYPE_SINGLE>  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                   str = string()  {this.setValue(property, "refAdminName", str);} ) )*
+    {return property;}
+}
+
+/**
+ * Evaluates integer value.
+ *
+ * @return integer
+ */
+Integer naturalNumber() :
+{
+    Token tmp;
+}
+{
+    tmp = <NATURALNUMBER>
+    {return Integer.valueOf(tmp.image);}
+}
+
+/**
+ * Evaluates multi-line string.
+ *
+ * @return string
+ */
+String multiLineString() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <MULTILINESTRING>  {ret = this.getString(tmp.image);}
+    | tmp = <MULTILINESINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
+}
+
+/**
+ * Evaluates single-line string.
+ *
+ * @return string
+ */
 String string() :
 {
     Token tmp;
@@ -203,7 +268,5 @@ String string() :
 {
     ( tmp = <STRING>  {ret = this.getString(tmp.image);}
     | tmp = <SINGLE>  {ret = this.getSingle(tmp.image);} )
-    {
-        return ret;
-    }
+    {return ret;}
 }

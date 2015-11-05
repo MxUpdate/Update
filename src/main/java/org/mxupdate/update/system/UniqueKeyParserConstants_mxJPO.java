@@ -26,57 +26,59 @@ interface UniqueKeyParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int UUID = 5;
+  int PACKAGE = 5;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 6;
+  int UUID = 6;
   /** RegularExpression Id. */
-  int DESCRIPTION = 7;
+  int SYMBOLICNAME = 7;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 8;
+  int DESCRIPTION = 8;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 9;
+  int HIDDEN_TRUE = 9;
   /** RegularExpression Id. */
-  int ENABLE_TRUE = 10;
+  int HIDDEN_FALSE = 10;
   /** RegularExpression Id. */
-  int ENABLE_FALSE = 11;
+  int ENABLE_TRUE = 11;
   /** RegularExpression Id. */
-  int GLOBAL_TRUE = 12;
+  int ENABLE_FALSE = 12;
   /** RegularExpression Id. */
-  int GLOBAL_FALSE = 13;
+  int GLOBAL_TRUE = 13;
   /** RegularExpression Id. */
-  int INTEGER = 14;
+  int GLOBAL_FALSE = 14;
   /** RegularExpression Id. */
-  int STRING = 15;
+  int NATURALNUMBER = 15;
   /** RegularExpression Id. */
-  int SINGLE = 16;
+  int STRING = 16;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 17;
+  int SINGLE = 17;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 18;
+  int MULTILINESTRING = 18;
   /** RegularExpression Id. */
-  int FOR = 19;
+  int MULTILINESINGLE = 19;
   /** RegularExpression Id. */
-  int WITH = 20;
+  int FOR = 20;
   /** RegularExpression Id. */
-  int FOR_RELATIONSHIP = 21;
+  int WITH = 21;
   /** RegularExpression Id. */
-  int FOR_TYPE = 22;
+  int FOR_RELATIONSHIP = 22;
   /** RegularExpression Id. */
-  int WITH_INTERFACE = 23;
+  int FOR_TYPE = 23;
   /** RegularExpression Id. */
-  int FIELD = 24;
+  int WITH_INTERFACE = 24;
   /** RegularExpression Id. */
-  int SIZE = 25;
+  int FIELD = 25;
   /** RegularExpression Id. */
-  int PROPERTY = 26;
+  int SIZE = 26;
   /** RegularExpression Id. */
-  int PROPERTYTO = 27;
+  int PROPERTY = 27;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 28;
+  int PROPERTYTO = 28;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 29;
+  int PROPERTYVAL = 29;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 30;
+  int ADMINTYPE_STRING = 30;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 31;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -89,7 +91,7 @@ interface UniqueKeyParserConstants_mxJPO {
   /** Lexical state. */
   int STRING_EXPECTED = 4;
   /** Lexical state. */
-  int INTEGER_EXPECTED = 5;
+  int NATURALNUMBER_EXPECTED = 5;
   /** Lexical state. */
   int DEFAULT = 6;
 
@@ -100,6 +102,7 @@ interface UniqueKeyParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"package\"",
     "\"uuid\"",
     "\"symbolicname\"",
     "\"description\"",
@@ -109,7 +112,7 @@ interface UniqueKeyParserConstants_mxJPO {
     "\"!enable\"",
     "\"global\"",
     "\"!global\"",
-    "<INTEGER>",
+    "<NATURALNUMBER>",
     "<STRING>",
     "<SINGLE>",
     "<MULTILINESTRING>",

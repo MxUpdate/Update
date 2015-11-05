@@ -20,6 +20,7 @@ import org.mxupdate.test.data.datamodel.AttributeData;
 import org.mxupdate.test.data.datamodel.InterfaceData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.system.UniqueKeyData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -86,27 +87,68 @@ public class UniqueKeyCI_2DeltaCalculationTest
                     new UniqueKeyData(this, "Test")
                             .setValue("for relationship", new RelationshipData(this, "Test").getName())
                             .setFlag("global", true)},
+            // package
+            {"3a) new package with type",
+                    new UniqueKeyData(this, "Test")
+                            .defData("for type", new TypeData(this, "Test")),
+                    new UniqueKeyData(this, "Test")
+                            .setValue("for type", new TypeData(this, "Test").getName())
+                            .defData("package", new PackageData(this, "TestPackage"))},
+            {"3b) update package with type",
+                    new UniqueKeyData(this, "Test")
+                            .defData("for type", new TypeData(this, "Test"))
+                            .defData("package", new PackageData(this, "TestPackage1")),
+                    new UniqueKeyData(this, "Test")
+                            .setValue("for type", new TypeData(this, "Test").getName())
+                            .defData("package", new PackageData(this, "TestPackage2"))},
+            {"3c) remove package with type",
+                    new UniqueKeyData(this, "Test")
+                            .defData("for type", new TypeData(this, "Test"))
+                            .defData("package", new PackageData(this, "TestPackage")),
+                    new UniqueKeyData(this, "Test")
+                            .setValue("for type", new TypeData(this, "Test").getName())
+                            .defKeyNotDefined("package")},
+            {"3d) new package with relationship",
+                    new UniqueKeyData(this, "Test")
+                            .defData("for relationship", new RelationshipData(this, "Test")),
+                    new UniqueKeyData(this, "Test")
+                            .setValue("for relationship", new RelationshipData(this, "Test").getName())
+                            .defData("package", new PackageData(this, "TestPackage"))},
+            {"3e) update package with relationship",
+                    new UniqueKeyData(this, "Test")
+                            .defData("for relationship", new RelationshipData(this, "Test"))
+                            .defData("package", new PackageData(this, "TestPackage1")),
+                    new UniqueKeyData(this, "Test")
+                            .setValue("for relationship", new RelationshipData(this, "Test").getName())
+                            .defData("package", new PackageData(this, "TestPackage2"))},
+            {"3f) remove package with relationship",
+                    new UniqueKeyData(this, "Test")
+                            .defData("for relationship", new RelationshipData(this, "Test"))
+                            .defData("package", new PackageData(this, "TestPackage")),
+                    new UniqueKeyData(this, "Test")
+                            .setValue("for relationship", new RelationshipData(this, "Test").getName())
+                            .defKeyNotDefined("package")},
             // uuid
-            {"3a) uuid with type",
+            {"4a) uuid with type",
                     new UniqueKeyData(this, "Test")
                             .defData("for type", new TypeData(this, "Test")),
                     new UniqueKeyData(this, "Test")
                             .setValue("for type", new TypeData(this, "Test").getName())
                             .setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
-            {"3b) uuid with relationship",
+            {"4b) uuid with relationship",
                     new UniqueKeyData(this, "Test")
                             .defData("for relationship", new RelationshipData(this, "Test")),
                     new UniqueKeyData(this, "Test")
                             .setValue("for relationship", new RelationshipData(this, "Test").getName())
                             .setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
             // symbolic names
-            {"4a) symbolic name",
+            {"5a) symbolic name",
                     new UniqueKeyData(this, "Test")
                             .defData("for type", new TypeData(this, "Test")),
                     new UniqueKeyData(this, "Test")
                             .setValue("for type", new TypeData(this, "Test").getName())
                             .setValue("symbolicname", "expression_123")},
-            {"4b) two symbolic name",
+            {"5b) two symbolic name",
                     new UniqueKeyData(this, "Test")
                             .defData("for relationship", new RelationshipData(this, "Test")),
                     new UniqueKeyData(this, "Test")
@@ -114,40 +156,39 @@ public class UniqueKeyCI_2DeltaCalculationTest
                             .setValue("symbolicname", "expression_123")
                             .setValue("symbolicname", "expression_345")},
             // description
-            {"5a) description with type",
+            {"6a) description with type",
                     new UniqueKeyData(this, "Test")
                             .defData("for type", new TypeData(this, "Test")),
                     new UniqueKeyData(this, "Test")
                             .setValue("for type", new TypeData(this, "Test").getName())
                             .setValue("description", "abc def")},
-            {"5b) description with relationship",
+            {"6b) description with relationship",
                     new UniqueKeyData(this, "Test")
                             .defData("for relationship", new RelationshipData(this, "Test")),
                     new UniqueKeyData(this, "Test")
                             .setValue("for relationship", new RelationshipData(this, "Test").getName())
                             .setValue("description", "abc def")},
             // hidden
-            {"5a) hidden with type",
+            {"7a) hidden with type",
                     new UniqueKeyData(this, "Test")
                             .defData("for type", new TypeData(this, "Test")),
                     new UniqueKeyData(this, "Test")
                             .setValue("for type", new TypeData(this, "Test").getName())
                             .setFlag("hidden", true)},
-            {"5b) hidden with relationship",
+            {"7b) hidden with relationship",
                     new UniqueKeyData(this, "Test")
                             .defData("for relationship", new RelationshipData(this, "Test")),
                     new UniqueKeyData(this, "Test")
                             .setValue("for relationship", new RelationshipData(this, "Test").getName())
                             .setFlag("hidden", true)},
-            // not hidden
-            {"6a) hidden with type",
+            {"7c) hidden with type",
                     new UniqueKeyData(this, "Test")
                             .defData("for type", new TypeData(this, "Test"))
                             .setFlag("hidden", true),
                     new UniqueKeyData(this, "Test")
                             .setValue("for type", new TypeData(this, "Test").getName())
                             .setFlag("hidden", false)},
-            {"6b) hidden with relationship",
+            {"7d) hidden with relationship",
                     new UniqueKeyData(this, "Test")
                             .defData("for relationship", new RelationshipData(this, "Test"))
                             .setFlag("hidden", true),
@@ -357,6 +398,7 @@ public class UniqueKeyCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.DM_INTERFACE);
         this.cleanup(AbstractTest.CI.DM_RELATIONSHIP);
         this.cleanup(AbstractTest.CI.DM_TYPE);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override
