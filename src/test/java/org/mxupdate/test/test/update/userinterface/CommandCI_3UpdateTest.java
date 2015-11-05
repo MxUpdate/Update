@@ -15,8 +15,6 @@
 
 package org.mxupdate.test.test.update.userinterface;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.ci.userinterface.AbstractUITest;
@@ -30,6 +28,8 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import matrix.util.MatrixException;
 
 /**
  * Tests the {@link Command_mxJPO command CI} export / update.
@@ -89,6 +89,8 @@ public class CommandCI_3UpdateTest
     public void positiveTestUpdateWithAddSettingSyntax()
         throws Exception
     {
+        new CommandData(this, "command").create();
+
         final CommandData orgData = new CommandData(this, "command").addCILine("add setting \"Key\" \"Value\"");
         final CommandData expData = new CommandData(this, "command").setKeyValue("setting", "Key", "Value");
 
@@ -106,6 +108,8 @@ public class CommandCI_3UpdateTest
     public void positiveTestUpdateWithAddUserSyntax()
         throws Exception
     {
+        new CommandData(this, "command").create();
+
         final CommandData orgData = new CommandData(this, "command").addCILine("add user \"" + AbstractTest.PREFIX + "adminuser" + "\"");
         final CommandData expData = new CommandData(this, "command").defData("user", new PersonData(this, "adminuser"));
 
@@ -126,20 +130,22 @@ public class CommandCI_3UpdateTest
     public void positiveTestCodeUpdate()
         throws Exception
     {
+        new CommandData(this, "Test").create();
+
         final String code = "function beta()\n{\n    var idx = 1;\n    $[test]\n}";
 
         final CommandData command = new CommandData(this, "Test").setValue("code", code).update("");
 
-        Assert.assertEquals(code, this.mql("print command " + command.getName() + " select code dump"));
+        Assert.assertEquals(code, this.mql().cmd("escape print command ").arg(command.getName()).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()));
 
         final ExportParser exportParser = command.export();
 
         // remove code and update via export
-        this.mql("mod command " + command.getName() + " code ''");
+        this.mql().cmd("escape modify command ").arg(command.getName()).cmd(" code ").arg("").exec(this.getContext());
         command.updateWithCode(exportParser.getCode(), "");
 
         // and check result (so that the export of code is also checked!)
-        Assert.assertEquals(code, this.mql("print command " + command.getName() + " select code dump"));
+        Assert.assertEquals(code,this.mql().cmd("escape print command ").arg(command.getName()).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext()));
     }
 
     @BeforeMethod()

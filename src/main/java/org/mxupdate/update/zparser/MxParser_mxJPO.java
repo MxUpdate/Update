@@ -20,6 +20,7 @@ package org.mxupdate.update.zparser;
 import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.update.userinterface.Channel_mxJPO;
+import org.mxupdate.update.userinterface.Command_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.CommandRef;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -42,7 +43,7 @@ public class MxParser_mxJPO
  *
  * @param _channel     target menu to update with parsed values
  */
-  final public void parse(Channel_mxJPO _channel) throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {String str;
+  final public void parseChannel(Channel_mxJPO _channel) throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {String str;
     Token tmp;
     AdminProperty property;
     CommandRef ref;
@@ -173,6 +174,125 @@ this.appendValue(_channel, "properties", "propertiesStack", property);
     }
   }
 
+/**************************************************************************** */
+
+/**
+ * Parses one complete command definition.
+ *
+ * @param _command  target command to update with parsed values
+ */
+  final public void parseCommand(Command_mxJPO _command) throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {String str;
+    AdminProperty property;
+    label_2:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case PACKAGE:
+      case UUID:
+      case SYMBOLICNAME:
+      case DESCRIPTION:
+      case HIDDEN_TRUE:
+      case HIDDEN_FALSE:
+      case LABEL:
+      case ALT:
+      case HREF:
+      case USER:
+      case SETTING:
+      case CODE:
+      case PROPERTY:{
+        ;
+        break;
+        }
+      default:
+        jj_la1[3] = jj_gen;
+        break label_2;
+      }
+      switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+      case PACKAGE:{
+        jj_consume_token(PACKAGE);
+        str = string();
+this.setValue(_command, "packageRef", str);
+        break;
+        }
+      case UUID:{
+        jj_consume_token(UUID);
+        property = uuidProperty();
+this.appendValue(_command, "properties", "propertiesStack", property);
+        break;
+        }
+      case SYMBOLICNAME:{
+        jj_consume_token(SYMBOLICNAME);
+        str = string();
+this.appendValue(_command, "symbolicNames", str);
+        break;
+        }
+      case DESCRIPTION:{
+        jj_consume_token(DESCRIPTION);
+        str = multiLineString();
+this.setValue(_command, "description", str);
+        break;
+        }
+      case HIDDEN_TRUE:{
+        jj_consume_token(HIDDEN_TRUE);
+this.setValue(_command, "hidden", true);
+        break;
+        }
+      case HIDDEN_FALSE:{
+        jj_consume_token(HIDDEN_FALSE);
+this.setValue(_command, "hidden", false);
+        break;
+        }
+      case ALT:{
+        jj_consume_token(ALT);
+        str = string();
+this.setValue(_command, "alt", str);
+        break;
+        }
+      case HREF:{
+        jj_consume_token(HREF);
+        str = string();
+this.setValue(_command, "href", str);
+        break;
+        }
+      case LABEL:{
+        jj_consume_token(LABEL);
+        str = string();
+this.setValue(_command, "label", str);
+        break;
+        }
+      case USER:{
+        jj_consume_token(USER);
+        str = string();
+this.appendValue(_command, "users", str);
+        break;
+        }
+      case SETTING:{
+        jj_consume_token(SETTING);
+        property = settingProperty();
+this.appendValue(_command, "properties", "propertiesStack", property);
+        break;
+        }
+      case PROPERTY:{
+        jj_consume_token(PROPERTY);
+        property = property();
+this.appendValue(_command, "properties", "propertiesStack", property);
+        break;
+        }
+      case CODE:{
+        jj_consume_token(CODE);
+        str = multiLineString();
+this.setValue(_command, "code", str);
+        break;
+        }
+      default:
+        jj_la1[4] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+  }
+
+/**************************************************************************** */
+
 /**
  * Parses the UUID property definition.
  */
@@ -186,6 +306,35 @@ this.setValue(property, "name",  "UUID");
   }
 
 /**
+ * Parses one setting.
+ */
+  final public AdminProperty settingProperty() throws ParseException {String name, value;
+    Token tmp;
+    AdminProperty property = new AdminProperty();
+    switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
+    case SETTING_STRING:{
+      tmp = jj_consume_token(SETTING_STRING);
+name = this.getString(tmp.image);
+      break;
+      }
+    case SETTING_SINGLE:{
+      tmp = jj_consume_token(SETTING_SINGLE);
+name = this.getSingle(tmp.image);
+      break;
+      }
+    default:
+      jj_la1[5] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    value = string();
+this.setValue(property, "name", "%" + name);
+this.setValue(property, "value", value);
+{if ("" != null) return property;}
+    throw new Error("Missing return statement in function");
+  }
+
+/**
  * Parses the properties definition.
  */
   final public AdminProperty property() throws ParseException {String str;
@@ -193,7 +342,7 @@ this.setValue(property, "name",  "UUID");
     AdminProperty property = new AdminProperty();
     str = string();
 this.setValue(property, "name", str);
-    label_2:
+    label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case PROPERTYTO:
@@ -202,8 +351,8 @@ this.setValue(property, "name", str);
         break;
         }
       default:
-        jj_la1[3] = jj_gen;
-        break label_2;
+        jj_la1[6] = jj_gen;
+        break label_3;
       }
       switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
       case PROPERTYVAL:{
@@ -226,7 +375,7 @@ this.setValue(property, "refAdminType", this.getSingle(tmp.image));
           break;
           }
         default:
-          jj_la1[4] = jj_gen;
+          jj_la1[7] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
@@ -235,7 +384,7 @@ this.setValue(property, "refAdminName", str);
         break;
         }
       default:
-        jj_la1[5] = jj_gen;
+        jj_la1[8] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -274,7 +423,7 @@ ret = this.getSingle(tmp.image);
       break;
       }
     default:
-      jj_la1[6] = jj_gen;
+      jj_la1[9] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -301,7 +450,7 @@ ret = this.getSingle(tmp.image);
       break;
       }
     default:
-      jj_la1[7] = jj_gen;
+      jj_la1[10] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -318,13 +467,13 @@ ret = this.getSingle(tmp.image);
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[8];
+  final private int[] jj_la1 = new int[11];
   static private int[] jj_la1_0;
   static {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x101ffe0,0xc00000,0x101ffe0,0x6000000,0x18000000,0x6000000,0x180000,0x60000,};
+      jj_la1_0 = new int[] {0x4037fe0,0x3000000,0x4037fe0,0x405bfe0,0x405bfe0,0x3000000,0x18000000,0x60000000,0x18000000,0x600000,0x180000,};
    }
 
   /** Constructor with InputStream. */
@@ -338,7 +487,7 @@ ret = this.getSingle(tmp.image);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -352,7 +501,7 @@ ret = this.getSingle(tmp.image);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -362,7 +511,7 @@ ret = this.getSingle(tmp.image);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -380,7 +529,7 @@ ret = this.getSingle(tmp.image);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -389,7 +538,7 @@ ret = this.getSingle(tmp.image);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -398,7 +547,7 @@ ret = this.getSingle(tmp.image);
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -449,12 +598,12 @@ ret = this.getSingle(tmp.image);
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[29];
+    boolean[] la1tokens = new boolean[31];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 11; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -463,7 +612,7 @@ ret = this.getSingle(tmp.image);
         }
       }
     }
-    for (int i = 0; i < 29; i++) {
+    for (int i = 0; i < 31; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

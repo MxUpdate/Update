@@ -46,33 +46,37 @@ interface MxParserConstants_mxJPO {
   /** RegularExpression Id. */
   int HEIGHT = 14;
   /** RegularExpression Id. */
-  int SETTING = 15;
+  int USER = 15;
   /** RegularExpression Id. */
-  int COMMAND = 16;
+  int SETTING = 16;
   /** RegularExpression Id. */
-  int STRING = 17;
+  int COMMAND = 17;
   /** RegularExpression Id. */
-  int SINGLE = 18;
+  int CODE = 18;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 19;
+  int STRING = 19;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 20;
+  int SINGLE = 20;
   /** RegularExpression Id. */
-  int NATURALNUMBER = 21;
+  int MULTILINESTRING = 21;
   /** RegularExpression Id. */
-  int SETTING_STRING = 22;
+  int MULTILINESINGLE = 22;
   /** RegularExpression Id. */
-  int SETTING_SINGLE = 23;
+  int NATURALNUMBER = 23;
   /** RegularExpression Id. */
-  int PROPERTY = 24;
+  int SETTING_STRING = 24;
   /** RegularExpression Id. */
-  int PROPERTYTO = 25;
+  int SETTING_SINGLE = 25;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 26;
+  int PROPERTY = 26;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 27;
+  int PROPERTYTO = 27;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 28;
+  int PROPERTYVAL = 28;
+  /** RegularExpression Id. */
+  int ADMINTYPE_STRING = 29;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 30;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -104,8 +108,10 @@ interface MxParserConstants_mxJPO {
     "\"alt\"",
     "\"href\"",
     "\"height\"",
+    "<USER>",
     "<SETTING>",
     "<COMMAND>",
+    "\"code\"",
     "<STRING>",
     "<SINGLE>",
     "<MULTILINESTRING>",
