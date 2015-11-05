@@ -21,6 +21,7 @@ import org.apache.commons.io.FileUtils;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.datamodel.RuleData;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.user.PersonData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -48,61 +49,74 @@ public abstract class Abstract_2DeltaCalculationTest<TESTDATA extends AbstractAd
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1) uuid",
+            // package
+            {"1a) new package",
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).defData("package", new PackageData(this, "TestPackage1")),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).defData("package", new PackageData(this, "TestPackage")),
+                    this.createNewTestData("Test").setSingle("kind", this.getKind()).defKeyNotDefined("package")},
+            // uuid
+            {"2) uuid",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
-            {"2a) symbolic name",
+            // symbolic names
+            {"3a) symbolic name",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setValue("symbolicname", "program_123")},
-            {"2b) two symbolic name",
+            {"3b) two symbolic name",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setValue("symbolicname", "program_123").setValue("symbolicname", "program_345")},
-            {"3) descrption",
+            // description
+            {"4) description",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setValue("description", "test")},
-            {"4) hidden",
+            {"5) hidden",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setFlag("hidden", true)},
-            {"5) needsbusinessobject",
+            {"6) needsbusinessobject",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setFlag("needsbusinessobject", true)},
-            {"6) downloadable (and deferred)",
+            {"7) downloadable (and deferred)",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setSingle("execute", "deferred").setFlag("downloadable", true)},
-            {"7) pipe",
+            {"8) pipe",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setFlag("pipe", true)},
-            {"8) pooled",
+            {"9) pooled",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setFlag("pooled", true)},
-            {"9) rule",
+            {"10) rule",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).defData("rule", new RuleData(this, "Test"))},
-            {"10a) execute immediate",
+            {"11a) execute immediate",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setSingle("execute", "deferred"),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setSingle("execute", null)},
-            {"10b) execute deferred",
+            {"11b) execute deferred",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setSingle("execute", "deferred")},
-            {"10c) execute user",
+            {"11c) execute user",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).defData("execute user", new PersonData(this, "Test"))},
-            {"10d) remove execute user",
+            {"11d) remove execute user",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).defData("execute user", new PersonData(this, "Test")),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setSingle("execute", null)},
-            {"11) code",
+            {"12) code",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).setValue("code", "abcdef")},
-            {"12a) property name",
+            {"13a) property name",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).addProperty(new PropertyDef("property"))},
-            {"12b) property name and value",
+            {"13b) property name and value",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).addProperty(new PropertyDef("property", "value"))},
-            {"12c) property name and link",
+            {"13c) property name and link",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).addProperty(new PropertyDef("property", this.createNewTestData("RefTest")))},
-            {"12d) property name, value and link",
+            {"13d) property name, value and link",
                     this.createNewTestData("Test").setSingle("kind", this.getKind()),
                     this.createNewTestData("Test").setSingle("kind", this.getKind()).addProperty(new PropertyDef("property", "value", this.createNewTestData("RefTest")))},
        };
@@ -206,7 +220,7 @@ public abstract class Abstract_2DeltaCalculationTest<TESTDATA extends AbstractAd
 
     @Override
     @BeforeMethod
-    @AfterClass(groups = "close" )
+    @AfterClass
     public void cleanup()
         throws MatrixException
     {
@@ -214,5 +228,6 @@ public abstract class Abstract_2DeltaCalculationTest<TESTDATA extends AbstractAd
         this.cleanup(CI.PRG_MQL);
         this.cleanup(CI.DM_RULE);
         this.cleanup(CI.USR_PERSON);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 }

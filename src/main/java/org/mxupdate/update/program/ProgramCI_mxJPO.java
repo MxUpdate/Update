@@ -34,12 +34,14 @@ import org.mxupdate.util.FileUtils_mxJPO;
 import org.mxupdate.util.JPOUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
+import org.mxupdate.util.StringUtils_mxJPO;
 
 import matrix.util.MatrixException;
 
 /**
  * Common definition for the code of a program. The handled properties are
  * <ul>
+ * <li>package</li>
  * <li>{@link #kind} of program</li>
  * <li>uuid</li>
  * <li>symbolic names</li>
@@ -203,21 +205,22 @@ public class ProgramCI_mxJPO
     public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
-                //              tag                 | default | value                                | write?
-                .single(        "kind",                         this.kind.name().toLowerCase())
-                .stringNotNull( "uuid",                         this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
-                .list(          "symbolicname",                 this.getSymbolicNames())
-                .string(        "description",                  this.getDescription())
-                .flagIfTrue(    "hidden",               false,  this.isHidden(),                        this.isHidden())
-                .flagIfTrue(    "needsbusinessobject",  false,  this.needsBusinessObjectContext,        this.needsBusinessObjectContext)
-                .flagIfTrue(    "downloadable",         false,  this.downloadable,                      this.downloadable)
-                .flagIfTrue(    "pipe",                 false,  this.pipe,                              this.pipe)
-                .flagIfTrue(    "pooled",               false,  this.pooled,                            this.pooled)
-                .stringIfTrue(  "rule",                         this.rule,                              (this.rule != null) && !this.rule.isEmpty())
-                .singleIfTrue(  "execute",                      this.execute.name().toLowerCase(),      (this.execute != Execute.IMMEDIATE))
-                .stringIfTrue(  "execute user",                 this.user,                              (this.user != null) && !this.user.isEmpty())
+                //              tag             | default | value                                | write?
+                .stringNotNull( "package",                  this.getPackageRef())
+                .single(        "kind",                     this.kind.name().toLowerCase())
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
+                .list(          "symbolicname",             this.getSymbolicNames())
+                .string(        "description",              this.getDescription())
+                .flagIfTrue(    "hidden",           false,  this.isHidden(),                        this.isHidden())
+                .flagIfTrue("needsbusinessobject",  false,  this.needsBusinessObjectContext,        this.needsBusinessObjectContext)
+                .flagIfTrue(    "downloadable",     false,  this.downloadable,                      this.downloadable)
+                .flagIfTrue(    "pipe",             false,  this.pipe,                              this.pipe)
+                .flagIfTrue(    "pooled",           false,  this.pooled,                            this.pooled)
+                .stringIfTrue(  "rule",                     this.rule,                              (this.rule != null) && !this.rule.isEmpty())
+                .singleIfTrue(  "execute",                  this.execute.name().toLowerCase(),      (this.execute != Execute.IMMEDIATE))
+                .stringIfTrue(  "execute user",             this.user,                              (this.user != null) && !this.user.isEmpty())
                 .properties(this.getProperties())
-                .codeIfTrue(    "code",                         this.getCode(),                         (this.kind != Kind.JAVA) && (this.getCode() != null) && !this.getCode().isEmpty())
+                .codeIfTrue(    "code",                     this.getCode(),                         (this.kind != Kind.JAVA) && (this.getCode() != null) && !this.getCode().isEmpty())
                 .stringIfTrue(  "file",     this.getName().replaceAll("\\.", "/") + "_" + "mxJPO.java", (this.kind == Kind.JAVA) && (this.getCode() != null) && !this.getCode().isEmpty());
     }
 
@@ -227,7 +230,8 @@ public class ProgramCI_mxJPO
      */
     public boolean hasNoValuesDefined(final ParameterCache_mxJPO _paramCache)
     {
-        return     this.getSymbolicNames().isEmpty()
+        return     StringUtils_mxJPO.isEmpty(this.getPackageRef())
+                && this.getSymbolicNames().isEmpty()
                 && ((this.getDescription() == null) || this.getDescription().isEmpty())
                 && !this.isHidden()
                 && !this.needsBusinessObjectContext
@@ -301,6 +305,7 @@ public class ProgramCI_mxJPO
                 _mql.newLine().cmd("execute ").cmd(this.execute.name().toLowerCase());
             }
 
+            DeltaUtil_mxJPO.calcPackage(_paramCache, _mql, this, _current);
             DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
             DeltaUtil_mxJPO.calcValueDelta(_mql, "description",                 this.getDescription(),              _current.getDescription());
             DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",              false,  this.isHidden(),                    _current.isHidden());
