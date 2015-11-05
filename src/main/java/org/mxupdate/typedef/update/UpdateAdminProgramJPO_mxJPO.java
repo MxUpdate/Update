@@ -58,33 +58,36 @@ public class UpdateAdminProgramJPO_mxJPO
                        final File _file)
         throws Exception
     {
-        if (_file.getName().endsWith(ProgramCI_mxJPO.JPO_NAME_SUFFIX_EXTENDSION))  {
+        if (_file.getName().endsWith(JPOUtil_mxJPO.JPO_NAME_SUFFIX_EXTENDSION))  {
             final String propName = PropertyDef_mxJPO.FILEDATE.getPropName(_paramCache);
+
+            // create program if not exists
+            if (!EMxAdmin_mxJPO.Program.exist(_paramCache, _name))  {
+                MqlBuilderUtil_mxJPO.mql().cmd("escape add program ").arg(_name).cmd(" java").exec(_paramCache.getContext());
+            }
+
+            final ProgramCI_mxJPO current = new ProgramCI_mxJPO(_name);
+            current.parse(_paramCache);
 
             final MultiLineMqlBuilder mql = MqlBuilderUtil_mxJPO.multiLine(_file, "");
 
-            if (!EMxAdmin_mxJPO.Program.exist(_paramCache, _name))  {
-                // create program if not exists
-                mql.newLine().cmd("escape add program ").arg(_name).cmd(" java");
-            } else  {
-                // check property already exists => remove property
-                final String propExists = MqlBuilderUtil_mxJPO.mql().cmd("escape print program ").arg(_name).cmd(" select ").arg("property[" + propName + "]").exec(_paramCache.getContext());
-                if (!propExists.isEmpty())  {
-                    mql.newLine().cmd("escape mod program ").arg(_name).cmd(" remove property ").arg(propName);
-                }
-                // check if program type is java => if not define
-                final String isJava = MqlBuilderUtil_mxJPO.mql().cmd("escape print program ").arg(_name).cmd(" select ").arg("isjavaprogram").exec(_paramCache.getContext());
-                if (!"TRUE".equalsIgnoreCase(isJava))  {
-                    mql.newLine().cmd("escape mod program ").arg(_name).cmd(" java");
-                }
+            // check property already exists => remove property
+            if (current.getProperties().getValue4KeyValue(_paramCache, PropertyDef_mxJPO.FILEDATE) != null)  {
+                mql.newLine().cmd("escape mod program ").arg(_name).cmd(" remove property ").arg(propName);
+            }
+            // check if program type is java => if not define
+            final String isJava = MqlBuilderUtil_mxJPO.mql().cmd("escape print program ").arg(_name).cmd(" select ").arg("isjavaprogram").exec(_paramCache.getContext());
+            if (!"TRUE".equalsIgnoreCase(isJava))  {
+                mql.newLine().cmd("escape mod program ").arg(_name).cmd(" java");
             }
 
             // define file date
             mql.newLine().cmd("escape mod program ").arg(_name).cmd(" add property ")
                     .arg(propName).cmd(" value ").arg(StringUtil_mxJPO.formatFileDate(_paramCache, new Date(_file.lastModified())));
 
-            // insert program
-            mql.newLine().cmd("escape mod program ").arg(_name).cmd(" code ").arg(JPOUtil_mxJPO.convertJavaToJPOCode(_name, FileUtils_mxJPO.readFileToString(_file).toString()));
+            // update program
+            mql.newLine().cmd("escape mod program ").arg(_name).cmd(" ")
+                    .cmd("code ").arg(JPOUtil_mxJPO.convertJavaToJPOCode(current.isBackslashUpgraded(), _name, FileUtils_mxJPO.readFileToString(_file).toString()));
 
             // and execute all
             mql.exec(_paramCache.getContext());

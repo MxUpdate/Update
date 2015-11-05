@@ -86,22 +86,22 @@ public class UpdateAdminProgramJPOTest
     {
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
-        this.mql("add prog '" + _name + "' java");
+        this.mql().cmd("escape add prog ").arg(_name).cmd(" java").exec(this.getContext());
         new UpdateAdminProgramJPO_mxJPO().update(paramCache, paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), false, _name, _file);
 
-        final String code = this.mql("print prog '" + _name + "' select code dump");
+        final String code = this.mql().cmd("escape print prog ").arg(_name).cmd(" select ").arg("code").cmd(" dump").exec(this.getContext());
 
         Assert.assertTrue(
                 !code.isEmpty(),
                 "code defined");
         Assert.assertEquals(
-                !this.mql("print prog '" + _name + "' select description dump").isEmpty(),
+                !this.mql().cmd("escape print prog ").arg(_name).cmd(" select ").arg("description").cmd(" dump").exec(this.getContext()).isEmpty(),
                 _expUpdateCalled,
                 "description defined");
 
         // TODO: file date is only defined if not update is called
         if (!_expUpdateCalled)  {
-            final String fileDate = this.mql("print prog '" + _name + "' select property[" + PropertyDef_mxJPO.FILEDATE.getPropName(paramCache) + "] dump");
+            final String fileDate = this.mql().cmd("escape print prog ").arg(_name).cmd(" select ").arg("property[" + PropertyDef_mxJPO.FILEDATE.getPropName(paramCache) + "]").cmd(" dump").exec(this.getContext());
             Assert.assertEquals(
                     fileDate.isEmpty(),
                     false,

@@ -42,6 +42,8 @@ import org.apache.maven.settings.Settings;
 import org.mxupdate.test.util.Version;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateUtils_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MqlBuilder;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -404,6 +406,16 @@ public abstract class AbstractTest
     }
 
     /**
+     * Returns new MQL builder instanace.
+     *
+     * @return mql builder
+     */
+    public MqlBuilder mql()
+    {
+        return MqlBuilderUtil_mxJPO.mql();
+    }
+
+    /**
      * Executes given MQL command statement <code>_cmd</code> and returns the
      * result.
      *
@@ -412,6 +424,7 @@ public abstract class AbstractTest
      *         <code>_cmd</code>
      * @throws MatrixException if MQL execution failed
      */
+    @Deprecated
     public String mql(final CharSequence _cmd)
         throws MatrixException
     {
@@ -427,6 +440,7 @@ public abstract class AbstractTest
      *         <code>_cmd</code>
      * @throws MatrixException if MQL execution failed
      */
+    @Deprecated
     public String mqlWOTrim(final CharSequence _cmd)
         throws MatrixException
     {
@@ -446,6 +460,7 @@ public abstract class AbstractTest
      * @return set of found values
      * @throws MatrixException if MQL execution failed
      */
+    @Deprecated
     public Set<String> mqlAsSet(final CharSequence _cmd)
         throws MatrixException
     {

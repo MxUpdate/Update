@@ -27,6 +27,7 @@ import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.util.FileUtils_mxJPO;
+import org.mxupdate.util.JPOUtil_mxJPO;
 
 import matrix.util.MatrixException;
 
@@ -84,7 +85,7 @@ public class ExportAdminProgramJPO_mxJPO
                 final int index = clazz.getName().lastIndexOf('.');
                 final String fileName = new StringBuilder()
                         .append((index >= 0) ? clazz.getName().substring(index + 1) : clazz.getName())
-                        .append(ProgramCI_mxJPO.JPO_NAME_SUFFIX_EXTENDSION)
+                        .append(JPOUtil_mxJPO.JPO_NAME_SUFFIX_EXTENDSION)
                         .toString();
                 // prepare path
                 final StringBuilder pathStr = new StringBuilder().append(path);
@@ -96,9 +97,11 @@ public class ExportAdminProgramJPO_mxJPO
                 if (!file.getParentFile().exists())  {
                     file.getParentFile().mkdirs();
                 }
+
                 final Writer out = new FileWriter(file);
+                final String code = JPOUtil_mxJPO.convertJPOToJavaCode(clazz.isBackslashUpgraded(), clazz.getName(), clazz.getCode());
                 try  {
-                    this.writeCode(_paramCache, out, clazz);
+                    out.write(code);
                     out.flush();
                 } finally {
                     out.close();
@@ -122,46 +125,6 @@ public class ExportAdminProgramJPO_mxJPO
             } else {
                 throw e;
             }
-        }
-    }
-
-    /**
-     * Writes given JPO to given path for given name. The JPO code is first
-     * converted, because Matrix uses keywords which must be replaced to have
-     * real Java code. The conversion works like the original extract method,
-     * but only converts the given JPOs and not depending JPOs.
-     *
-     * @param _paramCache   parameter cache
-     * @param _out          writer instance to the file where the JPO code must
-     *                      be written
-     * @throws IOException if the source code could not be written
-     * @throws MatrixException if the source code of the JPO could not be
-     *                         extracted from MX
-     */
-    protected void writeCode(final ParameterCache_mxJPO _paramCache,
-                             final Appendable _out,
-                             final ProgramCI_mxJPO _clazz)
-        throws IOException
-    {
-        // define package name (if points within JPO name)
-        final int idx = _clazz.getName().lastIndexOf('.');
-        if (idx > 0)  {
-            _out.append("package ").append(_clazz.getName().substring(0, idx)).append(";\n");
-        }
-
-        // replace class names and references to other JPOs
-        final String name = _clazz.getName() + ProgramCI_mxJPO.JPO_NAME_SUFFIX;
-        final String code = _clazz.getCode()
-                                .replaceAll("\\" + "$\\{CLASSNAME\\}", name.replaceAll(".*\\.", ""))
-                                .replaceAll("(?<=\\"+ "$\\{CLASS\\:[0-9a-zA-Z_.]{0,200})\\}", ProgramCI_mxJPO.JPO_NAME_SUFFIX)
-                                .replaceAll("\\" + "$\\{CLASS\\:", "")
-                                .trim();
-
-        // for old MX all backslashes are doubled...
-        if (!_clazz.isBackslashUpgraded())  {
-            _out.append(code.replaceAll("\\\\\\\\", "\\\\"));
-        } else  {
-            _out.append(code);
         }
     }
 }

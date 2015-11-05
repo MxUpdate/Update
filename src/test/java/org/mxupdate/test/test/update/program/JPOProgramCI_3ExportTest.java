@@ -141,7 +141,7 @@ public class JPOProgramCI_3ExportTest
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
         // create JPO
-        this.mql("add prog '" + _progData.getName() + "' java code '" + JPOUtil_mxJPO.convertJavaToJPOCode(_progData.getName(), FileUtils.readFileToString(_origJPO)) + "'");
+        this.mql().cmd("escape add prog ").arg(_progData.getName()).cmd(" java").exec(this.getContext());
 
         // update values
         _progData.createDependings();
@@ -150,7 +150,7 @@ public class JPOProgramCI_3ExportTest
         wrapper.store((File) null, paramCache);
 
         // insert again to ensure that the code is defined...
-        this.mql("mod prog '" + _progData.getName() + "' code '" + JPOUtil_mxJPO.convertJavaToJPOCode(_progData.getName(), FileUtils.readFileToString(_origJPO)) + "'");
+        this.mql().cmd("escape mod prog ").arg(_progData.getName()).cmd(" code ").arg(JPOUtil_mxJPO.convertJavaToJPOCode(true, _progData.getName(), FileUtils.readFileToString(_origJPO))).exec(this.getContext());
 
         new ExportAdminProgramJPO_mxJPO().export(paramCache, paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName(), new File(this.getTargetDir()));
 
@@ -180,7 +180,7 @@ public class JPOProgramCI_3ExportTest
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
         // create JPO
-        this.mql("add prog '" + _progData.getName() + "' java code '" + JPOUtil_mxJPO.convertJavaToJPOCode(_progData.getName(), FileUtils.readFileToString(_origJPO)) + "'");
+        this.mql().cmd("escape add prog ").arg(_progData.getName()).cmd(" java").exec(this.getContext());
 
         // update values
         _progData.createDependings();
@@ -189,7 +189,7 @@ public class JPOProgramCI_3ExportTest
         wrapper.store((File) null, paramCache);
 
         // insert again to ensure that the code is defined...
-        this.mql("mod prog '" + _progData.getName() + "' code '" + JPOUtil_mxJPO.convertJavaToJPOCode(_progData.getName(), FileUtils.readFileToString(_origJPO)) + "'");
+        this.mql().cmd("escape mod prog ").arg(_progData.getName()).cmd(" code ").arg(JPOUtil_mxJPO.convertJavaToJPOCode(true, _progData.getName(), FileUtils.readFileToString(_origJPO))).exec(this.getContext());
 
         new ExportAdminProgramJPO_mxJPO().export(paramCache, paramCache.getMapping().getTypeDef(CI.PRG_JPO.updateType), _progData.getName(), new File(this.getTargetDir()));
 
@@ -222,7 +222,7 @@ public class JPOProgramCI_3ExportTest
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
         // create JPO
-        this.mql("add prog '" + _progData.getName() + "' java code '" + JPOUtil_mxJPO.convertJavaToJPOCode(_progData.getName(), FileUtils.readFileToString(_origJPO)) + "'");
+        this.mql().cmd("escape add prog ").arg(_progData.getName()).cmd(" java").exec(this.getContext());
 
         // update values (and the code will be also null)
         _progData.createDependings();
@@ -261,7 +261,7 @@ public class JPOProgramCI_3ExportTest
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
 
         // create JPO
-        this.mql("add prog '" + _progData.getName() + "' java code '" + JPOUtil_mxJPO.convertJavaToJPOCode(_progData.getName(), FileUtils.readFileToString(_origJPO)) + "'");
+        this.mql().cmd("escape add prog ").arg(_progData.getName()).cmd(" java").exec(this.getContext());
 
         // update values (and the code will be also null)
         _progData.createDependings();
@@ -276,7 +276,7 @@ public class JPOProgramCI_3ExportTest
     }
 
     @BeforeMethod
-    @AfterClass(groups = "close" )
+    @AfterClass
     public void cleanup()
         throws MatrixException, IOException
     {

@@ -60,13 +60,6 @@ import matrix.util.MatrixException;
 public class ProgramCI_mxJPO
     extends AbstractCode_mxJPO<ProgramCI_mxJPO>
 {
-    /** String with name suffix (used also from the extract routine from Matrix). */
-    public static final String JPO_NAME_SUFFIX_EXTENDSION = ProgramCI_mxJPO.JPO_NAME_SUFFIX + ".java";
-    /** String length of {@link #JPO_NAME_SUFFIX_EXTENDSION}. */
-    public static final int JPO_NAME_SUFFIX_EXTENDSION_LENGTH = ProgramCI_mxJPO.JPO_NAME_SUFFIX_EXTENDSION.length();
-    /** String with name suffix (used also from the extract routine from Matrix). */
-    public static final String JPO_NAME_SUFFIX = "_" + "mxJPO";
-
     /** Program kind. */
     private Kind kind = null;
 
@@ -328,7 +321,7 @@ public class ProgramCI_mxJPO
                 }
                 switch (this.kind)  {
                     case JAVA:
-                        newCode = JPOUtil_mxJPO.convertJavaToJPOCode(this.getName(), FileUtils_mxJPO.readFileToString(new File(tmpFile)));
+                        newCode = JPOUtil_mxJPO.convertJavaToJPOCode(_current.backslashUpgraded, this.getName(), FileUtils_mxJPO.readFileToString(new File(tmpFile)));
                         break;
                     default:
                         newCode = FileUtils_mxJPO.readFileToString(new File(tmpFile));
