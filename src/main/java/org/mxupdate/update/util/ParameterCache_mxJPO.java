@@ -270,27 +270,6 @@ public class ParameterCache_mxJPO
     }
 
     /**
-     * Evaluated if given key is defined in the value maps.
-     *
-     * @param _key      searched key
-     * @return <i>true</i> if the given key is defined; otherwise <i>false</i>
-     *         is returned
-     * @see #mapBoolean
-     * @see #mapList
-     * @see #mapMap
-     * @see #mapString
-     */
-    @Deprecated()
-    public boolean contains(final String _key)
-    {
-        return this.mapBoolean.containsKey(_key)
-               || this.mapList.containsKey(_key)
-               || this.mapInteger.containsKey(_key)
-               || this.mapMap.containsKey(_key)
-               || this.mapString.containsKey(_key);
-    }
-
-    /**
      * Returns the MX context stored in this parameter cache.
      *
      * @return MX context
@@ -660,6 +639,9 @@ public class ParameterCache_mxJPO
         /** Path parameter for ignored paths. */
         PathIgnorePath,
 
+        /** Boolean that the update continues if a error was thrown. */
+        ParamContinueOnError,
+
         /** Parameter for copyright used for the help description. */
         HelpCopyright,
         /** Parameter for the description used for the help description. */
@@ -818,6 +800,9 @@ public class ParameterCache_mxJPO
         /** List of removed attributes for types to be removed. */
         DMTypeAttrRemove,
 
+        /** List of MX System Unique Keys which must be ignored (because they can not be handled from MxUpdate). */
+        SystemUniqueKeyMXSystemUniqueKeys,
+
         /** User role supports role type. */
         UserRoleSupportRoleType,
         /**
@@ -841,10 +826,7 @@ public class ParameterCache_mxJPO
          * If the parameter is set, products for persons matching given string are
          * not updated.
          */
-        UserPersonIgnoreProducts,
-
-        /** Boolean that the update continues if a error was thrown. */
-        ParamContinueOnError;
+        UserPersonIgnoreProducts;
     }
 
     /**

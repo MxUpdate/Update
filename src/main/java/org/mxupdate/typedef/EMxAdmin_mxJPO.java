@@ -159,7 +159,15 @@ public enum EMxAdmin_mxJPO
         }
     },
     Type(Type_mxJPO.class),
-    UniqueKey(UniqueKeyCI_mxJPO.class);
+    UniqueKey(UniqueKeyCI_mxJPO.class) {
+        @Override public SortedSet<String> evalListWOCache(final ParameterCache_mxJPO _paramCache)
+            throws MatrixException
+        {
+            final SortedSet<String> ret = super.evalListWOCache(_paramCache);
+            ret.removeAll(_paramCache.getValueList(ValueKeys.SystemUniqueKeyMXSystemUniqueKeys));
+            return ret;
+        }
+    };
 
     /** Key used for the select statements. */
     private static final String SELECT_KEY = "@@@2@@@2@@@";
