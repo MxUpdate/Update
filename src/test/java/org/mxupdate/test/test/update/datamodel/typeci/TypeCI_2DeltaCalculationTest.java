@@ -19,6 +19,7 @@ import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.AttributeData;
 import org.mxupdate.test.data.datamodel.PathTypeData;
 import org.mxupdate.test.data.datamodel.TypeData;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.Type_mxJPO;
@@ -44,6 +45,17 @@ public class TypeCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
+            // package
+            {"1a) new package",
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new TypeData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new TypeData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new TypeData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new TypeData(this, "Test").defKeyNotDefined("package")},
+            // uuid
             {"1) uuid",
                     new TypeData(this, "Test"),
                     new TypeData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
@@ -136,7 +148,43 @@ public class TypeCI_2DeltaCalculationTest
                                         .setFlag("multiline", false, Create.ViaFlag)
                                         .setSingle("maxlength", "0")
                                         .setValue("default", "")) },
-            {"107) attribute with uuid",
+            {"107a) local attribute with new package",
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .defData("package", new PackageData(this, "TestPackage"))
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", ""))},
+            {"107b) local attribute with package update",
+                    new TypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .defData("package", new PackageData(this, "TestPackage1"))
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")),
+                    new TypeData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .defData("package", new PackageData(this, "TestPackage2"))
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", ""))},
+            {"108) local attribute with uuid",
                     new TypeData(this, "Test"),
                     new TypeData(this, "Test")
                             .addLocalAttribute(
@@ -149,7 +197,7 @@ public class TypeCI_2DeltaCalculationTest
                                         .setFlag("resetonclone", false, Create.ViaFlag)
                                         .setFlag("resetonrevision", false, Create.ViaFlag)
                                         .setValue("default", "")) },
-            {"108) attribute with symbolic names",
+            {"109) attribute with symbolic names",
                     new TypeData(this, "Test"),
                     new TypeData(this, "Test")
                             .addLocalAttribute(
@@ -180,14 +228,53 @@ public class TypeCI_2DeltaCalculationTest
                             .addLocalPathType(new PathTypeData(this, "PathType")
                                     .def4FromSingle("cardinality", "many")
                                     .defData("attribute", new AttributeData(this, "PathType Attribute").setSingle("kind", "string"))) },
-            {"304a) local path type with embedded local attribute",
+            {"304) local path type with embedded local attribute",
                     new TypeData(this, "Test"),
                     new TypeData(this, "Test")
                             .addLocalPathType(new PathTypeData(this, "PathType")
                                     .def4FromSingle("cardinality", "many")
                                     .addLocalAttribute(new AttributeData(this, "PathType Attribute")
                                             .setSingle("kind", "string")))},
-            {"304b) local path type with embedded local attribute with uuid",
+            {"305a) local path type with embedded local attribute with new package",
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .def4FromSingle("cardinality", "many")
+                                    .addLocalAttribute(new AttributeData(this, "ATTR1")
+                                            .defData("package", new PackageData(this, "TestPackage"))
+                                            .setSingle("kind", "boolean")
+                                            .setValue("description", "")
+                                            .setFlag("hidden", false, Create.ViaFlag)
+                                            .setFlag("multivalue", false, Create.ViaFlag)
+                                            .setFlag("resetonclone", false, Create.ViaFlag)
+                                            .setFlag("resetonrevision", false, Create.ViaFlag)
+                                            .setValue("default", "")))},
+            {"305b) local path type with embedded local attribute with package update",
+                    new TypeData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .def4FromSingle("cardinality", "many")
+                                    .addLocalAttribute(new AttributeData(this, "ATTR1")
+                                            .defData("package", new PackageData(this, "TestPackage1"))
+                                            .setSingle("kind", "boolean")
+                                            .setValue("description", "")
+                                            .setFlag("hidden", false, Create.ViaFlag)
+                                            .setFlag("multivalue", false, Create.ViaFlag)
+                                            .setFlag("resetonclone", false, Create.ViaFlag)
+                                            .setFlag("resetonrevision", false, Create.ViaFlag)
+                                            .setValue("default", ""))),
+                    new TypeData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .def4FromSingle("cardinality", "many")
+                                    .addLocalAttribute(new AttributeData(this, "ATTR1")
+                                            .defData("package", new PackageData(this, "TestPackage2"))
+                                            .setSingle("kind", "boolean")
+                                            .setValue("description", "")
+                                            .setFlag("hidden", false, Create.ViaFlag)
+                                            .setFlag("multivalue", false, Create.ViaFlag)
+                                            .setFlag("resetonclone", false, Create.ViaFlag)
+                                            .setFlag("resetonrevision", false, Create.ViaFlag)
+                                            .setValue("default", "")))},
+            {"306) local path type with embedded local attribute with uuid",
                     new TypeData(this, "Test"),
                     new TypeData(this, "Test")
                             .addLocalPathType(new PathTypeData(this, "PathType")
@@ -195,7 +282,7 @@ public class TypeCI_2DeltaCalculationTest
                                     .addLocalAttribute(new AttributeData(this, "PathType Attribute")
                                             .setSingle("kind", "string")
                                             .setValue("uuid", "UUID")))},
-            {"304c) local path type with embedded local attribute with symbolic name",
+            {"307) local path type with embedded local attribute with symbolic name",
                     new TypeData(this, "Test"),
                     new TypeData(this, "Test")
                             .addLocalPathType(new PathTypeData(this, "PathType")
@@ -215,6 +302,7 @@ public class TypeCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.DM_PATHTYPE);  // as first, so that local attributes of path types are deleted!
         this.cleanup(AbstractTest.CI.DM_ATTRIBUTE);
         this.cleanup(AbstractTest.CI.DM_TYPE);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override

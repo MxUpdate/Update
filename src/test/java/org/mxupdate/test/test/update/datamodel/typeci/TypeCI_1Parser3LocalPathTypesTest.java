@@ -76,8 +76,30 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
+            // package
+            {"2a) package string",
+                    "",
+                    "description \"\" !hidden "
+                            + "local pathtype \"PathType\" { "
+                                    + "package \"abc\" description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "}"},
+            {"2b) package single",
+                    "description \"\" !hidden "
+                            + "local pathtype \"PathType\" { "
+                                    + "package \"abc\" description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "}",
+                    "description \"\" !hidden "
+                            + "local pathtype \"PathType\" { "
+                                    + "package abc     description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "}"},
             // uuid
-            {"2a) uuid with minus separator",
+            {"3a) uuid with minus separator",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -85,7 +107,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"2b) uuid w/o minus separator",
+            {"3b) uuid w/o minus separator",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -93,7 +115,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"2c) uuid convert from single to string",
+            {"3c) uuid convert from single to string",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" !hidden "
@@ -107,7 +129,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                             + "}"},
             // registered name
-            {"3a) local type path: symbolic name",
+            {"4a) local type path: symbolic name",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -115,7 +137,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"3b) local type path: two symbolic names",
+            {"4b) local type path: two symbolic names",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "symbolicname \"channel_abc\" symbolicname \"channel_def\" description \"\" !hidden "
@@ -129,7 +151,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                             + "}"},
             // description
-            {"4a) local type path: description",
+            {"5a) local type path: description",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -137,7 +159,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"4b) local type path: description not defined",
+            {"5b) local type path: description not defined",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -150,7 +172,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"4c) local type path: multi-line description ",
+            {"5c) local type path: multi-line description ",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -158,7 +180,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"4d) local type path: tab's in description",
+            {"5d) local type path: tab's in description",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -495,9 +517,33 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to { } "
                                     + "local attribute \"ATTRNAME\" { kind string  description \"\" !hidden !multivalue !resetonclone !resetonrevision             !multiline maxlength 0 default \"\" } "
                             + "}"},
-
+            //  local attribute with package
+            {"41a) local type path: local attribute with package string",
+                    "",
+                    "description \"\" !hidden "
+                            + "local pathtype \"PathType\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to { } "
+                                    + "local attribute \"ATTRNAME\" { package \"abc\" kind binary  description \"\" !hidden !resetonclone !resetonrevision default \"\" } "
+                            + "}"},
+            {"41b) local type path: local attribute with package single",
+                    "description \"\" !hidden "
+                            + "local pathtype \"PathType\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to { } "
+                                    + "local attribute \"ATTRNAME\" { package \"abc\" kind binary  description \"\" !hidden !resetonclone !resetonrevision default \"\" } "
+                            + "}",
+                    "description \"\" !hidden "
+                            + "local pathtype \"PathType\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to { } "
+                                    + "local attribute \"ATTRNAME\" { package abc     kind binary  description \"\" !hidden !resetonclone !resetonrevision default \"\" } "
+                            + "}"},
             // uuid
-            {"41a) local attribute with uuid with minus separator",
+            {"42a) local type path: local attribute with uuid with minus separator",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -506,7 +552,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind string uuid \"FDA75674-9792-11E6-AE22-56B6B6499611\" description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\" } "
                             + "}"},
-            {"41b) local attribute with uuid w/o minus separator",
+            {"42b) local type path: local attribute with uuid w/o minus separator",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -515,7 +561,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind string uuid \"FDA75674979211E6AE2256B6B6499611\" description \"\" !hidden !multivalue !resetonclone !resetonrevision !multiline maxlength 0 default \"\" } "
                             + "}"},
-            {"41c) local attribute with uuid convert from single to string",
+            {"42c) local type path: local attribute with uuid convert from single to string",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -532,7 +578,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                             + "}"},
 
              // attribute registered name
-            {"42a) local type path: local attribute symbolic name",
+            {"43a) local type path: local attribute symbolic name",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -541,7 +587,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean symbolicname \"attribute_abc\"                                description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" } "
                             + "}"},
-            {"42b) local type path: attribute two symbolic names",
+            {"43b) local type path: attribute two symbolic names",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -558,7 +604,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                             + "}"},
 
             // attribute description
-            {"43a) local type path: locale attribute description",
+            {"44a) local type path: locale attribute description",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -567,7 +613,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"abc def\"  !hidden !multivalue !resetonclone !resetonrevision default \"\" } "
                             + "}"},
-            {"43b) local type path: local attribute description not defined",
+            {"44b) local type path: local attribute description not defined",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -582,7 +628,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean                          !hidden !multivalue !resetonclone !resetonrevision default \"\" } "
                             + "}"},
-            {"43c) local type path: multi-line local attribute description",
+            {"44c) local type path: multi-line local attribute description",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -593,7 +639,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                             + "}"},
 
             // attribute hidden flag
-            {"44a) local type path: local attribute hidden",
+            {"45a) local type path: local attribute hidden",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -602,7 +648,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" hidden  !multivalue !resetonclone !resetonrevision default \"\" } "
                             + "}"},
-            {"44b) local type path: local attribute not hidden (not defined)",
+            {"45b) local type path: local attribute not hidden (not defined)",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -619,7 +665,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                             + "}"},
 
             // attribute multivalue flag
-            {"45a) local type path: local attribute multivalue flag",
+            {"46a) local type path: local attribute multivalue flag",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -628,7 +674,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden multivalue  !resetonclone !resetonrevision default \"\" } "
                             + "}"},
-            {"45b) local type path: local attribute multivalue flag not defined",
+            {"46b) local type path: local attribute multivalue flag not defined",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -645,7 +691,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                             + "}"},
 
             // attribute resetonclone flag
-            {"46a) local type path: local attribute resetonclone flag",
+            {"47a) local type path: local attribute resetonclone flag",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -654,7 +700,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue resetonclone  !resetonrevision default \"\" } "
                             + "}"},
-            {"46b) local type path: local attribute resetonclone flag not defined",
+            {"47b) local type path: local attribute resetonclone flag not defined",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -671,7 +717,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                             + "}"},
 
             // attribute resetonrevision flag
-            {"47a) local type path: local attribute resetonrevision flag",
+            {"48a) local type path: local attribute resetonrevision flag",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -680,7 +726,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone resetonrevision  default \"\" } "
                             + "}"},
-            {"47b) local type path: local attribute resetonrevision flag not defined",
+            {"48b) local type path: local attribute resetonrevision flag not defined",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -697,7 +743,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                             + "}"},
 
             // attribute default value
-            {"48a) local type path: local attribute default value",
+            {"49a) local type path: local attribute default value",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -706,7 +752,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"abc def\"  } "
                             + "}"},
-            {"48b) local type path: local attribute default value not defined",
+            {"49b) local type path: local attribute default value not defined",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -721,7 +767,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision                      } "
                             + "}"},
-            {"48c) local type path: multi-line local attribute default value",
+            {"49c) local type path: multi-line local attribute default value",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -732,7 +778,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                             + "}"},
 
             // real attribute rangevalue flag
-            {"49a) local type path: local real attribute rangevalue flag",
+            {"50a) local type path: local real attribute rangevalue flag",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -741,7 +787,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind real description \"\" !hidden !multivalue !resetonclone !resetonrevision rangevalue  default \"\" } "
                             + "}"},
-            {"49b) local type path: local real attribute rangevalue flag not defined",
+            {"50b) local type path: local real attribute rangevalue flag not defined",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -758,7 +804,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                             + "}"},
 
             // string attribute multiline flag
-            {"50a) local type path: local attribute multiline flag",
+            {"51a) local type path: local attribute multiline flag",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -767,7 +813,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision multiline  maxlength 0 default \"\" } "
                             + "}"},
-            {"50b) local type path: local attribute multiline flag not defined",
+            {"51b) local type path: local attribute multiline flag not defined",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -784,7 +830,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                             + "}"},
 
              // string attribute maxlength
-            {"51a) local type path: local attribute maxlength",
+            {"52a) local type path: local attribute maxlength",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -793,7 +839,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind string description \"\" !hidden !multivalue !resetonclone !resetonrevision multiline  maxlength 125 default \"\" } "
                             + "}"},
-            {"51b) local type path: local attribute maxlength not defined",
+            {"52b) local type path: local attribute maxlength not defined",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -810,7 +856,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                             + "}"},
 
             // attribute rule
-            {"52a) local type path: local attribute rule",
+            {"53a) local type path: local attribute rule",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -819,7 +865,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision rule \"A\"            default \"\"  } "
                             + "}"},
-            {"52a) local type path: local attribute rule list (if more than one none)",
+            {"53a) local type path: local attribute rule list (if more than one none)",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -836,7 +882,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                             + "}"},
 
             // attribute dimension
-            {"53) local type path: local real attribute dimension",
+            {"54) local type path: local real attribute dimension",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -847,7 +893,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                             + "}"},
 
             // attribute action trigger
-            {"54a) local type path: local action trigger with input",
+            {"55a) local type path: local action trigger with input",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -856,7 +902,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\" input \"{}\\\"\" } "
                             + "}"},
-            {"54b) local type path: local action trigger w/o input",
+            {"55b) local type path: local action trigger w/o input",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -872,7 +918,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify action \"{}\\\"\" } "
                             + "}"},
             //  attribute check trigger
-            {"55a) local type path: local attribute check trigger with input",
+            {"56a) local type path: local attribute check trigger with input",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -881,7 +927,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\" input \"{}\\\"\" } "
                             + "}"},
-            {"55b) local type path: local attributecheck trigger w/o input",
+            {"56b) local type path: local attributecheck trigger w/o input",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -897,7 +943,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify check \"{}\\\"\" } "
                             + "}"},
             //  attribute override trigger
-            {"56a) local type path: local attribute override trigger with input",
+            {"57a) local type path: local attribute override trigger with input",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -906,7 +952,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" trigger modify override \"{}\\\"\" input \"{}\\\"\" } "
                             + "}"},
-            {"56b) local type path: local attribute override trigger w/o input",
+            {"57b) local type path: local attribute override trigger w/o input",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
                                     + "description \"\" !hidden "
@@ -923,7 +969,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                             + "}"},
 
             // attribute ranges
-            {"57a) local type path: local attribute range",
+            {"58a) local type path: local attribute range",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -932,7 +978,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range = \"VALUE1\" } "
                             + "}"},
-            {"57b) local type path: local attribute range",
+            {"58b) local type path: local attribute range",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -941,7 +987,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range = \"VALUE1\" range = \"VALUE2\" } "
                             + "}"},
-            {"57c) local type path: local attribute range >",
+            {"58c) local type path: local attribute range >",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -950,7 +996,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range > \"VALUE1\" } "
                             + "}"},
-            {"57d) local type path: local attribute range >=",
+            {"58d) local type path: local attribute range >=",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -959,7 +1005,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range >= \"VALUE1\" } "
                             + "}"},
-            {"57e) local type path: local attribute range <",
+            {"58e) local type path: local attribute range <",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -968,7 +1014,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range < \"VALUE1\" } "
                             + "}"},
-            {"57f) local type path: local attribute range <=",
+            {"58f) local type path: local attribute range <=",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -977,7 +1023,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range <= \"VALUE1\" } "
                             + "}"},
-            {"57g) local type path: local attribute range !=",
+            {"58g) local type path: local attribute range !=",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -986,7 +1032,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range != \"VALUE1\" } "
                             + "}"},
-            {"57h) local type path: local attribute range match",
+            {"58h) local type path: local attribute range match",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -995,7 +1041,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range match \"VALUE1\" } "
                             + "}"},
-            {"57i) local type path: local attribute range !match",
+            {"58i) local type path: local attribute range !match",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -1004,7 +1050,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range !match \"VALUE1\" } "
                             + "}"},
-            {"57j) local type path: local attribute range smatch",
+            {"58j) local type path: local attribute range smatch",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -1013,7 +1059,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range smatch \"VALUE1\" } "
                             + "}"},
-            {"57k) local type path: local attribute range !smatch",
+            {"58k) local type path: local attribute range !smatch",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -1022,7 +1068,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range !smatch \"VALUE1\" } "
                             + "}"},
-            {"57l) local type path: local attribute range program",
+            {"58l) local type path: local attribute range program",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -1031,7 +1077,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range program \"VALUE1\" } "
                             + "}"},
-            {"57m) local type path: local attribute range program input",
+            {"58m) local type path: local attribute range program input",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -1040,7 +1086,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range program \"VALUE1\" input \"VALUE2\" } "
                             + "}"},
-            {"57n) local type path: local attribute range between inclusive",
+            {"58n) local type path: local attribute range between inclusive",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -1049,7 +1095,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind integer description \"\" !hidden !multivalue !resetonclone !resetonrevision !rangevalue default \"\" range between \"VALUE1\" inclusive \"VALUE2\" inclusive } "
                             + "}"},
-            {"57o) local type path: local attribute range between exclusive",
+            {"58o) local type path: local attribute range between exclusive",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -1060,7 +1106,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                             + "}"},
 
             // attribute property
-            {"58a) local type path: local attribute property special characters",
+            {"59a) local type path: local attribute property special characters",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -1069,7 +1115,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" } "
                             + "}"},
-            {"58b) local type path: local attribute property and value special characters",
+            {"59b) local type path: local attribute property and value special characters",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -1078,7 +1124,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" value \"{}\\\"\" } "
                             + "}"},
-            {"58c) local type path: local attribute property link special characters",
+            {"59c) local type path: local attribute property link special characters",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "
@@ -1087,7 +1133,7 @@ public class TypeCI_1Parser3LocalPathTypesTest
                                     + "to   { } "
                                     + "local attribute \"ATTRNAME\" { kind boolean description \"\" !hidden !multivalue !resetonclone !resetonrevision default \"\" property \"{}\\\"\" to type \"{}\\\"\" } "
                             + "}"},
-            {"58d) local type path: local attribute property link and value special characters",
+            {"59d) local type path: local attribute property link and value special characters",
                     "",
                     "description \"\" !hidden "
                             + "local pathtype \"PathType\" { "

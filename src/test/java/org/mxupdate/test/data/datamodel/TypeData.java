@@ -102,7 +102,8 @@ public class TypeData
     {
         super.createDependings();
 
-        this.localPathTypes.createDependings();
+        this.localAttributes.createDependings();
+        this.localPathTypes .createDependings();
 
         return this;
     }
