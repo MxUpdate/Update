@@ -16,6 +16,7 @@
 package org.mxupdate.test.test.update.userinterface;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.userinterface.InquiryData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.userinterface.Inquiry_mxJPO;
@@ -41,16 +42,29 @@ public class InquiryCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1) uuid",
+            // package
+            {"1a) new package",
+                    new InquiryData(this, "Test"),
+                    new InquiryData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new InquiryData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new InquiryData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new InquiryData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new InquiryData(this, "Test").defKeyNotDefined("package")},
+            // uuid
+            {"2) uuid",
                     new InquiryData(this, "Test"),
                     new InquiryData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
-            {"2a) symbolic name",
+            // symbolic names
+            {"3a) symbolic name",
                     new InquiryData(this, "Test"),
                     new InquiryData(this, "Test").setValue("symbolicname", "expression_123")},
-            {"2b) two symbolic name",
+            {"3b) two symbolic name",
                     new InquiryData(this, "Test"),
                     new InquiryData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
-            {"3) description",
+            // description
+            {"4) description",
                     new InquiryData(this, "Test"),
                     new InquiryData(this, "Test").setValue("description", "abc def")},
        };
@@ -58,16 +72,17 @@ public class InquiryCI_2DeltaCalculationTest
 
     @Override
     @BeforeMethod
-    @AfterClass(groups = "close" )
+    @AfterClass
     public void cleanup()
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.UI_INQUIRY);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override
     protected Inquiry_mxJPO createNewData(final ParameterCache_mxJPO _paramCache,
-                                             final String _name)
+                                          final String _name)
     {
         return new Inquiry_mxJPO(_name);
     }

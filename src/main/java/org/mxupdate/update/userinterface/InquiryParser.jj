@@ -14,7 +14,7 @@
  */
 
 options {
-    JDK_VERSION = "1.6";
+    JDK_VERSION = "1.7";
     STATIC = false;
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
@@ -69,7 +69,9 @@ PARSER_END(InquiryParser)
 
 <DEFAULT> TOKEN :
 {
-      <UUID:                                "uuid">                                         : STRING_EXPECTED
+      <PACKAGE:                             "package">                                      : STRING_EXPECTED
+
+    | <UUID:                                "uuid">                                         : STRING_EXPECTED
 
     | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
@@ -102,13 +104,13 @@ PARSER_END(InquiryParser)
 /******************************************************************* Argument */
 <DEFAULT> TOKEN :
 {
-      <ARGUMENT:                            "argument">                                     : ARGUMENT_EXPECTED
+      <ARGUMENT:                            "argument">                                     : SETTING_EXPECTED
 }
 
-<ARGUMENT_EXPECTED> TOKEN :
+<SETTING_EXPECTED> TOKEN :
 {
-      <ARGUMENT_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
-    | <ARGUMENT_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
+      <SETTING_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <SETTING_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
 }
 
 /******************************************************************* Property */
@@ -133,49 +135,117 @@ PARSER_END(InquiryParser)
  * @param _inquiry  target inquiry to update with parsed values
  */
 void parse(final Inquiry_mxJPO _inquiry)
-    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
-: {
-    Token tmp;
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
     AdminProperty property;
-} {
-    (   ( <UUID>                                                            {property = new AdminProperty();
-                                                                             this.appendValue(this.getValue(_inquiry, "properties"), "propertiesStack", property);
-                                                                             this.setValue(property, "name",  "UUID");}
-                                    ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_inquiry, "packageRef", str);} )
 
-      | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_inquiry, "symbolicNames", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.appendValue(_inquiry, "symbolicNames", this.getSingle(tmp.image));} ) )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_inquiry, "properties", "propertiesStack", property);} )
 
-      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_inquiry, "description",                         this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>               {this.setValue(_inquiry, "description",                         this.getSingle(tmp.image));} ) )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_inquiry, "symbolicNames", str);} )
 
-      | ( <HIDDEN_TRUE>                                                     {this.setValue(_inquiry, "hidden",                              true);} )
-      | ( <HIDDEN_FALSE>                                                    {this.setValue(_inquiry, "hidden",                              false);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_inquiry, "description", str);} )
 
-      | ( <PATTERN>                 ( tmp = <STRING>                        {this.setValue(_inquiry, "pattern",                             this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_inquiry, "pattern",                             this.getSingle(tmp.image));} ) )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_inquiry, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_inquiry, "hidden", false);} )
 
-      | ( <FORMAT>                  ( tmp = <STRING>                        {this.setValue(_inquiry, "format",                              this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_inquiry, "format",                              this.getSingle(tmp.image));} ) )
+      | ( <PATTERN>                   str = string()                            {this.setValue(_inquiry, "pattern", str);} )
 
-      | ( <CODE>                    ( tmp = <MULTILINESTRING>               {this.setValue(_inquiry, "code",                                this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>               {this.setValue(_inquiry, "code",                                this.getSingle(tmp.image));} ) )
+      | ( <FORMAT>                    str = string()                            {this.setValue(_inquiry, "format", str);} )
 
-      | ( <ARGUMENT>                                                        {property = new AdminProperty();this.appendValue(this.getValue(_inquiry, "properties"), "propertiesStack", property);}
-                      ( tmp = <ARGUMENT_STRING>                             {this.setValue(property, "name", "%" + this.getString(tmp.image));}
-                      | tmp = <ARGUMENT_SINGLE>                             {this.setValue(property, "name", "%" + this.getSingle(tmp.image));} )
-                                    ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+      | ( <CODE>                      str = multiLineString()                   {this.setValue(_inquiry, "code", str);} )
 
-      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_inquiry, "properties", "propertiesStack", property);}
-                                    ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
-              (   ( <PROPERTYVAL>   ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+      | ( <ARGUMENT>                  property = settingProperty()              {this.appendValue(_inquiry, "properties", "propertiesStack", property);} )
+
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_inquiry, "properties", "propertiesStack", property);} )
     )*
+}
+
+/**
+ * Parses the UUID property definition.
+ */
+AdminProperty uuidProperty() :
+{
+    String str;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()
+    {this.setValue(property, "value", str);}
+    {this.setValue(property, "name",  "UUID");}
+    {return property;}
+}
+
+/**
+ * Parses one setting.
+ */
+AdminProperty settingProperty() :
+{
+    String name, value;
+    Token tmp;
+    AdminProperty property = new AdminProperty();
+}
+{
+    ( tmp = <SETTING_STRING>   {name = this.getString(tmp.image);}
+    | tmp = <SETTING_SINGLE>   {name = this.getSingle(tmp.image);} )
+
+    value = string()
+    
+    {this.setValue(property, "name", "%" + name);}
+    {this.setValue(property, "value", value);}
+    {return property;}
+}
+
+/**
+ * Parses the properties definition.
+ */
+AdminProperty property() :
+{
+    String str;
+    Token tmp;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()                                 {this.setValue(property, "name", str);}
+    ( ( <PROPERTYVAL>  str = string()              {this.setValue(property, "value", str);} )
+    | ( <PROPERTYTO>   ( tmp = <ADMINTYPE_STRING>  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                       | tmp = <ADMINTYPE_SINGLE>  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                   str = string()  {this.setValue(property, "refAdminName", str);} ) )*
+    {return property;}
+}
+
+/**
+ * Evaluates multi-line string.
+ *
+ * @return string
+ */
+String multiLineString() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <MULTILINESTRING>  {ret = this.getString(tmp.image);}
+    | tmp = <MULTILINESINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
+}
+
+/**
+ * Evaluates single-line string.
+ *
+ * @return string
+ */
+String string() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <STRING>  {ret = this.getString(tmp.image);}
+    | tmp = <SINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
 }

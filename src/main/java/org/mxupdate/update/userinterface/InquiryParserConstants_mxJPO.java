@@ -26,50 +26,52 @@ interface InquiryParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int UUID = 5;
+  int PACKAGE = 5;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 6;
+  int UUID = 6;
   /** RegularExpression Id. */
-  int DESCRIPTION = 7;
+  int SYMBOLICNAME = 7;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 8;
+  int DESCRIPTION = 8;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 9;
+  int HIDDEN_TRUE = 9;
   /** RegularExpression Id. */
-  int PATTERN = 10;
+  int HIDDEN_FALSE = 10;
   /** RegularExpression Id. */
-  int FORMAT = 11;
+  int PATTERN = 11;
   /** RegularExpression Id. */
-  int CODE = 12;
+  int FORMAT = 12;
   /** RegularExpression Id. */
-  int STRING = 13;
+  int CODE = 13;
   /** RegularExpression Id. */
-  int SINGLE = 14;
+  int STRING = 14;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 15;
+  int SINGLE = 15;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 16;
+  int MULTILINESTRING = 16;
   /** RegularExpression Id. */
-  int ARGUMENT = 17;
+  int MULTILINESINGLE = 17;
   /** RegularExpression Id. */
-  int ARGUMENT_STRING = 18;
+  int ARGUMENT = 18;
   /** RegularExpression Id. */
-  int ARGUMENT_SINGLE = 19;
+  int SETTING_STRING = 19;
   /** RegularExpression Id. */
-  int PROPERTY = 20;
+  int SETTING_SINGLE = 20;
   /** RegularExpression Id. */
-  int PROPERTYTO = 21;
+  int PROPERTY = 21;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 22;
+  int PROPERTYTO = 22;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 23;
+  int PROPERTYVAL = 23;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 24;
+  int ADMINTYPE_STRING = 24;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 25;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
   /** Lexical state. */
-  int ARGUMENT_EXPECTED = 1;
+  int SETTING_EXPECTED = 1;
   /** Lexical state. */
   int MULTILINESTRING_EXPECTED = 2;
   /** Lexical state. */
@@ -84,6 +86,7 @@ interface InquiryParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"package\"",
     "\"uuid\"",
     "\"symbolicname\"",
     "\"description\"",
@@ -97,8 +100,8 @@ interface InquiryParserConstants_mxJPO {
     "<MULTILINESTRING>",
     "<MULTILINESINGLE>",
     "\"argument\"",
-    "<ARGUMENT_STRING>",
-    "<ARGUMENT_SINGLE>",
+    "<SETTING_STRING>",
+    "<SETTING_SINGLE>",
     "\"property\"",
     "\"to\"",
     "\"value\"",
