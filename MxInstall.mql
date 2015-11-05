@@ -69,8 +69,8 @@ eval  {
 
     # define paths
     set sRootJPOs            [file join "${sRoot}" "src" "main" "java"]
-    set sRootResources       [file join "${sRoot}" "src" "main" "resources"]
-    set sMappingFileOriginal [file join "${sRootResources}" "org" "mxupdate" "mapping.properties"]
+    set sMappingFileOriginal [file join "${sRoot}" "src" "main" "resources" "org" "mxupdate" "mapping.properties"]
+    set sLicenseFile         [file join "${sRoot}" "LICENSE.md"]
 
     ############################################################################
     # Read the mapping configuration between MX names and internal used names
@@ -116,12 +116,14 @@ eval  {
         global asMapping
         global sMappingFileExtension
         global sMappingFileOriginal
+        global sLicenseFile
 
         # if a file extension exists, both file dates must be checked!
         set sFileDate [clock format [file mtime "${sMappingFileOriginal}"] -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
         if {"${sMappingFileExtension}" != ""}  {
             set sFileDate "${sFileDate}, [clock format [file mtime "${sMappingFileExtension}"] -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]"
         }
+        set sFileDate "${sFileDate}, [clock format [file mtime "${sLicenseFile}"] -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]"
 
         if {[mql list prog "${_sProgName}"] == ""}  {
             set sDate ""
@@ -143,6 +145,30 @@ eval  {
                 set sCode "${sCode}\n[read $pFile]"
                 close $pFile
             }
+
+            # append license
+            # (hint: umlaute, sz and backslashes must be converted!)
+            set pFile [open "${sLicenseFile}" r]
+            fconfigure $pFile -encoding utf-8
+            set sLicense [string trim [read $pFile]]
+            close $pFile
+            regsub -all {\\}     "${sLicense}" "\\\\\\\\"  sLicense
+            regsub -all {\n\ }   "${sLicense}" "\n\\u0020" sLicense
+
+            regsub -all {\u00A7} "${sLicense}" {\u00A7} sLicense
+
+            regsub -all {\u00C4} "${sLicense}" {\u00C4} sLicense
+            regsub -all {\u00D6} "${sLicense}" {\u00D6} sLicense
+            regsub -all {\u00DC} "${sLicense}" {\u00DC} sLicense
+            regsub -all {\u1E9E} "${sLicense}" {\u1E9E} sLicense
+
+            regsub -all {\u00E4} "${sLicense}" {\u00E4} sLicense
+            regsub -all {\u00F6} "${sLicense}" {\u00F6} sLicense
+            regsub -all {\u00FC} "${sLicense}" {\u00FC} sLicense
+            regsub -all {\u00DF} "${sLicense}" {\u00DF} sLicense
+
+            regsub -all {\n} "${sLicense}" "\\n\\\n                                                                                  " sLicense
+            set sCode "${sCode}\n\nParameterDef.ActionLicenseText.Default                                          = ${sLicense}\n"
 
             # update property program (with escape on because of special characters)
             mql set escape on
