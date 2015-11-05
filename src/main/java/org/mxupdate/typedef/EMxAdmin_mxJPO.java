@@ -185,6 +185,7 @@ public enum EMxAdmin_mxJPO
         EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Form.name().toLowerCase(),          Form);
         EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Format.name().toLowerCase(),        Format);
         EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Group.name().toLowerCase(),         Group);
+        EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Index.name().toLowerCase(),         Index);
         EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Inquiry.name().toLowerCase(),       Inquiry);
         EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Interface.name().toLowerCase(),     Interface);
         EMxAdmin_mxJPO.MAP_FROM_MXCLASS.put(Menu.name().toLowerCase(),          Menu);

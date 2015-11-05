@@ -93,7 +93,7 @@ abstract class AbstractIndexCI_mxJPO<CLASS extends AbstractIndexCI_mxJPO<CLASS>>
         super.parse(_paramCache);
 
         // evaluate enabled flag directly (because not included in the XML export)
-        this.enable = Boolean.valueOf(MqlBuilderUtil_mxJPO.mql().cmd("escape print uniquekey ").arg(this.getName()).cmd(" select ").arg("enabled").cmd(" dump").exec(_paramCache.getContext()));
+        this.enable = Boolean.valueOf(MqlBuilderUtil_mxJPO.mql().cmd("escape print ").cmd(this.mxClassDef().mxClass()).cmd(" ").arg(this.getName()).cmd(" select ").arg("enabled").cmd(" dump").exec(_paramCache.getContext()));
     }
 
     @Override
@@ -110,7 +110,7 @@ abstract class AbstractIndexCI_mxJPO<CLASS extends AbstractIndexCI_mxJPO<CLASS>>
             this.fields.peek().expression = _content;
             parsed = true;
         } else if ("/attributeDefRefList/attributeSize".equals(_url))  {
-            this.fields.peek().size = Integer.valueOf(_content) + 4;
+            this.fields.peek().size = Integer.valueOf(_content);
             parsed = true;
 
         } else  {
@@ -155,8 +155,8 @@ abstract class AbstractIndexCI_mxJPO<CLASS extends AbstractIndexCI_mxJPO<CLASS>>
             }
             if (tarField == null)  {
                 if (enabled)  {
-                    _paramCache.logTrace("    - disable unique key");
-                    _mql.pushPrefix("escape disable uniquekey $1", this.getName()).newLine().popPrefix();
+                    _paramCache.logTrace("    - disable");
+                    _mql.pushPrefix("escape disable " + this.mxClassDef().mxClass() + " $1", this.getName()).newLine().popPrefix();
                     enabled = false;
                 }
                 _paramCache.logTrace("    - remove field " + curField.expression);
@@ -174,8 +174,8 @@ abstract class AbstractIndexCI_mxJPO<CLASS extends AbstractIndexCI_mxJPO<CLASS>>
             }
             if (curField == null)  {
                 if (enabled)  {
-                    _paramCache.logTrace("    - disable unique key");
-                    _mql.pushPrefix("escape disable uniquekey $1", this.getName()).newLine().popPrefix();
+                    _paramCache.logTrace("    - disable");
+                    _mql.pushPrefix("escape disable " + this.mxClassDef().mxClass() + " $1", this.getName()).newLine().popPrefix();
                     enabled = false;
                 }
                 _paramCache.logTrace("    - add field " + tarField.expression);
@@ -191,11 +191,11 @@ abstract class AbstractIndexCI_mxJPO<CLASS extends AbstractIndexCI_mxJPO<CLASS>>
         this.getProperties().calcDelta(_mql, "", _current.getProperties());
 
         if (this.enable && !enabled)  {
-            _paramCache.logTrace("    - enable unique key");
-            _mql.pushPrefix("escape enable uniquekey $1", this.getName()).newLine().popPrefix();
+            _paramCache.logTrace("    - enable");
+            _mql.pushPrefix("escape enable " + this.mxClassDef().mxClass() + " $1", this.getName()).newLine().popPrefix();
         } else if (!this.enable && enabled)  {
-            _paramCache.logTrace("    - disable unique key");
-            _mql.pushPrefix("escape disable uniquekey $1", this.getName()).newLine().popPrefix();
+            _paramCache.logTrace("    - disable");
+            _mql.pushPrefix("escape disable " + this.mxClassDef().mxClass() + " $1", this.getName()).newLine().popPrefix();
         }
     }
 
@@ -209,6 +209,26 @@ abstract class AbstractIndexCI_mxJPO<CLASS extends AbstractIndexCI_mxJPO<CLASS>>
         private String expression;
         /** Field size. */
         private int size;
+
+        /**
+         * Defines field {@link #size}.
+         *
+         * @param _size     field size
+         */
+        public void setSize(final int _size)
+        {
+            this.size = _size;
+        }
+
+        /**
+         * Returns the field {@link #size}.
+         *
+         * @return field size
+         */
+        public int getSize()
+        {
+            return this.size;
+        }
 
         @Override
         public int compareTo(final Field _toCompare)

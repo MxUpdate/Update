@@ -88,6 +88,18 @@ public class UniqueKeyCI_mxJPO
     }
 
     @Override
+    public void parse(final ParameterCache_mxJPO _paramCache)
+            throws MatrixException, ParseException
+    {
+        super.parse(_paramCache);
+
+        // fix field size (correct value differs!)
+        for (final Field field : this.getFields())  {
+            field.setSize(field.getSize() + 4);
+        }
+    }
+
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)

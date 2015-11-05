@@ -18,13 +18,18 @@ package org.mxupdate.update.system;
 import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
+import org.mxupdate.update.util.DeltaUtil_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
+import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
+
+import matrix.util.MatrixException;
 
 /**
  * Handles the export and update of &quot;system indexs&quot;.
@@ -45,11 +50,6 @@ import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 public class IndexCI_mxJPO
     extends AbstractIndexCI_mxJPO<IndexCI_mxJPO>
 {
-    /** Set of all ignored URLs from the XML definition for packages. */
-    private static final Set<String> IGNORED_URLS = new HashSet<>();
-    static  {
-    };
-
     /** Unique flag. */
     private boolean unique;
 
@@ -60,7 +60,17 @@ public class IndexCI_mxJPO
      */
     public IndexCI_mxJPO(final String _mxName)
     {
-        super(EMxAdmin_mxJPO.UniqueKey, _mxName);
+        super(EMxAdmin_mxJPO.Index, _mxName);
+    }
+
+    @Override
+    public void parse(final ParameterCache_mxJPO _paramCache)
+            throws MatrixException, ParseException
+    {
+        super.parse(_paramCache);
+
+        // evaluate unique flag directly (because not included in the XML export)
+        this.unique = Boolean.valueOf(MqlBuilderUtil_mxJPO.mql().cmd("escape print ").cmd(this.mxClassDef().mxClass()).cmd(" ").arg(this.getName()).cmd(" select ").arg("unique").cmd(" dump").exec(_paramCache.getContext()));
     }
 
     @Override
@@ -85,5 +95,28 @@ public class IndexCI_mxJPO
                 .flagIfTrue(    "unique",           false, this.unique,                         this.unique)
                 .list(this.getFields())
                 .properties(this.getProperties());
+    }
+
+    @Override
+    public void createOld(final ParameterCache_mxJPO _paramCache)
+    {
+    }
+
+    @Override
+    public void create(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException
+    {
+        MqlBuilderUtil_mxJPO.mql().cmd("escape add index ").arg(this.getName()).exec(_paramCache.getContext());
+    }
+
+    @Override
+    public void calcDelta(final ParameterCache_mxJPO _paramCache,
+                          final MultiLineMqlBuilder _mql,
+                          final IndexCI_mxJPO _current)
+        throws UpdateException_mxJPO
+    {
+        DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "unique",            false, this.unique,            _current.unique);
+
+        super.calcDelta(_paramCache, _mql, _current);
     }
 }
