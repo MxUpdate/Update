@@ -68,28 +68,70 @@ interface MxParserConstants_mxJPO {
   /** RegularExpression Id. */
   int SETTING_SINGLE = 25;
   /** RegularExpression Id. */
-  int PROPERTY = 26;
+  int FIELD = 26;
   /** RegularExpression Id. */
-  int PROPERTYTO = 27;
+  int FIELD_OPEN = 27;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 28;
+  int FIELD_CLOSE = 28;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 29;
+  int FIELD_NAME = 29;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 30;
+  int FIELD_LABEL = 30;
+  /** RegularExpression Id. */
+  int FIELD_SELECT = 31;
+  /** RegularExpression Id. */
+  int FIELD_BOBJ = 32;
+  /** RegularExpression Id. */
+  int FIELD_REL = 33;
+  /** RegularExpression Id. */
+  int FIELD_RANGE = 34;
+  /** RegularExpression Id. */
+  int FIELD_HREF = 35;
+  /** RegularExpression Id. */
+  int FIELD_ALT = 36;
+  /** RegularExpression Id. */
+  int FIELD_USER = 37;
+  /** RegularExpression Id. */
+  int FIELD_SETTING = 38;
+  /** RegularExpression Id. */
+  int FIELD_STRING = 39;
+  /** RegularExpression Id. */
+  int FIELD_SINGLE = 40;
+  /** RegularExpression Id. */
+  int FIELD_SETTING_STRING = 41;
+  /** RegularExpression Id. */
+  int FIELD_SETTING_SINGLE = 42;
+  /** RegularExpression Id. */
+  int PROPERTY = 43;
+  /** RegularExpression Id. */
+  int PROPERTYTO = 44;
+  /** RegularExpression Id. */
+  int PROPERTYVAL = 45;
+  /** RegularExpression Id. */
+  int ADMINTYPE_STRING = 46;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 47;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
   /** Lexical state. */
-  int SETTING_EXPECTED = 1;
+  int FIELD_SETTING_EXPECTED = 1;
   /** Lexical state. */
-  int NATURALNUMBER_EXPECTED = 2;
+  int FIELD_STRING_EXPECTED = 2;
   /** Lexical state. */
-  int MULTILINESTRING_EXPECTED = 3;
+  int FIELD_EXPECTED = 3;
   /** Lexical state. */
-  int STRING_EXPECTED = 4;
+  int FIELD_OPENEXPECTED = 4;
   /** Lexical state. */
-  int DEFAULT = 5;
+  int SETTING_EXPECTED = 5;
+  /** Lexical state. */
+  int NATURALNUMBER_EXPECTED = 6;
+  /** Lexical state. */
+  int MULTILINESTRING_EXPECTED = 7;
+  /** Lexical state. */
+  int STRING_EXPECTED = 8;
+  /** Lexical state. */
+  int DEFAULT = 9;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -119,6 +161,23 @@ interface MxParserConstants_mxJPO {
     "<NATURALNUMBER>",
     "<SETTING_STRING>",
     "<SETTING_SINGLE>",
+    "\"field\"",
+    "\"{\"",
+    "\"}\"",
+    "\"name\"",
+    "\"label\"",
+    "\"select\"",
+    "\"businessobject\"",
+    "\"relationship\"",
+    "\"range\"",
+    "\"href\"",
+    "\"alt\"",
+    "\"user\"",
+    "\"setting\"",
+    "<FIELD_STRING>",
+    "<FIELD_SINGLE>",
+    "<FIELD_SETTING_STRING>",
+    "<FIELD_SETTING_SINGLE>",
     "\"property\"",
     "\"to\"",
     "\"value\"",

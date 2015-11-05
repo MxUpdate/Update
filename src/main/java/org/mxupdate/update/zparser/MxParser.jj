@@ -43,8 +43,12 @@ package org.mxupdate.update.zparser;
 
 import java.lang.reflect.InvocationTargetException;
 
+import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.AbstractField.ExpressionType;
+import org.mxupdate.update.userinterface.AbstractUIWithFields_mxJPO.Setting;
 import org.mxupdate.update.userinterface.Channel_mxJPO;
 import org.mxupdate.update.userinterface.Command_mxJPO;
+import org.mxupdate.update.userinterface.Form_mxJPO;
+import org.mxupdate.update.userinterface.Form_mxJPO.Field;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.CommandRef;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -124,6 +128,45 @@ TOKEN : /** first level */
 {
       <SETTING_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
     | <SETTING_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+}
+
+/********************************************************************** Field */
+<DEFAULT> TOKEN :
+{
+      <FIELD:                               "field">                                        : FIELD_OPENEXPECTED
+}
+
+<FIELD_OPENEXPECTED> TOKEN :
+{
+      <FIELD_OPEN:                          "{">                                            : FIELD_EXPECTED
+}
+
+<FIELD_EXPECTED> TOKEN :
+{
+      <FIELD_CLOSE:                         "}">                                            : DEFAULT
+    | <FIELD_NAME:                          "name">                                         : FIELD_STRING_EXPECTED
+    | <FIELD_LABEL:                         "label">                                        : FIELD_STRING_EXPECTED
+    | <FIELD_SELECT:                        "select">                                       : FIELD_STRING_EXPECTED
+    | <FIELD_BOBJ:                          "businessobject">                               : FIELD_STRING_EXPECTED
+    | <FIELD_REL:                           "relationship">                                 : FIELD_STRING_EXPECTED
+    | <FIELD_RANGE:                         "range">                                        : FIELD_STRING_EXPECTED
+    | <FIELD_HREF:                          "href">                                         : FIELD_STRING_EXPECTED
+    | <FIELD_ALT:                           "alt">                                          : FIELD_STRING_EXPECTED
+    | <FIELD_USER:                          "user">                                         : FIELD_STRING_EXPECTED
+    | <FIELD_SETTING:                       "setting">                                      : FIELD_SETTING_EXPECTED
+}
+
+<FIELD_STRING_EXPECTED> TOKEN :
+{
+      <FIELD_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : FIELD_EXPECTED
+    | <FIELD_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : FIELD_EXPECTED
+}
+
+<FIELD_SETTING_EXPECTED> TOKEN :
+{
+      <FIELD_SETTING_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : FIELD_STRING_EXPECTED
+    | <FIELD_SETTING_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : FIELD_STRING_EXPECTED
+
 }
 
 /******************************************************************* Property */
@@ -228,6 +271,66 @@ void parseCommand(Command_mxJPO _command)
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_command, "properties", "propertiesStack", property);} )
 
       | ( <CODE>                      str = multiLineString()                   {this.setValue(_command, "code", str);} )
+    )*
+}
+
+/**************************************************************************** */
+
+/**
+ * Parses one complete interface definition.
+ *
+ * @param _form    target interface to update with parsed values
+ */
+void parseForm(final Form_mxJPO _form)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    Token tmp;
+    AdminProperty property;
+    Field field;
+    Setting setting;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_form, "packageRef", str);} )
+
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_form, "properties", "propertiesStack", property);} )
+
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_form, "symbolicNames", str);} )
+
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_form, "description", str);} )
+
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_form, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_form, "hidden", false);} )
+
+      | ( <FIELD>                                                               {field = new Field(); this.appendValue(_form, "fields", field);  }
+          <FIELD_OPEN>
+                    ( <FIELD_NAME>      ( tmp = <FIELD_STRING>                  {this.setValue(field, "name",           this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "name",           this.getSingle(tmp.image));} )
+                    | <FIELD_LABEL>     ( tmp = <FIELD_STRING>                  {this.setValue(field, "label",          this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "label",          this.getSingle(tmp.image));} )
+                    | <FIELD_SELECT>    ( tmp = <FIELD_STRING>                  {this.setValue(field, "expression",     this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "expression",     this.getSingle(tmp.image));} )
+                    | <FIELD_BOBJ>      ( tmp = <FIELD_STRING>                  {this.setValue(field, "expression",     this.getString(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.BUSINESSOBJECT);}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "expression",     this.getSingle(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.BUSINESSOBJECT);} )
+                    | <FIELD_REL>       ( tmp = <FIELD_STRING>                  {this.setValue(field, "expression",     this.getString(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.RELATIONSHIP);}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "expression",     this.getSingle(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.RELATIONSHIP);} )
+                    | <FIELD_RANGE>     ( tmp = <FIELD_STRING>                  {this.setValue(field, "range",          this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "range",          this.getSingle(tmp.image));} )
+                    | <FIELD_HREF>      ( tmp = <FIELD_STRING>                  {this.setValue(field, "href",           this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "href",           this.getSingle(tmp.image));} )
+                    | <FIELD_ALT>       ( tmp = <FIELD_STRING>                  {this.setValue(field, "alt",            this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "alt",            this.getSingle(tmp.image));} )
+                    | <FIELD_USER>      ( tmp = <FIELD_STRING>                  {this.appendValue(field, "users",       this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.appendValue(field, "users",       this.getSingle(tmp.image));} )
+                    | <FIELD_SETTING>                                           {setting = new Setting();this.appendValue(field, "settings", setting);}
+                                        ( tmp = <FIELD_SETTING_STRING>          {this.setValue(setting, "name",         this.getString(tmp.image));}
+                                        | tmp = <FIELD_SETTING_SINGLE>          {this.setValue(setting, "name",         this.getSingle(tmp.image));} )
+                                        ( tmp = <FIELD_STRING>                  {this.setValue(setting, "value",        this.getString(tmp.image));}
+                                        | tmp = <FIELD_SINGLE>                  {this.setValue(setting, "value",        this.getSingle(tmp.image));} ) ) *
+          <FIELD_CLOSE> )
+
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_form, "properties", "propertiesStack", property);} )
     )*
 }
 

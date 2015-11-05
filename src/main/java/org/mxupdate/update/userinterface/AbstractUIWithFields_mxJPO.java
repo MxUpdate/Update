@@ -123,7 +123,7 @@ public abstract class AbstractUIWithFields_mxJPO<CLASS extends AbstractAdminObje
     /**
      * Class used to define a column of a web table or a field of a web form.
      */
-    protected abstract static class AbstractField
+    public abstract static class AbstractField
         implements UpdateLine, Comparable<AbstractField>
     {
         /** Set of all ignored URLs from the XML definition for columns / fields. */
