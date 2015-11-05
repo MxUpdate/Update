@@ -105,6 +105,9 @@ public class FormCI_1ParserTest
             {"7b) field value for select",
                     "",
                     "description \"\" field { name \"ANAME\" label \"ALABEL\" select \"ASELECT\" }"},
+            {"7c) field value for select after businessobject",
+                    "description \"\" field { name \"ANAME\" label \"ALABEL\"                               select \"ASELECT\" }",
+                    "description \"\" field { name \"ANAME\" label \"ALABEL\" businessobject \"PREVSELECT\" select \"ASELECT\" }"},
             // business object sleect
             {"8a) field empty businessobject",
                     "description \"\" field { name \"ANAME\" label \"ALABEL\" }",

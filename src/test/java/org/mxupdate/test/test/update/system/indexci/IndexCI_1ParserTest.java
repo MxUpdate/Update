@@ -121,7 +121,7 @@ public class IndexCI_1ParserTest
             {"20a) basic field (string)",
                     "",
                     "description \"\" !hidden !enable field \"name\""},
-            {"20a) basic field (single)",
+            {"20b) basic field (single)",
                     "description \"\" !hidden !enable field \"name\"",
                     "description \"\" !hidden !enable field   name"},
             {"21a) basic fields sorted",

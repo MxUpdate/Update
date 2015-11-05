@@ -111,7 +111,7 @@ PARSER_END(MxParser)
   " " | "\t" | "\n" | <("#" (~["\n"])* "\n")>
 }
 
-<DEFAULT, BRACE_OPEN_EXPECTED, VERSION_EXPECTED> TOKEN : /** first level */
+<DEFAULT, USER_EXPECTED, VERSION_EXPECTED> TOKEN : /** first level */
 {
       <ABSTRACT_TRUE:                       "abstract">             : DEFAULT           | <ABSTRACT_FALSE:                      "!abstract">            : DEFAULT
     | <ACTIVE_TRUE:                         "active">               : DEFAULT           | <ACTIVE_FALSE:                        "!active">              : DEFAULT
@@ -192,7 +192,7 @@ PARSER_END(MxParser)
     // special cases
     | <FORMAT_ALL:                          "format" ([" ","\t","\n"])+ "all">              : DEFAULT
     | <USER:                                ("add" ([" ","\t","\n","\r"])+ )? "user">       : USER_EXPECTED
-    | <BRACE_OPEN:                          "{">                                            : BRACE_OPEN_EXPECTED
+    | <BRACE_OPEN:                          "{">                                            : DEFAULT
     | <BRACE_CLOSE:                         "}">                                            : DEFAULT
     | <FROM_WITH_BRACE:                     "from" ([" ","\t","\n"])+ "{">                  : DEFAULT
     | <TO_WITH_BRACE:                       "to"   ([" ","\t","\n"])+ "{">                  : DEFAULT
@@ -215,6 +215,7 @@ PARSER_END(MxParser)
     | <APPLICATION:                         "application" >                                 : STRING_EXPECTED
     | <ATTRIBUTE:                           "attribute">                                    : STRING_EXPECTED
     | <BRANCH:                              "branch">                                       : STRING_EXPECTED
+    | <BUSINESSOBJECT:                      "businessobject">                               : STRING_EXPECTED
     | <CHANNEL:                             "channel">                                      : STRING_EXPECTED
     | <CHECK:                               "check">                                        : STRING_EXPECTED
     | <COMMAND:                             ("add" ([" ","\t","\n","\r"])+ )? "command">    : STRING_EXPECTED
@@ -227,6 +228,7 @@ PARSER_END(MxParser)
     | <EDIT:                                "edit">                                         : STRING_EXPECTED
     | <EMAILADDRESS:                        "emailaddress">                                 : STRING_EXPECTED
     | <FAX:                                 "fax">                                          : STRING_EXPECTED
+    | <FIELD:                               "field">                                        : STRING_EXPECTED
     | <FILE:                                "file">                                         : STRING_EXPECTED
     | <FORMAT:                              "format">                                       : STRING_EXPECTED
     | <FULLNAME:                            "fullname">                                     : STRING_EXPECTED
@@ -241,16 +243,19 @@ PARSER_END(MxParser)
     | <METHOD:                              "method">                                       : STRING_EXPECTED
     | <MIME:                                "mime">                                         : STRING_EXPECTED
     | <MINORSEQUENCE:                       "minorsequence">                                : STRING_EXPECTED
+    | <NAME:                                "name">                                         : STRING_EXPECTED
     | <PACKAGE:                             "package">                                      : STRING_EXPECTED
     | <PARENT:                              "parent">                                       : STRING_EXPECTED
     | <PATHTYPE:                            "pathtype">                                     : STRING_EXPECTED
     | <PATTERN:                             "pattern">                                      : STRING_EXPECTED
     | <PHONE:                               "phone">                                        : STRING_EXPECTED
     | <PRINT:                               "print">                                        : STRING_EXPECTED
+    | <RANGE:                               "range">                                        : STRING_EXPECTED
     | <REGISTEREDNAME:                      "registeredname">                               : STRING_EXPECTED
     | <RELATIONSHIP:                        "relationship">                                 : STRING_EXPECTED
     | <ROLE:                                "role" >                                        : STRING_EXPECTED
     | <RULE:                                "rule">                                         : STRING_EXPECTED
+    | <SELECT:                              "select">                                       : STRING_EXPECTED
     | <SEQUENCE:                            "sequence">                                     : STRING_EXPECTED
     | <SIGNATURE:                           "signature">                                    : STRING_EXPECTED
     | <SITE:                                "site">                                         : STRING_EXPECTED
@@ -354,7 +359,7 @@ Integer naturalNumber() :
 }
 
 /************************************************************ Common Property */
-<DEFAULT, BRACE_OPEN_EXPECTED> TOKEN :
+<DEFAULT> TOKEN :
 {
       <PROPERTY:                            "property">                                     : STRING_EXPECTED
     | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
@@ -402,7 +407,7 @@ AdminProperty property() :
 }
 
 /**************************************************************** Common Kind */
-<DEFAULT, BRACE_OPEN_EXPECTED> TOKEN :
+<DEFAULT> TOKEN :
 {
       <KIND:                                "kind">                                         : KIND_EXPECTED
 }
@@ -432,7 +437,7 @@ AdminProperty property() :
 }
 
 /************************************************************ Common Triggers */
-<DEFAULT, BRACE_OPEN_EXPECTED> TOKEN :
+<DEFAULT> TOKEN :
 {
       <TRIGGER:                             "trigger">                                      : TRIGEVENT_EXPECTED
 }
@@ -1119,9 +1124,10 @@ Policy_mxJPO.State state() :
 }
 
 
-<BRACE_OPEN_EXPECTED> TOKEN :
+<AC_ACCESS_STRING_EXPECTED> TOKEN :
 {
     <AC_ACCESS_STRING: (["a"-"z"])+>
+   | <AC_CLOSE: "}"> : DEFAULT
 }
 
 void stateAccessDef(final Access _access) :
@@ -1133,10 +1139,8 @@ void stateAccessDef(final Access _access) :
 {
     // choice conflict for public can be ignore, because public is used outside of the access statement
     (
-          ( <BRACE_OPEN> ( tmp = <AC_ACCESS_STRING> {access.add(tmp.image);} )* <BRACE_CLOSE> )
-
+          ( <BRACE_OPEN> {token_source.SwitchTo(AC_ACCESS_STRING_EXPECTED);} ( tmp = <AC_ACCESS_STRING> {access.add(tmp.image);} )* <AC_CLOSE> )
         | ( <KEY> str = string()  {this.setValue(_access, "key", str);} )
-
         | ( <FILTER>                  str = multiLineString()               {this.setValue(_access, "filter", str);} )
         | ( <LOCALFILTER>             str = multiLineString()               {this.setValue(_access, "localfilter", str);} )
         | ( <ANCESTOR>              ( tmp = <ORGANIZATION>
@@ -1781,8 +1785,7 @@ void parseCommand(Command_mxJPO _command)
 void parseForm(final Form_mxJPO _form)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
 {
-    String str;
-    Token tmp;
+    String str,str2;
     AdminProperty property;
     Form_mxJPO.Field field;
     Setting setting;
@@ -1795,72 +1798,21 @@ void parseForm(final Form_mxJPO _form)
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_form, "description", str);} )
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_form, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_form, "hidden", false);} )
-      | ( <FIELD>                                                               {field = new Form_mxJPO.Field(); this.appendValue(_form, "fields", field);  }
-          <FIELD_OPEN>
-                    ( <FIELD_NAME>      ( tmp = <FIELD_STRING>                  {this.setValue(field, "name",           this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "name",           this.getSingle(tmp.image));} )
-                    | <FIELD_LABEL>     ( tmp = <FIELD_STRING>                  {this.setValue(field, "label",          this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "label",          this.getSingle(tmp.image));} )
-                    | <FIELD_SELECT>    ( tmp = <FIELD_STRING>                  {this.setValue(field, "expression",     this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "expression",     this.getSingle(tmp.image));} )
-                    | <FIELD_BOBJ>      ( tmp = <FIELD_STRING>                  {this.setValue(field, "expression",     this.getString(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.BUSINESSOBJECT);}
-                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "expression",     this.getSingle(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.BUSINESSOBJECT);} )
-                    | <FIELD_REL>       ( tmp = <FIELD_STRING>                  {this.setValue(field, "expression",     this.getString(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.RELATIONSHIP);}
-                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "expression",     this.getSingle(tmp.image)); this.setValue(field, "expressionType",  ExpressionType.RELATIONSHIP);} )
-                    | <FIELD_RANGE>     ( tmp = <FIELD_STRING>                  {this.setValue(field, "range",          this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "range",          this.getSingle(tmp.image));} )
-                    | <FIELD_HREF>      ( tmp = <FIELD_STRING>                  {this.setValue(field, "href",           this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "href",           this.getSingle(tmp.image));} )
-                    | <FIELD_ALT>       ( tmp = <FIELD_STRING>                  {this.setValue(field, "alt",            this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>                  {this.setValue(field, "alt",            this.getSingle(tmp.image));} )
-                    | <FIELD_USER>      ( tmp = <FIELD_STRING>                  {this.appendValue(field, "users",       this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>                  {this.appendValue(field, "users",       this.getSingle(tmp.image));} )
-                    | <FIELD_SETTING>                                           {setting = new Setting();this.appendValue(field, "settings", setting);}
-                                        ( tmp = <FIELD_SETTING_STRING>          {this.setValue(setting, "name",         this.getString(tmp.image));}
-                                        | tmp = <FIELD_SETTING_SINGLE>          {this.setValue(setting, "name",         this.getSingle(tmp.image));} )
-                                        ( tmp = <FIELD_STRING>                  {this.setValue(setting, "value",        this.getString(tmp.image));}
-                                        | tmp = <FIELD_SINGLE>                  {this.setValue(setting, "value",        this.getSingle(tmp.image));} ) ) *
-          <FIELD_CLOSE> )
+      | ( <FIELD>                                                               {token_source.SwitchTo(DEFAULT);} // work-around: because field has typically a name string...
+          <BRACE_OPEN>                                                          {field = new Form_mxJPO.Field(); this.appendValue(_form, "fields", field);}
+                  ( <NAME>            str = string()                            {this.setValue(field, "name", str);}
+                  | <LABEL>           str = string()                            {this.setValue(field, "label", str);}
+                  | <SELECT>          str = string()                            {this.setValue(field, "expression", str);this.setValue(field, "expressionType",  ExpressionType.SELECT);}
+                  | <BUSINESSOBJECT>  str = string()                            {this.setValue(field, "expression", str);this.setValue(field, "expressionType",  ExpressionType.BUSINESSOBJECT);}
+                  | <RELATIONSHIP>    str = string()                            {this.setValue(field, "expression", str);this.setValue(field, "expressionType",  ExpressionType.RELATIONSHIP);}
+                  | <RANGE>           str = string()                            {this.setValue(field, "range", str);}
+                  | <HREF>            str = string()                            {this.setValue(field, "href", str);}
+                  | <ALT>             str = string()                            {this.setValue(field, "alt", str);}
+                  | <USER>            str = string()                            {this.appendValue(field, "users", str);}
+                  | <SETTING>         str = stringString()  str2 = string()     {setting = new Setting();this.appendValue(field, "settings", setting);this.setValue(setting, "name", str);this.setValue(setting, "value", str2);} ) *
+          <BRACE_CLOSE> )
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_form, "properties", "propertiesStack", property);} )
     )*
-}
-
-<DEFAULT> TOKEN :
-{
-      <FIELD:                               "field">                            : FIELD_OPEN_EXPECTED
-}
-
-<FIELD_OPEN_EXPECTED> TOKEN :
-{
-      <FIELD_OPEN:                          "{">                                : FIELD_EXPECTED
-}
-
-<FIELD_EXPECTED> TOKEN :
-{
-      <FIELD_CLOSE:                         "}">                                : DEFAULT
-    | <FIELD_NAME:                          "name">                             : FIELD_STRING_EXPECTED
-    | <FIELD_LABEL:                         "label">                            : FIELD_STRING_EXPECTED
-    | <FIELD_SELECT:                        "select">                           : FIELD_STRING_EXPECTED
-    | <FIELD_BOBJ:                          "businessobject">                   : FIELD_STRING_EXPECTED
-    | <FIELD_REL:                           "relationship">                     : FIELD_STRING_EXPECTED
-    | <FIELD_RANGE:                         "range">                            : FIELD_STRING_EXPECTED
-    | <FIELD_HREF:                          "href">                             : FIELD_STRING_EXPECTED
-    | <FIELD_ALT:                           "alt">                              : FIELD_STRING_EXPECTED
-    | <FIELD_USER:                          "user">                             : FIELD_STRING_EXPECTED
-    | <FIELD_SETTING:                       "setting">                          : FIELD_SETTING_EXPECTED
-}
-
-<FIELD_STRING_EXPECTED> TOKEN :
-{
-      <FIELD_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : FIELD_EXPECTED
-    | <FIELD_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : FIELD_EXPECTED
-}
-
-<FIELD_SETTING_EXPECTED> TOKEN :
-{
-      <FIELD_SETTING_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : FIELD_STRING_EXPECTED
-    | <FIELD_SETTING_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : FIELD_STRING_EXPECTED
-
 }
 
 /************************************************** User Interface -> Inquiry */
