@@ -38,6 +38,13 @@ public class FormatCI_1ParserTest
             {"0) simple",
                     "",
                     "description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
+            // package
+            {"1a) package string",
+                    "",
+                    "package \"abc\" description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
+            {"1b) package single",
+                    "package \"abc\" description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\"",
+                    "package abc     description \"\" !hidden mime \"\" suffix \"\" type \"\" version \"\""},
             // uuid
             {"1a) uuid with minus separator",
                     "",

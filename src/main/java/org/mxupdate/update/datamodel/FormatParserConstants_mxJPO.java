@@ -26,47 +26,49 @@ public interface FormatParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int UUID = 5;
+  int PACKAGE = 5;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 6;
+  int UUID = 6;
   /** RegularExpression Id. */
-  int DESCRIPTION = 7;
+  int SYMBOLICNAME = 7;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 8;
+  int DESCRIPTION = 8;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 9;
+  int HIDDEN_TRUE = 9;
   /** RegularExpression Id. */
-  int MIME = 10;
+  int HIDDEN_FALSE = 10;
   /** RegularExpression Id. */
-  int SUFFIX = 11;
+  int MIME = 11;
   /** RegularExpression Id. */
-  int TYPE = 12;
+  int SUFFIX = 12;
   /** RegularExpression Id. */
-  int VERSION = 13;
+  int TYPE = 13;
   /** RegularExpression Id. */
-  int VIEW = 14;
+  int VERSION = 14;
   /** RegularExpression Id. */
-  int EDIT = 15;
+  int VIEW = 15;
   /** RegularExpression Id. */
-  int PRINT = 16;
+  int EDIT = 16;
   /** RegularExpression Id. */
-  int STRING = 17;
+  int PRINT = 17;
   /** RegularExpression Id. */
-  int SINGLE = 18;
+  int STRING = 18;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 19;
+  int SINGLE = 19;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 20;
+  int MULTILINESTRING = 20;
   /** RegularExpression Id. */
-  int PROPERTY = 21;
+  int MULTILINESINGLE = 21;
   /** RegularExpression Id. */
-  int PROPERTYTO = 22;
+  int PROPERTY = 22;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 23;
+  int PROPERTYTO = 23;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 24;
+  int PROPERTYVAL = 24;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 25;
+  int ADMINTYPE_STRING = 25;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 26;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -84,6 +86,7 @@ public interface FormatParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"package\"",
     "\"uuid\"",
     "\"symbolicname\"",
     "\"description\"",

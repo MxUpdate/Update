@@ -14,7 +14,7 @@
  */
 
 options {
-    JDK_VERSION = "1.6";
+    JDK_VERSION = "1.7";
     STATIC = false;
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
@@ -68,7 +68,9 @@ PARSER_END(FormatParser)
 
 TOKEN : /** first level */
 {
-      <UUID:                                "uuid">                                         : STRING_EXPECTED
+      <PACKAGE:                             "package">                                      : STRING_EXPECTED
+
+    | <UUID:                                "uuid">                                         : STRING_EXPECTED
 
     | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
@@ -127,51 +129,61 @@ TOKEN : /** first level */
 void parse(final Format_mxJPO _format)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
+    String str;
     Token tmp;
     AdminProperty property;
 } {
-    (   ( <UUID>                                                            {property = new AdminProperty();
-                                                                             this.appendValue(this.getValue(_format, "properties"), "propertiesStack", property);
-                                                                             this.setValue(property, "name",  "UUID");}
-                                    ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));property = null;}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));property = null;} ) )
+    (   ( <PACKAGE>                   str = string()                            {this.setValue(_format, "packageRef",   str);} )
 
-      | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_format, "symbolicNames", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.appendValue(_format, "symbolicNames", this.getSingle(tmp.image));} ) )
+      | ( <UUID>                                                                {property = new AdminProperty();
+                                                                                 this.appendValue(this.getValue(_format, "properties"), "propertiesStack", property);
+                                                                                 this.setValue(property, "name",  "UUID");}
+                                      str = string()                            {this.setValue(property, "value", str);property = null;} )
 
-      | (<DESCRIPTION>              ( tmp = <MULTILINESTRING>               {this.setValue(_format, "description", this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>               {this.setValue(_format, "description", this.getSingle(tmp.image));} ) )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_format, "symbolicNames", str);} )
 
-      | (<HIDDEN_TRUE>                                                      {this.setValue(_format, "hidden",       true);} )
-      | (<HIDDEN_FALSE>                                                     {this.setValue(_format, "hidden",       false);} )
+      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>                   {this.setValue(_format, "description",  this.getString(tmp.image));}
+                                    | tmp = <MULTILINESINGLE>                   {this.setValue(_format, "description",  this.getSingle(tmp.image));} ) )
 
-      | (<MIME>                     ( tmp = <STRING>                        {this.setValue(_format, "mimeType",     this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_format, "mimeType",     this.getSingle(tmp.image));} ) )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_format, "hidden",       true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_format, "hidden",       false);} )
 
-      | (<SUFFIX>                   ( tmp = <STRING>                        {this.setValue(_format, "fileSuffix",   this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_format, "fileSuffix",   this.getSingle(tmp.image));} ) )
+      | ( <MIME>                      str = string()                            {this.setValue(_format, "mimeType",     str);} )
 
-      | (<TYPE>                     ( tmp = <STRING>                        {this.setValue(_format, "type",         this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_format, "type",         this.getSingle(tmp.image));} ) )
+      | ( <SUFFIX>                    str = string()                            {this.setValue(_format, "fileSuffix",   str);} )
 
-      | (<VERSION>                  ( tmp = <STRING>                        {this.setValue(_format, "version",      this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_format, "version",      this.getSingle(tmp.image));} ) )
+      | ( <TYPE>                      str = string()                            {this.setValue(_format, "type",         str);} )
 
-      | (<VIEW>                     ( tmp = <STRING>                        {this.setValue(_format, "commandView",  this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_format, "commandView",  this.getSingle(tmp.image));} ) )
-      | (<EDIT>                     ( tmp = <STRING>                        {this.setValue(_format, "commandEdit",  this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_format, "commandEdit",  this.getSingle(tmp.image));} ) )
-      | (<PRINT>                    ( tmp = <STRING>                        {this.setValue(_format, "commandPrint", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(_format, "commandPrint", this.getSingle(tmp.image));} ) )
+      | ( <VERSION>                   str = string()                            {this.setValue(_format, "version",      str);} )
 
-      | (<PROPERTY>                                                         {property = new AdminProperty();this.appendValue(_format, "properties", "propertiesStack", property);}
-                                    ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
-              (   ( <PROPERTYVAL>   ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+      | ( <VIEW>                      str = string()                            {this.setValue(_format, "commandView",  str);} )
+      | ( <EDIT>                      str = string()                            {this.setValue(_format, "commandEdit",  str);} )
+      | ( <PRINT>                     str = string()                            {this.setValue(_format, "commandPrint", str);} )
+
+
+      | ( <PROPERTY>                                                            {property = new AdminProperty();this.appendValue(_format, "properties", "propertiesStack", property);}
+                                      str = string()                            {this.setValue(property, "name", str);}
+              (   ( <PROPERTYVAL>     str = string()                            {this.setValue(property, "value", str);} )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>                  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE>                  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                      str = string()                            {this.setValue(property, "refAdminName", str);} ) )* )
     )*
+}
+
+/**
+ * Evaluates single-line string.
+ *
+ * @return string
+ */
+String string() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <STRING>  {ret = this.getString(tmp.image);}
+    | tmp = <SINGLE>  {ret = this.getSingle(tmp.image);} )
+    {
+        return ret;
+    }
 }

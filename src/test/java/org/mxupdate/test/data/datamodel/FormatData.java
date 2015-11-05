@@ -125,7 +125,7 @@ public class FormatData
      *
      * @return TCL update file content
      */
-    @Override()
+    @Override
     public String ciFile()
     {
         final StringBuilder strg = new StringBuilder();
@@ -134,10 +134,9 @@ public class FormatData
 
         strg.append("mxUpdate format \"${NAME}\" {\n");
 
-        // append flags
-        this.getFlags().append4Update("  ", strg);
-        // append values
-        this.getValues().append4Update("  ", strg);
+        this.getValues().append4Update("    ", strg);
+        this.getFlags() .append4Update("    ", strg);
+        this.getDatas() .append4Update("    ", strg);
 
         if (this.viewProgram != null)  {
             strg.append(" view \"").append(AbstractTest.convertUpdate(this.viewProgram.getName())).append("\"\n");
@@ -150,7 +149,7 @@ public class FormatData
         }
 
         // append properties
-        this.getProperties().append4Update("  ", strg);
+        this.getProperties().append4Update("    ", strg);
 
         strg.append("}");
 
@@ -163,7 +162,7 @@ public class FormatData
      * @return this format data instance
      * @throws MatrixException if create failed
      */
-    @Override()
+    @Override
     public FormatData create()
         throws MatrixException
     {
@@ -205,7 +204,7 @@ public class FormatData
      * @see #editProgram
      * @see #printProgram
      */
-    @Override()
+    @Override
     public FormatData createDependings()
         throws MatrixException
     {
@@ -230,7 +229,7 @@ public class FormatData
      * Also the {@link #viewProgram}, {@link #editProgram} and
      * {@link #printProgram} are checked.
      */
-    @Override()
+    @Override
     public void checkExport(final ExportParser _exportParser)
     {
         super.checkExport(_exportParser);
