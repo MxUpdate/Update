@@ -415,8 +415,8 @@ void parse(final Type_mxJPO _type)
                    "}" ) )
 
     | ( <LOCAL_PATHTYPE>
-            ( tmp = <STRING>                                                                  {localPathType = new LocalPathType(this.getString(tmp.image));this.appendValue(_type, "localPathTypes", localPathType);}
-            | tmp = <SINGLE>                                                                  {localPathType = new LocalPathType(this.getSingle(tmp.image));this.appendValue(_type, "localPathTypes", localPathType);} )
+            ( tmp = <STRING>                                                                  {localPathType = new LocalPathType().setLocalName(this.getString(tmp.image));this.appendValue(_type, "localPathTypes", localPathType);}
+            | tmp = <SINGLE>                                                                  {localPathType = new LocalPathType().setLocalName(this.getSingle(tmp.image));this.appendValue(_type, "localPathTypes", localPathType);} )
                  ( "{"
                         ( ( <UUID>                                                            {property = new AdminProperty();
                                                                                                this.appendValue(this.getValue(localPathType, "properties"), "propertiesStack", property);

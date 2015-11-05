@@ -30,6 +30,8 @@ import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
+import matrix.util.MatrixException;
+
 /**
  * Handles list of local path type definitions.
  *
@@ -42,21 +44,20 @@ public class LocalPathTypeList_mxJPO
     /** Generated serial version UID. */
     private static final long serialVersionUID = -8536421946458610313L;
 
+    /** Owner of this attribute. */
+    private final AbstractAdminObject_mxJPO<? extends AbstractAdminObject_mxJPO<?>> owner;
+
     /** Stack with all local path type used within parsing. */
     private LocalPathType curParsedPathType;
 
     /**
-     * All path types are prepared.
+     * Constructor.
+     *
+     * @param _owner    owner of this local path type list
      */
-    public void prepare()
+    public LocalPathTypeList_mxJPO(final AbstractAdminObject_mxJPO<? extends AbstractAdminObject_mxJPO<?>> _owner)
     {
-        for (final LocalPathType localPathType : this)  {
-            localPathType.prepare();
-        }
-        // sort local path types (because name is set after parsing!)
-        final Set<LocalPathType> localPathTypes = new HashSet<>(this);
-        this.clear();
-        this.addAll(localPathTypes);
+        this.owner = _owner;
     }
 
     /**
@@ -75,11 +76,11 @@ public class LocalPathTypeList_mxJPO
         boolean parsed = false;
 
         if ("".equals(_url))  {
-            this.curParsedPathType = new LocalPathType(null);
+            this.curParsedPathType = new LocalPathType();
             this.add(this.curParsedPathType);
             parsed = true;
         } else if ("/adminProperties/name".equals(_url))  {
-            this.curParsedPathType.setName(_content);
+            this.curParsedPathType.setLocalName(_content);
             parsed = true;
         } else  {
             parsed = this.curParsedPathType.parseAdminXMLExportEvent(_paramCache, _url, _content);
@@ -88,13 +89,41 @@ public class LocalPathTypeList_mxJPO
         return parsed;
     }
 
+    /**
+     * Parses the symbolic names of all path types.
+     *
+     * @param _paramCache   parameter cache
+     * @throws MatrixException if parse of symbolic names failed
+     */
+    public void parseSymbolicNames(final ParameterCache_mxJPO _paramCache)
+        throws MatrixException
+    {
+        for (final LocalPathType localPathType : this)  {
+            localPathType.parseSymbolicNames(_paramCache);
+        }
+    }
+
+    /**
+     * All path types are prepared.
+     */
+    public void prepare()
+    {
+        for (final LocalPathType localPathType : this)  {
+            localPathType.prepare(this.owner);
+        }
+        // sort local path types (because name is set after parsing!)
+        final Set<LocalPathType> localPathTypes = new HashSet<>(this);
+        this.clear();
+        this.addAll(localPathTypes);
+    }
+
     @Override
     public void write(final UpdateBuilder_mxJPO _updateBuilder)
     {
         for (final LocalPathType localPathType : this)  {
             _updateBuilder
                     .stepStartNewLine()
-                    .stepSingle("local pathtype").stepString(localPathType.getName()).stepEndLineWithStartChild();
+                    .stepSingle("local pathtype").stepString(localPathType.localName).stepEndLineWithStartChild();
             localPathType.writeUpdate(_updateBuilder);
             _updateBuilder.childEnd();
         }
@@ -106,7 +135,6 @@ public class LocalPathTypeList_mxJPO
      *
      * @param _paramCache           parameter cache
      * @param _mql                  MQL builder to append the delta
-     * @param _owner                owner of the attributes
      * @param _errorKeyAttrRemoved  error key for the case that an attribute is
      *                              removed
      * @param _current              current properties
@@ -114,7 +142,6 @@ public class LocalPathTypeList_mxJPO
      */
     public void calcDelta(final ParameterCache_mxJPO _paramCache,
                           final MultiLineMqlBuilder _mql,
-                          final AbstractAdminObject_mxJPO<? extends AbstractAdminObject_mxJPO<?>> _owner,
                           final ErrorKey _errorKeyAttrRemoved,
                           final LocalPathTypeList_mxJPO _current)
         throws UpdateException_mxJPO
@@ -129,7 +156,7 @@ public class LocalPathTypeList_mxJPO
                 }
             }
             if (!found)  {
-                throw new UpdateException_mxJPO(_errorKeyAttrRemoved, tmpLocalPathType.getName(), _owner.getName());
+                throw new UpdateException_mxJPO(_errorKeyAttrRemoved, tmpLocalPathType.getName(), this.owner.getName());
             }
         }
 
@@ -147,20 +174,17 @@ public class LocalPathTypeList_mxJPO
             if (curLocalPathType == null)  {
                 _paramCache.logDebug("    - local path type '" + targetLocalPathType.getName() + "' is added");
                 _mql.pushPrefix("")
-                    .newLine().cmd("escape add pathtype ").arg(targetLocalPathType.getName())
-                                        .cmd(" owner ").cmd(_owner.mxClassDef().mxClass()).cmd(" ").arg(_owner.getName())
+                    .newLine().cmd("escape add pathtype ").arg(targetLocalPathType.localName)
+                                        .cmd(" owner ").cmd(this.owner.mxClassDef().mxClass()).cmd(" ").arg(this.owner.getName())
                     .popPrefix();
             }
 
             // update attribute
             // (hint: the name of the local path type is set to new name,
             // because a local path type can also contain local attributes!)
-            final String tmp = targetLocalPathType.getName();
-            targetLocalPathType.setName(_owner.getName() + "." + targetLocalPathType.getName());
             _mql.pushPrefix("escape mod pathtype $1", targetLocalPathType.getName());
             targetLocalPathType.calcDelta(_paramCache, _mql, curLocalPathType);
             _mql.popPrefix();
-            targetLocalPathType.setName(tmp);
         }
     }
 
@@ -171,33 +195,43 @@ public class LocalPathTypeList_mxJPO
         extends PathType_mxJPO
         implements Comparable<LocalPathType>
     {
+        /** Local path type name. */
+        private String localName;
+
         /**
          * Constructor used to initialize the local path type definition.
-         *
-         * @param _mxName   MX name of the local path type object
          */
-        public LocalPathType(final String _mxName)
+        public LocalPathType()
         {
-            super(_mxName);
+            super((String) null);
         }
 
         /**
-         * Defines the MX name of the local path type.
+         * Defines the local MX name of this local path type.
          *
-         * @param _mxName   MX name
+         * @param _localName    local name
          */
-        @Override
-        protected void setName(final String _mxName)
+        public LocalPathType setLocalName(final String _localName)
         {
-            super.setName(_mxName);
+            this.localName = _localName;
+            return this;
+        }
+
+        @Override
+        protected void parseSymbolicNames(final ParameterCache_mxJPO _paramCache)
+            throws MatrixException
+        {
+            super.parseSymbolicNames(_paramCache);
         }
 
         /**
          * Method is defined to be called from the locale attribute list.
+         *
+         * @param _owner    owner of this local path type
          */
-        @Override
-        protected void prepare()
+        protected void prepare(final AbstractAdminObject_mxJPO<? extends AbstractAdminObject_mxJPO<?>> _owner)
         {
+            this.setName(_owner.getName() + "." + this.localName);
             super.prepare();
         }
 
@@ -223,7 +257,7 @@ public class LocalPathTypeList_mxJPO
         public int compareTo(final LocalPathType _compareTo)
         {
             int ret = 0;
-            ret = CompareToUtil_mxJPO.compare(ret, this.getName(),           _compareTo.getName());
+            ret = CompareToUtil_mxJPO.compare(ret, this.localName, _compareTo.localName);
             return ret;
         }
     }

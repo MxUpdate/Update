@@ -113,7 +113,7 @@ public class Relationship_mxJPO
     private final LocalAttributeList_mxJPO localAttributes = new LocalAttributeList_mxJPO(this);
 
     /** Local path types. */
-    private final LocalPathTypeList_mxJPO localPathTypes = new LocalPathTypeList_mxJPO();
+    private final LocalPathTypeList_mxJPO localPathTypes = new LocalPathTypeList_mxJPO(this);
 
     /**
      * Constructor used to initialize the type definition enumeration.
@@ -255,6 +255,7 @@ public class Relationship_mxJPO
     {
         super.parseSymbolicNames(_paramCache);
         this.localAttributes.parseSymbolicNames(_paramCache);
+        this.localPathTypes.parseSymbolicNames(_paramCache);
     }
 
     /**
@@ -309,7 +310,7 @@ public class Relationship_mxJPO
                 ValueKeys.DMRelationAttrIgnore, ValueKeys.DMRelationAttrRemove,         this.globalAttributes,        _current.globalAttributes);
         this.localAttributes.calcDelta(_paramCache, _mql, ErrorKey.DM_RELATION_REMOVE_LOCAL_ATTRIBUTE, _current.localAttributes);
 
-        this.localPathTypes.calcDelta(_paramCache, _mql, this, ErrorKey.DM_RELATION_REMOVE_LOCAL_PATH_TYPE, _current.localPathTypes);
+        this.localPathTypes.calcDelta(_paramCache, _mql, ErrorKey.DM_RELATION_REMOVE_LOCAL_PATH_TYPE, _current.localPathTypes);
 
         // only one rule can exists maximum, but they must be technically handled like as list
         final SortedSet<String> thisRules = new TreeSet<>();

@@ -1296,12 +1296,12 @@ this.setValue(property, "refAdminName", this.getSingle(tmp.image));
         switch ((jj_ntk==-1)?jj_ntk_f():jj_ntk) {
         case STRING:{
           tmp = jj_consume_token(STRING);
-localPathType = new LocalPathType(this.getString(tmp.image));this.appendValue(_relationship, "localPathTypes", localPathType);
+localPathType = new LocalPathType().setLocalName(this.getString(tmp.image));this.appendValue(_relationship, "localPathTypes", localPathType);
           break;
           }
         case SINGLE:{
           tmp = jj_consume_token(SINGLE);
-localPathType = new LocalPathType(this.getSingle(tmp.image));this.appendValue(_relationship, "localPathTypes", localPathType);
+localPathType = new LocalPathType().setLocalName(this.getSingle(tmp.image));this.appendValue(_relationship, "localPathTypes", localPathType);
           break;
           }
         default:

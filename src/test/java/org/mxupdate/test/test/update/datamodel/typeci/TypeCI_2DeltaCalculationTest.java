@@ -161,7 +161,7 @@ public class TypeCI_2DeltaCalculationTest
                                         .setFlag("multivalue", false, Create.ViaFlag)
                                         .setFlag("resetonclone", false, Create.ViaFlag)
                                         .setFlag("resetonrevision", false, Create.ViaFlag)
-                                        .setValue("default", "")) },
+                                        .setValue("default", ""))},
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
             // local path type
@@ -180,12 +180,29 @@ public class TypeCI_2DeltaCalculationTest
                             .addLocalPathType(new PathTypeData(this, "PathType")
                                     .def4FromSingle("cardinality", "many")
                                     .defData("attribute", new AttributeData(this, "PathType Attribute").setSingle("kind", "string"))) },
-            {"304) local path type with embedded local attribute",
+            {"304a) local path type with embedded local attribute",
                     new TypeData(this, "Test"),
                     new TypeData(this, "Test")
                             .addLocalPathType(new PathTypeData(this, "PathType")
                                     .def4FromSingle("cardinality", "many")
-                                    .addLocalAttribute(new AttributeData(this, "PathType Attribute").setSingle("kind", "string"))) },
+                                    .addLocalAttribute(new AttributeData(this, "PathType Attribute")
+                                            .setSingle("kind", "string")))},
+            {"304b) local path type with embedded local attribute with uuid",
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .def4FromSingle("cardinality", "many")
+                                    .addLocalAttribute(new AttributeData(this, "PathType Attribute")
+                                            .setSingle("kind", "string")
+                                            .setValue("uuid", "UUID")))},
+            {"304c) local path type with embedded local attribute with symbolic name",
+                    new TypeData(this, "Test"),
+                    new TypeData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .def4FromSingle("cardinality", "many")
+                                    .addLocalAttribute(new AttributeData(this, "PathType Attribute")
+                                            .setSingle("kind", "string")
+                                            .setValue("symbolicname", "attribute_" + AbstractTest.PREFIX + "Test." + AbstractTest.PREFIX + "Test." + AbstractTest.PREFIX + "PathType_Attribute")))},
        };
     }
 

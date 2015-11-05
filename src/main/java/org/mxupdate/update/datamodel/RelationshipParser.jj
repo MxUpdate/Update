@@ -456,8 +456,8 @@ void parse(final Relationship_mxJPO _relationship)
                    "}" ) )
 
     | ( <LOCAL_PATHTYPE>
-            ( tmp = <STRING>                                                                    {localPathType = new LocalPathType(this.getString(tmp.image));this.appendValue(_relationship, "localPathTypes", localPathType);}
-            | tmp = <SINGLE>                                                                    {localPathType = new LocalPathType(this.getSingle(tmp.image));this.appendValue(_relationship, "localPathTypes", localPathType);} )
+            ( tmp = <STRING>                                                                    {localPathType = new LocalPathType().setLocalName(this.getString(tmp.image));this.appendValue(_relationship, "localPathTypes", localPathType);}
+            | tmp = <SINGLE>                                                                    {localPathType = new LocalPathType().setLocalName(this.getSingle(tmp.image));this.appendValue(_relationship, "localPathTypes", localPathType);} )
                  ( "{"
                         ( ( <UUID>                                                              {property = new AdminProperty();
                                                                                                  this.appendValue(this.getValue(localPathType, "properties"), "propertiesStack", property);
@@ -471,7 +471,7 @@ void parse(final Relationship_mxJPO _relationship)
                         | ( <HIDDEN_TRUE>                                                       {this.setValue(localPathType, "hidden", true);} )
                         | ( <HIDDEN_FALSE>                                                      {this.setValue(localPathType, "hidden", false);} )
                         | ( <FROM>
-                                  (   ( <CARDINALITY_ONE>                                        {this.setValue(localPathType, "fromCardinality", PathType_mxJPO.Cardinality.One);} )
+                                  (   ( <CARDINALITY_ONE>                                       {this.setValue(localPathType, "fromCardinality", PathType_mxJPO.Cardinality.One);} )
                                     | ( <CARDINALITY_MANY>                                      {this.setValue(localPathType, "fromCardinality", PathType_mxJPO.Cardinality.Many);} )
                                     | ( <TYPE>           ( tmp = <STRING>                       {this.appendValue(localPathType, "fromTypes", this.getString(tmp.image));}
                                                          | tmp = <SINGLE>                       {this.appendValue(localPathType, "fromTypes", this.getSingle(tmp.image));} ) )
