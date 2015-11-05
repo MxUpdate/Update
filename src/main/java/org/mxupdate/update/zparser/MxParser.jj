@@ -48,6 +48,8 @@ import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
 import org.mxupdate.update.datamodel.Expression_mxJPO;
 import org.mxupdate.update.datamodel.Format_mxJPO;
+import org.mxupdate.update.datamodel.Interface_mxJPO;
+import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO.LocalAttribute;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.program.Page_mxJPO;
 import org.mxupdate.update.program.ProgramCI_mxJPO;
@@ -99,7 +101,8 @@ PARSER_END(MxParser)
 
 TOKEN : /** first level */
 {
-      <ACTIVE_TRUE:                         "active">                   | <ACTIVE_FALSE:                        "!active">
+      <ABSTRACT_TRUE:                       "abstract">                 | <ABSTRACT_FALSE:                      "!abstract">
+    | <ACTIVE_TRUE:                         "active">                   | <ACTIVE_FALSE:                        "!active">
     | <CUSTOM_TRUE:                         "custom">                   | <CUSTOM_FALSE:                        "!custom">
     | <DOWNLOADABLE_TRUE:                   "downloadable">             | <DOWNLOADABLE_FALSE:                  "!downloadable">
     | <EMAIL_TRUE:                          "email">                    | <EMAIL_FALSE:                         "!email">
@@ -122,6 +125,7 @@ TOKEN : /** first level */
     | <DEFERRED:                            "deferred">                                     : DEFAULT
     | <EXECUTE:                             "execute">                                      : DEFAULT
     | <IMMEDIATE:                           "immediate">                                    : DEFAULT
+    | <LOCAL:                               "local">                                        : DEFAULT
     | <NEWROW:                              "newrow">                                       : DEFAULT
 
     | <HEIGHT:                              "height">                                       : NATURALNUMBER_EXPECTED
@@ -134,9 +138,11 @@ TOKEN : /** first level */
     | <ADDRESS:                             "address">                                      : STRING_EXPECTED
     | <ALT:                                 "alt">                                          : STRING_EXPECTED
     | <APPLICATION:                         "application" >                                 : STRING_EXPECTED
+    | <ATTRIBUTE:                           "attribute">                                    : STRING_EXPECTED
     | <CHANNEL:                             "channel">                                      : STRING_EXPECTED
     | <COMMAND:                             ("add" ([" ","\t","\n","\r"])+ )? "command">    : STRING_EXPECTED
     | <DEFINITION:                          "definition">                                   : STRING_EXPECTED
+    | <DERIVED:                             "derived">                                      : STRING_EXPECTED
     | <DIMENSION:                           "dimension">                                    : STRING_EXPECTED
     | <EDIT:                                "edit">                                         : STRING_EXPECTED
     | <EMAILADDRESS:                        "emailaddress">                                 : STRING_EXPECTED
@@ -215,7 +221,7 @@ String string() :
 /*************************************************** Common Multi-Line-String */
 <MULTILINESTRING_EXPECTED> TOKEN :
 {
-      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\n" | "\t" | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" | "\\t" )* "\"" )> : DEFAULT
+      <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\n" | "\t" | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" | "\\t" | "\\u" )* "\"" )> : DEFAULT
     | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
@@ -352,6 +358,24 @@ Trigger trigger() :
     ( <INPUT> str = string()    {this.setValue(trigger, "arguments",            str);} )?
 
     {return trigger;}
+}
+
+/************************************************************ Local Attribute */
+/**
+ * Parses the local attribute definition.
+ */
+LocalAttribute localAttribute()
+    throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    LocalAttribute localAttr = new LocalAttribute();
+}
+{
+    str = string()                                                              {localAttr.setLocalName(str);}
+    "{"
+        parseAttribute(localAttr)
+    "}"
+    {return localAttr;}
 }
 
 /**************************************************** Data Model -> Attribute */
@@ -742,6 +766,59 @@ void parseFormat(final Format_mxJPO _format)
     )*
 }
 
+/**************************************************** Data Model -> Interface */
+
+/**
+ * Parses one complete interface definition.
+ *
+ * @param _interface    target interface to update with parsed values
+ */
+void parseInterface(final Interface_mxJPO _interface)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    AdminProperty property;
+    LocalAttribute localAttr;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_interface, "packageRef",   str);} )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_interface, "properties", "propertiesStack", property);} )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_interface, "symbolicNames", str);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_interface, "description", str);} )
+      | ( <ABSTRACT_TRUE>                                                       {this.setValue(_interface, "abstractFlag", true);} )
+      | ( <ABSTRACT_FALSE>                                                      {this.setValue(_interface, "abstractFlag", false);} )
+      | ( <DERIVED>                   str = string()                            {this.appendValue(_interface, "derived", str);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_interface, "hidden",                         true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_interface, "hidden",                         false);} )
+      | ( <ATTRIBUTE>                 str = string()                            {this.appendValue(_interface, "globalAttributes",            str);} )
+      | ( <FOR>
+            ( <FOR_PATHTYPE_ALL>                                                {this.setValue(_interface, "pathTypeAll",                    true);}
+            | <FOR_PATHTYPE>          str = string()                            {this.appendValue(_interface, "pathTypes",                   str);}
+            | <FOR_RELATIONSHIP_ALL>                                            {this.setValue(_interface, "relationAll",                    true);}
+            | <FOR_RELATIONSHIP>      str = string()                            {this.appendValue(_interface, "relations",                   str);}
+            | <FOR_TYPE_ALL>                                                    {this.setValue(_interface, "typeAll",                        true);}
+            | <FOR_TYPE>              str = string()                            {this.appendValue(_interface, "types",                       str);} ) )
+      | ( <LOCAL> <ATTRIBUTE>         localAttr = localAttribute()              {this.appendValue(_interface, "localAttributes", localAttr);} )
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_interface, "properties", "propertiesStack", property);} )
+    )*
+}
+
+/** For Relationship / Type */
+<DEFAULT> TOKEN :
+{
+      <FOR:                                 "for">                                          : FOR_EXPECTED
+}
+<FOR_EXPECTED> TOKEN :
+{
+      <FOR_PATHTYPE_ALL:                    "pathtype" ([" ","\t","\n","\r"])+ "all">       : DEFAULT
+    | <FOR_PATHTYPE:                        "pathtype">                                     : STRING_EXPECTED
+    | <FOR_RELATIONSHIP_ALL:                "relationship" ([" ","\t","\n","\r"])+ "all">   : DEFAULT
+    | <FOR_RELATIONSHIP:                    "relationship">                                 : STRING_EXPECTED
+    | <FOR_TYPE_ALL:                        "type" ([" ","\t","\n","\r"])+ "all">           : DEFAULT
+    | <FOR_TYPE:                            "type">                                         : STRING_EXPECTED
+}
+
 /************************************************************ Program -> Page */
 
 /**
@@ -911,17 +988,6 @@ void parseUniqueKey(final UniqueKeyCI_mxJPO _uniqueKey)
                     ( <SIZE>          number = naturalNumber()                  {this.setValue(field, "size", number);} )? )
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_uniqueKey, "properties", "propertiesStack", property);} )
     )*
-}
-
-/** System -> Unique Key: For Relationship / Type */
-<DEFAULT> TOKEN :
-{
-      <FOR:                                 "for">                                          : FOR_EXPECTED
-}
-<FOR_EXPECTED> TOKEN :
-{
-      <FOR_RELATIONSHIP:                    "relationship">                                 : STRING_EXPECTED
-    | <FOR_TYPE:                            "type">                                         : STRING_EXPECTED
 }
 
 /** System -> Unique Key: With Interface */
