@@ -136,18 +136,14 @@ public class InstallDataModel_mxJPO
             // do we have a JPO?
             _paramCache.logInfo("check program '" + progName + "'");
             this.registerObject(_paramCache, "program", progName);
-            final StringBuilder cmd = new StringBuilder()
-                    .append("escape mod program \"").append(StringUtil_mxJPO.convertMql(progName)).append("\" ");
 
             // check for correct property entries
-            this.checkProperty(_paramCache, "program", progName, "application",        applName,       cmd, false);
-            this.checkProperty(_paramCache, "program", progName, "installer",          _installerName, cmd, false);
-            this.checkProperty(_paramCache, "program", progName, "installed date",     _installedDate, cmd, true);
-            this.checkProperty(_paramCache, "program", progName, "version",            _applVersion,   cmd, false);
-            this.checkProperty(_paramCache, "program", progName, "original name",      progName,       cmd, false);
-            this.checkProperty(_paramCache, "program", progName, "author",             _authorName,    cmd, false);
-
-            MqlUtil_mxJPO.execMql(_paramCache, cmd);
+            this.checkProperty(_paramCache, "program", progName, "application",        applName,       false);
+            this.checkProperty(_paramCache, "program", progName, "installer",          _installerName, false);
+            this.checkProperty(_paramCache, "program", progName, "installed date",     _installedDate, true);
+            this.checkProperty(_paramCache, "program", progName, "version",            _applVersion,   false);
+            this.checkProperty(_paramCache, "program", progName, "original name",      progName,       false);
+            this.checkProperty(_paramCache, "program", progName, "author",             _authorName,    false);
         }
     }
 
@@ -214,20 +210,14 @@ public class InstallDataModel_mxJPO
                                 .append("\" type string;"));
                 }
 
-                final StringBuilder cmd = new StringBuilder()
-                    .append("escape mod attribute \"")
-                    .append(StringUtil_mxJPO.convertMql(attrName)).append("\" ");
-
                 // check for correct property entries
-                this.checkProperty(_paramCache, "attribute", attrName, "application",                                        applName,                           cmd, false);
-                this.checkProperty(_paramCache, "attribute", attrName, "installer",                                          _installerName,                     cmd, false);
-                this.checkProperty(_paramCache, "attribute", attrName, "installed date",                                     _installedDate,                     cmd, true);
-                this.checkProperty(_paramCache, "attribute", attrName, "version",                                            _applVersion,                       cmd, false);
-                this.checkProperty(_paramCache, "attribute", attrName, "original name",                                      propDef.getAttrName(_paramCache),   cmd, false);
-                this.checkProperty(_paramCache, "attribute", attrName, "author",                                             _authorName,                        cmd, false);
-                this.checkProperty(_paramCache, "attribute", attrName, PropertyDef_mxJPO.FILEDATE.getPropName(_paramCache),  _fileDate,                          cmd, true);
-
-                MqlUtil_mxJPO.execMql(_paramCache, cmd);
+                this.checkProperty(_paramCache, "attribute", attrName, "application",                                        applName,                           false);
+                this.checkProperty(_paramCache, "attribute", attrName, "installer",                                          _installerName,                     false);
+                this.checkProperty(_paramCache, "attribute", attrName, "installed date",                                     _installedDate,                     true);
+                this.checkProperty(_paramCache, "attribute", attrName, "version",                                            _applVersion,                       false);
+                this.checkProperty(_paramCache, "attribute", attrName, "original name",                                      propDef.getAttrName(_paramCache),   false);
+                this.checkProperty(_paramCache, "attribute", attrName, "author",                                             _authorName,                        false);
+                this.checkProperty(_paramCache, "attribute", attrName, PropertyDef_mxJPO.FILEDATE.getPropName(_paramCache),  _fileDate,                          true);
 
                 this.registerObject(_paramCache, "attribute", attrName);
             }
@@ -283,39 +273,38 @@ public class InstallDataModel_mxJPO
      * @param _name             name of object
      * @param _propDef          property definition
      * @param _newValue         new property value
-     * @param _cmd              string builder used to append MQL code
      * @param _onlyIfNotDefined new property value is only defined if currently
      *                          no value is defined
      * @throws MatrixException if current value from the instance object could
-     *                         not be evaluated
+     *                          not be evaluated
      */
     protected void checkProperty(final ParameterCache_mxJPO _paramCache,
                                  final String _mxClass,
                                  final String _name,
                                  final String _propName,
                                  final String _newValue,
-                                 final StringBuilder _cmd,
                                  final boolean _onlyIfNotDefined)
             throws MatrixException
     {
         // fetch current value
-        final String tmp = MqlUtil_mxJPO.execMql(_paramCache, new StringBuilder()
-                .append("escape print ").append(_mxClass).append(" \"").append(StringUtil_mxJPO.convertMql(_name)).append("\" ")
-                .append("select property[").append(_propName).append("] dump"));
+        final String tmp = MqlBuilderUtil_mxJPO.mql()
+                .cmd("escape print ").cmd(_mxClass).cmd(" ").arg(_name).cmd(" ").cmd("select ").arg("property[" + _propName + "]").cmd(" dump")
+                .exec(_paramCache.getContext());
         final int length = 7 + _propName.length();
         final String current = (tmp.length() >= length) ? tmp.substring(length) : "";
 
-        if ((!_newValue.equals(current) && !_onlyIfNotDefined) || (((current == null) || current.isEmpty()) && _onlyIfNotDefined))  {
+        if ((!_newValue.equals(current) && !_onlyIfNotDefined) || (StringUtils_mxJPO.isEmpty(current) && _onlyIfNotDefined))  {
             _paramCache.logDebug("    - define " + _propName + " '" + _newValue + "'");
-            _cmd.append("add property \"")
-                .append(StringUtil_mxJPO.convertMql(_propName))
-                .append("\" value \"").append(StringUtil_mxJPO.convertMql(_newValue)).append("\" ");
+            MqlBuilderUtil_mxJPO.mql()
+                        .cmd("escape modify ").cmd(_mxClass).cmd(" ").arg(_name).cmd(" ")
+                                .cmd("add property ").arg(_propName).cmd(" ")
+                                .cmd("value ").arg(_newValue)
+                        .exec(_paramCache.getContext());
         }
     }
 
     /**
-     * Register symbolic name for given administration object
-     * <code>_instance</code>.
+     * Register symbolic name for given administration object {@code _instance}.
      *
      * @param _paramCache   parameter cache with the MX context
      * @param _mxClass      MX class
