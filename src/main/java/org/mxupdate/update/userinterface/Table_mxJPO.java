@@ -33,6 +33,7 @@ import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
  * The class is used to export, create, delete and update tables within MX.
  * The table specific information are:
  * <ul>
+ * <li>package</li>
  * <li>uuid</li>
  * <li>symbolic names</li>
  * <li>description</li>
@@ -98,6 +99,7 @@ System.err.println("The table is derived from '" + _content + "'! This is curren
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .stringNotNull( "package",                  this.getPackageRef())
                 .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
@@ -112,6 +114,7 @@ System.err.println("The table is derived from '" + _content + "'! This is curren
                           final Table_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcPackage(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(  _mql,              "description",              this.getDescription(),  _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "hidden",            false, this.isHidden(),        _current.isHidden());

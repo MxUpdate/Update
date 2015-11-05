@@ -26,81 +26,83 @@ interface TableParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int UUID = 5;
+  int PACKAGE = 5;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 6;
+  int UUID = 6;
   /** RegularExpression Id. */
-  int DESCRIPTION = 7;
+  int SYMBOLICNAME = 7;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 8;
+  int DESCRIPTION = 8;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 9;
+  int HIDDEN_TRUE = 9;
   /** RegularExpression Id. */
-  int STRING = 10;
+  int HIDDEN_FALSE = 10;
   /** RegularExpression Id. */
-  int SINGLE = 11;
+  int STRING = 11;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 12;
+  int SINGLE = 12;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 13;
+  int MULTILINESTRING = 13;
   /** RegularExpression Id. */
-  int COLUMN = 14;
+  int MULTILINESINGLE = 14;
   /** RegularExpression Id. */
-  int COLUMN_OPEN = 15;
+  int COLUMN = 15;
   /** RegularExpression Id. */
-  int COLUMN_CLOSE = 16;
+  int COLUMN_OPEN = 16;
   /** RegularExpression Id. */
-  int COLUMN_NAME = 17;
+  int COLUMN_CLOSE = 17;
   /** RegularExpression Id. */
-  int COLUMN_LABEL = 18;
+  int COLUMN_NAME = 18;
   /** RegularExpression Id. */
-  int COLUMN_SELECT = 19;
+  int COLUMN_LABEL = 19;
   /** RegularExpression Id. */
-  int COLUMN_BOBJ = 20;
+  int COLUMN_SELECT = 20;
   /** RegularExpression Id. */
-  int COLUMN_REL = 21;
+  int COLUMN_BOBJ = 21;
   /** RegularExpression Id. */
-  int COLUMN_RANGE = 22;
+  int COLUMN_REL = 22;
   /** RegularExpression Id. */
-  int COLUMN_HREF = 23;
+  int COLUMN_RANGE = 23;
   /** RegularExpression Id. */
-  int COLUMN_ALT = 24;
+  int COLUMN_HREF = 24;
   /** RegularExpression Id. */
-  int COLUMN_HIDDEN_TRUE = 25;
+  int COLUMN_ALT = 25;
   /** RegularExpression Id. */
-  int COLUMN_HIDDEN_FALSE = 26;
+  int COLUMN_HIDDEN_TRUE = 26;
   /** RegularExpression Id. */
-  int COLUMN_USER = 27;
+  int COLUMN_HIDDEN_FALSE = 27;
   /** RegularExpression Id. */
-  int COLUMN_SORTTYPE = 28;
+  int COLUMN_USER = 28;
   /** RegularExpression Id. */
-  int COLUMN_SETTING = 29;
+  int COLUMN_SORTTYPE = 29;
   /** RegularExpression Id. */
-  int COLUMN_STRING = 30;
+  int COLUMN_SETTING = 30;
   /** RegularExpression Id. */
-  int COLUMN_SINGLE = 31;
+  int COLUMN_STRING = 31;
   /** RegularExpression Id. */
-  int SETTING_STRING = 32;
+  int COLUMN_SINGLE = 32;
   /** RegularExpression Id. */
-  int SETTING_SINGLE = 33;
+  int SETTING_STRING = 33;
   /** RegularExpression Id. */
-  int COLUMN_SORTTYPE_ALPHA = 34;
+  int SETTING_SINGLE = 34;
   /** RegularExpression Id. */
-  int COLUMN_SORTTYPE_NUMERIC = 35;
+  int COLUMN_SORTTYPE_ALPHA = 35;
   /** RegularExpression Id. */
-  int COLUMN_SORTTYPE_OTHER = 36;
+  int COLUMN_SORTTYPE_NUMERIC = 36;
   /** RegularExpression Id. */
-  int COLUMN_SORTTYPE_NONE = 37;
+  int COLUMN_SORTTYPE_OTHER = 37;
   /** RegularExpression Id. */
-  int PROPERTY = 38;
+  int COLUMN_SORTTYPE_NONE = 38;
   /** RegularExpression Id. */
-  int PROPERTYTO = 39;
+  int PROPERTY = 39;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 40;
+  int PROPERTYTO = 40;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 41;
+  int PROPERTYVAL = 41;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 42;
+  int ADMINTYPE_STRING = 42;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 43;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -128,6 +130,7 @@ interface TableParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"package\"",
     "\"uuid\"",
     "\"symbolicname\"",
     "\"description\"",

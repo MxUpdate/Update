@@ -16,6 +16,7 @@
 package org.mxupdate.test.test.update.userinterface;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.user.PersonData;
 import org.mxupdate.test.data.userinterface.TableData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -42,35 +43,46 @@ public class TableCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1) uuid",
+            // package
+            {"1a) new package",
+                    new TableData(this, "Test"),
+                    new TableData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new TableData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new TableData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new TableData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new TableData(this, "Test").defKeyNotDefined("package")},
+            // uuid
+            {"2) uuid",
                     new TableData(this, "Test"),
                     new TableData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
             // symbolic names
-            {"2a) symbolic name",
+            {"3a) symbolic name",
                     new TableData(this, "Test"),
                     new TableData(this, "Test").setValue("symbolicname", "expression_123")},
-            {"2b) two symbolic name",
+            {"3b) two symbolic name",
                     new TableData(this, "Test"),
                     new TableData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
             // column add / remove
-            {"3a) add a column",
+            {"4a) add a column",
                     new TableData(this, "Table1"),
                     new TableData(this, "Table1")
                             .setValue("description", "\"\\\\ hello")
                             .newField("field").setValue("label", "an \"label\"").getFormTable() },
-            {"3b) add tow column",
+            {"4b) add tow column",
                     new TableData(this, "Table1"),
                     new TableData(this, "Table1")
                             .setValue("description", "\"\\\\ hello")
                             .newField("field1").setValue("label", "an \"label\"").getFormTable()
                             .newField("field2").setValue("label", "an \"label\"").getFormTable() },
-            {"3c) remove all columns",
+            {"4c) remove all columns",
                     new TableData(this, "Table1")
                             .setValue("description", "description")
                             .newField("field1").setValue("label", "an \"label\"").getFormTable()
                             .newField("field2").setValue("label", "an \"label\"").getFormTable(),
                     new TableData(this, "Table1").setValue("description", "description")},
-            {"3d) remove one column",
+            {"4d) remove one column",
                     new TableData(this, "Table1")
                             .setValue("description", "description")
                             .newField("field1").setValue("label", "an \"label\"").getFormTable()
@@ -78,7 +90,7 @@ public class TableCI_2DeltaCalculationTest
                     new TableData(this, "Table1")
                             .setValue("description", "description")
                             .newField("field2").setValue("label", "an \"label\"").getFormTable() },
-            {"3e) add one column",
+            {"4e) add one column",
                     new TableData(this, "Table1")
                             .setValue("description", "description")
                             .newField("field1").setValue("label", "an \"label\"").getFormTable()
@@ -194,12 +206,13 @@ public class TableCI_2DeltaCalculationTest
 
     @Override
     @BeforeMethod
-    @AfterClass(groups = "close" )
+    @AfterClass
     public void cleanup()
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.USR_PERSON);
         this.cleanup(AbstractTest.CI.UI_TABLE);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override

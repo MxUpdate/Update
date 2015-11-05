@@ -14,7 +14,7 @@
  */
 
 options {
-    JDK_VERSION = "1.6";
+    JDK_VERSION = "1.7";
     STATIC = false;
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
@@ -72,7 +72,9 @@ PARSER_END(TableParser)
 
 <DEFAULT> TOKEN : /** first level */
 {
-      <UUID:                                "uuid">                                         : STRING_EXPECTED
+      <PACKAGE:                             "package">                                      : STRING_EXPECTED
+
+    | <UUID:                                "uuid">                                         : STRING_EXPECTED
 
     | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
@@ -168,69 +170,125 @@ PARSER_END(TableParser)
  * @param _form    target interface to update with parsed values
  */
 void parse(final Table_mxJPO _table)
-    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
-: {
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
     Token tmp;
     AdminProperty property;
     Column column;
     Setting setting;
-} {
-    (   ( <UUID>                                                            {property = new AdminProperty();
-                                                                             this.appendValue(this.getValue(_table, "properties"), "propertiesStack", property);
-                                                                             this.setValue(property, "name",  "UUID");}
-                                    ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_table, "packageRef", str);} )
 
-      | ( <SYMBOLICNAME>            ( tmp = <STRING>                        {this.appendValue(_table, "symbolicNames",                  this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.appendValue(_table, "symbolicNames",                  this.getSingle(tmp.image));} ) )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_table, "properties", "propertiesStack", property);} )
 
-      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_table, "description",                       this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>               {this.setValue(_table, "description",                       this.getSingle(tmp.image));} ) )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_table, "symbolicNames", str);} )
 
-      | ( <HIDDEN_TRUE>                                                     {this.setValue(_table, "hidden",                            true);} )
-      | ( <HIDDEN_FALSE>                                                    {this.setValue(_table, "hidden",                            false);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_table, "description", str);} )
 
-      | ( <COLUMN>                                                          {column = new Column();this.appendValue(_table, "fields", column);  }
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_table, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_table, "hidden", false);} )
+
+      | ( <COLUMN>                                                              {column = new Column();this.appendValue(_table, "fields", column);  }
           <COLUMN_OPEN>
-                    ( <COLUMN_NAME>     ( tmp = <COLUMN_STRING>             {this.setValue(column, "name",                              this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>             {this.setValue(column, "name",                              this.getSingle(tmp.image));} )
-                    | <COLUMN_LABEL>    ( tmp = <COLUMN_STRING>             {this.setValue(column, "label",                             this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>             {this.setValue(column, "label",                             this.getSingle(tmp.image));} )
-                    | <COLUMN_SELECT>   ( tmp = <COLUMN_STRING>             {this.setValue(column, "expression",                        this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>             {this.setValue(column, "expression",                        this.getSingle(tmp.image));} )
-                    | <COLUMN_BOBJ>     ( tmp = <COLUMN_STRING>             {this.setValue(column, "expression",                        this.getString(tmp.image));this.setValue(column, "expressionType", ExpressionType.BUSINESSOBJECT);}
-                                        | tmp = <COLUMN_SINGLE>             {this.setValue(column, "expression",                        this.getSingle(tmp.image));this.setValue(column, "expressionType", ExpressionType.BUSINESSOBJECT);} )
-                    | <COLUMN_REL>      ( tmp = <COLUMN_STRING>             {this.setValue(column, "expression",                        this.getString(tmp.image));this.setValue(column, "expressionType", ExpressionType.RELATIONSHIP);}
-                                        | tmp = <COLUMN_SINGLE>             {this.setValue(column, "expression",                        this.getSingle(tmp.image));this.setValue(column, "expressionType", ExpressionType.RELATIONSHIP);} )
-                    | <COLUMN_RANGE>    ( tmp = <COLUMN_STRING>             {this.setValue(column, "range",                             this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>             {this.setValue(column, "range",                             this.getSingle(tmp.image));} )
-                    | <COLUMN_HREF>     ( tmp = <COLUMN_STRING>             {this.setValue(column, "href",                              this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>             {this.setValue(column, "href",                              this.getSingle(tmp.image));} )
-                    | <COLUMN_ALT>      ( tmp = <COLUMN_STRING>             {this.setValue(column, "alt",                               this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>             {this.setValue(column, "alt",                               this.getSingle(tmp.image));} )
-                    | <COLUMN_HIDDEN_TRUE>                                  {this.setValue(column, "hidden",                            true);}
-                    | <COLUMN_HIDDEN_FALSE>                                 {this.setValue(column, "hidden",                            false);}
-                    | <COLUMN_USER>     ( tmp = <COLUMN_STRING>             {this.appendValue(column, "users",                          this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>             {this.appendValue(column, "users",                          this.getSingle(tmp.image));} )
-                    | <COLUMN_SORTTYPE> ( <COLUMN_SORTTYPE_ALPHA>           {this.setValue(column, "sortType",                          SortType.ALPHANUMERIC);}
-                                        | <COLUMN_SORTTYPE_NUMERIC>         {this.setValue(column, "sortType",                          SortType.NUMERIC);}
-                                        | <COLUMN_SORTTYPE_OTHER>           {this.setValue(column, "sortType",                          SortType.OTHER);}
-                                        | <COLUMN_SORTTYPE_NONE>            {this.setValue(column, "sortType",                          SortType.NONE);} )
-                    | <COLUMN_SETTING>                                      {setting = new Setting();this.appendValue(column, "settings", setting);}
-                                        ( tmp = <SETTING_STRING>            {this.setValue(setting, "name",                             this.getString(tmp.image));}
-                                        | tmp = <SETTING_SINGLE>            {this.setValue(setting, "name",                             this.getSingle(tmp.image));} )
-                                        ( tmp = <COLUMN_STRING>             {this.setValue(setting, "value",                            this.getString(tmp.image));}
-                                        | tmp = <COLUMN_SINGLE>             {this.setValue(setting, "value",                            this.getSingle(tmp.image));} ) ) *
+                    ( <COLUMN_NAME>     ( tmp = <COLUMN_STRING>                 {this.setValue(column, "name",                              this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "name",                              this.getSingle(tmp.image));} )
+                    | <COLUMN_LABEL>    ( tmp = <COLUMN_STRING>                 {this.setValue(column, "label",                             this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "label",                             this.getSingle(tmp.image));} )
+                    | <COLUMN_SELECT>   ( tmp = <COLUMN_STRING>                 {this.setValue(column, "expression",                        this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "expression",                        this.getSingle(tmp.image));} )
+                    | <COLUMN_BOBJ>     ( tmp = <COLUMN_STRING>                 {this.setValue(column, "expression",                        this.getString(tmp.image));this.setValue(column, "expressionType", ExpressionType.BUSINESSOBJECT);}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "expression",                        this.getSingle(tmp.image));this.setValue(column, "expressionType", ExpressionType.BUSINESSOBJECT);} )
+                    | <COLUMN_REL>      ( tmp = <COLUMN_STRING>                 {this.setValue(column, "expression",                        this.getString(tmp.image));this.setValue(column, "expressionType", ExpressionType.RELATIONSHIP);}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "expression",                        this.getSingle(tmp.image));this.setValue(column, "expressionType", ExpressionType.RELATIONSHIP);} )
+                    | <COLUMN_RANGE>    ( tmp = <COLUMN_STRING>                 {this.setValue(column, "range",                             this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "range",                             this.getSingle(tmp.image));} )
+                    | <COLUMN_HREF>     ( tmp = <COLUMN_STRING>                 {this.setValue(column, "href",                              this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "href",                              this.getSingle(tmp.image));} )
+                    | <COLUMN_ALT>      ( tmp = <COLUMN_STRING>                 {this.setValue(column, "alt",                               this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(column, "alt",                               this.getSingle(tmp.image));} )
+                    | <COLUMN_HIDDEN_TRUE>                                      {this.setValue(column, "hidden",                            true);}
+                    | <COLUMN_HIDDEN_FALSE>                                     {this.setValue(column, "hidden",                            false);}
+                    | <COLUMN_USER>     ( tmp = <COLUMN_STRING>                 {this.appendValue(column, "users",                          this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.appendValue(column, "users",                          this.getSingle(tmp.image));} )
+                    | <COLUMN_SORTTYPE> ( <COLUMN_SORTTYPE_ALPHA>               {this.setValue(column, "sortType",                          SortType.ALPHANUMERIC);}
+                                        | <COLUMN_SORTTYPE_NUMERIC>             {this.setValue(column, "sortType",                          SortType.NUMERIC);}
+                                        | <COLUMN_SORTTYPE_OTHER>               {this.setValue(column, "sortType",                          SortType.OTHER);}
+                                        | <COLUMN_SORTTYPE_NONE>                {this.setValue(column, "sortType",                          SortType.NONE);} )
+                    | <COLUMN_SETTING>                                          {setting = new Setting();this.appendValue(column, "settings", setting);}
+                                        ( tmp = <SETTING_STRING>                {this.setValue(setting, "name",                             this.getString(tmp.image));}
+                                        | tmp = <SETTING_SINGLE>                {this.setValue(setting, "name",                             this.getSingle(tmp.image));} )
+                                        ( tmp = <COLUMN_STRING>                 {this.setValue(setting, "value",                            this.getString(tmp.image));}
+                                        | tmp = <COLUMN_SINGLE>                 {this.setValue(setting, "value",                            this.getSingle(tmp.image));} ) ) *
           <COLUMN_CLOSE> )
 
-      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_table, "properties", "propertiesStack", property);}
-                                    ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
-              (   ( <PROPERTYVAL>   ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_table, "properties", "propertiesStack", property);} )
     )*
+}
+
+/**
+ * Parses the UUID property definition.
+ */
+AdminProperty uuidProperty() :
+{
+    String str;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()
+    {this.setValue(property, "value", str);}
+    {this.setValue(property, "name",  "UUID");}
+    {return property;}
+}
+
+/**
+ * Parses the properties definition.
+ */
+AdminProperty property() :
+{
+    String str;
+    Token tmp;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()                                 {this.setValue(property, "name", str);}
+    ( ( <PROPERTYVAL>  str = string()              {this.setValue(property, "value", str);} )
+    | ( <PROPERTYTO>   ( tmp = <ADMINTYPE_STRING>  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                       | tmp = <ADMINTYPE_SINGLE>  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                   str = string()  {this.setValue(property, "refAdminName", str);} ) )*
+    {return property;}
+}
+
+/**
+ * Evaluates multi-line string.
+ *
+ * @return string
+ */
+String multiLineString() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <MULTILINESTRING>  {ret = this.getString(tmp.image);}
+    | tmp = <MULTILINESINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
+}
+
+/**
+ * Evaluates single-line string.
+ *
+ * @return string
+ */
+String string() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <STRING>  {ret = this.getString(tmp.image);}
+    | tmp = <SINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
 }
