@@ -46,11 +46,6 @@ import matrix.util.MatrixException;
  */
 public class InstallDataModel_mxJPO
 {
-    /** Name of the parameter defining the author name. */
-    private static final String PARAM_AUTHOR            = "RegisterAuthorName";
-    /** Name of the parameter defining the installer name. */
-    private static final String PARAM_INSTALLER         = "RegisterInstallerName";
-
     /** Name of the parameter defining the format of the file date / format. */
     private static final String PARAM_INSTALLFILEDATEFORMAT = "InstallFileDateFormatJava";
 
@@ -92,17 +87,17 @@ public class InstallDataModel_mxJPO
         // initialize mapping
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, false);
 
-        final String authorName = paramCache.getValueString(InstallDataModel_mxJPO.PARAM_AUTHOR);
-        final String installerName = paramCache.getValueString(InstallDataModel_mxJPO.PARAM_INSTALLER);
         final SimpleDateFormat dateFormat = new SimpleDateFormat(paramCache.getValueString(InstallDataModel_mxJPO.PARAM_INSTALLFILEDATEFORMAT));
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+00"));
 
         final String fileDate = dateFormat.format(new Date());
         final String installedDate = StringUtil_mxJPO.formatInstalledDate(paramCache, new Date());
 
-        this.updateAttributes(paramCache, applVersion, authorName, installerName, fileDate, installedDate);
+        final SortedSet<String> attrs = this.evalAttributes(paramCache);
+
+        this.updateAttributes(paramCache, attrs, applVersion, fileDate, installedDate);
         this.updateBusTypes(paramCache);
-        this.registerPrograms(paramCache, applVersion, authorName, installerName, installedDate);
+        this.registerPrograms(paramCache, applVersion, installedDate);
         this.registerMxUpdate(paramCache, applVersion);
     }
 
@@ -115,8 +110,6 @@ public class InstallDataModel_mxJPO
      *
      * @param _paramCache       parameter cache
      * @param _applVersion      Mx Update version
-     * @param _authorName       used author name
-     * @param _installerName    used installer name
      * @param _installedDate    used installed date
      * @throws Exception if registration of the symbolic names for all MxUpdate
      *                   Update programs failed
@@ -124,12 +117,12 @@ public class InstallDataModel_mxJPO
      */
     protected void registerPrograms(final ParameterCache_mxJPO _paramCache,
                                     final String _applVersion,
-                                    final String _authorName,
-                                    final String _installerName,
                                     final String _installedDate)
         throws Exception
     {
-        final String applName = _paramCache.getValueString(ValueKeys.RegisterApplicationName);
+        final String applName =     _paramCache.getValueString(ValueKeys.RegisterApplicationName);
+        final String authorName     = _paramCache.getValueString(ValueKeys.RegisterAuthorName);
+        final String installerName  = _paramCache.getValueString(ValueKeys.RegisterInstallerName);
         final String progs = MqlUtil_mxJPO.execMql(_paramCache, InstallDataModel_mxJPO.LIST_MXUPDATE_PROGRAMS);
         for (final String progLine : new TreeSet<>(Arrays.asList(progs.split("\n"))))  {
             final String[] progLineArr = progLine.split("@");
@@ -139,12 +132,12 @@ public class InstallDataModel_mxJPO
             this.registerObject(_paramCache, "program", progName);
 
             // check for correct property entries
-            this.checkProperty(_paramCache, "program", progName, "application",        applName,       false);
-            this.checkProperty(_paramCache, "program", progName, "installer",          _installerName, false);
-            this.checkProperty(_paramCache, "program", progName, "installed date",     _installedDate, true);
-            this.checkProperty(_paramCache, "program", progName, "version",            _applVersion,   false);
-            this.checkProperty(_paramCache, "program", progName, "original name",      progName,       false);
-            this.checkProperty(_paramCache, "program", progName, "author",             _authorName,    false);
+            this.checkProperty(_paramCache, "program", progName, "application",                                            applName,       false);
+            this.checkProperty(_paramCache, "program", progName, PropertyDef_mxJPO.INSTALLER.getPropName(_paramCache),     installerName,  false);
+            this.checkProperty(_paramCache, "program", progName, PropertyDef_mxJPO.INSTALLEDDATE.getPropName(_paramCache), _installedDate, true);
+            this.checkProperty(_paramCache, "program", progName, "version",                                                _applVersion,   false);
+            this.checkProperty(_paramCache, "program", progName, "original name",                                          progName,       false);
+            this.checkProperty(_paramCache, "program", progName, "author",                                                 authorName,     false);
         }
     }
 
@@ -198,49 +191,40 @@ public class InstallDataModel_mxJPO
      * @param _paramCache       parameter cache
      * @param _attributes       list of needed attributes
      * @param _applVersion      new MxUpdate version
-     * @param _authorName       used author name
-     * @param _installerName    used installer name
      * @param _fileDate         used file date
      * @param _installedDate    used installed date
      * @throws Exception if update of attribute failed
      */
     protected void updateAttributes(final ParameterCache_mxJPO _paramCache,
+                                    final SortedSet<String> _attributes,
                                     final String _applVersion,
-                                    final String _authorName,
-                                    final String _installerName,
                                     final String _fileDate,
                                     final String _installedDate)
             throws Exception
     {
-        final String applName = _paramCache.getValueString(ValueKeys.RegisterApplicationName);
-        for (final PropertyDef_mxJPO propDef : PropertyDef_mxJPO.values())  {
-            if ((propDef.getAttrName(_paramCache) != null) && !propDef.getAttrName(_paramCache).isEmpty())  {
-                final String attrName = propDef.getAttrName(_paramCache);
+        final String applName       = _paramCache.getValueString(ValueKeys.RegisterApplicationName);
+        final String authorName     = _paramCache.getValueString(ValueKeys.RegisterAuthorName);
+        final String installerName  = _paramCache.getValueString(ValueKeys.RegisterInstallerName);
 
-                _paramCache.logInfo("check attribute '" + attrName + "'");
+        for (final String attrName : _attributes)  {
+            _paramCache.logInfo("check attribute '" + attrName + "'");
 
-                final String exists = MqlUtil_mxJPO.execMql(_paramCache,
-                        new StringBuilder().append("list attribute '").append(attrName).append('\''));
-                if (exists.isEmpty())  {
-                    _paramCache.logDebug("    - create");
-                    MqlUtil_mxJPO.execMql(_paramCache,
-                            new StringBuilder()
-                                .append("escape add attribute \"")
-                                .append(StringUtil_mxJPO.convertMql(attrName))
-                                .append("\" type string;"));
-                }
-
-                // check for correct property entries
-                this.checkProperty(_paramCache, "attribute", attrName, "application",                                        applName,                           false);
-                this.checkProperty(_paramCache, "attribute", attrName, "installer",                                          _installerName,                     false);
-                this.checkProperty(_paramCache, "attribute", attrName, "installed date",                                     _installedDate,                     true);
-                this.checkProperty(_paramCache, "attribute", attrName, "version",                                            _applVersion,                       false);
-                this.checkProperty(_paramCache, "attribute", attrName, "original name",                                      propDef.getAttrName(_paramCache),   false);
-                this.checkProperty(_paramCache, "attribute", attrName, "author",                                             _authorName,                        false);
-                this.checkProperty(_paramCache, "attribute", attrName, PropertyDef_mxJPO.FILEDATE.getPropName(_paramCache),  _fileDate,                          true);
-
-                this.registerObject(_paramCache, "attribute", attrName);
+            final String exists = MqlBuilderUtil_mxJPO.mql().cmd("escape list attribute ").arg(attrName).exec(_paramCache.getContext());
+            if (exists.isEmpty())  {
+                _paramCache.logDebug("    - create");
+                MqlBuilderUtil_mxJPO.mql().cmd("escape add attribute ").arg(attrName).cmd(" type string").exec(_paramCache.getContext());
             }
+
+            // check for correct property entries
+            this.checkProperty(_paramCache, "attribute", attrName, "application",                                            applName,       false);
+            this.checkProperty(_paramCache, "attribute", attrName, PropertyDef_mxJPO.INSTALLER.getPropName(_paramCache),     installerName,  true);
+            this.checkProperty(_paramCache, "attribute", attrName, PropertyDef_mxJPO.INSTALLEDDATE.getPropName(_paramCache), _installedDate, true);
+            this.checkProperty(_paramCache, "attribute", attrName, "version",                                                _applVersion,   false);
+            this.checkProperty(_paramCache, "attribute", attrName, "original name",                                          attrName,       false);
+            this.checkProperty(_paramCache, "attribute", attrName, "author",                                                 authorName,     false);
+            this.checkProperty(_paramCache, "attribute", attrName, PropertyDef_mxJPO.FILEDATE.getPropName(_paramCache),      _fileDate,      true);
+
+            this.registerObject(_paramCache, "attribute", attrName);
         }
     }
 

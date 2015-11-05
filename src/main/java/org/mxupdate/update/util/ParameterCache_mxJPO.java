@@ -680,6 +680,10 @@ public class ParameterCache_mxJPO
         RegisterApplicationName,
         /** Defines the program name where applications must be registered. */
         RegisterApplicationProg,
+        /** Defines the author of MxUpdate. */
+        RegisterAuthorName,
+        /** Defines the installer of MxUpdate. */
+        RegisterInstallerName,
         /** Defines the program where all administration objects must be registered with symbolic names. */
         RegisterSymbolicNames,
 
