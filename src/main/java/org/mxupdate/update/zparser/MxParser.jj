@@ -977,14 +977,12 @@ void parsePathType(final PathType_mxJPO _pathType)
       | ( <FROM_WITH_BRACE>
                        (   ( <CARDINALITY>    ( <ONE>                           {this.setValue(_pathType, "fromCardinality", PathType_mxJPO.Cardinality.One);}
                                               | <MANY>                          {this.setValue(_pathType, "fromCardinality", PathType_mxJPO.Cardinality.Many);} ) )
-                         | ( <TYPE>             str = string()                  {this.appendValue(_pathType, "fromTypes", str);} )
-                         | ( <TYPE_ALL>                                         {this.setValue(_pathType, "fromTypeAll", true);} )
+                         | ( <TYPE>             str = string()                  {if ("all".equals(str)) {this.setValue(_pathType, "fromTypeAll", true);} else  {this.appendValue(_pathType, "fromTypes", str);}} )
                          | ( <RELATIONSHIP>     str = string()                  {this.appendValue(_pathType, "fromRelations", str);} )
                          | ( <RELATIONSHIP_ALL>                                 {this.setValue(_pathType, "fromRelationAll", true);} ) )*
                   "}" )
       | ( <TO_WITH_BRACE>
-                       (   ( <TYPE>             str = string()                  {this.appendValue(_pathType, "toTypes", str);} )
-                         | ( <TYPE_ALL>                                         {this.setValue(_pathType, "toTypeAll", true);} )
+                       (   ( <TYPE>             str = string()                  {if ("all".equals(str)) {this.setValue(_pathType, "toTypeAll", true);} else {this.appendValue(_pathType, "toTypes", str);}} )
                          | ( <RELATIONSHIP>     str = string()                  {this.appendValue(_pathType, "toRelations", str);} )
                          | ( <RELATIONSHIP_ALL>                                 {this.setValue(_pathType, "toRelationAll", true);} ) )*
                   "}" )
@@ -997,8 +995,7 @@ void parsePathType(final PathType_mxJPO _pathType)
 /** From / To Information */
 <DEFAULT> TOKEN :
 {
-      <TYPE_ALL:                            "type" ([" ","\t","\n"])+ "all">                : DEFAULT
-    | <RELATIONSHIP_ALL:                    "relationship" ([" ","\t","\n"])+ "all">        : DEFAULT
+      <RELATIONSHIP_ALL:                    "relationship" ([" ","\t","\n"])+ "all">        : DEFAULT
     | <RELATIONSHIP:                        "relationship">                                 : STRING_EXPECTED
 }
 
@@ -1026,8 +1023,7 @@ void parsePolicy(final Policy_mxJPO _policy)
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_policy, "description", str);} )
       | ( <FORMAT_ALL>                                                          {this.setValue(_policy, "allFormats",                           true);} )
       | ( <FORMAT>                    str = string()                            {this.appendValue(_policy, "formats",                           str);} )
-      | ( <TYPE_ALL>                                                            {this.setValue(_policy, "allTypes",                             true);} )
-      | ( <TYPE>                      str = string()                            {this.appendValue(_policy, "types",                             str);} )
+      | ( <TYPE>                      str = string()                            {if ("all".equals(str)) {this.setValue(_policy, "allTypes", true);} else {this.appendValue(_policy, "types", str);}} )
       | ( <DEFAULTFORMAT>             str = string()                            {this.setValue(_policy, "defaultFormat",                        str);} )
       | ( <ENFORCE_TRUE>                                                        {this.setValue(_policy, "enforce",                              true);} )
       | ( <ENFORCE_FALSE>                                                       {this.setValue(_policy, "enforce",                              false);} )
@@ -1247,8 +1243,7 @@ void parseRelationship(final Relationship_mxJPO _relationship)
                                             | <REPLICATE>                       {this.setValue(_relationship, fromTo, "cloneAction", "replicate");} ) )
                   | ( <CARDINALITY>         ( <ONE>                             {this.setValue(_relationship, fromTo, "cardinality", "one");}
                                             | <MANY>                            {this.setValue(_relationship, fromTo, "cardinality", "many");} ) )
-                  | ( <TYPE>                  str = string()                    {this.appendValue(_relationship, fromTo, "types", str);} )
-                  | ( <TYPE_ALL>                                                {this.setValue(_relationship, fromTo, "typeAll", true);} )
+                  | ( <TYPE>                  str = string()                    {if ("all".equals(str)) {this.setValue(_relationship, fromTo, "typeAll", true);} else {this.appendValue(_relationship, fromTo, "types", str);}} )
                   | ( <RELATIONSHIP>          str = string()                    {this.appendValue(_relationship, fromTo, "relations", str);} )
                   | ( <RELATIONSHIP_ALL>                                        {this.setValue(_relationship, fromTo, "relationAll", true);} )
                 )*
