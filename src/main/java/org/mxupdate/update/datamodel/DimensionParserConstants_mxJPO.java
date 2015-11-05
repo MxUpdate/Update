@@ -26,136 +26,132 @@ interface DimensionParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int UUID = 5;
+  int PACKAGE = 5;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 6;
+  int UUID = 6;
   /** RegularExpression Id. */
-  int DESCRIPTION = 7;
+  int SYMBOLICNAME = 7;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 8;
+  int DESCRIPTION = 8;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE_VIA_VALUE = 9;
+  int HIDDEN_TRUE = 9;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE_VIA_VALUE_APOSTROPHE = 10;
+  int HIDDEN_TRUE_VIA_VALUE = 10;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 11;
+  int HIDDEN_TRUE_VIA_VALUE_APOSTROPHE = 11;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE_VIA_VALUE = 12;
+  int HIDDEN_FALSE = 12;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE_VIA_VALUE_APOSTROPHE = 13;
+  int HIDDEN_FALSE_VIA_VALUE = 13;
   /** RegularExpression Id. */
-  int STRING = 14;
+  int HIDDEN_FALSE_VIA_VALUE_APOSTROPHE = 14;
   /** RegularExpression Id. */
-  int SINGLE = 15;
+  int STRING = 15;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 16;
+  int SINGLE = 16;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 17;
+  int MULTILINESTRING = 17;
   /** RegularExpression Id. */
-  int UNIT = 18;
+  int MULTILINESINGLE = 18;
   /** RegularExpression Id. */
-  int UNITNAME_STRING = 19;
+  int UNIT = 19;
   /** RegularExpression Id. */
-  int UNITNAME_SINGLE = 20;
+  int UNITNAME_STRING = 20;
   /** RegularExpression Id. */
-  int UNITDEF_START = 21;
+  int UNITNAME_SINGLE = 21;
   /** RegularExpression Id. */
-  int UNITDEF_END = 22;
+  int UNITDEF_START = 22;
   /** RegularExpression Id. */
-  int UNITDEF_UUID = 23;
+  int UNITDEF_END = 23;
   /** RegularExpression Id. */
-  int UNITDEF_DEFAULT_TRUE = 24;
+  int UNITDEF_UUID = 24;
   /** RegularExpression Id. */
-  int UNITDEF_DEFAULT_TRUE_VIA_VALUE = 25;
+  int UNITDEF_DEFAULT_TRUE = 25;
   /** RegularExpression Id. */
-  int UNITDEF_DEFAULT_TRUE_VIA_VALUE_APOSTROPHE = 26;
+  int UNITDEF_DEFAULT_TRUE_VIA_VALUE = 26;
   /** RegularExpression Id. */
-  int UNITDEF_DEFAULT_FALSE = 27;
+  int UNITDEF_DEFAULT_TRUE_VIA_VALUE_APOSTROPHE = 27;
   /** RegularExpression Id. */
-  int UNITDEF_DEFAULT_FALSE_VIA_VALUE = 28;
+  int UNITDEF_DEFAULT_FALSE = 28;
   /** RegularExpression Id. */
-  int UNITDEF_DEFAULT_FALSE_VIA_VALUE_APOSTROPHE = 29;
+  int UNITDEF_DEFAULT_FALSE_VIA_VALUE = 29;
   /** RegularExpression Id. */
-  int UNITDEF_DESCRIPTION = 30;
+  int UNITDEF_DEFAULT_FALSE_VIA_VALUE_APOSTROPHE = 30;
   /** RegularExpression Id. */
-  int UNITDEF_LABEL = 31;
+  int UNITDEF_DESCRIPTION = 31;
   /** RegularExpression Id. */
-  int UNITDEF_MULTIPLIER = 32;
+  int UNITDEF_LABEL = 32;
   /** RegularExpression Id. */
-  int UNITDEF_OFFSET = 33;
+  int UNITDEF_MULTIPLIER = 33;
   /** RegularExpression Id. */
-  int UNITDEF_SETTING = 34;
+  int UNITDEF_OFFSET = 34;
   /** RegularExpression Id. */
-  int UNITDEF_PROPERTY = 35;
+  int UNITDEF_SETTING = 35;
   /** RegularExpression Id. */
-  int UNITDEF_PROPERTYVAL = 36;
+  int UNITDEF_PROPERTY = 36;
   /** RegularExpression Id. */
-  int UNITDEF_PROPERTYTO = 37;
+  int UNITDEF_PROPERTYVAL = 37;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEM = 38;
+  int UNITDEF_PROPERTYTO = 38;
   /** RegularExpression Id. */
-  int UNITDEF_STRING = 39;
+  int UNITDEF_SYSTEM = 39;
   /** RegularExpression Id. */
-  int UNITDEF_SINGLE = 40;
+  int UNITDEF_STRING = 40;
   /** RegularExpression Id. */
-  int UNITDEF_STRINGSTRING_STRING = 41;
+  int UNITDEF_SINGLE = 41;
   /** RegularExpression Id. */
-  int UNITDEF_STRINGSTRING_SINGLE = 42;
+  int UNITDEF_STRINGSTRING_STRING = 42;
   /** RegularExpression Id. */
-  int UNITDEF_DOUBLE_DOUBLE = 43;
+  int UNITDEF_STRINGSTRING_SINGLE = 43;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMNAME_STRING = 44;
+  int UNITDEF_DOUBLE_DOUBLE = 44;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMNAME_SINGLE = 45;
+  int UNITDEF_SYSTEMNAME_STRING = 45;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMDEF_TO = 46;
+  int UNITDEF_SYSTEMNAME_SINGLE = 46;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMDEF_UNIT = 47;
+  int UNITDEF_SYSTEMDEF_TO = 47;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMUNIT_STRING = 48;
+  int UNITDEF_SYSTEMDEF_UNIT = 48;
   /** RegularExpression Id. */
-  int UNITDEF_SYSTEMUNIT_SINGLE = 49;
+  int UNITDEF_SYSTEMUNIT_STRING = 49;
   /** RegularExpression Id. */
-  int PROPERTY = 50;
+  int UNITDEF_SYSTEMUNIT_SINGLE = 50;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 51;
+  int PROPERTY = 51;
   /** RegularExpression Id. */
   int PROPERTYTO = 52;
   /** RegularExpression Id. */
-  int PROPERTYTOTYPE = 53;
+  int PROPERTYVAL = 53;
   /** RegularExpression Id. */
-  int PROPERTYTO_CHAR = 54;
+  int ADMINTYPE_STRING = 54;
   /** RegularExpression Id. */
-  int PROPERTY_STRING_STRING = 55;
-  /** RegularExpression Id. */
-  int PROPERTY_STRING_SINGLE = 56;
+  int ADMINTYPE_SINGLE = 55;
 
   /** Lexical state. */
-  int PROPERTY_STRING_EXPECTED = 0;
+  int ADMINREF_EXPECTED = 0;
   /** Lexical state. */
-  int PROPERTYTO_EXPECTED = 1;
+  int UNITDEF_SYSTEMUNIT_EXPECTED = 1;
   /** Lexical state. */
-  int UNITDEF_SYSTEMUNIT_EXPECTED = 2;
+  int UNITDEF_SYSTEMDEF_EXPECTED = 2;
   /** Lexical state. */
-  int UNITDEF_SYSTEMDEF_EXPECTED = 3;
+  int UNITDEF_SYSTEMNAME_EXPECTED = 3;
   /** Lexical state. */
-  int UNITDEF_SYSTEMNAME_EXPECTED = 4;
+  int UNITDEF_DOUBLE_EXPECTED = 4;
   /** Lexical state. */
-  int UNITDEF_DOUBLE_EXPECTED = 5;
+  int UNITDEF_STRINGSTRING_EXPECTED = 5;
   /** Lexical state. */
-  int UNITDEF_STRINGSTRING_EXPECTED = 6;
+  int UNITDEF_STRING_EXPECTED = 6;
   /** Lexical state. */
-  int UNITDEF_STRING_EXPECTED = 7;
+  int UNITDEF_EXPECTED = 7;
   /** Lexical state. */
-  int UNITDEF_EXPECTED = 8;
+  int UNITNAME_EXPECTED = 8;
   /** Lexical state. */
-  int UNITNAME_EXPECTED = 9;
+  int MULTILINESTRING_EXPECTED = 9;
   /** Lexical state. */
-  int MULTILINESTRING_EXPECTED = 10;
+  int STRING_EXPECTED = 10;
   /** Lexical state. */
-  int STRING_EXPECTED = 11;
-  /** Lexical state. */
-  int DEFAULT = 12;
+  int DEFAULT = 11;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -164,6 +160,7 @@ interface DimensionParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"package\"",
     "\"uuid\"",
     "\"symbolicname\"",
     "\"description\"",
@@ -210,12 +207,10 @@ interface DimensionParserConstants_mxJPO {
     "<UNITDEF_SYSTEMUNIT_STRING>",
     "<UNITDEF_SYSTEMUNIT_SINGLE>",
     "\"property\"",
-    "\"value\"",
     "\"to\"",
-    "<PROPERTYTOTYPE>",
-    "<PROPERTYTO_CHAR>",
-    "<PROPERTY_STRING_STRING>",
-    "<PROPERTY_STRING_SINGLE>",
+    "\"value\"",
+    "<ADMINTYPE_STRING>",
+    "<ADMINTYPE_SINGLE>",
   };
 
 }

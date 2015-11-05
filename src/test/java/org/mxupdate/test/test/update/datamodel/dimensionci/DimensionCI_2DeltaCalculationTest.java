@@ -18,6 +18,7 @@ package org.mxupdate.test.test.update.datamodel.dimensionci;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.DimensionData;
 import org.mxupdate.test.data.datamodel.DimensionData.UnitData;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -42,19 +43,28 @@ public class DimensionCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1) uuid",
+            {"1a) new package",
+                    new DimensionData(this, "Test"),
+                    new DimensionData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new DimensionData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new DimensionData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new DimensionData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new DimensionData(this, "Test").defKeyNotDefined("package")},
+            {"2) uuid",
                     new DimensionData(this, "Test"),
                     new DimensionData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
-            {"2a) symbolic name",
+            {"3a) symbolic name",
                     new DimensionData(this, "Test"),
                     new DimensionData(this, "Test").setValue("symbolicname", "dimension_123")},
-            {"2b) two symbolic name",
+            {"3b) two symbolic name",
                     new DimensionData(this, "Test"),
                     new DimensionData(this, "Test").setValue("symbolicname", "dimension_123").setValue("symbolicname", "dimension_345")},
-            {"3) description",
+            {"4) description",
                     new DimensionData(this, "Test"),
                     new DimensionData(this, "Test").setValue("description", "abc def")},
-            {"4) unit",
+            {"5) unit",
                     new DimensionData(this, "Test"),
                     new DimensionData(this, "Test")
                             .addUnit(new UnitData("unit")
@@ -63,7 +73,7 @@ public class DimensionCI_2DeltaCalculationTest
                                     .setValueWithQuots("label", "\"\\\\ label")
                                     .setValueWOQuots("multiplier", "1.0")
                                     .setValueWOQuots("offset", "0.0"))},
-            {"5) unit with uuid",
+            {"6) unit with uuid",
                     new DimensionData(this, "Test"),
                     new DimensionData(this, "Test")
                             .addUnit(new UnitData("unit")
@@ -83,6 +93,7 @@ public class DimensionCI_2DeltaCalculationTest
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.DM_DIMENSION);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override

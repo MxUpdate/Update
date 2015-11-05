@@ -14,7 +14,7 @@
  */
 
 options {
-    JDK_VERSION = "1.6";
+    JDK_VERSION = "1.7";
     STATIC = false;
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
@@ -73,11 +73,13 @@ PARSER_END(DimensionParser)
 
 <DEFAULT> TOKEN :
 {
-      <UUID:                                "uuid">                                         : STRING_EXPECTED
+      <PACKAGE:                             "package">                                      : STRING_EXPECTED
 
-    | <SYMBOLICNAME:                        "symbolicname">                                         : STRING_EXPECTED
+    | <UUID:                                "uuid">                                         : STRING_EXPECTED
 
-    | <DESCRIPTION:                         "description">                                          : MULTILINESTRING_EXPECTED
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
+    | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <HIDDEN_TRUE:                         "hidden">
     | <HIDDEN_TRUE_VIA_VALUE:               "hidden" ([" ","\t","\n","\r"])+ ["t","T"] ["r","R"] ["u","U"] ["e","E"]>
@@ -104,7 +106,7 @@ PARSER_END(DimensionParser)
 /******************************************************* String for Unit Name */
 <DEFAULT> TOKEN :
 {
-      <UNIT:                                "unit">                                                 : UNITNAME_EXPECTED
+      <UNIT:                                "unit">                                         : UNITNAME_EXPECTED
 }
 
 <UNITNAME_EXPECTED> TOKEN :
@@ -180,21 +182,15 @@ PARSER_END(DimensionParser)
 /******************************************************************* Property */
 <DEFAULT> TOKEN :
 {
-      <PROPERTY:                            "property">                                             : PROPERTY_STRING_EXPECTED
-    | <PROPERTYVAL:                         "value">                                                : PROPERTY_STRING_EXPECTED
-    | <PROPERTYTO:                          "to">                                                   : PROPERTYTO_EXPECTED
+      <PROPERTY:                            "property">                                             : STRING_EXPECTED
+    | <PROPERTYTO:                          "to">                                                   : ADMINREF_EXPECTED
+    | <PROPERTYVAL:                         "value">                                                : STRING_EXPECTED
 }
 
-<PROPERTYTO_EXPECTED> TOKEN :
+<ADMINREF_EXPECTED> TOKEN :
 {
-      <PROPERTYTOTYPE : (<PROPERTYTO_CHAR>)+> : PROPERTY_STRING_EXPECTED
-    | <#PROPERTYTO_CHAR : ~["\u0000"-"\u0020","\"","{","}","\u0100"-"\uffff"]>
-}
-
-<PROPERTY_STRING_EXPECTED> TOKEN :
-{
-      <PROPERTY_STRING_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
-    | <PROPERTY_STRING_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
+      <ADMINTYPE_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <ADMINTYPE_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
 }
 
 /**************************************************************************** */
@@ -207,20 +203,20 @@ PARSER_END(DimensionParser)
 void parse(final Dimension_mxJPO _dimension)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
-    String tmpStr;
+    String str;
     Token tmp;
     Set<String> set;
     AdminProperty property;
     Unit unit;
 } {
-    (   ( <UUID>                                                                {property = new AdminProperty();
+    (   ( <PACKAGE>                   str = string()                            {this.setValue(_dimension, "packageRef", str);} )
+
+      | ( <UUID>                                                                {property = new AdminProperty();
                                                                                  this.appendValue(this.getValue(_dimension, "properties"), "propertiesStack", property);
                                                                                  this.setValue(property, "name",  "UUID");}
-                                    ( tmp = <STRING>                            {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                            {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+                                      str = string()                            {this.setValue(property, "value", str);} )
 
-      | ( <SYMBOLICNAME>            ( tmp = <STRING>                            {this.appendValue(_dimension, "symbolicNames", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                            {this.appendValue(_dimension, "symbolicNames", this.getSingle(tmp.image));} ) )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_dimension, "symbolicNames", str);} )
 
       | (<DESCRIPTION>  ( tmp = <MULTILINESTRING>                               {this.setValue(_dimension, "description", this.getString(tmp.image));}
                         | tmp = <MULTILINESINGLE>                               {this.setValue(_dimension, "description", this.getSingle(tmp.image));} ) )
@@ -246,8 +242,8 @@ void parse(final Dimension_mxJPO _dimension)
                     | ( ( <UNITDEF_DEFAULT_FALSE>
                         | <UNITDEF_DEFAULT_FALSE_VIA_VALUE>
                         | <UNITDEF_DEFAULT_FALSE_VIA_VALUE_APOSTROPHE> )        {this.setValue(unit, "defaultUnit", false);} )
-                    | ( <UNITDEF_DESCRIPTION>   tmpStr = uvString()             {this.setValue(unit, "description", tmpStr);} )
-                    | ( <UNITDEF_LABEL>         tmpStr = uvString()             {this.setValue(unit, "label", tmpStr);} )
+                    | ( <UNITDEF_DESCRIPTION>   str = uvString()                {this.setValue(unit, "description", str);} )
+                    | ( <UNITDEF_LABEL>         str = uvString()                {this.setValue(unit, "label", str);} )
                     | ( <UNITDEF_MULTIPLIER>    tmp = <UNITDEF_DOUBLE_DOUBLE>   {this.setValue(unit, "multiplier", Double.parseDouble(tmp.image));} )
                     | ( <UNITDEF_OFFSET>        tmp = <UNITDEF_DOUBLE_DOUBLE>   {this.setValue(unit, "offset", Double.parseDouble(tmp.image));} )
                     | ( unitSetting(unit) )
@@ -256,13 +252,11 @@ void parse(final Dimension_mxJPO _dimension)
                             <UNITDEF_END>                                       {this.appendValue(_dimension, "units", unit);} )
 
       | (<PROPERTY>                                                             {property = new AdminProperty();this.appendValue(_dimension, "properties", "propertiesStack", property);}
-                ( tmp = <PROPERTY_STRING_STRING>                                {this.setValue(property, "name", this.getString(tmp.image));}
-                | tmp = <PROPERTY_STRING_SINGLE>                                {this.setValue(property, "name", this.getSingle(tmp.image));} )
-              (   ( <PROPERTYTO>   tmp = <PROPERTYTOTYPE>                       {this.setValue(property, "refAdminType", this.getSingle(tmp.image));}
-                                  ( ( tmp = <PROPERTY_STRING_STRING>            {this.setValue(property, "refAdminName", this.getString(tmp.image));} )
-                                  | ( tmp = <PROPERTY_STRING_SINGLE>            {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )
-                | ( <PROPERTYVAL> ( ( tmp = <PROPERTY_STRING_STRING>            {this.setValue(property, "value", this.getString(tmp.image));} )
-                                  | ( tmp = <PROPERTY_STRING_SINGLE>            {this.setValue(property, "value", this.getSingle(tmp.image));} ) ) ) )* )
+                                      str = string()                            {this.setValue(property, "name", str);}
+              (   ( <PROPERTYVAL>     str = string()                            {this.setValue(property, "value", str);} )
+                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>                  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                                    | tmp = <ADMINTYPE_SINGLE>                  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                      str = string()                            {this.setValue(property, "refAdminName", str);} ) )* )
     )*
 }
 
@@ -373,6 +367,24 @@ String uvString() : {
         |
         (tmp = <UNITDEF_SINGLE>) {ret = this.getSingle(tmp.image);}
     )
+    {
+        return ret;
+    }
+}
+
+/**
+ * Evaluates single-line string.
+ *
+ * @return string
+ */
+String string() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <STRING>  {ret = this.getString(tmp.image);}
+    | tmp = <SINGLE>  {ret = this.getSingle(tmp.image);} )
     {
         return ret;
     }

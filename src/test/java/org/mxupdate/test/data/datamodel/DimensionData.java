@@ -54,7 +54,7 @@ public class DimensionData
         super(_test, AbstractTest.CI.DM_DIMENSION, _name);
     }
 
-    @Override()
+    @Override
     public String ciFile()
     {
         final StringBuilder strg = new StringBuilder();
@@ -64,7 +64,8 @@ public class DimensionData
         strg.append("mxUpdate dimension \"${NAME}\" {\n");
 
         this.getValues().append4Update("    ", strg);
-        this.getFlags().append4Update("    ", strg);
+        this.getFlags() .append4Update("    ", strg);
+        this.getDatas() .append4Update("    ", strg);
 
         for (final UnitData unit : this.units)
         {
@@ -79,7 +80,7 @@ public class DimensionData
         return strg.toString();
     }
 
-    @Override()
+    @Override
     public DimensionData create()
         throws MatrixException
     {
@@ -112,7 +113,7 @@ public class DimensionData
      * {@inheritDoc}
      * Creates for all units depending referenced property admin objects.
      */
-    @Override()
+    @Override
     public DimensionData createDependings()
         throws MatrixException
     {
@@ -130,7 +131,7 @@ public class DimensionData
      *
      * @param _exportParser     parsed export
      */
-    @Override()
+    @Override
     public void checkExport(final ExportParser _exportParser)
     {
         super.checkExport(_exportParser);
