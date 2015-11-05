@@ -16,6 +16,7 @@
 package org.mxupdate.test.test.update.userinterface;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.userinterface.MenuData;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
@@ -42,22 +43,36 @@ public class MenuCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1) uuid",
+            // package
+            {"1a) new package",
+                    new MenuData(this, "Test"),
+                    new MenuData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new MenuData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new MenuData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new MenuData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new MenuData(this, "Test").defKeyNotDefined("package")},
+            // uuid
+            {"2) uuid",
                     new MenuData(this, "Test"),
                     new MenuData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
-            {"2) simple test",
+            {"3) simple test",
                     new MenuData(this, "Menu1"),
                     new MenuData(this, "Menu1").setValue("description", "test").setValue("label", "").setValue("href", "").setValue("alt", "")},
-            {"3a) symbolic name",
+            // symbolic names
+            {"4a) symbolic name",
                     new MenuData(this, "Test"),
                     new MenuData(this, "Test").setValue("symbolicname", "expression_123")},
-            {"3b) two symbolic name",
+            {"4b) two symbolic name",
                     new MenuData(this, "Test"),
                     new MenuData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
-            {"4) tree menu",
+            // tree menu
+            {"5) tree menu",
                     new MenuData(this, "Menu1"),
                     new MenuData(this, "Menu1").setTreeMenu(true)},
-            {"5) property name and value",
+            // properties
+            {"6) property name and value",
                     new MenuData(this, "Menu1"),
                     new MenuData(this, "Menu1").addProperty(new PropertyDef("property", "value"))},
        };
@@ -65,11 +80,12 @@ public class MenuCI_2DeltaCalculationTest
 
     @Override
     @BeforeMethod
-    @AfterClass(groups = "close" )
+    @AfterClass
     public void cleanup()
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.UI_MENU);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override

@@ -92,6 +92,7 @@ public class MenuData
         this.getFlags()     .append4Update("    ", strg);
         this.getValues()    .append4Update("    ", strg);
         this.getKeyValues() .append4Update("    ", strg);
+        this.getDatas()     .append4Update("    ", strg);
         this.getProperties().append4Update("    ", strg);
         for (final String ciLine : this.getCILines())  {
             strg.append("    ").append(ciLine).append('\n');

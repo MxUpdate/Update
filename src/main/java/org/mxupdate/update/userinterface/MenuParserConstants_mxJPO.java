@@ -26,53 +26,55 @@ interface MenuParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int UUID = 5;
+  int PACKAGE = 5;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 6;
+  int UUID = 6;
   /** RegularExpression Id. */
-  int DESCRIPTION = 7;
+  int SYMBOLICNAME = 7;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 8;
+  int DESCRIPTION = 8;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 9;
+  int HIDDEN_TRUE = 9;
   /** RegularExpression Id. */
-  int TREEMENU_TRUE = 10;
+  int HIDDEN_FALSE = 10;
   /** RegularExpression Id. */
-  int TREEMENU_FALSE = 11;
+  int TREEMENU_TRUE = 11;
   /** RegularExpression Id. */
-  int ALT = 12;
+  int TREEMENU_FALSE = 12;
   /** RegularExpression Id. */
-  int HREF = 13;
+  int ALT = 13;
   /** RegularExpression Id. */
-  int LABEL = 14;
+  int HREF = 14;
   /** RegularExpression Id. */
-  int COMMAND = 15;
+  int LABEL = 15;
   /** RegularExpression Id. */
-  int MENU = 16;
+  int COMMAND = 16;
   /** RegularExpression Id. */
-  int STRING = 17;
+  int MENU = 17;
   /** RegularExpression Id. */
-  int SINGLE = 18;
+  int STRING = 18;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 19;
+  int SINGLE = 19;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 20;
+  int MULTILINESTRING = 20;
   /** RegularExpression Id. */
-  int SETTING = 21;
+  int MULTILINESINGLE = 21;
   /** RegularExpression Id. */
-  int SETTING_STRING = 22;
+  int SETTING = 22;
   /** RegularExpression Id. */
-  int SETTING_SINGLE = 23;
+  int SETTING_STRING = 23;
   /** RegularExpression Id. */
-  int PROPERTY = 24;
+  int SETTING_SINGLE = 24;
   /** RegularExpression Id. */
-  int PROPERTYTO = 25;
+  int PROPERTY = 25;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 26;
+  int PROPERTYTO = 26;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 27;
+  int PROPERTYVAL = 27;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 28;
+  int ADMINTYPE_STRING = 28;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 29;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -92,6 +94,7 @@ interface MenuParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"package\"",
     "\"uuid\"",
     "\"symbolicname\"",
     "\"description\"",
