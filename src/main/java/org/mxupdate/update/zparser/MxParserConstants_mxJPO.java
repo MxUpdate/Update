@@ -50,67 +50,73 @@ interface MxParserConstants_mxJPO {
   /** RegularExpression Id. */
   int SETTING = 16;
   /** RegularExpression Id. */
-  int COMMAND = 17;
+  int ARGUMENT = 17;
   /** RegularExpression Id. */
-  int CODE = 18;
+  int COMMAND = 18;
   /** RegularExpression Id. */
-  int STRING = 19;
+  int PATTERN = 19;
   /** RegularExpression Id. */
-  int SINGLE = 20;
+  int FORMAT = 20;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 21;
+  int CODE = 21;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 22;
+  int STRING_STRING_STRING = 22;
   /** RegularExpression Id. */
-  int NATURALNUMBER = 23;
+  int STRING_STRING_SINGLE = 23;
   /** RegularExpression Id. */
-  int SETTING_STRING = 24;
+  int STRING = 24;
   /** RegularExpression Id. */
-  int SETTING_SINGLE = 25;
+  int SINGLE = 25;
   /** RegularExpression Id. */
-  int FIELD = 26;
+  int MULTILINESTRING = 26;
   /** RegularExpression Id. */
-  int FIELD_OPEN = 27;
+  int MULTILINESINGLE = 27;
   /** RegularExpression Id. */
-  int FIELD_CLOSE = 28;
+  int NATURALNUMBER = 28;
   /** RegularExpression Id. */
-  int FIELD_NAME = 29;
+  int FIELD = 29;
   /** RegularExpression Id. */
-  int FIELD_LABEL = 30;
+  int FIELD_OPEN = 30;
   /** RegularExpression Id. */
-  int FIELD_SELECT = 31;
+  int FIELD_CLOSE = 31;
   /** RegularExpression Id. */
-  int FIELD_BOBJ = 32;
+  int FIELD_NAME = 32;
   /** RegularExpression Id. */
-  int FIELD_REL = 33;
+  int FIELD_LABEL = 33;
   /** RegularExpression Id. */
-  int FIELD_RANGE = 34;
+  int FIELD_SELECT = 34;
   /** RegularExpression Id. */
-  int FIELD_HREF = 35;
+  int FIELD_BOBJ = 35;
   /** RegularExpression Id. */
-  int FIELD_ALT = 36;
+  int FIELD_REL = 36;
   /** RegularExpression Id. */
-  int FIELD_USER = 37;
+  int FIELD_RANGE = 37;
   /** RegularExpression Id. */
-  int FIELD_SETTING = 38;
+  int FIELD_HREF = 38;
   /** RegularExpression Id. */
-  int FIELD_STRING = 39;
+  int FIELD_ALT = 39;
   /** RegularExpression Id. */
-  int FIELD_SINGLE = 40;
+  int FIELD_USER = 40;
   /** RegularExpression Id. */
-  int FIELD_SETTING_STRING = 41;
+  int FIELD_SETTING = 41;
   /** RegularExpression Id. */
-  int FIELD_SETTING_SINGLE = 42;
+  int FIELD_STRING = 42;
   /** RegularExpression Id. */
-  int PROPERTY = 43;
+  int FIELD_SINGLE = 43;
   /** RegularExpression Id. */
-  int PROPERTYTO = 44;
+  int FIELD_SETTING_STRING = 44;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 45;
+  int FIELD_SETTING_SINGLE = 45;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 46;
+  int PROPERTY = 46;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 47;
+  int PROPERTYTO = 47;
+  /** RegularExpression Id. */
+  int PROPERTYVAL = 48;
+  /** RegularExpression Id. */
+  int ADMINTYPE_STRING = 49;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 50;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -123,13 +129,13 @@ interface MxParserConstants_mxJPO {
   /** Lexical state. */
   int FIELD_OPENEXPECTED = 4;
   /** Lexical state. */
-  int SETTING_EXPECTED = 5;
+  int NATURALNUMBER_EXPECTED = 5;
   /** Lexical state. */
-  int NATURALNUMBER_EXPECTED = 6;
+  int MULTILINESTRING_EXPECTED = 6;
   /** Lexical state. */
-  int MULTILINESTRING_EXPECTED = 7;
+  int STRING_EXPECTED = 7;
   /** Lexical state. */
-  int STRING_EXPECTED = 8;
+  int STRING_STRING_EXPECTED = 8;
   /** Lexical state. */
   int DEFAULT = 9;
 
@@ -152,15 +158,18 @@ interface MxParserConstants_mxJPO {
     "\"height\"",
     "<USER>",
     "<SETTING>",
+    "\"argument\"",
     "<COMMAND>",
+    "\"pattern\"",
+    "\"format\"",
     "\"code\"",
+    "<STRING_STRING_STRING>",
+    "<STRING_STRING_SINGLE>",
     "<STRING>",
     "<SINGLE>",
     "<MULTILINESTRING>",
     "<MULTILINESINGLE>",
     "<NATURALNUMBER>",
-    "<SETTING_STRING>",
-    "<SETTING_SINGLE>",
     "\"field\"",
     "\"{\"",
     "\"}\"",

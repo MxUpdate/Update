@@ -49,6 +49,7 @@ import org.mxupdate.update.userinterface.Channel_mxJPO;
 import org.mxupdate.update.userinterface.Command_mxJPO;
 import org.mxupdate.update.userinterface.Form_mxJPO;
 import org.mxupdate.update.userinterface.Form_mxJPO.Field;
+import org.mxupdate.update.userinterface.Inquiry_mxJPO;
 import org.mxupdate.update.userinterface.helper.ChildRefList_mxJPO.CommandRef;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -96,11 +97,25 @@ TOKEN : /** first level */
 
     | <USER:                                ("add" ([" ","\t","\n","\r"])+ )? "user">       : STRING_EXPECTED
 
-    | <SETTING:                             ("add" ([" ","\t","\n","\r"])+ )? "setting">    : SETTING_EXPECTED
+    | <SETTING:                             ("add" ([" ","\t","\n","\r"])+ )? "setting">    : STRING_STRING_EXPECTED
+    | <ARGUMENT:                            "argument">                                     : STRING_STRING_EXPECTED
 
     | <COMMAND:                             ("add" ([" ","\t","\n","\r"])+ )? "command">    : STRING_EXPECTED
 
+    | <PATTERN:                             "pattern">                                      : STRING_EXPECTED
+
+    | <FORMAT:                              "format">                                       : STRING_EXPECTED
+
     | <CODE:                                "code">                                         : MULTILINESTRING_EXPECTED
+}
+
+/******************************************************* Common String String */
+
+<STRING_STRING_EXPECTED> TOKEN :
+{
+      <STRING_STRING_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
+    | <STRING_STRING_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
+
 }
 
 /************************************************************** Common String */
@@ -123,14 +138,7 @@ TOKEN : /** first level */
       <NATURALNUMBER: (("0") | (["1"-"9"](["0"-"9"])*))> : DEFAULT
 }
 
-/********************************************************* Setting Key String */
-<SETTING_EXPECTED> TOKEN :
-{
-      <SETTING_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
-    | <SETTING_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
-}
-
-/********************************************************************** Field */
+/***************************************************************** Form Field */
 <DEFAULT> TOKEN :
 {
       <FIELD:                               "field">                                        : FIELD_OPENEXPECTED
@@ -221,10 +229,7 @@ void parseChannel(Channel_mxJPO _channel)
 
       | ( <HEIGHT>                    number = naturalNumber()                  {this.setValue(_channel, "height", number);} )
 
-      | ( <SETTING>                                                             {property = new AdminProperty();this.appendValue(_channel, "properties", "propertiesStack", property);}
-                                    ( tmp = <SETTING_STRING>                    {this.setValue(property, "name", "%" + this.getString(tmp.image));}
-                                    | tmp = <SETTING_SINGLE>                    {this.setValue(property, "name", "%" + this.getSingle(tmp.image));})
-                                      str = string()                            {this.setValue(property, "value", str);} )
+      | ( <SETTING>                   property = settingProperty()              {this.appendValue(_channel, "properties", "propertiesStack", property);} )
 
       | ( <COMMAND>                   str = string()                            {ref = new CommandRef();this.setValue(ref, "column", refIdx++);this.appendValue(_channel, "children", "childrenStack", ref);this.setValue(ref, "name", str);} )
 
@@ -337,6 +342,44 @@ void parseForm(final Form_mxJPO _form)
 /**************************************************************************** */
 
 /**
+ * Parses one complete inquiry definition.
+ *
+ * @param _inquiry  target inquiry to update with parsed values
+ */
+void parseInquiry(final Inquiry_mxJPO _inquiry)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    AdminProperty property;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_inquiry, "packageRef", str);} )
+
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_inquiry, "properties", "propertiesStack", property);} )
+
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_inquiry, "symbolicNames", str);} )
+
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_inquiry, "description", str);} )
+
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_inquiry, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_inquiry, "hidden", false);} )
+
+      | ( <PATTERN>                   str = string()                            {this.setValue(_inquiry, "pattern", str);} )
+
+      | ( <FORMAT>                    str = string()                            {this.setValue(_inquiry, "format", str);} )
+
+      | ( <CODE>                      str = multiLineString()                   {this.setValue(_inquiry, "code", str);} )
+
+      | ( <ARGUMENT>                  property = settingProperty()              {this.appendValue(_inquiry, "properties", "propertiesStack", property);} )
+
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_inquiry, "properties", "propertiesStack", property);} )
+    )*
+}
+
+/**************************************************************************** */
+
+/**
  * Parses the UUID property definition.
  */
 AdminProperty uuidProperty() :
@@ -361,9 +404,7 @@ AdminProperty settingProperty() :
     AdminProperty property = new AdminProperty();
 }
 {
-    ( tmp = <SETTING_STRING>   {name = this.getString(tmp.image);}
-    | tmp = <SETTING_SINGLE>   {name = this.getSingle(tmp.image);} )
-
+    name = stringString()
     value = string()
 
     {this.setValue(property, "name", "%" + name);}
@@ -416,6 +457,22 @@ String multiLineString() :
 {
     ( tmp = <MULTILINESTRING>  {ret = this.getString(tmp.image);}
     | tmp = <MULTILINESINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
+}
+
+/**
+ * Evaluates prefixed single-line string.
+ *
+ * @return string
+ */
+String stringString() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <STRING_STRING_STRING>  {ret = this.getString(tmp.image);}
+    | tmp = <STRING_STRING_SINGLE>  {ret = this.getSingle(tmp.image);} )
     {return ret;}
 }
 
