@@ -45,6 +45,9 @@ public class ExpressionCI_1ParserTest
             {"1b) package single",
                     "package \"abc\" description \"\" !hidden value \"\"",
                     "package abc     description \"\" !hidden value \"\""},
+            {"1c) package string with property (to check expression value is correct set)",
+                    "                  package \"abc\"               description \"\" !hidden value \"abc\" property \"prop\"",
+                    "property \"prop\" package \"abc\" value \"abc\" description \"\" !hidden"},
             // uuid
             {"2a) uuid with minus separator",
                     "",

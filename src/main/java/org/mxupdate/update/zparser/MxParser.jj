@@ -46,6 +46,7 @@ import java.util.Set;
 
 import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
+import org.mxupdate.update.datamodel.Expression_mxJPO;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.program.Page_mxJPO;
 import org.mxupdate.update.program.ProgramCI_mxJPO;
@@ -190,6 +191,17 @@ TOKEN : /** first level */
     | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
 }
 
+String multiLineString() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <MULTILINESTRING>  {ret = this.getString(tmp.image);}
+    | tmp = <MULTILINESINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
+}
+
 /************************************************************* Common Integer */
 <NATURALNUMBER_EXPECTED> TOKEN :
 {
@@ -202,6 +214,19 @@ TOKEN : /** first level */
       <PROPERTY:                            "property">                                     : STRING_EXPECTED
     | <PROPERTYTO:                          "to">                                           : STRING_STRING_EXPECTED
     | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
+}
+
+AdminProperty property() :
+{
+    String str1,str2;
+    Token tmp;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str1 = string()                                             {this.setValue(property, "name", str1);}
+    ( ( <PROPERTYVAL>  str1 = string()                          {this.setValue(property, "value", str1);} )
+    | ( <PROPERTYTO>   str1 = stringString()  str2 = string()   {this.setValue(property, "refAdminType", str1);this.setValue(property, "refAdminName", str2);} ) )*
+    {return property;}
 }
 
 /**************************************************************** Common Kind */
@@ -428,7 +453,7 @@ void parseDimension(final Dimension_mxJPO _dimension)
 String unitDefString() :
 {
     Token tmp;
-} 
+}
 {
     tmp = <UNITDEF_STRING> {return this.getString(tmp.image);} | tmp = <UNITDEF_SINGLE> {return this.getSingle(tmp.image);}
 }
@@ -472,7 +497,7 @@ AdminProperty unitDefSystem() :
 {
     ( tmp = <UNITDEF_SYSTEMNAME_STRING> {name = this.getString(tmp.image);} | tmp = <UNITDEF_SYSTEMNAME_SINGLE> {name = this.getSingle(tmp.image);} )
     <UNITDEF_SYSTEMDEF_TO>
-    <UNITDEF_SYSTEMDEF_UNIT> 
+    <UNITDEF_SYSTEMDEF_UNIT>
     ( tmp = <UNITDEF_SYSTEMUNIT_STRING> {unit = this.getString(tmp.image);} | tmp = <UNITDEF_SYSTEMUNIT_SINGLE> {unit = this.getSingle(tmp.image);} )
     {
         final AdminProperty ret = new AdminProperty();
@@ -573,6 +598,52 @@ AdminProperty unitDefProperty() :
 {
       <UNITDEF_SYSTEMUNIT_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : UNITDEF_EXPECTED
     | <UNITDEF_SYSTEMUNIT_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : UNITDEF_EXPECTED
+}
+
+/*************************************************** Data Model -> Expression */
+
+/**
+ * Parses one complete expression definition.
+ *
+ * @param _expression   target expression to update with parsed values
+ */
+void parseExpression(final Expression_mxJPO _expression)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    Token tmp;
+    AdminProperty property = null;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_expression, "packageRef", str);property = null;} )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_expression, "properties", "propertiesStack", property);property = null;} )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_expression, "symbolicNames", str);property = null;} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_expression, "description", str);property = null;} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_expression, "hidden", true);property = null;} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_expression, "hidden", false);property = null;} )
+      | ( <PROPERTYVAL>                                                         {   // work-around:
+                                                                                    // normally only single-line-string is allowed
+                                                                                    // but for expression value, multi-line-string is allowed (property == null)
+                                                                                    if (property == null)  {
+                                                                                        token_source.SwitchTo(MULTILINESTRING_EXPECTED);
+                                                                                    }
+                                                                                }
+                          ( str = string()  | str = multiLineString() )         {   // hint: token value is used twice
+                                                                                    // (for property and as expression value)
+                                                                                    // => staffed via property variable
+                                                                                    if (property == null)  {
+                                                                                        this.setValue(_expression, "value", str);
+                                                                                    } else  {
+                                                                                        this.setValue(property, "value", str);
+                                                                                        property = null;
+                                                                                    }
+                                                                                } )
+      | ( <PROPERTY>                                                            {property = new AdminProperty();this.appendValue(_expression, "properties", "propertiesStack", property);}
+                                      str = string()                            {this.setValue(property, "name", str);}
+                     ( <PROPERTYTO>   str = stringString()                      {this.setValue(property, "refAdminType", str);}
+                                      str = string()                            {this.setValue(property, "refAdminName", str);} )? )
+    )*
 }
 
 /************************************************************ Program -> Page */
@@ -1371,22 +1442,6 @@ AdminProperty settingProperty() :
 }
 
 /**
- * Parses the properties definition.
- */
-AdminProperty property() :
-{
-    String str1,str2;
-    Token tmp;
-    AdminProperty property = new AdminProperty();
-}
-{
-    str1 = string()                                             {this.setValue(property, "name", str1);}
-    ( ( <PROPERTYVAL>  str1 = string()                          {this.setValue(property, "value", str1);} )
-    | ( <PROPERTYTO>   str1 = stringString()  str2 = string()   {this.setValue(property, "refAdminType", str1);this.setValue(property, "refAdminName", str2);} ) )*
-    {return property;}
-}
-
-/**
  * Evaluates integer value.
  *
  * @return integer
@@ -1398,22 +1453,6 @@ Integer naturalNumber() :
 {
     tmp = <NATURALNUMBER>
     {return Integer.valueOf(tmp.image);}
-}
-
-/**
- * Evaluates multi-line string.
- *
- * @return string
- */
-String multiLineString() :
-{
-    Token tmp;
-    String ret = null;
-}
-{
-    ( tmp = <MULTILINESTRING>  {ret = this.getString(tmp.image);}
-    | tmp = <MULTILINESINGLE>  {ret = this.getSingle(tmp.image);} )
-    {return ret;}
 }
 
 /**
