@@ -29,7 +29,7 @@ import org.testng.annotations.Test;
  *
  * @author The MxUpdate Team
  */
-@Test()
+@Test
 public class AssociationCI_3UpdateTest
     extends AbstractDataExportUpdate<AssociationData>
 {
@@ -66,25 +66,26 @@ public class AssociationCI_3UpdateTest
     public void positiveTestCodeUpdate()
         throws Exception
     {
-        final AssociationData asso = new AssociationData(this, "Test").create();
-
-        asso.setValue("definition", "\"!User Agent\"")
-            .update("")
-            .checkExport()
-            .setValue("definition", "!Employee")
-            .update("")
-            .checkExport();
+        new AssociationData(this, "Test")
+                .create()
+                .setValue("definition", "\"!User Agent\"")
+                .update("")
+                .checkExport();
+        new AssociationData(this, "Test")
+                .setValue("definition", "!Employee")
+                .update("")
+                .checkExport();
     }
 
-    @BeforeMethod()
-    @AfterClass(groups = "close")
+    @BeforeMethod
+    @AfterClass
     public void cleanup()
         throws Exception
     {
         this.cleanup(AbstractTest.CI.USR_ASSOCIATION);
     }
 
-    @Override()
+    @Override
     protected AssociationData createNewData(final String _name)
     {
         return new AssociationData(this, _name);

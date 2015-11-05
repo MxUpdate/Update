@@ -16,6 +16,7 @@
 package org.mxupdate.test.test.update.user;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.user.AssociationData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.user.Association_mxJPO;
@@ -41,16 +42,29 @@ public class AssociationCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1) uuid",
+            // package
+            {"1a) new package",
+                    new AssociationData(this, "Test"),
+                    new AssociationData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new AssociationData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new AssociationData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new AssociationData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new AssociationData(this, "Test").defKeyNotDefined("package")},
+            // uuid
+            {"2) uuid",
                     new AssociationData(this, "Test"),
                     new AssociationData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
-            {"2a) symbolic name",
+            // symbolic names
+            {"3a) symbolic name",
                     new AssociationData(this, "Test"),
                     new AssociationData(this, "Test").setValue("symbolicname", "association_123")},
-            {"2b) two symbolic name",
+            {"3b) two symbolic name",
                     new AssociationData(this, "Test"),
                     new AssociationData(this, "Test").setValue("symbolicname", "association_123").setValue("symbolicname", "association_345")},
-            {"3) description",
+            // description
+            {"4) description",
                     new AssociationData(this, "Test"),
                     new AssociationData(this, "Test").setValue("description", "abc def")},
        };
@@ -58,11 +72,12 @@ public class AssociationCI_2DeltaCalculationTest
 
     @Override
     @BeforeMethod
-    @AfterClass(groups = "close" )
+    @AfterClass
     public void cleanup()
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.USR_ASSOCIATION);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override

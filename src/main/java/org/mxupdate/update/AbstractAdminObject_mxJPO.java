@@ -193,11 +193,18 @@ public abstract class AbstractAdminObject_mxJPO<CLASS extends AbstractAdminObjec
             }
         }
 
-        // evaluate package
-        final String pckTmp = MqlBuilderUtil_mxJPO.mql()
-                .cmd("escape print ").cmd(this.mxClassDef().mxClass()).cmd(" ").arg(this.getName()).cmd(" ").cmd(this.mxClassDef().mxClassSuffix()).cmd(" ")
-                .cmd("select ").arg("package").cmd(" dump")
-                .exec(_paramCache.getContext());
+        // evaluate package (with workaround for associations)
+        final String pckTmp;
+        if (this.mxClassDef() == EMxAdmin_mxJPO.Association)  {
+            pckTmp = MqlBuilderUtil_mxJPO.mql()
+                    .cmd("escape list package ").arg("*").cmd(" where ").arg("member[association " + this.getName() + "]")
+                    .exec(_paramCache.getContext());
+        } else  {
+            pckTmp = MqlBuilderUtil_mxJPO.mql()
+                    .cmd("escape print ").cmd(this.mxClassDef().mxClass()).cmd(" ").arg(this.getName()).cmd(" ").cmd(this.mxClassDef().mxClassSuffix()).cmd(" ")
+                    .cmd("select ").arg("package").cmd(" dump")
+                    .exec(_paramCache.getContext());
+        }
         this.packageRef = StringUtils_mxJPO.isEmpty(pckTmp) ? (String) null : pckTmp;
     }
 
