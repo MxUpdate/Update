@@ -55,8 +55,10 @@ import org.mxupdate.update.datamodel.Format_mxJPO;
 import org.mxupdate.update.datamodel.Interface_mxJPO;
 import org.mxupdate.update.datamodel.PathType_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
+import org.mxupdate.update.datamodel.Relationship_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO.LocalAttribute;
+import org.mxupdate.update.datamodel.helper.LocalPathTypeList_mxJPO.LocalPathType;
 import org.mxupdate.update.datamodel.helper.TriggerList_mxJPO.Trigger;
 import org.mxupdate.update.program.Page_mxJPO;
 import org.mxupdate.update.program.ProgramCI_mxJPO;
@@ -127,50 +129,57 @@ PARSER_END(MxParser)
     | <NEEDSBUSINESSOBJECT_TRUE:            "needsbusinessobject">  : DEFAULT           | <NEEDSBUSINESSOBJECT_FALSE:           "!needsbusinessobject"> : DEFAULT
     | <PIPE_TRUE:                           "pipe">                 : DEFAULT           | <PIPE_FALSE:                          "!pipe">                : DEFAULT
     | <POOLED_TRUE:                         "pooled">               : DEFAULT           | <POOLED_FALSE:                        "!pooled">              : DEFAULT
+    | <PREVENTDUPLICATES_TRUE:              "preventduplicates">    : DEFAULT           | <PREVENTDUPLICATES_FALSE:             "!preventduplicates">   : DEFAULT
     | <PROMOTE_TRUE:                        "promote">              : DEFAULT           | <PROMOTE_FALSE:                       "!promote">             : DEFAULT
+    | <PROPAGATECONNECTION_TRUE:            "propagateconnection">  : DEFAULT           | <PROPAGATECONNECTION_FALSE:           "!propagateconnection"> : DEFAULT
+    | <PROPAGATEMODIFY_TRUE:                "propagatemodify">      : DEFAULT           | <PROPAGATEMODIFY_FALSE:               "!propagatemodify">     : DEFAULT
     | <PUBLISHED_TRUE:                      "published">            : DEFAULT           | <PUBLISHED_FALSE:                     "!published">           : DEFAULT
     | <RANGEVALUE_TRUE:                     "rangevalue">           : DEFAULT           | <RANGEVALUE_FALSE:                    "!rangevalue">          : DEFAULT
     | <RESETONCLONE_TRUE:                   "resetonclone">         : DEFAULT           | <RESETONCLONE_FALSE:                  "!resetonclone">        : DEFAULT
     | <RESETONREVISION_TRUE:                "resetonrevision">      : DEFAULT           | <RESETONREVISION_FALSE:               "!resetonrevision">     : DEFAULT
-    | <REVISION_TRUE:                       "revision">             : DEFAULT           | <REVISION_FALSE:                      "!revision">            : DEFAULT
+    | <REVISION:                            "revision">             : DEFAULT           | <REVISION_FALSE:                      "!revision">            : DEFAULT
     | <TREEMENU_TRUE:                       "treemenu">             : DEFAULT           | <TREEMENU_FALSE:                      "!treemenu">            : DEFAULT
     | <TRUSTED_TRUE:                        "trusted">              : DEFAULT           | <TRUSTED_FALSE:                       "!trusted">             : DEFAULT
     | <UNIQUE_TRUE:                         "unique">               : DEFAULT           | <UNIQUE_FALSE:                        "!unique">              : DEFAULT
     | <VERSION:                             "version">              : VERSION_EXPECTED  | <VERSION_FALSE:                       "!version">             : DEFAULT
 
     | <ALLSTATE:                            "allstate">                                     : DEFAULT
+    | <ANCESTOR:                            "ancestor">                                     : DEFAULT
+    | <ANY:                                 "any">                                          : DEFAULT
+    | <CATEGORY:                            "category">                                     : DEFAULT
+    | <CLONE:                               "clone">                                        : DEFAULT
+    | <CONTEXT:                             "context">                                      : DEFAULT
+    | <CONTRACTOR:                          "contractor">                                   : DEFAULT
+    | <CUSTOMER:                            "customer">                                     : DEFAULT
     | <DEFERRED:                            "deferred">                                     : DEFAULT
+    | <DESCENDANT:                          "descendant">                                   : DEFAULT
     | <EXECUTE:                             "execute">                                      : DEFAULT
+    | <FLOAT:                               "float">                                        : DEFAULT
+    | <GOLDPARTNER:                         "goldpartner">                                  : DEFAULT
     | <IMMEDIATE:                           "immediate">                                    : DEFAULT
+    | <INCLUSIVE:                           "inclusive">                                    : DEFAULT
     | <LOCAL:                               "local">                                        : DEFAULT
     | <LOGIN:                               "login">                                        : DEFAULT
-    | <NEWROW:                              "newrow">                                       : DEFAULT
-    | <OWNER:                               "owner">                                        : DEFAULT
-    | <PUBLIC:                              "public">                                       : DEFAULT
-    | <REVOKE:                              "revoke">                                       : DEFAULT
-    | <ANY:                                 "any">                                          : DEFAULT
-    | <SINGLE:                              "single">                                       : DEFAULT
-    | <ANCESTOR:                            "ancestor">                                     : DEFAULT
-    | <DESCENDANT:                          "descendant">                                   : DEFAULT
-    | <RELATED:                             "related">                                      : DEFAULT
-    | <ORGANIZATION:                        "organization">                                 : DEFAULT
-    | <PROJECT:                             "project">                                      : DEFAULT
-    | <CONTEXT:                             "context">                                      : DEFAULT
-    | <RESERVE:                             "reserve">                                      : DEFAULT
-    | <NO:                                  "no">                                           : DEFAULT
-    | <INCLUSIVE:                           "inclusive">                                    : DEFAULT
     | <MATURITY:                            "maturity">                                     : DEFAULT
-    | <PROTECTED:                           "protected">                                    : DEFAULT
-    | <PRIVATE:                             "private">                                      : DEFAULT
+    | <NEWROW:                              "newrow">                                       : DEFAULT
+    | <NO:                                  "no">                                           : DEFAULT
+    | <NONE:                                "none">                                         : DEFAULT
     | <NOTPRIVATE:                          "notprivate">                                   : DEFAULT
-    | <PPP:                                 "ppp">                                          : DEFAULT
-    | <CATEGORY:                            "category">                                     : DEFAULT
     | <OEM:                                 "oem">                                          : DEFAULT
-    | <GOLDPARTNER:                         "goldpartner">                                  : DEFAULT
+    | <ORGANIZATION:                        "organization">                                 : DEFAULT
+    | <OWNER:                               "owner">                                        : DEFAULT
     | <PARTNER:                             "partner">                                      : DEFAULT
+    | <PPP:                                 "ppp">                                          : DEFAULT
+    | <PRIVATE:                             "private">                                      : DEFAULT
+    | <PROJECT:                             "project">                                      : DEFAULT
+    | <PROTECTED:                           "protected">                                    : DEFAULT
+    | <PUBLIC:                              "public">                                       : DEFAULT
+    | <RELATED:                             "related">                                      : DEFAULT
+    | <REPLICATE:                           "replicate">                                    : DEFAULT
+    | <RESERVE:                             "reserve">                                      : DEFAULT
+    | <REVOKE:                              "revoke">                                       : DEFAULT
+    | <SINGLE:                              "single">                                       : DEFAULT
     | <SUPPLIER:                            "supplier">                                     : DEFAULT
-    | <CUSTOMER:                            "customer">                                     : DEFAULT
-    | <CONTRACTOR:                          "contractor">                                   : DEFAULT
 
     // special cases
     | <FORMAT_ALL:                          "format" ([" ","\t","\n"])+ "all">              : DEFAULT
@@ -217,11 +226,13 @@ PARSER_END(MxParser)
     | <LABEL:                               "label">                                        : STRING_EXPECTED
     | <LOCALFILTER:                         "localfilter">                                  : STRING_EXPECTED
     | <MAJORSEQUENCE:                       "majorsequence">                                : STRING_EXPECTED
+    | <MEANING:                             "meaning">                                      : STRING_EXPECTED
     | <MENU:                                ("add" ([" ","\t","\n","\r"])+ )? "menu">       : STRING_EXPECTED
     | <MIME:                                "mime">                                         : STRING_EXPECTED
     | <MINORSEQUENCE:                       "minorsequence">                                : STRING_EXPECTED
     | <PACKAGE:                             "package">                                      : STRING_EXPECTED
     | <PARENT:                              "parent">                                       : STRING_EXPECTED
+    | <PATHTYPE:                            "pathtype">                                     : STRING_EXPECTED
     | <PATTERN:                             "pattern">                                      : STRING_EXPECTED
     | <PHONE:                               "phone">                                        : STRING_EXPECTED
     | <PRINT:                               "print">                                        : STRING_EXPECTED
@@ -398,6 +409,9 @@ AdminProperty property() :
     | <KIND_ORGANIZATION:                   "organization">                                 : DEFAULT
     | <KIND_PROJECT:                        "project">                                      : DEFAULT
     | <KIND_ROLE:                           "role">                                         : DEFAULT
+    // Data Model -> Relationship
+    | <KIND_BASIC:                          "basic">                                        : DEFAULT
+    | <KIND_COMPOSITIONAL:                  "compositional">                                : DEFAULT
 }
 
 /************************************************************ Common Triggers */
@@ -442,15 +456,41 @@ Trigger trigger() :
 LocalAttribute localAttribute()
     throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
 {
-    String str;
+    String name;
     LocalAttribute localAttr = new LocalAttribute();
 }
 {
-    str = string()                                                              {localAttr.setLocalName(str);}
+    name = string()
     <BRACE_OPEN>
         parseAttribute(localAttr)
     <BRACE_CLOSE>
-    {return localAttr;}
+    {
+        localAttr.setLocalName(name);
+        return localAttr;
+    }
+}
+
+/************************************************************ Local Path Type */
+/**
+ * Parses the local path type definition.
+ */
+LocalPathType localPathType() 
+    throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String name;
+    AdminProperty property;
+    LocalAttribute localAttr;
+    LocalPathType localPathType = new LocalPathType();
+}
+{
+    name = string()
+    <BRACE_OPEN>
+        parsePathType(localPathType)
+    <BRACE_CLOSE>
+    {
+        localPathType.setLocalName(name);
+        return localPathType;
+    }
 }
 
 /**************************************************** Data Model -> Attribute */
@@ -1027,10 +1067,10 @@ Policy_mxJPO.State state() :
     Access access = new Access();
 }
 {
-    ( str = string()                                                              {this.setValue(state, "name", str);} )
+    ( str = string()                                                            {this.setValue(state, "name", str);} )
     <BRACE_OPEN>
       ( ( <REGISTEREDNAME>            str = string()                            {this.appendValue(state, "symbolicNames", str);} )
-      | ( ( <MINORREVISION_TRUE>  | <REVISION_TRUE> )                           {this.setValue(state, "minorrevisionable", true);} )
+      | ( ( <MINORREVISION_TRUE>  | <REVISION> )                                {this.setValue(state, "minorrevisionable", true);} )
       | ( ( <MINORREVISION_FALSE> | <REVISION_FALSE> )                          {this.setValue(state, "minorrevisionable", false);} )
       | ( <MAJORREVISION_TRUE>                                                  {this.setValue(state, "majorrevisionable", true);} )
       | ( <MAJORREVISION_FALSE>                                                 {this.setValue(state, "majorrevisionable", false);} )
@@ -1144,6 +1184,68 @@ void stateAccessDef(final Access _access) :
       <ROUTEUSERSTRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : ROUTEUSER_EXPECTED
     | <ROUTEUSERSINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : ROUTEUSER_EXPECTED
     | <ROUTEUSERCLOSE : "}">   : STRING_EXPECTED
+}
+
+/************************************************* Data Model -> Relationship */
+
+/**
+ * Parses one complete relationship definition.
+ *
+ * @param _relationship target relationship to update with parsed values
+ */
+void parseRelationship(final Relationship_mxJPO _relationship)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    AdminProperty property;
+    Trigger trigger;
+    String fromTo, str;
+    LocalAttribute localAttr;
+    LocalPathType localPathType;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_relationship, "packageRef", str);} )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(this.getValue(_relationship, "properties"), "propertiesStack", property);} )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_relationship, "symbolicNames", str);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_relationship, "description", str);} )
+      | ( <KIND>                    ( <KIND_BASIC>                              {this.setValue(_relationship, "kind", Relationship_mxJPO.Kind.Basic);}
+                                    | <KIND_COMPOSITIONAL>                      {this.setValue(_relationship, "kind", Relationship_mxJPO.Kind.Compositional);} ) )
+      | ( <ABSTRACT_TRUE>                                                       {this.setValue(_relationship, "abstractFlag", true);} )
+      | ( <ABSTRACT_FALSE>                                                      {this.setValue(_relationship, "abstractFlag", false);} )
+      | ( <DERIVED>                   str = string()                            {this.setValue(_relationship, "derived", str);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_relationship, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_relationship, "hidden", false);} )
+      | ( <PREVENTDUPLICATES_TRUE>                                              {this.setValue(_relationship, "preventDuplicates", true);} )
+      | ( <PREVENTDUPLICATES_FALSE>                                             {this.setValue(_relationship, "preventDuplicates", false);} )
+      | ( <RULE>                      str = string()                            {this.setValue(_relationship, "rule", str);} )
+      | ( <TRIGGER>                   trigger = trigger()                       {this.appendValue(_relationship, "triggers", "triggersStack", trigger);} )
+      | ( ( <FROM>                                                              {fromTo = "from";}
+          | <TO>                                                                {fromTo = "to";} )
+                (   ( <PROPAGATEMODIFY_TRUE>                                    {this.setValue(_relationship, fromTo, "propagateModify", true);} )
+                  | ( <PROPAGATEMODIFY_FALSE>                                   {this.setValue(_relationship, fromTo, "propagateModify", false);} )
+                  | ( <PROPAGATECONNECTION_TRUE>                                {this.setValue(_relationship, fromTo, "propagateConnection", true);} )
+                  | ( <PROPAGATECONNECTION_FALSE>                               {this.setValue(_relationship, fromTo, "propagateConnection", false);} )
+                  | ( <MEANING>               str = string()                    {this.setValue(_relationship, fromTo, "meaning", str);} )
+                  | ( <REVISION>            ( <NONE>                            {this.setValue(_relationship, fromTo, "revisionAction", "none");}
+                                            | <FLOAT>                           {this.setValue(_relationship, fromTo, "revisionAction", "float");}
+                                            | <REPLICATE>                       {this.setValue(_relationship, fromTo, "revisionAction", "replicate");} ) )
+                  | ( <CLONE>               ( <NONE>                            {this.setValue(_relationship, fromTo, "cloneAction", "none");}
+                                            | <FLOAT>                           {this.setValue(_relationship, fromTo, "cloneAction", "float");}
+                                            | <REPLICATE>                       {this.setValue(_relationship, fromTo, "cloneAction", "replicate");} ) )
+                  | ( <CARDINALITY_ONE>                                         {this.setValue(_relationship, fromTo, "cardinality", "one");} )
+                  | ( <CARDINALITY_MANY>                                        {this.setValue(_relationship, fromTo, "cardinality", "many");} )
+                  | ( <TYPE>                  str = string()                    {this.appendValue(_relationship, fromTo, "types", str);} )
+                  | ( <TYPE_ALL>                                                {this.setValue(_relationship, fromTo, "typeAll", true);} )
+                  | ( <RELATIONSHIP>          str = string()                    {this.appendValue(_relationship, fromTo, "relations", str);} )
+                  | ( <RELATIONSHIP_ALL>                                        {this.setValue(_relationship, fromTo, "relationAll", true);} )
+                )*
+          "}" )
+      | ( <ATTRIBUTE>                 str = string()                            {this.appendValue(_relationship, "globalAttributes", str);} )
+      | ( <LOCAL>
+                 ( <ATTRIBUTE>        localAttr = localAttribute()              {this.appendValue(_relationship, "localAttributes", localAttr);}
+                 | <PATHTYPE>         localPathType = localPathType()           {this.appendValue(_relationship, "localPathTypes", localPathType);} ) )
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_relationship, "properties", "propertiesStack", property);} )
+    )*
 }
 
 /************************************************************ Program -> Page */

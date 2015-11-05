@@ -34,6 +34,7 @@ import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateList;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
+import org.mxupdate.update.zparser.MxParser_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
@@ -129,7 +130,7 @@ public class Relationship_mxJPO
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-        new RelationshipParser_mxJPO(new StringReader(_code)).parse(this);
+        new MxParser_mxJPO(new StringReader(_code)).parseRelationship(this);
         this.prepare();
     }
 
