@@ -97,7 +97,7 @@ public class UpdateAction_mxJPO
 
                    final boolean update;
                    if (_paramCache.getValueBoolean(ValueKeys.UpdateCheckFileDate))  {
-                       final AbstractObject_mxJPO<?> instance = typeDef.newTypeInstance(fileEntry.getKey());
+                       final AbstractObject_mxJPO<?> instance = typeDef.newTypeInstance(this.paramCache, fileEntry.getKey());
                        final Date fileDate = new Date(fileEntry.getValue().lastModified());
                        final String instDateString;
                        if (existings.contains(fileEntry.getKey()))  {
@@ -139,7 +139,7 @@ public class UpdateAction_mxJPO
                            }
                            commit = true;
                            if (_paramCache.getValueBoolean(ValueKeys.Compile))  {
-                               compiles.add(typeDef.newTypeInstance(fileEntry.getKey()));
+                               compiles.add(typeDef.newTypeInstance(this.paramCache, fileEntry.getKey()));
                            }
                        } finally  {
                            if (!commit && !transActive && _paramCache.getContext().isTransactionActive())  {
@@ -197,7 +197,7 @@ public class UpdateAction_mxJPO
                for (final Entry<String,File> fileEntry : clazzMap.entrySet())  {
                    final Set<String> existings = _existingNames.get(clazz);
                    if (!existings.contains(fileEntry.getKey()))  {
-                       final AbstractObject_mxJPO<?> instance = clazz.newTypeInstance(fileEntry.getKey());
+                       final AbstractObject_mxJPO<?> instance = clazz.newTypeInstance(_paramCache, fileEntry.getKey());
                        _paramCache.logInfo("create " + clazz.getLogging() + " '" + fileEntry.getKey() + "'");
                        instance.createOld(_paramCache);
                    }

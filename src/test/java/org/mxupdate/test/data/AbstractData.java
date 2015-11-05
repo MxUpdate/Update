@@ -479,9 +479,9 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         final TypeDef_mxJPO typeDef = paramCache.getMapping().getTypeDef(this.getCI().updateType);
 
         // prepare the current
-        final WrapperCIInstance<AbstractObject_mxJPO<?>> cur = new WrapperCIInstance<AbstractObject_mxJPO<?>>(typeDef.newTypeInstance(this.getName()));
+        final WrapperCIInstance<AbstractObject_mxJPO<?>> cur = new WrapperCIInstance<AbstractObject_mxJPO<?>>(typeDef.newTypeInstance(paramCache, this.getName()));
         cur.parseUpdate(_code);
-        final WrapperCIInstance<AbstractObject_mxJPO<?>> tmp = new WrapperCIInstance<AbstractObject_mxJPO<?>>(typeDef.newTypeInstance(this.getName()));
+        final WrapperCIInstance<AbstractObject_mxJPO<?>> tmp = new WrapperCIInstance<AbstractObject_mxJPO<?>>(typeDef.newTypeInstance(paramCache, this.getName()));
         tmp.parse(paramCache);
         cur.calcDelta(paramCache,  (File) null, tmp).exec(paramCache.getContext());
 
@@ -552,7 +552,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getTest().getContext(), false);
         final TypeDef_mxJPO typeDef = paramCache.getMapping().getTypeDef(this.getCI().updateType);
 
-        final WrapperCIInstance<AbstractObject_mxJPO<?>> resultWrapper = new WrapperCIInstance<AbstractObject_mxJPO<?>>(typeDef.newTypeInstance(this.getName()));
+        final WrapperCIInstance<AbstractObject_mxJPO<?>> resultWrapper = new WrapperCIInstance<AbstractObject_mxJPO<?>>(typeDef.newTypeInstance(paramCache, this.getName()));
         resultWrapper.parse(paramCache);
 
         return new ExportParser(this.getCI(), resultWrapper.write(paramCache), "");

@@ -79,7 +79,7 @@ public class DeleteAction_mxJPO
                         if (!transActive)  {
                             this.paramCache.getContext().start(true);
                         }
-                        entry.getKey().newTypeInstance(name).delete(this.paramCache);
+                        entry.getKey().newTypeInstance(this.paramCache, name).delete(this.paramCache);
                         if (!transActive)  {
                             this.paramCache.getContext().commit();
                         }

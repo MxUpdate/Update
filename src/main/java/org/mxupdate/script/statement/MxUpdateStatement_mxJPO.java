@@ -181,7 +181,7 @@ public class MxUpdateStatement_mxJPO
             }
         }
 
-        final BusObject_mxJPO target = (BusObject_mxJPO) typeDef.newTypeInstance(_mxName + BusObject_mxJPO.SPLIT_NAME + _mxRevision);
+        final BusObject_mxJPO target = (BusObject_mxJPO) typeDef.newTypeInstance(_paramCache, _mxName + BusObject_mxJPO.SPLIT_NAME + _mxRevision);
         target.parseUpdate(_file, this.code);
 
         final BusObject_mxJPO current = new BusObject_mxJPO(typeDef, target.getBusType(), target.getBusName(), target.getBusRevision());

@@ -44,10 +44,10 @@ public class ExportAdmin_mxJPO
                        final TypeDef_mxJPO _typeDef,
                        final String _mxName,
                        final File _path)
-        throws IOException, MatrixException, ParseException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+        throws IOException, MatrixException, ParseException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException
     {
         try  {
-            final AbstractObject_mxJPO<?> clazz = _typeDef.newTypeInstance(_mxName);
+            final AbstractObject_mxJPO<?> clazz = _typeDef.newTypeInstance(_paramCache, _mxName);
 
             clazz.parse(_paramCache);
 

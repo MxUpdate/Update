@@ -87,15 +87,29 @@ public final class TypeDef_mxJPO
     /** Name of the mxUpdate type for this type definition */
     private String mxUpdateType;
 
-    /** JPO implementing the CI MxUpdate functionality. */
+    /** JPO name implementing the CI MxUpdate functionality. */
+    private String jpoClassStr;
+    /** JPO class implementing the CI MxUpdate functionality. */
     private Class<? extends AbstractObject_mxJPO<?>> jpoClass;
-    /** JPO implementing the export interface. */
+
+    /** JPO name implementing the export interface. */
+    private String jpoExportStr;
+    /** JPO class implementing the export interface. */
     private Class<? extends IExport_mxJPO> jpoExport;
-    /** JPO implementing the Match File Names interface. */
+
+    /** JPO name implementing the Match File Names interface. */
+    private String jpoMatchFileNamesStr;
+    /** JPO class implementing the Match File Names interface. */
     private Class<? extends IMatcherFileNames_mxJPO> jpoMatchFileNames;
-    /** JPO implementing the Fetch-Mx-Names interface. */
+
+    /** JPO name implementing the Fetch-Mx-Names interface. */
+    private String jpoMatchMxNamesStr;
+    /** JPO class implementing the Fetch-Mx-Names interface. */
     private Class<? extends IMatcherMxNames_mxJPO> jpoMatchMxNames;
-    /** JPO implementing the Update interface. */
+
+    /** JPO name implementing the Update interface. */
+    private String jpoUpdateStr;
+    /** JPO class implementing the Update interface. */
     private Class<? extends IUpdate_mxJPO> jpoUpdate;
 
     /** Order number used within update. */
@@ -165,11 +179,11 @@ public final class TypeDef_mxJPO
                 case MxUpdateKind:          typeDef.mxUpdateKind = _value;break;
                 case MxUpdateType:          typeDef.mxUpdateType = _value;break;
 
-                case JPO:                   typeDef.jpoClass            = (Class<? extends AbstractObject_mxJPO<?>>) TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
-                case JpoExport:             typeDef.jpoExport           = (Class<? extends IExport_mxJPO>)           TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
-                case JpoMatchFileNames:     typeDef.jpoMatchFileNames   = (Class<? extends IMatcherFileNames_mxJPO>) TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
-                case JpoMatchMxNames:       typeDef.jpoMatchMxNames     = (Class<? extends IMatcherMxNames_mxJPO>)   TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
-                case JpoUpdate:             typeDef.jpoUpdate           = (Class<? extends IUpdate_mxJPO>)           TypeDef_mxJPO.fetchJPOClass(_paramCache, _value);break;
+                case JPO:                   typeDef.jpoClassStr = _value;break;
+                case JpoExport:             typeDef.jpoExportStr = _value;break;
+                case JpoMatchFileNames:     typeDef.jpoMatchFileNamesStr = _value;break;
+                case JpoMatchMxNames:       typeDef.jpoMatchMxNamesStr = _value;break;
+                case JpoUpdate:             typeDef.jpoUpdateStr = _value;break;
 
                 case OrderNo:               typeDef.orderNo = Integer.parseInt(_value);break;
 
@@ -184,14 +198,12 @@ public final class TypeDef_mxJPO
      *
      * @param _paramCache   parameter cache
      * @param _jpoName      name of searched JPO
-     * @throws Exception if the list of MxUdpate JPOs could not evaluated or
-     *                   if the related class could not be found
-     * @see #MQL_LISTPROG
-     * @see #jpoClass
+     * @throws ClassNotFoundException if the related class could not be found
+     * @throws MatrixException if the list of MxUdpate JPOs could not evaluated
      */
     private static Class<?> fetchJPOClass(final ParameterCache_mxJPO _paramCache,
                                           final String _jpoName)
-        throws Exception
+        throws MatrixException, ClassNotFoundException
     {
         Class<?> ret;
         try  {
@@ -220,7 +232,7 @@ public final class TypeDef_mxJPO
             }
             final String jpoClassName = jpos.get(_jpoName);
             if (jpoClassName == null)  {
-                throw new Exception("unknown jpo class definition for " + _jpoName);
+                throw new MatrixException("unknown jpo class definition for " + _jpoName);
             }
 
             ret = Class.forName(jpoClassName);
@@ -460,23 +472,27 @@ public final class TypeDef_mxJPO
      * @param _mxName   MX name of the new instance
      * @return instance of the administration object used for create, update or
      *                  delete
-     * @throws NoSuchMethodException        if the constructor with
-     *                                      {@link TypeDef_mxJPO} and
-     *                                      {@link String} does not exists
-     * @throws InstantiationException       if a new instance of the class
-     *                                      {@link #jpoClass} could not be
-     *                                      created
-     * @throws IllegalAccessException       if the constructor is not public
-     * @throws InvocationTargetException    if the constructor of the
-     *                                      {@link #jpoClass} itself throws an
-     *                                      exception
+     * @throws MatrixException if evaluate of the JPO class failed
+     * @throws NoSuchMethodException if the constructor with
+     *                  {@link TypeDef_mxJPO} and {@link String} does not exists
+     * @throws InstantiationException if a new instance of the class
+     *                  {@link #jpoClass} could not be created
+     * @throws IllegalAccessException if the constructor is not public
+     * @throws InvocationTargetException if the constructor of the
+     *                  {@link #jpoClass} itself throws an exception
+     * @throws ClassNotFoundException if the class for {@link #jpoClassStr} is
+     *                  not found
      */
-    public AbstractObject_mxJPO<?> newTypeInstance(final String _mxName)
-            throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
+    public AbstractObject_mxJPO<?> newTypeInstance(final ParameterCache_mxJPO _paramCache,
+                                                   final String _mxName)
+            throws MatrixException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException
     {
         final AbstractObject_mxJPO<?> ret;
         final EMxAdmin_mxJPO mxClassDef = EMxAdmin_mxJPO.valueOfByClass(this.mxUpdateType);
         if (mxClassDef == null)  {
+            if (this.jpoClass == null)  {
+                this.jpoClass = (Class<? extends AbstractObject_mxJPO<?>>) TypeDef_mxJPO.fetchJPOClass(_paramCache, this.jpoClassStr);
+            }
             ret = this.jpoClass.getConstructor(TypeDef_mxJPO.class, String.class).newInstance(this, _mxName);
         } else  {
             ret = mxClassDef.newTypeInstance(_mxName);
@@ -502,12 +518,17 @@ public final class TypeDef_mxJPO
      *                                      {@link #jpoExport} itself
      *                                      throws an exception
      * @throws NoSuchMethodException        if the constructor does not exists
+     * @throws ClassNotFoundException if the class for {@link #jpoExportStr} is
+     *                      not found
      */
     public void export(final ParameterCache_mxJPO _paramCache,
                        final String _mxName,
                        final File _path)
-        throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException, MatrixException, ParseException
+        throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException, MatrixException, ParseException, ClassNotFoundException
     {
+        if (this.jpoExport == null)  {
+            this.jpoExport = (Class<? extends IExport_mxJPO>) TypeDef_mxJPO.fetchJPOClass(_paramCache, this.jpoExportStr);
+        }
         this.jpoExport.getConstructor().newInstance().export(_paramCache, this, _mxName, _path);
     }
 
@@ -518,21 +539,27 @@ public final class TypeDef_mxJPO
      * @param _files        files to test
      * @param _matches      matches to fulfill
      * @return map of MX names and depending files for this type definition
+     * @throws MatrixException              if fetch failed
      * @throws NoSuchMethodException        if the constructor does not exists
      * @throws InstantiationException       if a new instance of the class
-     *                                      {@link #jpoMatchMxNames} could not
+     *                                      {@link #jpoMatchFileNames} could not
      *                                      be created
      * @throws IllegalAccessException       if the constructor is not public
      * @throws InvocationTargetException    if the constructor of the
-     *                                      {@link #jpoMatchMxNames} itself
+     *                                      {@link #jpoMatchFileNames} itself
      *                                      throws an exception
      * @throws UpdateException_mxJPO        if match failed
+     * @throws ClassNotFoundException if the class for
+     *                      {@link #jpoMatchFileNamesStr} is not found
      */
     public SortedMap<String,File> matchFileNames(final ParameterCache_mxJPO _paramCache,
                                                  final Collection<File> _files,
                                                  final Collection<String> _matches)
-            throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UpdateException_mxJPO
+            throws MatrixException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, UpdateException_mxJPO, ClassNotFoundException
     {
+        if (this.jpoMatchFileNames == null)  {
+            this.jpoMatchFileNames = (Class<? extends IMatcherFileNames_mxJPO>) TypeDef_mxJPO.fetchJPOClass(_paramCache, this.jpoMatchFileNamesStr);
+        };
         return this.jpoMatchFileNames.getConstructor().newInstance().match(_paramCache, this, _files, _matches);
     }
 
@@ -545,11 +572,11 @@ public final class TypeDef_mxJPO
      * @return map of MX names and depending files for this type definition
      * @throws NoSuchMethodException        if the constructor does not exists
      * @throws InstantiationException       if a new instance of the class
-     *                                      {@link #jpoMatchMxNames} could not
+     *                                      {@link #jpoMatchFileNames} could not
      *                                      be created
      * @throws IllegalAccessException       if the constructor is not public
      * @throws InvocationTargetException    if the constructor of the
-     *                                      {@link #jpoMatchMxNames} itself
+     *                                      {@link #jpoMatchFileNames} itself
      *                                      throws an exception
      * @throws UpdateException_mxJPO        if match failed
      */
@@ -566,20 +593,25 @@ public final class TypeDef_mxJPO
      * @param _paramCache   parameter cache
      * @param _matches      matches to fulfill
      * @return set of MX names for this type definition
-     * @throws NoSuchMethodException        if the constructor does not exists
-     * @throws InstantiationException       if a new instance of the class
-     *                                      {@link #jpoMatchMxNames} could not
-     *                                      be created
-     * @throws IllegalAccessException       if the constructor is not public
-     * @throws InvocationTargetException    if the constructor of the
-     *                                      {@link #jpoMatchMxNames} itself
-     *                                      throws an exception
-     * @throws MatrixException              if fetch of Mx names failed
+     * @throws NoSuchMethodException if the constructor does not exists
+     * @throws InstantiationException if a new instance of the class
+     *                      {@link #jpoMatchMxNames} could not be created
+     * @throws IllegalAccessException if the constructor is not public
+     * @throws InvocationTargetException if the constructor of the
+     *                      {@link #jpoMatchMxNames} itself
+     *                      throws an exception
+     * @throws MatrixException if fetch of Mx names failed
+     * @throws ClassNotFoundException if the class for
+     *                      {@link #jpoMatchFileNamesStr} is not found
      */
     public SortedSet<String> matchMxNames(final ParameterCache_mxJPO _paramCache,
                                           final Collection<String> _matches)
-        throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, MatrixException
+        throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, MatrixException, ClassNotFoundException
     {
+        if (this.jpoMatchMxNames == null)  {
+            this.jpoMatchMxNames = (Class<? extends IMatcherMxNames_mxJPO>) TypeDef_mxJPO.fetchJPOClass(_paramCache, this.jpoMatchMxNamesStr);
+        }
+
         return this.jpoMatchMxNames.getConstructor().newInstance().match(_paramCache, this, _matches);
     }
 
@@ -592,12 +624,16 @@ public final class TypeDef_mxJPO
      * @param _file         file to update
      * @throws Exception if update failed
      */
+    @SuppressWarnings("unchecked")
     public void update(final ParameterCache_mxJPO _paramCache,
                        final boolean _create,
                        final String _mxName,
                        final File _file)
        throws Exception
     {
+        if (this.jpoUpdate == null)  {
+            this.jpoUpdate = (Class<? extends IUpdate_mxJPO>) TypeDef_mxJPO.fetchJPOClass(_paramCache, this.jpoUpdateStr);
+        }
         this.jpoUpdate.getConstructor().newInstance().update(_paramCache, this, _create, _mxName, _file);
     }
 

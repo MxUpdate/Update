@@ -102,7 +102,7 @@ public abstract class AbstractBusUpdateTest<BUSDATA extends AbstractBusData<?>>
         // create object
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
         final TypeDef_mxJPO typeDef = paramCache.getMapping().getTypeDef(_busData.getCI().updateType);
-        final WrapperCIInstance<?> currentWrapper = new WrapperCIInstance<>(typeDef.newTypeInstance(_busData.getName()));
+        final WrapperCIInstance<?> currentWrapper = new WrapperCIInstance<>(typeDef.newTypeInstance(paramCache, _busData.getName()));
         currentWrapper.create(paramCache);
         // create the depending objects to be able to connect to them
         _busData.createDependings();

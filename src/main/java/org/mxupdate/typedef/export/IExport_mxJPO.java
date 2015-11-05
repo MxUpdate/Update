@@ -19,11 +19,11 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.typedef.TypeDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
+
+import matrix.util.MatrixException;
 
 /**
  *
@@ -50,10 +50,11 @@ public interface IExport_mxJPO
      * @throws IllegalAccessException       initialize of type failed
      * @throws InstantiationException       initialize of type failed
      * @throws NoSuchMethodException        initialize of type failed
+     * @throws ClassNotFoundException       initialize of type failed
      */
     void export(final ParameterCache_mxJPO _paramCache,
                 final TypeDef_mxJPO _typeDef,
                 final String _mxName,
                 final File _path)
-        throws IOException, MatrixException, ParseException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException;
+        throws IOException, MatrixException, ParseException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ClassNotFoundException;
 }
