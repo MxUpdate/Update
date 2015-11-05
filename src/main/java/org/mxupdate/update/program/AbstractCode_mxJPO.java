@@ -67,10 +67,10 @@ public abstract class AbstractCode_mxJPO<CLASS extends AbstractCode_mxJPO<CLASS>
      */
     private static final String CODE_TAG_END = "]]></code>";
 
-    /**
-     * Source code of this program.
-     */
+    /** Source code of this program. */
     private String code;
+    /** File with code to update. */
+    private String file;
 
     /**
      * Constructor used to initialize the type definition enumeration and the
@@ -89,11 +89,20 @@ public abstract class AbstractCode_mxJPO<CLASS extends AbstractCode_mxJPO<CLASS>
      * Returns the {@link #code} of this program.
      *
      * @return code of this program
-     * @see #code
      */
     public String getCode()
     {
         return this.code;
+    }
+
+    /**
+     * Returns the {@link #file} of this program.
+     *
+     * @return file of this program
+     */
+    protected String getFile()
+    {
+        return this.file;
     }
 
     /**

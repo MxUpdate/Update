@@ -121,7 +121,7 @@ PARSER_END(PageParser)
  * @param _file     parsed file
  * @param _page     target page to update with parsed values
  */
-void parse(final File _file, final Page_mxJPO _page)
+void parse(final Page_mxJPO _page)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
 {
     String str;
@@ -144,7 +144,7 @@ void parse(final File _file, final Page_mxJPO _page)
       | ( <MIME>                      str = string()                            {this.setValue(_page, "mimeType", str);} )
 
       | ( <CONTENT>                   str = multiLineString()                   {this.setValue(_page, "code", str);} )
-      | ( <FILE>                      str = string()                            {this.setValue(_page, "code", this.getFileFromCode(_file, str));} )
+      | ( <FILE>                      str = string()                            {this.setValue(_page, "file", str);} )
 
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_page, "properties", "propertiesStack", property);} )
     )*

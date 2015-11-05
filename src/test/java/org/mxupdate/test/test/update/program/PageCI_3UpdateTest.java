@@ -15,10 +15,16 @@
 
 package org.mxupdate.test.test.update.program;
 
+import java.io.File;
+
+import org.apache.commons.io.FileUtils;
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.data.program.PageData;
+import org.mxupdate.test.test.update.WrapperCIInstance;
+import org.mxupdate.update.program.Page_mxJPO;
+import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeMethod;
@@ -77,23 +83,45 @@ public class PageCI_3UpdateTest
     public void positiveTestCodeUpdate(final String _code)
         throws Exception
     {
-        this.mql("add page \"" + this.createNewData("Test").getName() + "\"");
+        this.mql().cmd("escape add page ").arg(this.createNewData("Test").getName()).exec(this.getContext());
 
         final PageData page = this.createNewData("Test").setValue("content", _code).update("");
 
-        Assert.assertEquals(this.mql("print page " + page.getName() + " select content dump"), _code);
+        Assert.assertEquals(this.mql().cmd("escape print page ").arg(page.getName()).cmd(" select ").arg("content").cmd(" dump").exec(this.getContext()), _code);
 
         final ExportParser exportParser = page.export();
 
         // remove code and update via export
-        this.mql("mod page " + page.getName() + " content ''");
+        this.mql().cmd("escape mod page ").arg(page.getName()).cmd(" content ").arg("").exec(this.getContext());
         page.updateWithCode(exportParser.getCode(), "");
 
         // and check result (so that the export of code is also checked!)
-        Assert.assertEquals(this.mql("print page " + page.getName() + " select content dump"), _code);
+        Assert.assertEquals(this.mql().cmd("escape print page ").arg(page.getName()).cmd(" select ").arg("content").cmd(" dump").exec(this.getContext()), _code);
     }
 
-    @BeforeMethod()
+    /**
+     * Positive test for update with referenced file.
+     *
+     * @throws Exception if update failed
+     */
+    @Test(description = "positive test for update with referenced file")
+    public void positiveTestUpdateWithFile()
+        throws Exception
+    {
+        final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(this.getContext(), false);
+
+        final PageData page = new PageData(this, "Test").create().setValue("file", "program/mql/test.tcl");
+
+        final WrapperCIInstance<Page_mxJPO> wrapper = new WrapperCIInstance<>(new Page_mxJPO(page.getName()));
+        wrapper.parseUpdate(page);
+        wrapper.store(new File(this.getResourcesDir(), "test.mxu"), paramCache);
+
+        Assert.assertEquals(
+                this.mql().cmd("escape print page ").arg(page.getName()).cmd(" select ").arg("content").cmd(" dump").exec(this.getContext()),
+                FileUtils.readFileToString(new File(this.getResourcesDir(), "program/mql/test.tcl")).trim());
+    }
+
+    @BeforeMethod
     @AfterClass(groups = "close")
     public void cleanup()
         throws MatrixException
@@ -101,7 +129,7 @@ public class PageCI_3UpdateTest
         this.cleanup(AbstractTest.CI.PRG_PAGE);
     }
 
-    @Override()
+    @Override
     protected PageData createNewData(final String _name)
     {
         return new PageData(this, _name);

@@ -283,4 +283,31 @@ public final class FileUtils_mxJPO
         }
         return _charFileName[_idx];
     }
+
+    /**
+     * Calculates the file.
+     *
+     * @param _ciFile   ci file
+     * @param _file     file
+     * @return calculated file file
+     */
+    public static File calcFile(final File _ciFile,
+                                final String _file)
+    {
+        final File ret;
+        if (StringUtils_mxJPO.isEmpty(_file))  {
+            ret = null;
+        } else  {
+            // code via file
+            final String tmpFile;
+            // absolute path?
+            if (_file.startsWith("/"))  {
+                tmpFile = _file;
+            } else  {
+                tmpFile = _ciFile.getParent() + "/" + _file;
+            }
+            ret = new File(tmpFile);
+        }
+        return ret;
+    }
 }

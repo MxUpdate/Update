@@ -41,7 +41,7 @@ class PageParser_mxJPO
  * @param _file     parsed file
  * @param _page     target page to update with parsed values
  */
-  final public void parse(final File _file, final Page_mxJPO _page) throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {String str;
+  final public void parse(final Page_mxJPO _page) throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {String str;
     Token tmp;
     AdminProperty property;
     label_1:
@@ -114,7 +114,7 @@ this.setValue(_page, "code", str);
       case FILE:{
         jj_consume_token(FILE);
         str = string();
-this.setValue(_page, "code", this.getFileFromCode(_file, str));
+this.setValue(_page, "file", str);
         break;
         }
       case PROPERTY:{

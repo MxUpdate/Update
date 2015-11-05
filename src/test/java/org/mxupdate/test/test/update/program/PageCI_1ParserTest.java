@@ -97,8 +97,8 @@ public class PageCI_1ParserTest
                     "description \"\" mime \"\"              ",
                     "description \"\" mime \"\" content \"\" "},
             // file
-            {"8) file (as content)",
-                    "description \"\" mime \"\" content \"This is a page test.\"",
+            {"8) file (must be removed)",
+                    "description \"\" mime \"\"",
                     "file \"src/test/resources/program/page/test.page\""},
             // property
             {"20a) property special characters",

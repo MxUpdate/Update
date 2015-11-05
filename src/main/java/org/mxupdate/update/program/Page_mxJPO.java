@@ -26,6 +26,7 @@ import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.FileUtils_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 /**
@@ -65,7 +66,7 @@ public class Page_mxJPO
                             final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-        new PageParser_mxJPO(new StringReader(_code)).parse(_file, this);
+        new PageParser_mxJPO(new StringReader(_code)).parse(this);
         this.prepare();
     }
 
@@ -124,7 +125,16 @@ public class Page_mxJPO
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(),                      _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),                            _current.isHidden());
         DeltaUtil_mxJPO.calcValueDelta(_mql, "mime",                this.mimeType,                              _current.mimeType);
-        DeltaUtil_mxJPO.calcValueDelta(_mql, "content",             this.getCode(),                             _current.getCode());
+
+        // content from file if defined...
+        final String code;
+        final File realFile = FileUtils_mxJPO.calcFile(_mql.getFile(), this.getFile());
+        if (realFile == null)  {
+            code = this.getCode();
+        } else  {
+            code = FileUtils_mxJPO.readFileToString(realFile);
+        }
+        DeltaUtil_mxJPO.calcValueDelta(_mql, "content", code, _current.getCode());
 
         this.getProperties().calcDelta(_mql, "", _current.getProperties());
     }

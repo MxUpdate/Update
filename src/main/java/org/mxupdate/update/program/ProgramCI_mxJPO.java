@@ -86,9 +86,6 @@ public class ProgramCI_mxJPO
     /** Rule. */
     private String rule;
 
-    /** File with code to update. */
-    private String file;
-
     /**
      * The flag indicates that the back slashes are converted. In older MX
      * versions double back slashes was escaped. In this cases all escaped
@@ -271,18 +268,7 @@ public class ProgramCI_mxJPO
         boolean update = true;
 
         // evaluate file incl. path (if a file in the CI is defined)
-        File realFile = null;
-        if ((this.file != null) && !this.file.isEmpty())  {
-            // code via file
-            final String tmpFile;
-            // absolute path?
-            if (this.file.startsWith("/"))  {
-                tmpFile = this.file;
-            } else  {
-                tmpFile = _mql.getFile().getParent() + "/" + this.file;
-            }
-            realFile = new File(tmpFile);
-        }
+        final File realFile = FileUtils_mxJPO.calcFile(_mql.getFile(), this.getFile());
 
         // check file date
         if (_paramCache.getValueBoolean(ValueKeys.UpdateCheckFileDate) && (realFile != null))  {
@@ -315,21 +301,14 @@ public class ProgramCI_mxJPO
             DeltaUtil_mxJPO.calcFlagDelta(_mql,  "pooled",              false,  this.pooled,                        _current.pooled);
 
             final String newCode;
-            if ((this.file != null) && !this.file.isEmpty())  {
+            if (!StringUtils_mxJPO.isEmpty(this.getFile()))  {
                 // code via file
-                final String tmpFile;
-                // absolute path?
-                if (this.file.startsWith("/"))  {
-                    tmpFile = this.file;
-                } else  {
-                    tmpFile = _mql.getFile().getParent() + "/" + this.file;
-                }
                 switch (this.kind)  {
                     case JAVA:
-                        newCode = JPOUtil_mxJPO.convertJavaToJPOCode(_current.backslashUpgraded, this.getName(), FileUtils_mxJPO.readFileToString(new File(tmpFile)));
+                        newCode = JPOUtil_mxJPO.convertJavaToJPOCode(_current.backslashUpgraded, this.getName(), FileUtils_mxJPO.readFileToString(realFile));
                         break;
                     default:
-                        newCode = FileUtils_mxJPO.readFileToString(new File(tmpFile));
+                        newCode = FileUtils_mxJPO.readFileToString(realFile);
                         break;
                 }
             } else  {
