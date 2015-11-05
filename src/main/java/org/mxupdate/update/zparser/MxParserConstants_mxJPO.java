@@ -38,106 +38,106 @@ interface MxParserConstants_mxJPO {
   /** RegularExpression Id. */
   int HIDDEN_FALSE = 10;
   /** RegularExpression Id. */
-  int LABEL = 11;
+  int TREEMENU_TRUE = 11;
   /** RegularExpression Id. */
-  int ALT = 12;
+  int TREEMENU_FALSE = 12;
   /** RegularExpression Id. */
-  int HREF = 13;
+  int LABEL = 13;
   /** RegularExpression Id. */
-  int HEIGHT = 14;
+  int ALT = 14;
   /** RegularExpression Id. */
-  int USER = 15;
+  int HREF = 15;
   /** RegularExpression Id. */
-  int SETTING = 16;
+  int HEIGHT = 16;
   /** RegularExpression Id. */
-  int ARGUMENT = 17;
+  int USER = 17;
   /** RegularExpression Id. */
-  int COMMAND = 18;
+  int SETTING = 18;
   /** RegularExpression Id. */
-  int PATTERN = 19;
+  int ARGUMENT = 19;
   /** RegularExpression Id. */
-  int FORMAT = 20;
+  int COMMAND = 20;
   /** RegularExpression Id. */
-  int CODE = 21;
+  int MENU = 21;
   /** RegularExpression Id. */
-  int STRING_STRING_STRING = 22;
+  int PATTERN = 22;
   /** RegularExpression Id. */
-  int STRING_STRING_SINGLE = 23;
+  int FORMAT = 23;
   /** RegularExpression Id. */
-  int STRING = 24;
+  int CODE = 24;
   /** RegularExpression Id. */
-  int SINGLE = 25;
+  int STRING_STRING_STRING = 25;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 26;
+  int STRING_STRING_SINGLE = 26;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 27;
+  int STRING = 27;
   /** RegularExpression Id. */
-  int NATURALNUMBER = 28;
+  int SINGLE = 28;
   /** RegularExpression Id. */
-  int FIELD = 29;
+  int MULTILINESTRING = 29;
   /** RegularExpression Id. */
-  int FIELD_OPEN = 30;
+  int MULTILINESINGLE = 30;
   /** RegularExpression Id. */
-  int FIELD_CLOSE = 31;
+  int NATURALNUMBER = 31;
   /** RegularExpression Id. */
-  int FIELD_NAME = 32;
+  int FIELD = 32;
   /** RegularExpression Id. */
-  int FIELD_LABEL = 33;
+  int FIELD_OPEN = 33;
   /** RegularExpression Id. */
-  int FIELD_SELECT = 34;
+  int FIELD_CLOSE = 34;
   /** RegularExpression Id. */
-  int FIELD_BOBJ = 35;
+  int FIELD_NAME = 35;
   /** RegularExpression Id. */
-  int FIELD_REL = 36;
+  int FIELD_LABEL = 36;
   /** RegularExpression Id. */
-  int FIELD_RANGE = 37;
+  int FIELD_SELECT = 37;
   /** RegularExpression Id. */
-  int FIELD_HREF = 38;
+  int FIELD_BOBJ = 38;
   /** RegularExpression Id. */
-  int FIELD_ALT = 39;
+  int FIELD_REL = 39;
   /** RegularExpression Id. */
-  int FIELD_USER = 40;
+  int FIELD_RANGE = 40;
   /** RegularExpression Id. */
-  int FIELD_SETTING = 41;
+  int FIELD_HREF = 41;
   /** RegularExpression Id. */
-  int FIELD_STRING = 42;
+  int FIELD_ALT = 42;
   /** RegularExpression Id. */
-  int FIELD_SINGLE = 43;
+  int FIELD_USER = 43;
   /** RegularExpression Id. */
-  int FIELD_SETTING_STRING = 44;
+  int FIELD_SETTING = 44;
   /** RegularExpression Id. */
-  int FIELD_SETTING_SINGLE = 45;
+  int FIELD_STRING = 45;
   /** RegularExpression Id. */
-  int PROPERTY = 46;
+  int FIELD_SINGLE = 46;
   /** RegularExpression Id. */
-  int PROPERTYTO = 47;
+  int FIELD_SETTING_STRING = 47;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 48;
+  int FIELD_SETTING_SINGLE = 48;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 49;
+  int PROPERTY = 49;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 50;
+  int PROPERTYTO = 50;
+  /** RegularExpression Id. */
+  int PROPERTYVAL = 51;
 
   /** Lexical state. */
-  int ADMINREF_EXPECTED = 0;
+  int FIELD_SETTING_EXPECTED = 0;
   /** Lexical state. */
-  int FIELD_SETTING_EXPECTED = 1;
+  int FIELD_STRING_EXPECTED = 1;
   /** Lexical state. */
-  int FIELD_STRING_EXPECTED = 2;
+  int FIELD_EXPECTED = 2;
   /** Lexical state. */
-  int FIELD_EXPECTED = 3;
+  int FIELD_OPENEXPECTED = 3;
   /** Lexical state. */
-  int FIELD_OPENEXPECTED = 4;
+  int NATURALNUMBER_EXPECTED = 4;
   /** Lexical state. */
-  int NATURALNUMBER_EXPECTED = 5;
+  int MULTILINESTRING_EXPECTED = 5;
   /** Lexical state. */
-  int MULTILINESTRING_EXPECTED = 6;
+  int STRING_EXPECTED = 6;
   /** Lexical state. */
-  int STRING_EXPECTED = 7;
+  int STRING_STRING_EXPECTED = 7;
   /** Lexical state. */
-  int STRING_STRING_EXPECTED = 8;
-  /** Lexical state. */
-  int DEFAULT = 9;
+  int DEFAULT = 8;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -152,6 +152,8 @@ interface MxParserConstants_mxJPO {
     "\"description\"",
     "\"hidden\"",
     "\"!hidden\"",
+    "\"treemenu\"",
+    "\"!treemenu\"",
     "\"label\"",
     "\"alt\"",
     "\"href\"",
@@ -160,6 +162,7 @@ interface MxParserConstants_mxJPO {
     "<SETTING>",
     "\"argument\"",
     "<COMMAND>",
+    "<MENU>",
     "\"pattern\"",
     "\"format\"",
     "\"code\"",
@@ -190,8 +193,6 @@ interface MxParserConstants_mxJPO {
     "\"property\"",
     "\"to\"",
     "\"value\"",
-    "<ADMINTYPE_STRING>",
-    "<ADMINTYPE_SINGLE>",
   };
 
 }
