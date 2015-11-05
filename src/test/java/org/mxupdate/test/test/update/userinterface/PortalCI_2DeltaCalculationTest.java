@@ -16,6 +16,7 @@
 package org.mxupdate.test.test.update.userinterface;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.userinterface.PortalData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.userinterface.Portal_mxJPO;
@@ -41,12 +42,24 @@ public class PortalCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1) simple test",
+            {"0) simple test",
                     new PortalData(this, "Portal1"),
                     new PortalData(this, "Portal1").setValue("description", "test").setValue("label", "").setValue("href", "").setValue("alt", "")},
+            // package
+            {"1a) new package",
+                    new PortalData(this, "Test"),
+                    new PortalData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new PortalData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new PortalData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new PortalData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new PortalData(this, "Test").defKeyNotDefined("package")},
+            // uuid
             {"2) uuid",
                     new PortalData(this, "Test"),
                     new PortalData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
+            // symbolic names
             {"3a) symbolic name",
                     new PortalData(this, "Test"),
                     new PortalData(this, "Test").setValue("symbolicname", "expression_123")},
@@ -58,11 +71,12 @@ public class PortalCI_2DeltaCalculationTest
 
     @Override
     @BeforeMethod
-    @AfterClass(groups = "close" )
+    @AfterClass
     public void cleanup()
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.UI_PORTAL);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override

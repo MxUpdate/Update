@@ -26,49 +26,51 @@ public interface PortalParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int UUID = 5;
+  int PACKAGE = 5;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 6;
+  int UUID = 6;
   /** RegularExpression Id. */
-  int DESCRIPTION = 7;
+  int SYMBOLICNAME = 7;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 8;
+  int DESCRIPTION = 8;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 9;
+  int HIDDEN_TRUE = 9;
   /** RegularExpression Id. */
-  int ALT = 10;
+  int HIDDEN_FALSE = 10;
   /** RegularExpression Id. */
-  int HREF = 11;
+  int ALT = 11;
   /** RegularExpression Id. */
-  int LABEL = 12;
+  int HREF = 12;
   /** RegularExpression Id. */
-  int SETTING = 13;
+  int LABEL = 13;
   /** RegularExpression Id. */
-  int CHANNEL = 14;
+  int SETTING = 14;
   /** RegularExpression Id. */
-  int NEWROW = 15;
+  int CHANNEL = 15;
   /** RegularExpression Id. */
-  int STRING = 16;
+  int NEWROW = 16;
   /** RegularExpression Id. */
-  int SINGLE = 17;
+  int STRING = 17;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 18;
+  int SINGLE = 18;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 19;
+  int MULTILINESTRING = 19;
   /** RegularExpression Id. */
-  int SETTING_STRING = 20;
+  int MULTILINESINGLE = 20;
   /** RegularExpression Id. */
-  int SETTING_SINGLE = 21;
+  int SETTING_STRING = 21;
   /** RegularExpression Id. */
-  int PROPERTY = 22;
+  int SETTING_SINGLE = 22;
   /** RegularExpression Id. */
-  int PROPERTYTO = 23;
+  int PROPERTY = 23;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 24;
+  int PROPERTYTO = 24;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 25;
+  int PROPERTYVAL = 25;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 26;
+  int ADMINTYPE_STRING = 26;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 27;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
@@ -88,6 +90,7 @@ public interface PortalParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"package\"",
     "\"uuid\"",
     "\"symbolicname\"",
     "\"description\"",
