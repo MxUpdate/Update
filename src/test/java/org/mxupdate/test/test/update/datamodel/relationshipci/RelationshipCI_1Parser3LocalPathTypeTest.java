@@ -83,8 +83,36 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
+            // package
+            {"2a) package string",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local pathtype \"PathType\" { "
+                                    + "package \"abc\" description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "}"},
+            {"2b) package single",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local pathtype \"PathType\" { "
+                                    + "package \"abc\" description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "}",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local pathtype \"PathType\" { "
+                                    + "package abc     description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to   { } "
+                            + "}"},
             // uuid
-            {"2a) local path type uuid with minus separator",
+            {"3a) local path type uuid with minus separator",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -94,7 +122,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"2b) local path type uuid w/o minus separator",
+            {"3b) local path type uuid w/o minus separator",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -104,7 +132,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"2c) local path type uuid convert from single to string",
+            {"3c) local path type uuid convert from single to string",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -122,7 +150,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                             + "}"},
             // registered name
-            {"3a) local path type: symbolic name",
+            {"4a) local path type: symbolic name",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -132,7 +160,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"3b) local path type: two symbolic names",
+            {"4b) local path type: two symbolic names",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -150,7 +178,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                             + "}"},
             // description
-            {"4a) local path type: description",
+            {"5a) local path type: description",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -160,7 +188,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"4b) local path type: description not defined",
+            {"5b) local path type: description not defined",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
                             + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -177,7 +205,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"4c) local path type: multi-line description ",
+            {"5c) local path type: multi-line description ",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -187,7 +215,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "from { cardinality many } "
                                     + "to   { } "
                             + "}"},
-            {"4d) local path type: tab's in description",
+            {"5d) local path type: tab's in description",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -247,8 +275,39 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                                     + "attribute \"222\" attribute \"111\" "
                             + "}"},
+            // package
+            {"12a) package string",
+                    "",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local pathtype \"PathType\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to { } "
+                                    + "local attribute \"ATTRNAME\" { package \"abc\" kind binary  description \"\" !hidden !resetonclone !resetonrevision default \"\" } "
+                            + "}"},
+            {"12b) package single",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local pathtype \"PathType\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to { } "
+                                    + "local attribute \"ATTRNAME\" { package \"abc\" kind binary  description \"\" !hidden !resetonclone !resetonrevision default \"\" } "
+                            + "}",
+                    "description \"\" !hidden !preventduplicates "
+                            + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "to   { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
+                            + "local pathtype \"PathType\" { "
+                                    + "description \"\" !hidden "
+                                    + "from { cardinality many } "
+                                    + "to { } "
+                                    + "local attribute \"ATTRNAME\" { package abc     kind binary  description \"\" !hidden !resetonclone !resetonrevision default \"\" } "
+                            + "}"},
             // property
-            {"12a) local path type: property special characters",
+            {"13a) local path type: property special characters",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -259,7 +318,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                                     + "property \"{}\\\"\" "
                             + "}"},
-            {"12b) local path type: property and value special characters",
+            {"13b) local path type: property and value special characters",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -270,7 +329,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                                     + "property \"{}\\\"\" value \"{}\\\"\" "
                             + "}"},
-            {"12c) local path type: property link special characters",
+            {"13c) local path type: property link special characters",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "
@@ -281,7 +340,7 @@ public class RelationshipCI_1Parser3LocalPathTypeTest
                                     + "to   { } "
                                     + "property \"{}\\\"\" to type \"{}\\\"\" "
                             + "}"},
-            {"12d) local path type: property link and value special characters",
+            {"13d) local path type: property link and value special characters",
                     "",
                     "description \"\" !hidden !preventduplicates "
                             + "from { meaning \"\" cardinality many revision none clone none !propagatemodify !propagateconnection } "

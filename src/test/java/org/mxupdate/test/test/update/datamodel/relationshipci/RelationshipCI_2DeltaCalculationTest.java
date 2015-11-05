@@ -20,6 +20,7 @@ import org.mxupdate.test.data.datamodel.AttributeData;
 import org.mxupdate.test.data.datamodel.PathTypeData;
 import org.mxupdate.test.data.datamodel.RelationshipData;
 import org.mxupdate.test.data.datamodel.TypeData;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.Relationship_mxJPO;
@@ -45,16 +46,27 @@ public class RelationshipCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1) uuid",
+            // package
+            {"1a) new package",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new RelationshipData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new RelationshipData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new RelationshipData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new RelationshipData(this, "Test").defKeyNotDefined("package")},
+            // uuid
+            {"2) uuid",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
-            {"2a) symbolic name",
+            {"3a) symbolic name",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test").setValue("symbolicname", "expression_123")},
-            {"2b) two symbolic name",
+            {"3b) two symbolic name",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
-            {"3) description",
+            {"4) description",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test").setValue("description", "abc def")},
             // derived
@@ -181,7 +193,7 @@ public class RelationshipCI_2DeltaCalculationTest
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test").to().defFlag("propagateconnection", false)},
 
-            {"101) binary attribute",
+            {"101) local binary attribute",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalAttribute(
@@ -192,7 +204,7 @@ public class RelationshipCI_2DeltaCalculationTest
                                         .setFlag("resetonclone", false, Create.ViaFlag)
                                         .setFlag("resetonrevision", false, Create.ViaFlag)
                                         .setValue("default", "")) },
-            {"102) boolean attribute",
+            {"102) local boolean attribute",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalAttribute(
@@ -204,7 +216,7 @@ public class RelationshipCI_2DeltaCalculationTest
                                         .setFlag("resetonclone", false, Create.ViaFlag)
                                         .setFlag("resetonrevision", false, Create.ViaFlag)
                                         .setValue("default", "")) },
-            {"103) date attribute",
+            {"103) local date attribute",
                     new TypeData(this, "Test"),
                     new TypeData(this, "Test")
                             .addLocalAttribute(
@@ -217,7 +229,7 @@ public class RelationshipCI_2DeltaCalculationTest
                                         .setFlag("resetonrevision", false, Create.ViaFlag)
                                         .setFlag("rangevalue", false, Create.ViaFlag)
                                         .setValue("default", "")) },
-            {"104) integer attribute",
+            {"104) local integer attribute",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalAttribute(
@@ -230,7 +242,7 @@ public class RelationshipCI_2DeltaCalculationTest
                                         .setFlag("resetonrevision", false, Create.ViaFlag)
                                         .setFlag("rangevalue", false, Create.ViaFlag)
                                         .setValue("default", "")) },
-            {"105) real attribute",
+            {"105) local real attribute",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalAttribute(
@@ -243,7 +255,7 @@ public class RelationshipCI_2DeltaCalculationTest
                                         .setFlag("resetonrevision", false, Create.ViaFlag)
                                         .setFlag("rangevalue", false, Create.ViaFlag)
                                         .setValue("default", "")) },
-            {"106) string attribute",
+            {"106) local string attribute",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalAttribute(
@@ -257,7 +269,65 @@ public class RelationshipCI_2DeltaCalculationTest
                                         .setFlag("multiline", false, Create.ViaFlag)
                                         .setSingle("maxlength", "0")
                                         .setValue("default", "")) },
-            {"107) attribute with uuid",
+            {"107a) local attribute with new package",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .defData("package", new PackageData(this, "TestPackage"))
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", ""))},
+            {"107b) local attribute with package update",
+                    new RelationshipData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .defData("package", new PackageData(this, "TestPackage1"))
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")),
+                    new RelationshipData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .defData("package", new PackageData(this, "TestPackage2"))
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", ""))},
+            {"107c) local attribute with package remove",
+                    new RelationshipData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .defData("package", new PackageData(this, "TestPackage"))
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", "")),
+                    new RelationshipData(this, "Test")
+                            .addLocalAttribute(
+                                    new AttributeData(this, "ATTR1")
+                                        .setSingle("kind", "boolean")
+                                        .setValue("description", "")
+                                        .setFlag("hidden", false, Create.ViaFlag)
+                                        .setFlag("multivalue", false, Create.ViaFlag)
+                                        .setFlag("resetonclone", false, Create.ViaFlag)
+                                        .setFlag("resetonrevision", false, Create.ViaFlag)
+                                        .setValue("default", ""))},
+            {"108) local attribute with uuid",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalAttribute(
@@ -270,7 +340,7 @@ public class RelationshipCI_2DeltaCalculationTest
                                         .setFlag("resetonclone", false, Create.ViaFlag)
                                         .setFlag("resetonrevision", false, Create.ViaFlag)
                                         .setValue("default", "")) },
-            {"108) attribute with symbolic names",
+            {"109) local attribute with symbolic names",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalAttribute(
@@ -291,23 +361,109 @@ public class RelationshipCI_2DeltaCalculationTest
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalPathType(new PathTypeData(this, "PathType").def4FromSingle("cardinality", "many")) },
-            {"302) local path type with uuid",
+            {"302a) local path type with new package",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .defData("package", new PackageData(this, "TestPackage"))
+                                    .def4FromSingle("cardinality", "many")) },
+            {"302b) local path type with package update",
+                    new RelationshipData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .defData("package", new PackageData(this, "TestPackage1"))
+                                    .def4FromSingle("cardinality", "many")),
+                    new RelationshipData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .defData("package", new PackageData(this, "TestPackage2"))
+                                    .def4FromSingle("cardinality", "many")) },
+            {"302c) local path type with package remove",
+                    new RelationshipData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                        .defData("package", new PackageData(this, "TestPackage1"))
+                                        .def4FromSingle("cardinality", "many")),
+                    new RelationshipData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                        .def4FromSingle("cardinality", "many")) },
+            {"303) local path type with uuid",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalPathType(new PathTypeData(this, "PathType").setValue("uuid", "UUID").def4FromSingle("cardinality", "many")) },
-            {"303) local path type with global attribute",
+            {"304) local path type with global attribute",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalPathType(new PathTypeData(this, "PathType")
                                     .def4FromSingle("cardinality", "many")
                                     .defData("attribute", new AttributeData(this, "PathType Attribute").setSingle("kind", "string"))) },
-            {"304a) local path type with embedded local attribute",
+            {"310) local path type with embedded local attribute",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalPathType(new PathTypeData(this, "PathType")
                                     .def4FromSingle("cardinality", "many")
                                     .addLocalAttribute(new AttributeData(this, "PathType Attribute").setSingle("kind", "string"))) },
-            {"304b) local path type with embedded local attribute with uuid",
+            {"311a) local path type with embedded local attribute with new package",
+                    new RelationshipData(this, "Test"),
+                    new RelationshipData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .def4FromSingle("cardinality", "many")
+                                    .addLocalAttribute(new AttributeData(this, "ATTR1")
+                                            .defData("package", new PackageData(this, "TestPackage"))
+                                            .setSingle("kind", "boolean")
+                                            .setValue("description", "")
+                                            .setFlag("hidden", false, Create.ViaFlag)
+                                            .setFlag("multivalue", false, Create.ViaFlag)
+                                            .setFlag("resetonclone", false, Create.ViaFlag)
+                                            .setFlag("resetonrevision", false, Create.ViaFlag)
+                                            .setValue("default", "")))},
+            {"311b) local path type with embedded local attribute with package update",
+                    new RelationshipData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .def4FromSingle("cardinality", "many")
+                                    .addLocalAttribute(new AttributeData(this, "ATTR1")
+                                            .defData("package", new PackageData(this, "TestPackage1"))
+                                            .setSingle("kind", "boolean")
+                                            .setValue("description", "")
+                                            .setFlag("hidden", false, Create.ViaFlag)
+                                            .setFlag("multivalue", false, Create.ViaFlag)
+                                            .setFlag("resetonclone", false, Create.ViaFlag)
+                                            .setFlag("resetonrevision", false, Create.ViaFlag)
+                                            .setValue("default", ""))),
+                    new RelationshipData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .def4FromSingle("cardinality", "many")
+                                    .addLocalAttribute(new AttributeData(this, "ATTR1")
+                                            .defData("package", new PackageData(this, "TestPackage2"))
+                                            .setSingle("kind", "boolean")
+                                            .setValue("description", "")
+                                            .setFlag("hidden", false, Create.ViaFlag)
+                                            .setFlag("multivalue", false, Create.ViaFlag)
+                                            .setFlag("resetonclone", false, Create.ViaFlag)
+                                            .setFlag("resetonrevision", false, Create.ViaFlag)
+                                            .setValue("default", "")))},
+            {"311c) local path type with embedded local attribute with package remove",
+                    new RelationshipData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .def4FromSingle("cardinality", "many")
+                                    .addLocalAttribute(new AttributeData(this, "ATTR1")
+                                            .defData("package", new PackageData(this, "TestPackage"))
+                                            .setSingle("kind", "boolean")
+                                            .setValue("description", "")
+                                            .setFlag("hidden", false, Create.ViaFlag)
+                                            .setFlag("multivalue", false, Create.ViaFlag)
+                                            .setFlag("resetonclone", false, Create.ViaFlag)
+                                            .setFlag("resetonrevision", false, Create.ViaFlag)
+                                            .setValue("default", ""))),
+                    new RelationshipData(this, "Test")
+                            .addLocalPathType(new PathTypeData(this, "PathType")
+                                    .def4FromSingle("cardinality", "many")
+                                    .addLocalAttribute(new AttributeData(this, "ATTR1")
+                                            .setSingle("kind", "boolean")
+                                            .setValue("description", "")
+                                            .setFlag("hidden", false, Create.ViaFlag)
+                                            .setFlag("multivalue", false, Create.ViaFlag)
+                                            .setFlag("resetonclone", false, Create.ViaFlag)
+                                            .setFlag("resetonrevision", false, Create.ViaFlag)
+                                            .setValue("default", "")))},
+            {"312a) local path type with embedded local attribute with uuid",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalPathType(new PathTypeData(this, "PathType")
@@ -315,7 +471,7 @@ public class RelationshipCI_2DeltaCalculationTest
                                     .addLocalAttribute(new AttributeData(this, "PathType Attribute")
                                             .setSingle("kind", "string")
                                             .setValue("uuid", "UUID")))},
-            {"304c) local path type with embedded local attribute with uuid",
+            {"312b) local path type with embedded local attribute with symbolic names",
                     new RelationshipData(this, "Test"),
                     new RelationshipData(this, "Test")
                             .addLocalPathType(new PathTypeData(this, "PathType")
@@ -335,6 +491,8 @@ public class RelationshipCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.DM_PATHTYPE); // as first, so that local attributes of path types are deleted!
         this.cleanup(AbstractTest.CI.DM_RELATIONSHIP);
         this.cleanup(AbstractTest.CI.DM_TYPE);
+        this.cleanup(AbstractTest.CI.DM_ATTRIBUTE);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override

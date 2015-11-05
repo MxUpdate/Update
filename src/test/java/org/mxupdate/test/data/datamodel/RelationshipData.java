@@ -203,12 +203,11 @@ public class RelationshipData
     {
         super.createDependings();
 
-        this.rules.createDependings();
-
-        this.from.datas.createDependings();
-        this.to.datas.createDependings();
-
-        this.localPathTypes.createDependings();
+        this.rules          .createDependings();
+        this.from.datas     .createDependings();
+        this.to.datas       .createDependings();
+        this.localAttributes.createDependings();
+        this.localPathTypes .createDependings();
 
         return this;
     }
