@@ -15,15 +15,14 @@
 
 package org.mxupdate.update;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
 import matrix.util.MatrixException;
 
@@ -55,7 +54,6 @@ public abstract class AbstractObject_mxJPO<CLASS extends AbstractObject_mxJPO<CL
     /**
      * Parses the given {@code _code} and updates this data instance.
      *
-     * @param _file     file which holds the code to parse
      * @param _code     code to parse
      * @throws SecurityException
      * @throws IllegalArgumentException
@@ -65,8 +63,7 @@ public abstract class AbstractObject_mxJPO<CLASS extends AbstractObject_mxJPO<CL
      * @throws InvocationTargetException
      * @throws ParseException
      */
-    public abstract void parseUpdate(final File _file,
-                                     final String _code)
+    public abstract void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException;
 
     /**

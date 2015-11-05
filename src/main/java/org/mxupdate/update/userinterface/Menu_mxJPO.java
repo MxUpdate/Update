@@ -15,7 +15,6 @@
 
 package org.mxupdate.update.userinterface;
 
-import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashSet;
@@ -81,8 +80,7 @@ public class Menu_mxJPO
     }
 
     @Override
-    public void parseUpdate(final File _file,
-                            final String _code)
+    public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
         new MenuParser_mxJPO(new StringReader(_code)).parse(this);

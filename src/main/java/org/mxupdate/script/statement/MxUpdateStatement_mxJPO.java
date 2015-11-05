@@ -103,7 +103,7 @@ public class MxUpdateStatement_mxJPO
         throws Exception
     {
         final AbstractAdminObject_mxJPO<?> target  = _mxClass.newTypeInstance(_mxName);
-        target.parseUpdate(_file, this.code);
+        target.parseUpdate(this.code);
         if (!_mxClass.exist(_paramCache, _mxName))  {
             _paramCache.logDebug("    - create");
             target.create(_paramCache);
@@ -182,7 +182,7 @@ public class MxUpdateStatement_mxJPO
         }
 
         final BusObject_mxJPO target = (BusObject_mxJPO) typeDef.newTypeInstance(_paramCache, _mxName + BusObject_mxJPO.SPLIT_NAME + _mxRevision);
-        target.parseUpdate(_file, this.code);
+        target.parseUpdate(this.code);
 
         final BusObject_mxJPO current = new BusObject_mxJPO(typeDef, target.getBusType(), target.getBusName(), target.getBusRevision());
         current.parse(_paramCache);

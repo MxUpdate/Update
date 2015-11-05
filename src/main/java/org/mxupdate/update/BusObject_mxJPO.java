@@ -15,7 +15,6 @@
 
 package org.mxupdate.update;
 
-import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Comparator;
@@ -415,9 +414,8 @@ public class BusObject_mxJPO
         return this.attrValues;
     }
 
-    @Override()
-    public void parseUpdate(final File _file,
-                            final String _code)
+    @Override
+    public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
         new BusObjectParser_mxJPO(new StringReader(_code)).parse(this);

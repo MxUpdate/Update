@@ -15,14 +15,13 @@
 
 package org.mxupdate.test.ci.program;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.update.program.AbstractCode_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
+import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
@@ -130,8 +129,7 @@ public class TestOldXMLExportEncoding
         }
 
         @Override()
-        public void parseUpdate(final File _file,
-                                final String _code)
+        public void parseUpdate(final String _code)
             throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
         {
             // TODO Auto-generated method stub
