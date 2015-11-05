@@ -26,58 +26,60 @@ interface ChannelParserConstants_mxJPO {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int UUID = 5;
+  int PACKAGE = 5;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 6;
+  int UUID = 6;
   /** RegularExpression Id. */
-  int DESCRIPTION = 7;
+  int SYMBOLICNAME = 7;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 8;
+  int DESCRIPTION = 8;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 9;
+  int HIDDEN_TRUE = 9;
   /** RegularExpression Id. */
-  int LABEL = 10;
+  int HIDDEN_FALSE = 10;
   /** RegularExpression Id. */
-  int ALT = 11;
+  int LABEL = 11;
   /** RegularExpression Id. */
-  int HREF = 12;
+  int ALT = 12;
   /** RegularExpression Id. */
-  int HEIGHT = 13;
+  int HREF = 13;
   /** RegularExpression Id. */
-  int SETTING = 14;
+  int HEIGHT = 14;
   /** RegularExpression Id. */
-  int COMMAND = 15;
+  int SETTING = 15;
   /** RegularExpression Id. */
-  int STRING = 16;
+  int COMMAND = 16;
   /** RegularExpression Id. */
-  int SINGLE = 17;
+  int STRING = 17;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 18;
+  int SINGLE = 18;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 19;
+  int MULTILINESTRING = 19;
   /** RegularExpression Id. */
-  int INTEGER = 20;
+  int MULTILINESINGLE = 20;
   /** RegularExpression Id. */
-  int SETTING_STRING = 21;
+  int NATURALNUMBER = 21;
   /** RegularExpression Id. */
-  int SETTING_SINGLE = 22;
+  int SETTING_STRING = 22;
   /** RegularExpression Id. */
-  int PROPERTY = 23;
+  int SETTING_SINGLE = 23;
   /** RegularExpression Id. */
-  int PROPERTYTO = 24;
+  int PROPERTY = 24;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 25;
+  int PROPERTYTO = 25;
   /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 26;
+  int PROPERTYVAL = 26;
   /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 27;
+  int ADMINTYPE_STRING = 27;
+  /** RegularExpression Id. */
+  int ADMINTYPE_SINGLE = 28;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
   /** Lexical state. */
   int SETTING_EXPECTED = 1;
   /** Lexical state. */
-  int INTEGER_EXPECTED = 2;
+  int NATURALNUMBER_EXPECTED = 2;
   /** Lexical state. */
   int MULTILINESTRING_EXPECTED = 3;
   /** Lexical state. */
@@ -92,6 +94,7 @@ interface ChannelParserConstants_mxJPO {
     "\"\\t\"",
     "\"\\n\"",
     "<token of kind 4>",
+    "\"package\"",
     "\"uuid\"",
     "\"symbolicname\"",
     "\"description\"",
@@ -107,7 +110,7 @@ interface ChannelParserConstants_mxJPO {
     "<SINGLE>",
     "<MULTILINESTRING>",
     "<MULTILINESINGLE>",
-    "<INTEGER>",
+    "<NATURALNUMBER>",
     "<SETTING_STRING>",
     "<SETTING_SINGLE>",
     "\"property\"",

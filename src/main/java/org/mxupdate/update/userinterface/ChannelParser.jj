@@ -14,7 +14,7 @@
  */
 
 options {
-    JDK_VERSION = "1.6";
+    JDK_VERSION = "1.7";
     STATIC = false;
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
@@ -69,7 +69,9 @@ PARSER_END(ChannelParser)
 
 TOKEN : /** first level */
 {
-      <UUID:                                "uuid">                                         : STRING_EXPECTED
+      <PACKAGE:                             "package">                                      : STRING_EXPECTED
+
+    | <UUID:                                "uuid">                                         : STRING_EXPECTED
 
     | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
@@ -84,7 +86,7 @@ TOKEN : /** first level */
 
     | <HREF:                                "href">                                         : STRING_EXPECTED
 
-    | <HEIGHT:                              "height">                                       : INTEGER_EXPECTED
+    | <HEIGHT:                              "height">                                       : NATURALNUMBER_EXPECTED
 
     | <SETTING:                             ("add" ([" ","\t","\n","\r"])+ )? "setting">    : SETTING_EXPECTED
 
@@ -106,9 +108,9 @@ TOKEN : /** first level */
 }
 
 /************************************************************* Common Integer */
-<INTEGER_EXPECTED> TOKEN :
+<NATURALNUMBER_EXPECTED> TOKEN :
 {
-      <INTEGER: (("0") | (["1"-"9"](["0"-"9"])*))> : DEFAULT
+      <NATURALNUMBER: (("0") | (["1"-"9"](["0"-"9"])*))> : DEFAULT
 }
 
 /********************************************************* Setting Key String */
@@ -140,57 +142,122 @@ TOKEN : /** first level */
  * @param _channel     target menu to update with parsed values
  */
 void parse(Channel_mxJPO _channel)
-    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
-: {
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
     Token tmp;
     AdminProperty property;
     CommandRef ref;
+    Integer number;
     int refIdx = 0;
-} {
-    (   ( <UUID>                                               {property = new AdminProperty();
-                                                                this.appendValue(this.getValue(_channel, "properties"), "propertiesStack", property);
-                                                                this.setValue(property, "name",  "UUID");}
-                                    ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_channel, "packageRef", str);} )
 
-      | ( <SYMBOLICNAME>            ( tmp = <STRING>           {this.appendValue(_channel, "symbolicNames", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.appendValue(_channel, "symbolicNames", this.getSingle(tmp.image));} ) )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_channel, "properties", "propertiesStack", property);} )
 
-      | (<DESCRIPTION>              ( tmp = <MULTILINESTRING>  {this.setValue(_channel, "description", this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>  {this.setValue(_channel, "description", this.getSingle(tmp.image));} ) )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_channel, "symbolicNames", str);} )
 
-      | (<HIDDEN_TRUE>                                         {this.setValue(_channel, "hidden", true);} )
-      | (<HIDDEN_FALSE>                                        {this.setValue(_channel, "hidden", false);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_channel, "description", str);} )
 
-      | (<LABEL>                    ( tmp = <STRING>           {this.setValue(_channel, "label", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_channel, "label", this.getSingle(tmp.image));} ) )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_channel, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_channel, "hidden", false);} )
 
-      | (<ALT>                      ( tmp = <STRING>           {this.setValue(_channel, "alt", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_channel, "alt", this.getSingle(tmp.image));} ) )
+      | ( <LABEL>                     str = string()                            {this.setValue(_channel, "label", str);} )
 
-      | (<HREF>                     ( tmp = <STRING>           {this.setValue(_channel, "href", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(_channel, "href", this.getSingle(tmp.image));} ) )
+      | ( <ALT>                       str = string()                            {this.setValue(_channel, "alt", str);} )
 
-      | (<HEIGHT>                   tmp = <INTEGER>            {this.setValue(_channel, "height", Integer.valueOf(tmp.image));} )
+      | ( <HREF>                      str = string()                            {this.setValue(_channel, "href", str);} )
 
-      | (<SETTING>                                             {property = new AdminProperty();this.appendValue(this.getValue(_channel, "properties"), "propertiesStack", property);}
-                                    ( tmp = <SETTING_STRING>   {this.setValue(property, "name", "%" + this.getString(tmp.image));}
-                                    | tmp = <SETTING_SINGLE>   {this.setValue(property, "name", "%" + this.getSingle(tmp.image));})
-                                    ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+      | ( <HEIGHT>                    number = naturalNumber()                  {this.setValue(_channel, "height", number);} )
 
-      | (<COMMAND>                                             {ref = new CommandRef();this.setValue(ref, "column", refIdx++);this.appendValue(this.getValue(_channel, "children"), "childrenStack", ref);}
-                                    ( tmp = <STRING>           {this.setValue(ref, "name", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(ref, "name", this.getString(tmp.image));} ) )
+      | ( <SETTING>                                                             {property = new AdminProperty();this.appendValue(_channel, "properties", "propertiesStack", property);}
+                                    ( tmp = <SETTING_STRING>                    {this.setValue(property, "name", "%" + this.getString(tmp.image));}
+                                    | tmp = <SETTING_SINGLE>                    {this.setValue(property, "name", "%" + this.getSingle(tmp.image));})
+                                      str = string()                            {this.setValue(property, "value", str);} )
 
-      | (<PROPERTY>                                            {property = new AdminProperty();this.appendValue(this.getValue(_channel, "properties"), "propertiesStack", property);}
-                                    ( tmp = <STRING>           {this.setValue(property, "name", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(property, "name", this.getSingle(tmp.image));} )
-              (   ( <PROPERTYVAL>   ( tmp = <STRING>           {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING> {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                    | tmp = <ADMINTYPE_SINGLE> {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                    ( tmp = <STRING>           {this.setValue(property, "refAdminName", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>           {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+      | ( <COMMAND>                   str = string()                            {ref = new CommandRef();this.setValue(ref, "column", refIdx++);this.appendValue(_channel, "children", "childrenStack", ref);this.setValue(ref, "name", str);} )
+
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_channel, "properties", "propertiesStack", property);} )
     )*
+}
+
+/**
+ * Parses the UUID property definition.
+ */
+AdminProperty uuidProperty() :
+{
+    String str;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()
+    {this.setValue(property, "value", str);}
+    {this.setValue(property, "name",  "UUID");}
+    {return property;}
+}
+
+/**
+ * Parses the properties definition.
+ */
+AdminProperty property() :
+{
+    String str;
+    Token tmp;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()                                 {this.setValue(property, "name", str);}
+    ( ( <PROPERTYVAL>  str = string()              {this.setValue(property, "value", str);} )
+    | ( <PROPERTYTO>   ( tmp = <ADMINTYPE_STRING>  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                       | tmp = <ADMINTYPE_SINGLE>  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                   str = string()  {this.setValue(property, "refAdminName", str);} ) )*
+    {return property;}
+}
+
+/**
+ * Evaluates integer value.
+ *
+ * @return integer
+ */
+Integer naturalNumber() :
+{
+    Token tmp;
+}
+{
+    tmp = <NATURALNUMBER>
+    {return Integer.valueOf(tmp.image);}
+}
+
+/**
+ * Evaluates multi-line string.
+ *
+ * @return string
+ */
+String multiLineString() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <MULTILINESTRING>  {ret = this.getString(tmp.image);}
+    | tmp = <MULTILINESINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
+}
+
+/**
+ * Evaluates single-line string.
+ *
+ * @return string
+ */
+String string() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <STRING>  {ret = this.getString(tmp.image);}
+    | tmp = <SINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
 }

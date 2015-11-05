@@ -36,6 +36,7 @@ import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
  * The class is used to export and import / update channel configuration items.
  * The handled properties are:
  * <ul>
+ * <li>package</li>
  * <li>uuid</li>
  * <li>symbolic names</li>
  * <li>hidden flag (only if hidden)</li>
@@ -99,7 +100,7 @@ public class Channel_mxJPO
      *         <i>false</i>
      * @see #IGNORED_URLS
      */
-    @Override()
+    @Override
     public boolean parseAdminXMLExportEvent(final ParameterCache_mxJPO _paramCache,
                                             final String _url,
                                             final String _content)
@@ -135,6 +136,7 @@ public class Channel_mxJPO
     {
         _updateBuilder
                 //              tag             | default | value                              | write?
+                .stringNotNull( "package",                  this.getPackageRef())
                 .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
                 .list(          "symbolicname",             this.getSymbolicNames())
                 .string(        "description",              this.getDescription())
@@ -154,6 +156,7 @@ public class Channel_mxJPO
                           final Channel_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcPackage(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",         this.getDescription(),       _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false,  this.isHidden(),             _current.isHidden());

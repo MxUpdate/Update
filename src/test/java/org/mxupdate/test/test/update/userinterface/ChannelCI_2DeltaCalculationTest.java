@@ -16,6 +16,7 @@
 package org.mxupdate.test.test.update.userinterface;
 
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.userinterface.ChannelData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.userinterface.Channel_mxJPO;
@@ -41,16 +42,29 @@ public class ChannelCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1) uuid",
+            // package
+            {"1a) new package",
+                    new ChannelData(this, "Test"),
+                    new ChannelData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new ChannelData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new ChannelData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new ChannelData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new ChannelData(this, "Test").defKeyNotDefined("package")},
+            // uuid
+            {"2) uuid",
                     new ChannelData(this, "Test"),
                     new ChannelData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
-            {"2a) symbolic name",
+            // symbolic names
+            {"3a) symbolic name",
                     new ChannelData(this, "Test"),
                     new ChannelData(this, "Test").setValue("symbolicname", "channel_123")},
-            {"2b) two symbolic name",
+            {"3b) two symbolic name",
                     new ChannelData(this, "Test"),
                     new ChannelData(this, "Test").setValue("symbolicname", "channel_123").setValue("symbolicname", "channel_345")},
-            {"3) description",
+            // description
+            {"4) description",
                     new ChannelData(this, "Test"),
                     new ChannelData(this, "Test").setValue("description", "abc def")},
        };
@@ -63,6 +77,7 @@ public class ChannelCI_2DeltaCalculationTest
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.UI_CHANNEL);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override
