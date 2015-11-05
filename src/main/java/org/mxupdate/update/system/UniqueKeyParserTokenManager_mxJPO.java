@@ -17,7 +17,7 @@
 
 package org.mxupdate.update.system;
 import java.lang.reflect.InvocationTargetException;
-import org.mxupdate.update.system.UniqueKeyCI_mxJPO.Field;
+import org.mxupdate.update.system.AbstractIndexCI_mxJPO.Field;
 import org.mxupdate.update.util.AbstractParser_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.SimpleCharStream;
 import org.mxupdate.update.util.AbstractParser_mxJPO.Token;

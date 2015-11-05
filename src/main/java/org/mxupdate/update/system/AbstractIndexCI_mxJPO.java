@@ -15,15 +15,12 @@
 
 package org.mxupdate.update.system;
 
-import java.io.File;
-import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
-import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
@@ -33,65 +30,60 @@ import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateLine;
 import org.mxupdate.update.util.UpdateException_mxJPO;
-import org.mxupdate.update.util.UpdateException_mxJPO.ErrorKey;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
-import org.mxupdate.util.MqlBuilderUtil_mxJPO.MqlBuilder;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
-import org.mxupdate.util.StringUtils_mxJPO;
 
 import matrix.util.MatrixException;
 
 /**
- * Handles the export and update of &quot;system unqiue keys&quot;.
- * The handled properties are:
- * <ul>
- * <li>uuid</li>
- * <li>description</li>
- * <li>hidden flag</li>
- * <li>{@link #global} flag</li>
- * <li>{@link #enable} flag</li>
- * <li>for {@link #forType type} or {@link #forRelation relationship} with
- *     {@link #withInterface interface}</li>
- * <li>list of {@link #fields} with depending sizes</li>
- * <li>properties</li>
- * </ul>
+ * Handles the export and update of &quot;index&quot;.
  *
  * @author The MxUpdate Team
  */
-public class UniqueKeyCI_mxJPO
-    extends AbstractAdminObject_mxJPO<UniqueKeyCI_mxJPO>
+abstract class AbstractIndexCI_mxJPO<CLASS extends AbstractIndexCI_mxJPO<CLASS>>
+    extends AbstractAdminObject_mxJPO<CLASS>
 {
     /** Set of all ignored URLs from the XML definition for packages. */
     private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
-        UniqueKeyCI_mxJPO.IGNORED_URLS.add("/attributeDefRefList");
-        UniqueKeyCI_mxJPO.IGNORED_URLS.add("/typeRefList");
+        AbstractIndexCI_mxJPO.IGNORED_URLS.add("/attributeDefRefList");
     };
 
     /** Enabled and global flag. */
-    private boolean enable, global = false;
-    /** Unique key is defined for relationship / type with interface. */
-    private String forRelation, forType, withInterface;
+    private boolean enable = false;
     /** List of fields. */
     private final Stack<Field> fields = new Stack<>();
 
     /**
-     * Initializes this system unique key configuration item.
+     * Constructor used to initialize the unique key configuration item.
      *
-     * @param _mxName   name of package
+     * @param _mxClass  defines the related MX class enumeration
+     * @param _mxName   MX name of the administration object
      */
-    public UniqueKeyCI_mxJPO(final String _mxName)
+    protected AbstractIndexCI_mxJPO(final EMxAdmin_mxJPO _mxClassDef,
+                                    final String _mxName)
     {
-        super(EMxAdmin_mxJPO.UniqueKey, _mxName);
+        super(_mxClassDef, _mxName);
     }
 
-    @Override
-    public void parseUpdate(final File _file,
-                            final String _code)
-        throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
+    /**
+     * Returns {@link #enable} flag.
+     *
+     * @return is enabled
+     */
+    protected boolean isEnable()
     {
-        new UniqueKeyParser_mxJPO(new StringReader(_code)).parse(this);
-        this.prepare();
+        return this.enable;
+    }
+
+    /**
+     * Returns the {@link #fields}.
+     *
+     * @return fields
+     */
+    protected Collection<Field> getFields()
+    {
+        return this.fields;
     }
 
     @Override
@@ -110,7 +102,7 @@ public class UniqueKeyCI_mxJPO
                                             final String _content)
     {
         final boolean parsed;
-        if (UniqueKeyCI_mxJPO.IGNORED_URLS.contains(_url))  {
+        if (AbstractIndexCI_mxJPO.IGNORED_URLS.contains(_url))  {
             parsed = true;
 
         } else if ("/attributeDefRefList/attributeDefRef".equals(_url))  {
@@ -119,19 +111,6 @@ public class UniqueKeyCI_mxJPO
             parsed = true;
         } else if ("/attributeDefRefList/attributeSize".equals(_url))  {
             this.fields.peek().size = Integer.valueOf(_content) + 4;
-            parsed = true;
-
-        } else if ("/global".equals(_url))  {
-            this.global = true;
-            parsed = true;
-        } else if ("/interfaceTypeRef".equals(_url))  {
-            this.withInterface = _content;
-            parsed = true;
-        } else if ("/relationshipDefRef".equals(_url))  {
-            this.forRelation = _content;
-            parsed = true;
-        } else if ("/typeRefList/typeRef".equals(_url))  {
-            this.forType = _content;
             parsed = true;
 
         } else  {
@@ -152,70 +131,21 @@ public class UniqueKeyCI_mxJPO
     }
 
     @Override
-    public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
-    {
-        _updateBuilder
-                //              tag            | default | value                              | write?
-                .stringNotNull( "uuid",                    this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
-                .list(          "symbolicname",            this.getSymbolicNames())
-                .string(        "description",             this.getDescription())
-                .flag(          "hidden",           false, this.isHidden())
-                .flag(          "enable",           false, this.enable)
-                .flagIfTrue(    "global",           false, this.global,                         this.global)
-                .stringNotNull( "for type",                this.forType)
-                .stringNotNull( "for relationship",        this.forRelation)
-                .stringNotNull( "with interface",          this.withInterface)
-                .list(this.fields)
-                .properties(this.getProperties());
-    }
-
-    @Override
-    public void createOld(final ParameterCache_mxJPO _paramCache)
-    {
-    }
-
-    @Override
-    public void create(final ParameterCache_mxJPO _paramCache)
-        throws MatrixException
-    {
-        final MqlBuilder mql = MqlBuilderUtil_mxJPO.mql().cmd("escape add uniquekey ").arg(this.getName());
-        if (!StringUtils_mxJPO.isEmpty(this.forType))  {
-            mql.cmd(" type ").arg(this.forType);
-        } else if (!StringUtils_mxJPO.isEmpty(this.forRelation))  {
-            mql.cmd(" relationship ").arg(this.forRelation);
-        }
-        if (!StringUtils_mxJPO.isEmpty(this.withInterface))  {
-            mql.cmd(" interface ").arg(this.withInterface);
-        }
-        if (this.global)  {
-            mql.cmd(" global");
-        }
-        mql.exec(_paramCache.getContext());
-    }
-
-    @Override
     public void calcDelta(final ParameterCache_mxJPO _paramCache,
                           final MultiLineMqlBuilder _mql,
-                          final UniqueKeyCI_mxJPO _current)
+                          final CLASS _current)
         throws UpdateException_mxJPO
     {
-        int bck = 0;
-        bck = CompareToUtil_mxJPO.compare(bck, this.forRelation,    _current.forRelation);
-        bck = CompareToUtil_mxJPO.compare(bck, this.forType,        _current.forType);
-        bck = CompareToUtil_mxJPO.compare(bck, this.withInterface,  _current.withInterface);
-        bck = CompareToUtil_mxJPO.compare(bck, this.global,         _current.global);
-        if (bck != 0)  {
-            throw new UpdateException_mxJPO(ErrorKey.SYS_UNIQUEKEY_FOR_CHANGED, this.getName());
-        }
+        final AbstractIndexCI_mxJPO<CLASS> current = _current;
 
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(  _mql,              "description",              this.getDescription(),  _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(   _mql,              "hidden",            false, this.isHidden(),        _current.isHidden());
 
-        boolean enabled = _current.enable;
+        boolean enabled = current.enable;
 
         // remove fields
-        for (final Field curField : _current.fields)  {
+        for (final Field curField : current.fields)  {
             Field tarField = null;
             for (final Field tmpField : this.fields)  {
                 if (curField.expression.equals(tmpField.expression))  {
@@ -236,7 +166,7 @@ public class UniqueKeyCI_mxJPO
         // add / update fields
         for (final Field tarField : this.fields)  {
             Field curField = null;
-            for (final Field tmpField : _current.fields)  {
+            for (final Field tmpField : current.fields)  {
                 if (tarField.expression.equals(tmpField.expression))  {
                     curField = tmpField;
                     break;
