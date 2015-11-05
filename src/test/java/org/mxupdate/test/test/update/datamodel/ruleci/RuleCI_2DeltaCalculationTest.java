@@ -17,6 +17,7 @@ package org.mxupdate.test.test.update.datamodel.ruleci;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.RuleData;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.Rule_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -41,16 +42,25 @@ public class RuleCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1) uuid",
+            {"1a) new package",
+                    new RuleData(this, "Test"),
+                    new RuleData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new RuleData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new RuleData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new RuleData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new RuleData(this, "Test").defKeyNotDefined("package")},
+            {"2) uuid",
                     new RuleData(this, "Test"),
                     new RuleData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
-            {"2a) symbolic name",
+            {"3a) symbolic name",
                     new RuleData(this, "Test"),
                     new RuleData(this, "Test").setValue("symbolicname", "rule_123")},
-            {"2b) two symbolic name",
+            {"3b) two symbolic name",
                     new RuleData(this, "Test"),
                     new RuleData(this, "Test").setValue("symbolicname", "rule_123").setValue("symbolicname", "rule_345")},
-            {"3) description",
+            {"4) description",
                     new RuleData(this, "Test"),
                     new RuleData(this, "Test").setValue("description", "abc def")},
        };
@@ -63,6 +73,7 @@ public class RuleCI_2DeltaCalculationTest
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.DM_RULE);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override

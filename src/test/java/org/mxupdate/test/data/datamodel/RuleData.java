@@ -21,14 +21,14 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.ExportParser.Line;
 import org.mxupdate.test.data.AbstractAdminData;
 import org.mxupdate.test.data.datamodel.helper.Access;
 import org.testng.Assert;
+
+import matrix.util.MatrixException;
 
 /**
  * Used to define a rule, create them and test the result.
@@ -39,7 +39,7 @@ public class RuleData
     extends AbstractAdminData<RuleData>
 {
     /** Access definitions for this state. */
-    private final List<Access> accessList = new ArrayList<Access>();
+    private final List<Access> accessList = new ArrayList<>();
 
     /**
      * Initialize this rule with given <code>_name</code>.
@@ -78,8 +78,9 @@ public class RuleData
         this.append4CIFileHeader(strg);
         strg.append("mxUpdate rule \"${NAME}\" {\n");
 
-        this.getFlags().append4Update("    ", strg);
+        this.getFlags() .append4Update("    ", strg);
         this.getValues().append4Update("    ", strg);
+        this.getDatas() .append4Update("    ", strg);
 
         for (final Access access : this.accessList)  {
             strg.append("   ");
@@ -151,7 +152,7 @@ public class RuleData
         super.checkExport(_exportParser);
 
         // access filter
-        final SortedSet<String> curAccess = new TreeSet<String>();
+        final SortedSet<String> curAccess = new TreeSet<>();
         for (final Line subLine : _exportParser.getRootLines().get(0).getChildren())  {
             if (subLine.getTag().equals("public")
                     || subLine.getTag().equals("owner")
@@ -162,7 +163,7 @@ public class RuleData
                 curAccess.add("    " + subLine.getTag() + ' ' + subLine.getValue());
             }
         }
-        final SortedSet<String> expAccess = new TreeSet<String>();
+        final SortedSet<String> expAccess = new TreeSet<>();
         for (final Access access : this.accessList)  {
             final StringBuilder tmp = new StringBuilder();
             access.append4CIFile(tmp);

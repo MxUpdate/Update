@@ -38,6 +38,7 @@ import matrix.util.MatrixException;
  * The class is used to export and import / update rule configuration items.
  * The handles properties are
  * <ul>
+ * <li>package</li>
  * <li>uuid<li>
  * <li>symbolic names</li>
  * <li>description</li>
@@ -140,12 +141,13 @@ public class Rule_mxJPO
     public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
-                //              tag                 | default | value                              | write?
-                .stringNotNull( "uuid",                         this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
-                .list(          "symbolicname",                 this.getSymbolicNames())
-                .string(        "description",                  this.getDescription())
-                .flag(          "hidden",               false,  this.isHidden())
-                .flagIfTrue(    "enforcereserveaccess", false,  this.enforcereserveaccess,          _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMRuleSupportsEnforceReserveAccess))
+                //              tag             | default | value                              | write?
+                .stringNotNull( "package",                  this.getPackageRef())
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
+                .list(          "symbolicname",             this.getSymbolicNames())
+                .string(        "description",              this.getDescription())
+                .flag(          "hidden",           false,  this.isHidden())
+                .flagIfTrue("enforcereserveaccess", false,  this.enforcereserveaccess,          _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMRuleSupportsEnforceReserveAccess))
                 .write(this.accessList)
                 .properties(this.getProperties());
     }
@@ -155,6 +157,7 @@ public class Rule_mxJPO
                           final MultiLineMqlBuilder _mql,
                           final Rule_mxJPO _current)
     {
+        DeltaUtil_mxJPO.calcPackage(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(_mql, "description",        this.getDescription(),   _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(_mql,  "hidden",      false, this.isHidden(),         _current.isHidden());

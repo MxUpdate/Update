@@ -14,7 +14,7 @@
  */
 
 options {
-    JDK_VERSION = "1.6";
+    JDK_VERSION = "1.7";
     STATIC = false;
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
@@ -70,7 +70,9 @@ PARSER_END(RuleParser)
 
 <DEFAULT> TOKEN :
 {
-      <UUID:                                "uuid">                                         : STRING_EXPECTED
+      <PACKAGE:                             "package">                                      : STRING_EXPECTED
+
+    | <UUID:                                "uuid">                                         : STRING_EXPECTED
 
     | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
 
@@ -184,63 +186,54 @@ PARSER_END(RuleParser)
  * @param _rule   target rule to update with parsed values
  */
 void parse(final Rule_mxJPO _rule)
-    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
-: {
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException : 
+{
+    String str;
     Token tmp;
     AdminProperty property;
     Access access = new Access();
-} {
-    (   ( <UUID>                                                {property = new AdminProperty();
-                                                                 this.appendValue(this.getValue(_rule, "properties"), "propertiesStack", property);
-                                                                 this.setValue(property, "name",  "UUID");}
-                                    ( tmp = <STRING>            {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>            {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+}
+{
+    (   ( <PACKAGE>                   str = string()                            {this.setValue(_rule, "packageRef", str);} )
 
-      | ( <SYMBOLICNAME>            ( tmp = <STRING>            {this.appendValue(_rule, "symbolicNames",       this.getString(tmp.image));}
-                                    | tmp = <SINGLE>            {this.appendValue(_rule, "symbolicNames",       this.getSingle(tmp.image));} ) )
+      | ( <UUID>                      property = uuid()                         {this.appendValue(this.getValue(_rule, "properties"), "propertiesStack", property);} )
 
-      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>   {this.setValue(_rule, "description",            this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>   {this.setValue(_rule, "description",            this.getSingle(tmp.image));} ) )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_rule, "symbolicNames", str);} )
 
-      | ( <HIDDEN_TRUE>                                         {this.setValue(_rule, "hidden",                 true);} )
-      | ( <HIDDEN_FALSE>                                        {this.setValue(_rule, "hidden",                 false);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_rule, "description", str);} )
 
-      | ( <ENFORCERESERVEACCESS_TRUE>                           {this.setValue(_rule, "enforcereserveaccess",   true);} )
-      | ( <ENFORCERESERVEACCESS_FALSE>                          {this.setValue(_rule, "enforcereserveaccess",   false);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_rule, "hidden",                 true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_rule, "hidden",                 false);} )
 
-      | ( ( <REVOKE>                                            {this.setValue(access, "revoke",                true);} ) ?
-          ( <LOGIN>                                             {this.setValue(access, "login",                 true);} ) ?
-                ( <OWNER>                                       {this.setValue(access, "kind",                  "owner");}
-                | <PUBLIC>                                      {this.setValue(access, "kind",                  "public");}
-                | <USER>                                        {this.setValue(access, "kind",                  "user");}
-                            ( tmp = <ACCESS_STRING>             {this.setValue(access, "userRef",               this.getString(tmp.image));}
-                            | tmp = <ACCESS_SINGLE_STRING>      {this.setValue(access, "userRef",               this.getSingle(tmp.image));} ) )
-                                    stateAccessDef(access)      {this.appendValue(_rule, "accessList",          "accessList", access);/*reset*/access = new Access();} )
+      | ( <ENFORCERESERVEACCESS_TRUE>                                           {this.setValue(_rule, "enforcereserveaccess",   true);} )
+      | ( <ENFORCERESERVEACCESS_FALSE>                                          {this.setValue(_rule, "enforcereserveaccess",   false);} )
 
-      | (<PROPERTY>                                             {property = new AdminProperty();this.appendValue(_rule, "properties", "propertiesStack", property);}
-                                    ( tmp = <STRING>            {this.setValue(property, "name", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>            {this.setValue(property, "name", this.getSingle(tmp.image));} )
-              (   ( <PROPERTYVAL>   ( tmp = <STRING>            {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>            {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                    | tmp = <ADMINTYPE_SINGLE>  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                    ( tmp = <STRING>            {this.setValue(property, "refAdminName", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>            {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+      | ( ( <REVOKE>                                                            {this.setValue(access, "revoke",                true);} ) ?
+          ( <LOGIN>                                                             {this.setValue(access, "login",                 true);} ) ?
+                ( <OWNER>                                                       {this.setValue(access, "kind",                  "owner");}
+                | <PUBLIC>                                                      {this.setValue(access, "kind",                  "public");}
+                | <USER>                                                        {this.setValue(access, "kind",                  "user");}
+                            ( tmp = <ACCESS_STRING>                             {this.setValue(access, "userRef",               this.getString(tmp.image));}
+                            | tmp = <ACCESS_SINGLE_STRING>                      {this.setValue(access, "userRef",               this.getSingle(tmp.image));} ) )
+                                    stateAccessDef(access)                      {this.appendValue(_rule, "accessList",          "accessList", access);/*reset*/access = new Access();} )
+
+      | (<PROPERTY>                   property = property()                     {this.appendValue(_rule, "properties", "propertiesStack", property);} )
     )*
 }
 
-void stateAccessDef(final Access _access) : {
+void stateAccessDef(final Access _access) : 
+{
+    String str;
     Token tmp;
-} {
+} 
+{
     (
           ( <KEY>                   ( tmp = <ACCESS_STRING>         {this.setValue(_access, "key",              this.getString(tmp.image));}
                                     | tmp = <ACCESS_SINGLE_STRING>  {this.setValue(_access, "key",              this.getSingle(tmp.image));} ) )
 
-        | ( <FILTER>                ( tmp = <MULTILINESTRING>       {this.setValue(_access, "filter",           this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>       {this.setValue(_access, "filter",           this.getSingle(tmp.image));} ) )
+        | ( <FILTER>                  str = multiLineString()       {this.setValue(_access, "filter",           str);} )
 
-        | ( <LOCALFILTER>           ( tmp = <MULTILINESTRING>       {this.setValue(_access, "localfilter",      this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>       {this.setValue(_access, "localfilter",      this.getSingle(tmp.image));} ) )
+        | ( <LOCALFILTER>             str = multiLineString()       {this.setValue(_access, "localfilter",      str);} )
 
         | ( tmp = <ACCESS>                                          {this.appendValues(_access, "access",       Arrays.asList(
                                                                                                                     tmp.image.replaceFirst("^\\{", "").replaceFirst("\\}$", "")  // remove {}
@@ -285,4 +278,69 @@ void stateAccessDef(final Access _access) : {
         | ( <CATEGORY_CUSTOMER>                                     {this.setValue(_access, "category",         "customer");    } )
         | ( <CATEGORY_CONTRACTOR>                                   {this.setValue(_access, "category",         "contractor");  } )
     )*
+}
+
+/**
+ * Parses the UUID property definition.
+ */
+AdminProperty uuid() :
+{
+    String str;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()
+    {this.setValue(property, "value", str);}
+    {this.setValue(property, "name",  "UUID");}
+    {return property;}
+}
+
+/**
+ * Parses the properties definition.
+ */
+AdminProperty property() :
+{
+    String str;
+    Token tmp;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()                                 {this.setValue(property, "name", str);}
+    ( ( <PROPERTYVAL>  str = string()              {this.setValue(property, "value", str);} )
+    | ( <PROPERTYTO>   ( tmp = <ADMINTYPE_STRING>  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                       | tmp = <ADMINTYPE_SINGLE>  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                   str = string()  {this.setValue(property, "refAdminName", str);} ) )*
+    {return property;}
+}
+
+/**
+ * Evaluates multi-line string.
+ *
+ * @return string
+ */
+String multiLineString() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <MULTILINESTRING>  {ret = this.getString(tmp.image);}
+    | tmp = <MULTILINESINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
+}
+
+/**
+ * Evaluates single-line string.
+ *
+ * @return string
+ */
+String string() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <STRING>  {ret = this.getString(tmp.image);}
+    | tmp = <SINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
 }
