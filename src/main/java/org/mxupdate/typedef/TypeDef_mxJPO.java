@@ -104,9 +104,6 @@ public final class TypeDef_mxJPO
     /** Mapping between internal used administration type definitions and the logging string. */
     private String textLogging;
 
-    /** Mapping between internal used administration type definitions and the titles. */
-    private String textTitle;
-
     /**
      * Defines the values of the type definition.
      *
@@ -177,7 +174,6 @@ public final class TypeDef_mxJPO
                 case OrderNo:               typeDef.orderNo = Integer.parseInt(_value);break;
 
                 case TextLogging:           typeDef.textLogging = _value;break;
-                case TextTitle:             typeDef.textTitle = _value;break;
                 default:                    typeDef.defineValues(key, _value);break;
             }
         }
@@ -457,18 +453,6 @@ public final class TypeDef_mxJPO
     public String getLogging()
     {
         return this.textLogging;
-    }
-
-    /**
-     * Returns the related title used in the MX update files. The method
-     * returns only correct values if the initialize method was called!
-     *
-     * @return title of the business type definition
-     * @see #textTitle
-     */
-    public String getTitle()
-    {
-        return this.textTitle;
     }
 
     /**
