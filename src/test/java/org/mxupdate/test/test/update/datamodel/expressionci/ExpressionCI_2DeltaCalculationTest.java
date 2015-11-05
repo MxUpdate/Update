@@ -17,6 +17,7 @@ package org.mxupdate.test.test.update.datamodel.expressionci;
 
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.data.datamodel.ExpressionData;
+import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.Expression_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -36,21 +37,30 @@ import matrix.util.MatrixException;
 public class ExpressionCI_2DeltaCalculationTest
     extends AbstractDeltaCalculationTest<Expression_mxJPO,ExpressionData>
 {
-    @Override()
+    @Override
     @DataProvider(name = "data")
     public Object[][] getData()
     {
         return new Object[][] {
-            {"1) uuid",
+            {"1a) new package",
+                    new ExpressionData(this, "Test"),
+                    new ExpressionData(this, "Test").defData("package", new PackageData(this, "TestPackage"))},
+            {"1b) update package",
+                    new ExpressionData(this, "Test").defData("package", new PackageData(this, "TestPackage1")),
+                    new ExpressionData(this, "Test").defData("package", new PackageData(this, "TestPackage2"))},
+            {"1c) remove package",
+                    new ExpressionData(this, "Test").defData("package", new PackageData(this, "TestPackage")),
+                    new ExpressionData(this, "Test").defKeyNotDefined("package")},
+            {"2) uuid",
                     new ExpressionData(this, "Test"),
                     new ExpressionData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
-            {"2a) symbolic name",
+            {"3a) symbolic name",
                     new ExpressionData(this, "Test"),
                     new ExpressionData(this, "Test").setValue("symbolicname", "expression_123")},
-            {"2b) two symbolic name",
+            {"3b) two symbolic name",
                     new ExpressionData(this, "Test"),
                     new ExpressionData(this, "Test").setValue("symbolicname", "expression_123").setValue("symbolicname", "expression_345")},
-            {"3) description",
+            {"4) description",
                     new ExpressionData(this, "Test"),
                     new ExpressionData(this, "Test").setValue("description", "abc def")},
        };
@@ -63,6 +73,7 @@ public class ExpressionCI_2DeltaCalculationTest
         throws MatrixException
     {
         this.cleanup(AbstractTest.CI.DM_EXPRESSION);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 
     @Override
