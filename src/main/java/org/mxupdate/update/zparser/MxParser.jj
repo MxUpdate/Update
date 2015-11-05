@@ -56,6 +56,7 @@ import org.mxupdate.update.datamodel.Interface_mxJPO;
 import org.mxupdate.update.datamodel.PathType_mxJPO;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.datamodel.Relationship_mxJPO;
+import org.mxupdate.update.datamodel.Rule_mxJPO;
 import org.mxupdate.update.datamodel.helper.AccessList_mxJPO.Access;
 import org.mxupdate.update.datamodel.helper.LocalAttributeList_mxJPO.LocalAttribute;
 import org.mxupdate.update.datamodel.helper.LocalPathTypeList_mxJPO.LocalPathType;
@@ -95,7 +96,7 @@ import org.mxupdate.update.util.AdminPropertyList_mxJPO.AdminProperty;
 /**
  * Parses the update format for {@link Channel_mxJPO}.
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "unchecked"})
 public class MxParser
     extends AbstractParser_mxJPO
 {
@@ -216,7 +217,6 @@ PARSER_END(MxParser)
     | <EMAILADDRESS:                        "emailaddress">                                 : STRING_EXPECTED
     | <FAX:                                 "fax">                                          : STRING_EXPECTED
     | <FILE:                                "file">                                         : STRING_EXPECTED
-    | <FILTER:                              "filter">                                       : STRING_EXPECTED
     | <FORMAT:                              "format">                                       : STRING_EXPECTED
     | <FULLNAME:                            "fullname">                                     : STRING_EXPECTED
     | <GROUP:                               "group" >                                       : STRING_EXPECTED
@@ -224,7 +224,6 @@ PARSER_END(MxParser)
     | <INPUT:                               "input">                                        : STRING_EXPECTED
     | <KEY:                                 "key" >                                         : STRING_EXPECTED
     | <LABEL:                               "label">                                        : STRING_EXPECTED
-    | <LOCALFILTER:                         "localfilter">                                  : STRING_EXPECTED
     | <MAJORSEQUENCE:                       "majorsequence">                                : STRING_EXPECTED
     | <MEANING:                             "meaning">                                      : STRING_EXPECTED
     | <MENU:                                ("add" ([" ","\t","\n","\r"])+ )? "menu">       : STRING_EXPECTED
@@ -256,6 +255,8 @@ PARSER_END(MxParser)
     | <CONTENT:                             "content">                                      : MULTILINESTRING_EXPECTED
     | <DEFAULTVALUE:                        "default">                                      : MULTILINESTRING_EXPECTED
     | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
+    | <FILTER:                              "filter">                                       : MULTILINESTRING_EXPECTED
+    | <LOCALFILTER:                         "localfilter">                                  : MULTILINESTRING_EXPECTED
 }
 
 /******************************************************* Common String String */
@@ -1101,14 +1102,14 @@ Policy_mxJPO.State state() :
       | ( <SIGNATURE>                                                           {signature = new Policy_mxJPO.Signature();this.appendValue(state, "signatures", signature);}
                   str = string()                                                {this.setValue(signature, "name", str);}
                     <BRACE_OPEN>
-                        ( (<BRANCH>           str = string()                    {this.setValue(signature, "branch", str);} )
-                        | (<APPROVE_LIST>   ( tmp = <LISTSTRING>                {this.appendValue(signature, "approverUsers",                   this.getString(tmp.image));}
+                        ( ( <BRANCH>          str = string()                    {this.setValue(signature, "branch", str);} )
+                        | ( <APPROVE_LIST>  ( tmp = <LISTSTRING>                {this.appendValue(signature, "approverUsers",                   this.getString(tmp.image));}
                                             | tmp = <LISTSINGLE>                {this.appendValue(signature, "approverUsers",                   this.getSingle(tmp.image));} )* <LISTCLOSE>)
-                        | (<IGNORE_LIST>    ( tmp = <LISTSTRING>                {this.appendValue(signature, "ignoreUsers",                     this.getString(tmp.image));}
+                        | ( <IGNORE_LIST>   ( tmp = <LISTSTRING>                {this.appendValue(signature, "ignoreUsers",                     this.getString(tmp.image));}
                                             | tmp = <LISTSINGLE>                {this.appendValue(signature, "ignoreUsers",                     this.getSingle(tmp.image));} )* <LISTCLOSE>)
-                        | (<REJECT_LIST>    ( tmp = <LISTSTRING>                {this.appendValue(signature, "rejectUsers",                     this.getString(tmp.image));}
+                        | ( <REJECT_LIST>   ( tmp = <LISTSTRING>                {this.appendValue(signature, "rejectUsers",                     this.getString(tmp.image));}
                                             | tmp = <LISTSINGLE>                {this.appendValue(signature, "rejectUsers",                     this.getSingle(tmp.image));} )* <LISTCLOSE>)
-                        | (<FILTER>           str = string()                    {this.setValue(signature, "filter", str);} ) )*
+                        | ( <FILTER>          str = multiLineString()           {this.setValue(signature, "filter", str);} ) )*
                     <BRACE_CLOSE> )
       | ( <PROPERTY>                  property = property()                     {this.appendValue(state, "properties", "propertiesStack", property);} )
     )*
@@ -1127,7 +1128,7 @@ void stateAccessDef(final Access _access) :
 {
     String str;
     Token tmp;
-    Set access = new HashSet();
+    @SuppressWarnings("rawtypes") Set access = new HashSet();
 }
 {
     // choice conflict for public can be ignore, because public is used outside of the access statement
@@ -1136,8 +1137,8 @@ void stateAccessDef(final Access _access) :
 
         | ( <KEY> str = string()  {this.setValue(_access, "key", str);} )
 
-        | ( <FILTER>                  str = string()                        {this.setValue(_access, "filter", str);} )
-        | ( <LOCALFILTER>             str = string()                        {this.setValue(_access, "localfilter", str);} )
+        | ( <FILTER>                  str = multiLineString()               {this.setValue(_access, "filter", str);} )
+        | ( <LOCALFILTER>             str = multiLineString()               {this.setValue(_access, "localfilter", str);} )
         | ( <ANCESTOR>              ( tmp = <ORGANIZATION>
                                     | tmp = <PROJECT> )                     {this.setValue(_access, tmp.image, "ancestor");} )
         | ( <ANY>                   ( tmp = <CATEGORY>
@@ -1245,6 +1246,41 @@ void parseRelationship(final Relationship_mxJPO _relationship)
                  ( <ATTRIBUTE>        localAttr = localAttribute()              {this.appendValue(_relationship, "localAttributes", localAttr);}
                  | <PATHTYPE>         localPathType = localPathType()           {this.appendValue(_relationship, "localPathTypes", localPathType);} ) )
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_relationship, "properties", "propertiesStack", property);} )
+    )*
+}
+
+/********************************************************* Data Model -> Rule */
+
+/**
+ * Parses one complete rule definition.
+ *
+ * @param _rule   target rule to update with parsed values
+ */
+void parseRule(final Rule_mxJPO _rule)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException : 
+{
+    String str;
+    Token tmp;
+    AdminProperty property;
+    Access access = new Access();
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_rule, "packageRef", str);} )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(this.getValue(_rule, "properties"), "propertiesStack", property);} )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_rule, "symbolicNames", str);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_rule, "description", str);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_rule, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_rule, "hidden", false);} )
+      | ( <ENFORCERESERVEACCESS_TRUE>                                           {this.setValue(_rule, "enforcereserveaccess", true);} )
+      | ( <ENFORCERESERVEACCESS_FALSE>                                          {this.setValue(_rule, "enforcereserveaccess", false);} )
+      | ( ( <REVOKE>                                                            {this.setValue(access, "revoke",  true);} ) ?
+          ( <LOGIN>                                                             {this.setValue(access, "login", true);} ) ?
+                ( <OWNER>                                                       {this.setValue(access, "kind", "owner");}
+                | <PUBLIC>                                                      {this.setValue(access, "kind", "public");}
+                | <USER>  str = string()                                        {this.setValue(access, "kind", "user");this.setValue(access, "userRef", str);} )
+                                      stateAccessDef(access)                    {this.appendValue(_rule, "accessList", "accessList", access);/*reset*/access = new Access();} )
+      | (<PROPERTY>                   property = property()                     {this.appendValue(_rule, "properties", "propertiesStack", property);} )
     )*
 }
 

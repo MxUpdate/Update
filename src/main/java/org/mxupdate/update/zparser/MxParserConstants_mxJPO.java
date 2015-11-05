@@ -286,83 +286,83 @@ interface MxParserConstants_mxJPO {
   /** RegularExpression Id. */
   int FILE = 134;
   /** RegularExpression Id. */
-  int FILTER = 135;
+  int FORMAT = 135;
   /** RegularExpression Id. */
-  int FORMAT = 136;
+  int FULLNAME = 136;
   /** RegularExpression Id. */
-  int FULLNAME = 137;
+  int GROUP = 137;
   /** RegularExpression Id. */
-  int GROUP = 138;
+  int HREF = 138;
   /** RegularExpression Id. */
-  int HREF = 139;
+  int INPUT = 139;
   /** RegularExpression Id. */
-  int INPUT = 140;
+  int KEY = 140;
   /** RegularExpression Id. */
-  int KEY = 141;
+  int LABEL = 141;
   /** RegularExpression Id. */
-  int LABEL = 142;
+  int MAJORSEQUENCE = 142;
   /** RegularExpression Id. */
-  int LOCALFILTER = 143;
+  int MEANING = 143;
   /** RegularExpression Id. */
-  int MAJORSEQUENCE = 144;
+  int MENU = 144;
   /** RegularExpression Id. */
-  int MEANING = 145;
+  int MIME = 145;
   /** RegularExpression Id. */
-  int MENU = 146;
+  int MINORSEQUENCE = 146;
   /** RegularExpression Id. */
-  int MIME = 147;
+  int PACKAGE = 147;
   /** RegularExpression Id. */
-  int MINORSEQUENCE = 148;
+  int PARENT = 148;
   /** RegularExpression Id. */
-  int PACKAGE = 149;
+  int PATHTYPE = 149;
   /** RegularExpression Id. */
-  int PARENT = 150;
+  int PATTERN = 150;
   /** RegularExpression Id. */
-  int PATHTYPE = 151;
+  int PHONE = 151;
   /** RegularExpression Id. */
-  int PATTERN = 152;
+  int PRINT = 152;
   /** RegularExpression Id. */
-  int PHONE = 153;
+  int REGISTEREDNAME = 153;
   /** RegularExpression Id. */
-  int PRINT = 154;
+  int ROLE = 154;
   /** RegularExpression Id. */
-  int REGISTEREDNAME = 155;
+  int RULE = 155;
   /** RegularExpression Id. */
-  int ROLE = 156;
+  int SEQUENCE = 156;
   /** RegularExpression Id. */
-  int RULE = 157;
+  int SIGNATURE = 157;
   /** RegularExpression Id. */
-  int SEQUENCE = 158;
+  int SITE = 158;
   /** RegularExpression Id. */
-  int SIGNATURE = 159;
+  int STATE = 159;
   /** RegularExpression Id. */
-  int SITE = 160;
+  int STORE = 160;
   /** RegularExpression Id. */
-  int STATE = 161;
+  int SUFFIX = 161;
   /** RegularExpression Id. */
-  int STORE = 162;
+  int SYMBOLICNAME = 162;
   /** RegularExpression Id. */
-  int SUFFIX = 163;
+  int USESPACKAGE = 163;
   /** RegularExpression Id. */
-  int SYMBOLICNAME = 164;
+  int UUID = 164;
   /** RegularExpression Id. */
-  int USESPACKAGE = 165;
+  int VAULT = 165;
   /** RegularExpression Id. */
-  int UUID = 166;
+  int VIEW = 166;
   /** RegularExpression Id. */
-  int VAULT = 167;
+  int CODE = 167;
   /** RegularExpression Id. */
-  int VIEW = 168;
+  int COMMENT = 168;
   /** RegularExpression Id. */
-  int CODE = 169;
+  int CONTENT = 169;
   /** RegularExpression Id. */
-  int COMMENT = 170;
+  int DEFAULTVALUE = 170;
   /** RegularExpression Id. */
-  int CONTENT = 171;
+  int DESCRIPTION = 171;
   /** RegularExpression Id. */
-  int DEFAULTVALUE = 172;
+  int FILTER = 172;
   /** RegularExpression Id. */
-  int DESCRIPTION = 173;
+  int LOCALFILTER = 173;
   /** RegularExpression Id. */
   int STRING_STRING_STRING = 174;
   /** RegularExpression Id. */
@@ -938,7 +938,6 @@ interface MxParserConstants_mxJPO {
     "\"emailaddress\"",
     "\"fax\"",
     "\"file\"",
-    "\"filter\"",
     "\"format\"",
     "\"fullname\"",
     "\"group\"",
@@ -946,7 +945,6 @@ interface MxParserConstants_mxJPO {
     "\"input\"",
     "\"key\"",
     "\"label\"",
-    "\"localfilter\"",
     "\"majorsequence\"",
     "\"meaning\"",
     "<MENU>",
@@ -977,6 +975,8 @@ interface MxParserConstants_mxJPO {
     "\"content\"",
     "\"default\"",
     "\"description\"",
+    "\"filter\"",
+    "\"localfilter\"",
     "<STRING_STRING_STRING>",
     "<STRING_STRING_SINGLE>",
     "<STRING>",
