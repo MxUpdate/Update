@@ -32,8 +32,6 @@ public class PackageData
 {
     /** All used packages. */
     private final DataList<PackageData> usePackages = new DataList<>("uses", "uses", true);
-    /** All members. */
-    private final DataList<AbstractAdminData<?>> members = new DataList<>("member ", "member ", true);
 
     /**
      * Initialize this package with given {@code _name}.
@@ -60,18 +58,6 @@ public class PackageData
         return this;
     }
 
-    /**
-     * Assigns the {@code _member} to this data instance.
-     *
-     * @param _member       member to append
-     * @return this data instance
-     */
-    public PackageData addMember(final AbstractAdminData<?> _member)
-    {
-        this.members.add(_member);
-        return this;
-    }
-
     @Override
     public String ciFile()
     {
@@ -82,7 +68,6 @@ public class PackageData
         this.getFlags()     .append4Update("    ", strg);
         this.getValues()    .append4Update("    ", strg);
         this.usePackages    .append4Update("    ", strg);
-        this.members        .append4Update("    ", strg);
         this.getProperties().append4Update("    ", strg);
 
         for (final String ciLine : this.getCILines())  {
@@ -110,7 +95,6 @@ public class PackageData
 
             final StringBuilder modCreate = new StringBuilder();
             modCreate.append("escape mod package \"").append(AbstractTest.convertMql(this.getName())).append('\"');
-            this.members.append4CreateViaAdd(modCreate);
             this.getTest().mql(modCreate);
         }
         return this;
@@ -122,7 +106,6 @@ public class PackageData
     {
         super.createDependings();
         this.usePackages.createDependings();
-        this.members    .createDependings();
         return this;
     }
 
@@ -132,6 +115,5 @@ public class PackageData
         super.checkExport(_exportParser);
 
         this.usePackages    .check4Export(_exportParser, "");
-        this.members        .check4Export(_exportParser, "");
     }
 }

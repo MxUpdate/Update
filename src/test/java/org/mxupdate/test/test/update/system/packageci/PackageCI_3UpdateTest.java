@@ -17,8 +17,6 @@ package org.mxupdate.test.test.update.system.packageci;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;
-import org.mxupdate.test.data.datamodel.RelationshipData;
-import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.system.PackageData;
 import org.mxupdate.test.data.util.FlagList.Create;
 import org.mxupdate.update.system.PackageCI_mxJPO;
@@ -36,28 +34,6 @@ import org.testng.annotations.Test;
 public class PackageCI_3UpdateTest
     extends AbstractDataExportUpdate<PackageData>
 {
-    @Override
-    protected PackageData createNewData(final String _name)
-    {
-        return new PackageData(this, _name);
-    }
-
-    /**
-     * Removes the MxUpdate programs, attributes and types.
-     *
-     * @throws Exception if MQL execution failed
-     */
-    @BeforeMethod
-    @AfterClass(groups = "close")
-    public void cleanup()
-        throws Exception
-    {
-        this.cleanup(AbstractTest.CI.DM_RULE);
-        this.cleanup(AbstractTest.CI.DM_RELATIONSHIP);
-        this.cleanup(AbstractTest.CI.DM_TYPE);
-        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
-    }
-
     /**
      * Data provider for test packages.
      *
@@ -67,31 +43,48 @@ public class PackageCI_3UpdateTest
     public Object[][] getData()
     {
         return this.prepareData("package",
-                new Object[]{
-                        "1) package without anything (to test required fields)",
-                        this.createNewData("Test")
-                                .setValue("description", "")
-                                .setFlag("hidden", false)
-                                .setFlag("custom", false),
-                        this.createNewData("Test")},
-                new Object[]{
-                        "2) package with description",
-                        this.createNewData("Test")
-                                .setValue("description", "ABC { } \"")},
-                new Object[]{
-                        "3) package with custom",
-                        this.createNewData("Test")
-                                .setFlag("custom", true, Create.ViaValue)},
-                new Object[]{
-                        "4) package with two used packages",
-                        this.createNewData("Test")
-                                .usePackage(this.createNewData("use 1"))
-                                .usePackage(this.createNewData("use 2"))},
-                new Object[]{
-                        "5) package with two members",
-                        this.createNewData("Test")
-                                .addMember(new TypeData(this, "type"))
-                                .addMember(new RelationshipData(this, "relationship"))}
+            new Object[]{
+                    "1) package without anything (to test required fields)",
+                    this.createNewData("Test")
+                            .setValue("description", "")
+                            .setFlag("hidden", false)
+                            .setFlag("custom", false),
+                    this.createNewData("Test")},
+            new Object[]{
+                    "2) package with description",
+                    this.createNewData("Test")
+                            .setValue("description", "ABC { } \"")},
+            new Object[]{
+                    "3) package with custom",
+                    this.createNewData("Test")
+                            .setFlag("custom", true, Create.ViaValue)},
+            new Object[]{
+                    "4) package with two used packages",
+                    this.createNewData("Test")
+                            .usePackage(this.createNewData("use 1"))
+                            .usePackage(this.createNewData("use 2"))}
          );
+    }
+
+    /**
+     * Removes the MxUpdate programs, attributes and types.
+     *
+     * @throws Exception if MQL execution failed
+     */
+    @BeforeMethod
+    @AfterClass
+    public void cleanup()
+        throws Exception
+    {
+        this.cleanup(AbstractTest.CI.DM_RULE);
+        this.cleanup(AbstractTest.CI.DM_RELATIONSHIP);
+        this.cleanup(AbstractTest.CI.DM_TYPE);
+        this.cleanup(AbstractTest.CI.SYS_PACKAGE);
+    }
+
+    @Override
+    protected PackageData createNewData(final String _name)
+    {
+        return new PackageData(this, _name);
     }
 }

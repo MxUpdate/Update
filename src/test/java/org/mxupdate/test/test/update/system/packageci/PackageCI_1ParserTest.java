@@ -34,8 +34,7 @@ public class PackageCI_1ParserTest
     @DataProvider(name = "data")
     public Object[][] getData()
     {
-        return new Object[][]
-        {
+        return new Object[][]  {
             {"0) simple",
                 "",
                 "description \"\" !hidden !custom"},
@@ -49,72 +48,51 @@ public class PackageCI_1ParserTest
             {"1c) uuid convert from single to string",
                     "uuid \"FDA7-5674979211-E6AE2256B6-B6499611\"  description \"\" !hidden !custom",
                     "uuid   FDA7-5674979211-E6AE2256B6-B6499611    description \"\" !hidden !custom"},
+            // registered name
+            {"2a) symbolic name",
+                    "",
+                    "symbolicname \"channel_abc\" description \"\" !hidden !custom"},
+            {"2b) two symbolic names",
+                    "symbolicname \"channel_abc\" symbolicname \"channel_def\" description \"\" !hidden !custom",
+                    "symbolicname \"channel_def\" symbolicname \"channel_abc\" description \"\" !hidden !custom"},
             // description
-            {"2a) description",
+            {"3a) description",
                 "",
                 "description \"abc def\" !hidden !custom"},
-            {"2b) description not defined",
+            {"3b) description not defined",
                 "description \"\" !hidden !custom",
                 "!hidden !custom"},
             // hidden flag
-            {"3a) hidden",
+            {"4a) hidden",
                 "",
                 "description \"\" hidden !custom"},
-            {"3b) not hidden (not defined)",
+            {"4b) not hidden (not defined)",
                     "description \"\" !hidden !custom",
                 "description \"\" !custom"},
             // custom flag
-            {"4a) custom",
+            {"5a) custom",
                 "",
                 "description \"\" !hidden custom"},
-            {"4b) not custom (not defined)",
+            {"5b) not custom (not defined)",
                 "description \"\" !hidden !custom",
                 "description \"\" !hidden"},
             // usespackage
-            {"5a) usespackage",
+            {"6a) usespackage",
                 "",
                 "description \"\" !hidden !custom "
                         + "usespackage \"111\""},
-            {"5b) usespackage name w/o apostrophe",
+            {"6b) usespackage name w/o apostrophe",
                 "description \"\" !hidden !custom "
                         + "usespackage \"111\"",
                 "description \"\" !hidden !custom "
                         + "usespackage 111"},
-            {"5c) two usespackage (to check sort)",
+            {"6c) two usespackage (to check sort)",
                 "description \"\" !hidden !custom "
                         + "usespackage \"111\" "
                         + "usespackage \"222\"",
                 "description \"\" !hidden !custom "
                         + "usespackage \"222\" "
                         + "usespackage \"111\""},
-            // member list
-            {"6a) member",
-                "",
-                "description \"\" !hidden !custom "
-                        + "member type \"111\""},
-            {"6b) member name w/o apostrophe",
-                "description \"\" !hidden !custom "
-                        + "member type \"111\"",
-                "description \"\" !hidden !custom "
-                        + "member type 111"},
-            {"6c) two members from same admin type (to check sort)",
-                "description \"\" !hidden !custom "
-                        + "member type \"111\" "
-                        + "member type \"222\"",
-                "description \"\" !hidden !custom "
-                        + "member type \"222\" "
-                        + "member type \"111\""},
-            {"6d) two members from different admin type (to check sort)",
-                "description \"\" !hidden !custom "
-                        + "member relationship \"111\" "
-                        + "member type \"111\"",
-                "description \"\" !hidden !custom "
-                        + "member type \"111\" "
-                        + "member relationship \"111\""},
-            {"6e) new unknown member type (to check all kind of member admin types are allowed)",
-                "",
-                "description \"\" !hidden !custom "
-                        + "member unknown \"111\""},
             // properties
             {"10a) property",
                 "",

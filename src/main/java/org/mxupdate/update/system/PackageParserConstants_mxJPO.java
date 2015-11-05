@@ -28,52 +28,46 @@ interface PackageParserConstants_mxJPO {
   /** RegularExpression Id. */
   int UUID = 5;
   /** RegularExpression Id. */
-  int DESCRIPTION = 6;
+  int SYMBOLICNAME = 6;
   /** RegularExpression Id. */
-  int HIDDEN_TRUE = 7;
+  int DESCRIPTION = 7;
   /** RegularExpression Id. */
-  int HIDDEN_FALSE = 8;
+  int HIDDEN_TRUE = 8;
   /** RegularExpression Id. */
-  int CUSTOM_TRUE = 9;
+  int HIDDEN_FALSE = 9;
   /** RegularExpression Id. */
-  int CUSTOM_FALSE = 10;
+  int CUSTOM_TRUE = 10;
   /** RegularExpression Id. */
-  int USESPACKAGE = 11;
+  int CUSTOM_FALSE = 11;
   /** RegularExpression Id. */
-  int STRING = 12;
+  int USESPACKAGE = 12;
   /** RegularExpression Id. */
-  int SINGLE = 13;
+  int STRING = 13;
   /** RegularExpression Id. */
-  int MULTILINESTRING = 14;
+  int SINGLE = 14;
   /** RegularExpression Id. */
-  int MULTILINESINGLE = 15;
+  int MULTILINESTRING = 15;
   /** RegularExpression Id. */
-  int MEMBER = 16;
+  int MULTILINESINGLE = 16;
   /** RegularExpression Id. */
-  int MEMBERTYPE_STRING = 17;
+  int PROPERTY = 17;
   /** RegularExpression Id. */
-  int MEMBERTYPE_SINGLE = 18;
+  int PROPERTYTO = 18;
   /** RegularExpression Id. */
-  int PROPERTY = 19;
+  int PROPERTYVAL = 19;
   /** RegularExpression Id. */
-  int PROPERTYTO = 20;
+  int ADMINTYPE_STRING = 20;
   /** RegularExpression Id. */
-  int PROPERTYVAL = 21;
-  /** RegularExpression Id. */
-  int ADMINTYPE_STRING = 22;
-  /** RegularExpression Id. */
-  int ADMINTYPE_SINGLE = 23;
+  int ADMINTYPE_SINGLE = 21;
 
   /** Lexical state. */
   int ADMINREF_EXPECTED = 0;
   /** Lexical state. */
-  int MEMBERREF_EXPECTED = 1;
+  int MULTILINESTRING_EXPECTED = 1;
   /** Lexical state. */
-  int MULTILINESTRING_EXPECTED = 2;
+  int STRING_EXPECTED = 2;
   /** Lexical state. */
-  int STRING_EXPECTED = 3;
-  /** Lexical state. */
-  int DEFAULT = 4;
+  int DEFAULT = 3;
 
   /** Literal token values. */
   String[] tokenImage = {
@@ -83,6 +77,7 @@ interface PackageParserConstants_mxJPO {
     "\"\\n\"",
     "<token of kind 4>",
     "\"uuid\"",
+    "\"symbolicname\"",
     "\"description\"",
     "\"hidden\"",
     "\"!hidden\"",
@@ -93,9 +88,6 @@ interface PackageParserConstants_mxJPO {
     "<SINGLE>",
     "<MULTILINESTRING>",
     "<MULTILINESINGLE>",
-    "\"member\"",
-    "<MEMBERTYPE_STRING>",
-    "<MEMBERTYPE_SINGLE>",
     "\"property\"",
     "\"to\"",
     "\"value\"",

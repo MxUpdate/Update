@@ -14,7 +14,7 @@
  */
 
 options {
-    JDK_VERSION = "1.6";
+    JDK_VERSION = "1.7";
     STATIC = false;
     ERROR_REPORTING = true;
     USER_TOKEN_MANAGER = false;
@@ -70,6 +70,8 @@ PARSER_END(PackageParser)
 {
       <UUID:                                "uuid">                                         : STRING_EXPECTED
 
+    | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
+
     | <DESCRIPTION:                         "description">                                  : MULTILINESTRING_EXPECTED
 
     | <HIDDEN_TRUE:                         "hidden">
@@ -93,18 +95,6 @@ PARSER_END(PackageParser)
 {
       <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u0009","\u000b"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" )* "\"" )> : DEFAULT
     | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
-}
-
-/********************************************************************* Member */
-<DEFAULT> TOKEN :
-{
-      <MEMBER:                              "member">                                       : MEMBERREF_EXPECTED
-}
-
-<MEMBERREF_EXPECTED> TOKEN :
-{
-      <MEMBERTYPE_STRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
-    | <MEMBERTYPE_SINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
 }
 
 /******************************************************************* Property */
@@ -131,43 +121,90 @@ PARSER_END(PackageParser)
 void parse(final PackageCI_mxJPO _package)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException
 : {
-    Token tmp;
-    MemberRef member;
+    String str;
     AdminProperty property;
-} {
-    (   ( <UUID>                                                            {property = new AdminProperty();
-                                                                             this.appendValue(this.getValue(_package, "properties"), "propertiesStack", property);
-                                                                             this.setValue(property, "name",  "UUID");}
-                                    ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
+}
+{
+    (
+        ( <UUID>                      property = uuidProperty()                 {this.appendValue(_package, "properties", "propertiesStack", property);} )
 
-      | ( <DESCRIPTION>             ( tmp = <MULTILINESTRING>               {this.setValue(_package, "description",                    this.getString(tmp.image));}
-                                    | tmp = <MULTILINESINGLE>               {this.setValue(_package, "description",                    this.getSingle(tmp.image));} ) )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_package, "symbolicNames", str);} )
 
-      | ( <HIDDEN_TRUE>                                                     {this.setValue(_package, "hidden",                         true);} )
-      | ( <HIDDEN_FALSE>                                                    {this.setValue(_package, "hidden",                         false);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_package, "description", str);} )
 
-      | ( <CUSTOM_TRUE>                                                     {this.setValue(_package, "custom",                         true);} )
-      | ( <CUSTOM_FALSE>                                                    {this.setValue(_package, "custom",                         false);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_package, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_package, "hidden", false);} )
 
-      | ( <USESPACKAGE>             ( tmp = <STRING>                        {this.appendValue(_package, "usesPackages",                this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.appendValue(_package, "usesPackages",                this.getSingle(tmp.image));} ) )
+      | ( <CUSTOM_TRUE>                                                         {this.setValue(_package, "custom", true);} )
+      | ( <CUSTOM_FALSE>                                                        {this.setValue(_package, "custom", false);} )
 
+      | ( <USESPACKAGE>               str = string()                            {this.appendValue(_package, "usesPackages", str);} )
 
-      | ( <MEMBER>                                                          {member = new MemberRef();this.appendValue(_package, "members", member);}
-                    ( tmp = <MEMBERTYPE_STRING>                             {this.setValue(member, "refAdminType",                      this.getString(tmp.image));}
-                    | tmp = <MEMBERTYPE_SINGLE>                             {this.setValue(member, "refAdminType",                      this.getSingle(tmp.image));} )
-                                    ( tmp = <STRING>                        {this.setValue(member, "refAdminName",                      this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(member, "refAdminName",                      this.getSingle(tmp.image));} ) )
-
-      | ( <PROPERTY>                                                        {property = new AdminProperty();this.appendValue(_package, "properties", "propertiesStack", property);}
-                                    ( tmp = <STRING>                        {this.setValue(property, "name", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "name", this.getSingle(tmp.image));} )
-              (   ( <PROPERTYVAL>   ( tmp = <STRING>                        {this.setValue(property, "value", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "value", this.getSingle(tmp.image));} ) )
-                | ( <PROPERTYTO>    ( tmp = <ADMINTYPE_STRING>              {this.setValue(property, "refAdminType", this.getString(tmp.image));}
-                                    | tmp = <ADMINTYPE_SINGLE>              {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
-                                    ( tmp = <STRING>                        {this.setValue(property, "refAdminName", this.getString(tmp.image));}
-                                    | tmp = <SINGLE>                        {this.setValue(property, "refAdminName", this.getSingle(tmp.image));} ) ) )* )
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_package, "properties", "propertiesStack", property);} )
     )*
+}
+
+/**
+ * Parses the UUID property definition.
+ */
+AdminProperty uuidProperty() :
+{
+    String str;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()
+    {this.setValue(property, "value", str);}
+    {this.setValue(property, "name",  "UUID");}
+    {return property;}
+}
+
+/**
+ * Parses the properties definition.
+ */
+AdminProperty property() :
+{
+    String str;
+    Token tmp;
+    AdminProperty property = new AdminProperty();
+}
+{
+    str = string()                                 {this.setValue(property, "name", str);}
+    ( ( <PROPERTYVAL>  str = string()              {this.setValue(property, "value", str);} )
+    | ( <PROPERTYTO>   ( tmp = <ADMINTYPE_STRING>  {this.setValue(property, "refAdminType", this.getString(tmp.image));}
+                       | tmp = <ADMINTYPE_SINGLE>  {this.setValue(property, "refAdminType", this.getSingle(tmp.image));} )
+                                   str = string()  {this.setValue(property, "refAdminName", str);} ) )*
+    {return property;}
+}
+
+/**
+ * Evaluates multi-line string.
+ *
+ * @return string
+ */
+String multiLineString() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <MULTILINESTRING>  {ret = this.getString(tmp.image);}
+    | tmp = <MULTILINESINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
+}
+
+/**
+ * Evaluates single-line string.
+ *
+ * @return string
+ */
+String string() :
+{
+    Token tmp;
+    String ret = null;
+}
+{
+    ( tmp = <STRING>  {ret = this.getString(tmp.image);}
+    | tmp = <SINGLE>  {ret = this.getSingle(tmp.image);} )
+    {return ret;}
 }

@@ -42,10 +42,22 @@ public class PackageCI_2DeltaCalculationTest
     public Object[][] getData()
     {
         return new Object[][] {
+            // uuid
             {"1) uuid",
                     new PackageData(this, "Test"),
                     new PackageData(this, "Test").setValue("uuid", "FDA75674979211E6AE2256B6B6499611")},
-            {"2) with property",
+            // symbolic names
+            {"2a) symbolic name",
+                    new PackageData(this, "Test"),
+                    new PackageData(this, "Test")
+                            .setValue("symbolicname", "expression_123")},
+            {"2b) two symbolic name",
+                    new PackageData(this, "Test"),
+                    new PackageData(this, "Test")
+                            .setValue("symbolicname", "expression_123")
+                            .setValue("symbolicname", "expression_345")},
+            // property
+            {"3) with property",
                     new PackageData(this, "Test"),
                     new PackageData(this, "Test").addProperty(new PropertyDef("my test \"property\" desc\"\\\\ription"))},
        };

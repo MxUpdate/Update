@@ -18,22 +18,18 @@ package org.mxupdate.update.system;
 import java.io.File;
 import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.SortedSet;
-import java.util.Stack;
 import java.util.TreeSet;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.EMxAdmin_mxJPO;
 import org.mxupdate.update.AbstractAdminObject_mxJPO;
 import org.mxupdate.update.util.AbstractParser_mxJPO.ParseException;
-import org.mxupdate.update.util.CompareToUtil_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
-import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateLine;
 import org.mxupdate.update.util.UpdateException_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
 
@@ -46,7 +42,6 @@ import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
  * <li>hidden flag</li>
  * <li>{@link #custom} flag</li>
  * <li>{@link #usesPackages used packages}</li>
- * <li>{@link #members member admin objects}</li>
  * <li>properties</li>
  * </ul>
  *
@@ -59,7 +54,10 @@ public class PackageCI_mxJPO
     private static final Set<String> IGNORED_URLS = new HashSet<>();
     static  {
         PackageCI_mxJPO.IGNORED_URLS.add("/memberList");
+        PackageCI_mxJPO.IGNORED_URLS.add("/memberList/member");
         PackageCI_mxJPO.IGNORED_URLS.add("/memberList/member/adminRef");
+        PackageCI_mxJPO.IGNORED_URLS.add("/memberList/member/adminRef/adminName");
+        PackageCI_mxJPO.IGNORED_URLS.add("/memberList/member/adminRef/adminType");
         PackageCI_mxJPO.IGNORED_URLS.add("/packageList");
     };
 
@@ -67,8 +65,6 @@ public class PackageCI_mxJPO
     private Boolean custom;
     /** Uses packages. */
     private final SortedSet<String> usesPackages = new TreeSet<>();
-    /** Holds all referenced meber's. */
-    private final Stack<MemberRef> members = new Stack<>();
 
     /**
      * Initializes this system package configuration item.
@@ -101,15 +97,6 @@ public class PackageCI_mxJPO
             this.custom = true;
             parsed = true;
 
-        } else if ("/memberList/member".equals(_url))  {
-            this.members.add(new MemberRef());
-            parsed = true;
-        } else if ("/memberList/member/adminRef/adminType".equals(_url))  {
-            this.members.peek().refAdminType = _content;
-            parsed = true;
-        } else if ("/memberList/member/adminRef/adminName".equals(_url))  {
-            this.members.peek().refAdminName = _content;
-            parsed = true;
         } else if ("/memberList/member/protection".equals(_url))  {
             parsed = "public".equals(_content);
 
@@ -122,29 +109,17 @@ public class PackageCI_mxJPO
         return parsed;
     }
 
-    /**
-     * {@inheritDoc}
-     * All {@link #members} are sorted.
-     */
-    @Override
-    protected void prepare()
-    {
-        super.prepare();
-
-        Collections.sort(this.members);
-    }
-
     @Override
     public void writeUpdate(final UpdateBuilder_mxJPO _updateBuilder)
     {
         _updateBuilder
-                //              tag            | default | value                              | write?
-                .stringNotNull( "uuid",                    this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
-                .string(        "description",             this.getDescription())
-                .flag(          "hidden",           false, this.isHidden())
-                .flag(          "custom",           false, this.custom)
-                .list(          "usespackage",             this.usesPackages)
-                .list(this.members)
+                //              tag             | default | value                              | write?
+                .stringNotNull( "uuid",                     this.getProperties().getValue4KeyValue(_updateBuilder.getParamCache(), PropertyDef_mxJPO.UUID))
+                .list(          "symbolicname",             this.getSymbolicNames())
+                .string(        "description",              this.getDescription())
+                .flag(          "hidden",            false, this.isHidden())
+                .flag(          "custom",            false, this.custom)
+                .list(          "usespackage",              this.usesPackages)
                 .properties(this.getProperties());
     }
 
@@ -154,65 +129,12 @@ public class PackageCI_mxJPO
                           final PackageCI_mxJPO _current)
         throws UpdateException_mxJPO
     {
+        DeltaUtil_mxJPO.calcSymbNames(_paramCache, _mql, this, _current);
         DeltaUtil_mxJPO.calcValueDelta(  _mql, "description",              this.getDescription(),   _current.getDescription());
         DeltaUtil_mxJPO.calcFlagDelta(   _mql, "hidden",            false, this.isHidden(),         _current.isHidden());
         DeltaUtil_mxJPO.calcValFlgDelta( _mql, "custom",            false, this.custom,             _current.custom);
         DeltaUtil_mxJPO.calcListDelta(   _mql, "usespackage",              this.usesPackages,       _current.usesPackages);
 
-        // remove not defined members
-        for (final MemberRef curMember : _current.members)  {
-            boolean found = false;
-            for (final MemberRef thisMember : this.members)  {
-                if (curMember.compareTo(thisMember) == 0)  {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)  {
-                _mql.newLine().cmd("remove member ").cmd(curMember.refAdminType).cmd(" ").arg(curMember.refAdminName);
-            }
-        }
-        // append new members
-        for (final MemberRef thisMember : this.members)  {
-            boolean found = false;
-            for (final MemberRef curMember : _current.members)  {
-                if (curMember.compareTo(thisMember) == 0)  {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found)  {
-                _mql.newLine().cmd("add member ").cmd(thisMember.refAdminType).cmd(" ").arg(thisMember.refAdminName);
-            }
-        }
-
         this.getProperties().calcDelta(_mql, "", _current.getProperties());
-    }
-
-    /**
-     * One referenced member.
-     */
-    public static class MemberRef
-        implements Comparable<MemberRef>, UpdateLine
-    {
-        /** Type of the referenced administration object. */
-        private String refAdminType;
-        /** Name of the referenced administration object. */
-        private String refAdminName;
-
-        @Override()
-        public int compareTo(final MemberRef _toCompare)
-        {
-            int ret = 0;
-            ret = CompareToUtil_mxJPO.compare(ret, this.refAdminType, _toCompare.refAdminType);
-            ret = CompareToUtil_mxJPO.compare(ret, this.refAdminName, _toCompare.refAdminName);
-            return ret;
-        }
-
-        @Override()
-        public void write(final UpdateBuilder_mxJPO _updateBuilder)
-        {
-            _updateBuilder.stepStartNewLine().stepSingle("member").stepSingle(this.refAdminType).stepString(this.refAdminName).stepEndLine();
-        }
     }
 }
