@@ -44,6 +44,7 @@ package org.mxupdate.update.zparser;
 import java.lang.reflect.InvocationTargetException;
 
 import org.mxupdate.update.program.Page_mxJPO;
+import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.system.IndexCI_mxJPO;
 import org.mxupdate.update.system.PackageCI_mxJPO;
 import org.mxupdate.update.system.UniqueKeyCI_mxJPO;
@@ -92,17 +93,24 @@ PARSER_END(MxParser)
 
 TOKEN : /** first level */
 {
-      <ACTIVE_TRUE:                         "active">    | <ACTIVE_FALSE:                        "!active">
-    | <CUSTOM_TRUE:                         "custom">    | <CUSTOM_FALSE:                        "!custom">
-    | <EMAIL_TRUE:                          "email">     | <EMAIL_FALSE:                         "!email">
-    | <ENABLE_TRUE:                         "enable">    | <ENABLE_FALSE:                        "!enable">
-    | <GLOBAL_TRUE:                         "global">    | <GLOBAL_FALSE:                        "!global">
-    | <HIDDEN_TRUE:                         "hidden">    | <HIDDEN_FALSE:                        "!hidden">
-    | <INCONMAIL_TRUE:                      "iconmail">  | <INCONMAIL_FALSE:                     "!iconmail">
-    | <TREEMENU_TRUE:                       "treemenu">  | <TREEMENU_FALSE:                      "!treemenu">
-    | <TRUSTED_TRUE:                        "trusted">   | <TRUSTED_FALSE:                       "!trusted">
-    | <UNIQUE_TRUE:                         "unique">    | <UNIQUE_FALSE:                        "!unique">
+      <ACTIVE_TRUE:                         "active">                   | <ACTIVE_FALSE:                        "!active">
+    | <CUSTOM_TRUE:                         "custom">                   | <CUSTOM_FALSE:                        "!custom">
+    | <DOWNLOADABLE_TRUE:                   "downloadable">             | <DOWNLOADABLE_FALSE:                  "!downloadable">
+    | <EMAIL_TRUE:                          "email">                    | <EMAIL_FALSE:                         "!email">
+    | <ENABLE_TRUE:                         "enable">                   | <ENABLE_FALSE:                        "!enable">
+    | <GLOBAL_TRUE:                         "global">                   | <GLOBAL_FALSE:                        "!global">
+    | <HIDDEN_TRUE:                         "hidden">                   | <HIDDEN_FALSE:                        "!hidden">
+    | <INCONMAIL_TRUE:                      "iconmail">                 | <INCONMAIL_FALSE:                     "!iconmail">
+    | <NEEDSBUSINESSOBJECT_TRUE:            "needsbusinessobject">      | <NEEDSBUSINESSOBJECT_FALSE:           "!needsbusinessobject">
+    | <PIPE_TRUE:                           "pipe">                     | <PIPE_FALSE:                          "!pipe">
+    | <POOLED_TRUE:                         "pooled">                   | <POOLED_FALSE:                        "!pooled">
+    | <TREEMENU_TRUE:                       "treemenu">                 | <TREEMENU_FALSE:                      "!treemenu">
+    | <TRUSTED_TRUE:                        "trusted">                  | <TRUSTED_FALSE:                       "!trusted">
+    | <UNIQUE_TRUE:                         "unique">                   | <UNIQUE_FALSE:                        "!unique">
 
+    | <DEFERRED:                            "deferred">                                     : DEFAULT
+    | <EXECUTE:                             "execute">                                      : DEFAULT
+    | <IMMEDIATE:                           "immediate">                                    : DEFAULT
     | <NEWROW:                              "newrow">                                       : DEFAULT
 
     | <HEIGHT:                              "height">                                       : NATURALNUMBER_EXPECTED
@@ -132,6 +140,7 @@ TOKEN : /** first level */
     | <PATTERN:                             "pattern">                                      : STRING_EXPECTED
     | <PHONE:                               "phone">                                        : STRING_EXPECTED
     | <ROLE:                                "role" >                                        : STRING_EXPECTED
+    | <RULE:                                "rule">                                         : STRING_EXPECTED
     | <SITE:                                "site">                                         : STRING_EXPECTED
     | <SYMBOLICNAME:                        "symbolicname">                                 : STRING_EXPECTED
     | <USER:                                ("add" ([" ","\t","\n","\r"])+ )? "user">       : STRING_EXPECTED
@@ -182,7 +191,7 @@ TOKEN : /** first level */
     | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
 }
 
-/*********************************************************************** Kind */
+/**************************************************************** Common Kind */
 <DEFAULT> TOKEN :
 {
       <KIND:                                "kind">                                         : KIND_EXPECTED
@@ -190,194 +199,15 @@ TOKEN : /** first level */
 
 <KIND_EXPECTED> TOKEN :
 {
-      <KIND_ORGANIZATION:                   "organization">                                 : DEFAULT
+    // Program -> Program
+      <KIND_EKL:                            "ekl">                                          : DEFAULT
+    | <KIND_EXTERNAL:                       "external">                                     : DEFAULT
+    | <KIND_JAVA:                           "java">                                         : DEFAULT
+    | <KIND_MQL:                            "mql">                                          : DEFAULT
+    // User -> Role
+    | <KIND_ORGANIZATION:                   "organization">                                 : DEFAULT
     | <KIND_PROJECT:                        "project">                                      : DEFAULT
     | <KIND_ROLE:                           "role">                                         : DEFAULT
-}
-
-/****************************** System -> Unique Key: For Relationship / Type */
-<DEFAULT> TOKEN :
-{
-      <FOR:                                 "for">                                          : FOR_EXPECTED
-}
-
-<FOR_EXPECTED> TOKEN :
-{
-      <FOR_RELATIONSHIP:                    "relationship">                                 : STRING_EXPECTED
-    | <FOR_TYPE:                            "type">                                         : STRING_EXPECTED
-}
-
-/*************************************** System -> Unique Key: With Interface */
-<DEFAULT> TOKEN :
-{
-      <WITH:                                "with">                                         : WITH_EXPECTED
-}
-
-<WITH_EXPECTED> TOKEN :
-{
-      <WITH_INTERFACE:                      "interface">                                    : STRING_EXPECTED
-}
-
-/***************************************************** User -> Person: Access */
-<DEFAULT> TOKEN :
-{
-       <ACCESS:                              "access">                                     : ACCESS_OPENEXPECTED
-}
-
-<ACCESS_OPENEXPECTED> TOKEN :
-{
-      <ACCESS_ALL:                           "all" >                                       : DEFAULT
-    | <ACCESS_OPEN:                          "{">                                          : ACCESS_EXPECTED
-}
-
-<ACCESS_EXPECTED> TOKEN :
-{
-      <ACCESS_CLOSE:                         "}">                                           : DEFAULT
-    | <ACCESS_EXPECTED_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>
-}
-
-/****************************************************** User -> Person: Admin */
-<DEFAULT> TOKEN :
-{
-       <ADMIN:                              "admin">                                        : ADMIN_OPENEXPECTED
-}
-
-<ADMIN_OPENEXPECTED> TOKEN :
-{
-      <ADMIN_ALL:                           "all" >                                         : DEFAULT
-    | <ADMIN_OPEN:                          "{">                                            : ADMIN_EXPECTED
-}
-
-<ADMIN_EXPECTED> TOKEN :
-{
-      <ADMIN_CLOSE:                         "}">                                           : DEFAULT
-    | <ADMIN_EXPECTED_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>
-}
-
-/**************************************************** User -> Person: Product */
-
-<DEFAULT> TOKEN :
-{
-      <PRODUCT:                              "product">                                    : PRODUCT_OPENEXPECTED
-}
-
-<PRODUCT_OPENEXPECTED> TOKEN :
-{
-      <PRODUCT_OPEN:                         "{">                                          : PRODUCT_EXPECTED
-}
-
-<PRODUCT_EXPECTED> TOKEN :
-{
-      <PRODUCT_CLOSE:                        "}">                                           : DEFAULT
-    | <PRODUCT_EXPECTED_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>
-}
-
-/******************************************************* User -> Person: Type */
-<DEFAULT> TOKEN :
-{
-       <TYPE:                                "type">                                        : TYPE_OPENEXPECTED
-}
-
-<TYPE_OPENEXPECTED> TOKEN :
-{
-      <TYPE_OPEN:                            "{">                                          : TYPE_EXPECTED
-}
-
-<TYPE_EXPECTED> TOKEN :
-{
-      <TYPE_CLOSE:                           "}">                                           : DEFAULT
-    | <TYPE_APPLICATION:                     "application">                                 : TYPE_EXPECTED
-    | <TYPE_FULL:                            "full">                                        : TYPE_EXPECTED
-    | <TYPE_BUSINESS:                        "business">                                    : TYPE_EXPECTED
-    | <TYPE_SYSTEM:                          "system">                                      : TYPE_EXPECTED
-}
-
-/********************************************** User Interface -> Form: Field */
-<DEFAULT> TOKEN :
-{
-      <FIELD:                               "field">                                        : FIELD_START_EXPECTED
-}
-
-<FIELD_START_EXPECTED> TOKEN :
-{
-      <FIELD_OPEN:                          "{">                                            : FIELD_EXPECTED
-}
-
-<FIELD_EXPECTED> TOKEN :
-{
-      <FIELD_CLOSE:                         "}">                                            : DEFAULT
-    | <FIELD_NAME:                          "name">                                         : FIELD_STRING_EXPECTED
-    | <FIELD_LABEL:                         "label">                                        : FIELD_STRING_EXPECTED
-    | <FIELD_SELECT:                        "select">                                       : FIELD_STRING_EXPECTED
-    | <FIELD_BOBJ:                          "businessobject">                               : FIELD_STRING_EXPECTED
-    | <FIELD_REL:                           "relationship">                                 : FIELD_STRING_EXPECTED
-    | <FIELD_RANGE:                         "range">                                        : FIELD_STRING_EXPECTED
-    | <FIELD_HREF:                          "href">                                         : FIELD_STRING_EXPECTED
-    | <FIELD_ALT:                           "alt">                                          : FIELD_STRING_EXPECTED
-    | <FIELD_USER:                          "user">                                         : FIELD_STRING_EXPECTED
-    | <FIELD_SETTING:                       "setting">                                      : FIELD_SETTING_EXPECTED
-}
-
-<FIELD_STRING_EXPECTED> TOKEN :
-{
-      <FIELD_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : FIELD_EXPECTED
-    | <FIELD_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : FIELD_EXPECTED
-}
-
-<FIELD_SETTING_EXPECTED> TOKEN :
-{
-      <FIELD_SETTING_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : FIELD_STRING_EXPECTED
-    | <FIELD_SETTING_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : FIELD_STRING_EXPECTED
-
-}
-
-/******************************************** User Interface -> Table: Column */
-<DEFAULT> TOKEN :
-{
-      <COLUMN:                              "column">                                       : COLUMN_OPENEXPECTED
-}
-
-<COLUMN_OPENEXPECTED> TOKEN :
-{
-      <COLUMN_OPEN:                         "{">                                            : COLUMN_EXPECTED
-}
-
-<COLUMN_EXPECTED> TOKEN :
-{
-      <COLUMN_CLOSE:                        "}">                                            : DEFAULT
-    | <COLUMN_NAME:                         "name">                                         : COLUMN_STRING_EXPECTED
-    | <COLUMN_LABEL:                        "label">                                        : COLUMN_STRING_EXPECTED
-    | <COLUMN_SELECT:                       "select">                                       : COLUMN_STRING_EXPECTED
-    | <COLUMN_BOBJ:                         "businessobject">                               : COLUMN_STRING_EXPECTED
-    | <COLUMN_REL:                          "relationship">                                 : COLUMN_STRING_EXPECTED
-    | <COLUMN_RANGE:                        "range">                                        : COLUMN_STRING_EXPECTED
-    | <COLUMN_HREF:                         "href">                                         : COLUMN_STRING_EXPECTED
-    | <COLUMN_ALT:                          "alt">                                          : COLUMN_STRING_EXPECTED
-    | <COLUMN_HIDDEN_TRUE:                  "hidden">                                       : COLUMN_EXPECTED
-    | <COLUMN_HIDDEN_FALSE:                 "!hidden">                                      : COLUMN_EXPECTED
-    | <COLUMN_USER:                         "user">                                         : COLUMN_STRING_EXPECTED
-    | <COLUMN_SORTTYPE:                     "sorttype">                                     : COLUMN_SORTTYPE_EXPECTED
-    | <COLUMN_SETTING:                      "setting">                                      : COLUMN_SETTING_STRING_EXPECTED
-}
-
-<COLUMN_STRING_EXPECTED> TOKEN :
-{
-      <COLUMN_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : COLUMN_EXPECTED
-    | <COLUMN_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : COLUMN_EXPECTED
-}
-
-<COLUMN_SETTING_STRING_EXPECTED> TOKEN :
-{
-      <SETTING_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : COLUMN_STRING_EXPECTED
-    | <SETTING_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : COLUMN_STRING_EXPECTED
-}
-
-<COLUMN_SORTTYPE_EXPECTED> TOKEN :
-{
-      <COLUMN_SORTTYPE_ALPHA:               "alpha">                                        : COLUMN_EXPECTED
-    | <COLUMN_SORTTYPE_NUMERIC:             "numeric">                                      : COLUMN_EXPECTED
-    | <COLUMN_SORTTYPE_OTHER:               "other">                                        : COLUMN_EXPECTED
-    | <COLUMN_SORTTYPE_NONE:                "none">                                         : COLUMN_EXPECTED
 }
 
 /************************************************************ Program -> Page */
@@ -407,6 +237,50 @@ void parsePage(final Page_mxJPO _page)
       | ( <CONTENT>                   str = multiLineString()                   {this.setValue(_page, "code", str);} )
       | ( <FILE>                      str = string()                            {this.setValue(_page, "file", str);} )
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_page, "properties", "propertiesStack", property);} )
+    )*
+}
+
+/********************************************************* Program -> Program */
+
+/**
+ * Parses one complete program definition.
+ *
+ * @param _page     target program to update with parsed values
+ */
+void parseProgram(final ProgramCI_mxJPO _prog)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    Token tmp;
+    AdminProperty property;
+}
+{
+    (
+        ( <PACKAGE>                   str = string()                            {this.setValue(_prog, "packageRef", str);} )
+      | ( <KIND>                    ( <KIND_EKL>                                {this.setValue(_prog, "kind", ProgramCI_mxJPO.Kind.EKL);}
+                                    | <KIND_EXTERNAL>                           {this.setValue(_prog, "kind", ProgramCI_mxJPO.Kind.EXTERNAL);}
+                                    | <KIND_MQL>                                {this.setValue(_prog, "kind", ProgramCI_mxJPO.Kind.MQL);}
+                                    | <KIND_JAVA>                               {this.setValue(_prog, "kind", ProgramCI_mxJPO.Kind.JAVA);} ) )
+      | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_prog, "properties", "propertiesStack", property);} )
+      | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_prog, "symbolicNames", str);} )
+      | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_prog, "description", str);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_prog, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_prog, "hidden", false);} )
+      | ( <NEEDSBUSINESSOBJECT_TRUE>                                            {this.setValue(_prog, "needsBusinessObjectContext", true);} )
+      | ( <NEEDSBUSINESSOBJECT_FALSE>                                           {this.setValue(_prog, "needsBusinessObjectContext", false);} )
+      | ( <DOWNLOADABLE_TRUE>                                                   {this.setValue(_prog, "downloadable", true);} )
+      | ( <DOWNLOADABLE_FALSE>                                                  {this.setValue(_prog, "downloadable", false);} )
+      | ( <PIPE_TRUE>                                                           {this.setValue(_prog, "pipe", true);} )
+      | ( <PIPE_FALSE>                                                          {this.setValue(_prog, "pipe", false);} )
+      | ( <POOLED_TRUE>                                                         {this.setValue(_prog, "pooled", true);} )
+      | ( <POOLED_FALSE>                                                        {this.setValue(_prog, "pooled", false);} )
+      | ( <RULE>                      str = string()                            {this.setValue(_prog, "rule", str);} )
+      | ( <EXECUTE>     ( <IMMEDIATE>                                           {this.setValue(_prog, "execute", ProgramCI_mxJPO.Execute.IMMEDIATE);}
+                        | <DEFERRED>                                            {this.setValue(_prog, "execute", ProgramCI_mxJPO.Execute.DEFERRED);}
+                        | <USER>            str = string()                      {this.setValue(_prog, "user", str);} )* )
+      | ( <CODE>                      str = multiLineString()                   {this.setValue(_prog, "code", str);} )
+      | ( <FILE>                      str = string()                            {this.setValue(_prog, "file", str);} )
+      | ( <PROPERTY>                  property = property()                     {this.appendValue(_prog, "properties", "propertiesStack", property);} )
     )*
 }
 
@@ -507,6 +381,27 @@ void parseUniqueKey(final UniqueKeyCI_mxJPO _uniqueKey)
     )*
 }
 
+/** System -> Unique Key: For Relationship / Type */
+<DEFAULT> TOKEN :
+{
+      <FOR:                                 "for">                                          : FOR_EXPECTED
+}
+<FOR_EXPECTED> TOKEN :
+{
+      <FOR_RELATIONSHIP:                    "relationship">                                 : STRING_EXPECTED
+    | <FOR_TYPE:                            "type">                                         : STRING_EXPECTED
+}
+
+/** System -> Unique Key: With Interface */
+<DEFAULT> TOKEN :
+{
+      <WITH:                                "with">                                         : WITH_EXPECTED
+}
+<WITH_EXPECTED> TOKEN :
+{
+      <WITH_INTERFACE:                      "interface">                                    : STRING_EXPECTED
+}
+
 /******************************************************** User -> Association */
 
 /**
@@ -578,59 +473,108 @@ void parsePerson(final PersonCI_mxJPO _person)
 {
     (
         ( <PACKAGE>                   str = string()                            {this.setValue(_person, "packageRef", str);} )
-
       | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_person, "properties", "propertiesStack", property);} )
-
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_person, "symbolicNames", str);} )
-
       | ( <COMMENT>                   str = multiLineString()                   {this.setValue(_person, "description", str);} )
-
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_person, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_person, "hidden", false);} )
-
       | ( <ACTIVE_TRUE>                                                         {this.setValue(_person, "active", true);} )
       | ( <ACTIVE_FALSE>                                                        {this.setValue(_person, "active", false);} )
-
       | ( <TRUSTED_TRUE>                                                        {this.setValue(_person, "trusted", true);} )
       | ( <TRUSTED_FALSE>                                                       {this.setValue(_person, "trusted", false);} )
-
       | ( <ACCESS>      ( <ACCESS_ALL>                                          {this.clearValues(_person, "access");this.appendValue(_person, "access", "all");}
                         | <ACCESS_OPEN>                                         {this.clearValues(_person, "access");}
                                         ( tmp = <ACCESS_EXPECTED_SINGLE>        {this.appendValue(_person, "access", this.getString(tmp.image));} )* <ACCESS_CLOSE > ) )
-
       | ( <ADMIN>       ( <ADMIN_ALL>                                           {this.clearValues(_person, "admin");this.appendValue(_person, "admin", "all");}
                         | <ADMIN_OPEN>                                          {this.clearValues(_person, "admin");}
                                         ( tmp = <ADMIN_EXPECTED_SINGLE>         {this.appendValue(_person, "admin", this.getString(tmp.image));} )* <ADMIN_CLOSE > ) )
-
       | ( <EMAIL_TRUE>                                                          {this.setValue(_person, "email", true);} )
       | ( <EMAIL_FALSE>                                                         {this.setValue(_person, "email", false);} )
       | ( <INCONMAIL_TRUE>                                                      {this.setValue(_person, "iconmail", true);} )
       | ( <INCONMAIL_FALSE>                                                     {this.setValue(_person, "iconmail", false);} )
-
       | ( <ADDRESS>                   str = string()                            {this.setValue(_person, "address", str);} )
       | ( <EMAILADDRESS>              str = string()                            {this.setValue(_person, "emailAddress", str);} )
       | ( <FAX>                       str = string()                            {this.setValue(_person, "fax", str);} )
       | ( <FULLNAME>                  str = string()                            {this.setValue(_person, "fullName", str);} )
       | ( <PHONE>                     str = string()                            {this.setValue(_person, "phone", str);} )
-
       | ( <PRODUCT> <PRODUCT_OPEN>  ( tmp = <PRODUCT_EXPECTED_SINGLE>           {this.appendValue(_person, "products", this.getString(tmp.image));} )* <PRODUCT_CLOSE> )
-
       | ( <TYPE> <TYPE_OPEN>                                                    {this.clearValues(_person, "types");}
                                     ( ( <TYPE_APPLICATION>                      {this.appendValue(_person, "types", TypeItem.APPLICATION);} )
                                     | ( <TYPE_FULL>                             {this.appendValue(_person, "types", TypeItem.FULL);} )
                                     | ( <TYPE_BUSINESS>                         {this.appendValue(_person, "types", TypeItem.BUSINESS);} )
                                     | ( <TYPE_SYSTEM>                           {this.appendValue(_person, "types", TypeItem.SYSTEM);} ) )* <TYPE_CLOSE > )
-
       | (<VAULT>                      str = string()                            {this.setValue(_person, "vault", str);} )
       | (<APPLICATION>                str = string()                            {this.setValue(_person, "application", str);} )
       | (<SITE>                       str = string()                            {this.setValue(_person, "site", str);} )
-
       | (<GROUP>                      str = string()                            {this.appendValue(_person, "groups", str);} )
-
       | (<ROLE>                       str = string()                            {this.appendValue(_person, "roles", str);} )
-
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_person, "properties", "propertiesStack", property);} )
     )*
+}
+
+/** User -> Person: Access */
+<DEFAULT> TOKEN :
+{
+       <ACCESS:                              "access">                                     : ACCESS_OPENEXPECTED
+}
+<ACCESS_OPENEXPECTED> TOKEN :
+{
+      <ACCESS_ALL:                           "all" >                                       : DEFAULT
+    | <ACCESS_OPEN:                          "{">                                          : ACCESS_EXPECTED
+}
+<ACCESS_EXPECTED> TOKEN :
+{
+      <ACCESS_CLOSE:                         "}">                                           : DEFAULT
+    | <ACCESS_EXPECTED_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>
+}
+
+/** User -> Person: Admin */
+<DEFAULT> TOKEN :
+{
+       <ADMIN:                              "admin">                                        : ADMIN_OPENEXPECTED
+}
+<ADMIN_OPENEXPECTED> TOKEN :
+{
+      <ADMIN_ALL:                           "all" >                                         : DEFAULT
+    | <ADMIN_OPEN:                          "{">                                            : ADMIN_EXPECTED
+}
+<ADMIN_EXPECTED> TOKEN :
+{
+      <ADMIN_CLOSE:                         "}">                                           : DEFAULT
+    | <ADMIN_EXPECTED_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>
+}
+
+/** User -> Person: Product */
+<DEFAULT> TOKEN :
+{
+      <PRODUCT:                              "product">                                    : PRODUCT_OPENEXPECTED
+}
+<PRODUCT_OPENEXPECTED> TOKEN :
+{
+      <PRODUCT_OPEN:                         "{">                                          : PRODUCT_EXPECTED
+}
+<PRODUCT_EXPECTED> TOKEN :
+{
+      <PRODUCT_CLOSE:                        "}">                                           : DEFAULT
+    | <PRODUCT_EXPECTED_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+>
+}
+
+/** User -> Person: Type */
+<DEFAULT> TOKEN :
+{
+       <TYPE:                                "type">                                        : TYPE_OPENEXPECTED
+}
+<TYPE_OPENEXPECTED> TOKEN :
+{
+      <TYPE_OPEN:                            "{">                                          : TYPE_EXPECTED
+}
+<TYPE_EXPECTED> TOKEN :
+{
+      <TYPE_CLOSE:                           "}">                                           : DEFAULT
+    | <TYPE_APPLICATION:                     "application">                                 : TYPE_EXPECTED
+    | <TYPE_FULL:                            "full">                                        : TYPE_EXPECTED
+    | <TYPE_BUSINESS:                        "business">                                    : TYPE_EXPECTED
+    | <TYPE_SYSTEM:                          "system">                                      : TYPE_EXPECTED
 }
 
 /************************************************************* User -> Role * */
@@ -781,6 +725,44 @@ void parseForm(final Form_mxJPO _form)
           <FIELD_CLOSE> )
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_form, "properties", "propertiesStack", property);} )
     )*
+}
+
+<DEFAULT> TOKEN :
+{
+      <FIELD:                               "field">                            : FIELD_START_EXPECTED
+}
+
+<FIELD_START_EXPECTED> TOKEN :
+{
+      <FIELD_OPEN:                          "{">                                : FIELD_EXPECTED
+}
+
+<FIELD_EXPECTED> TOKEN :
+{
+      <FIELD_CLOSE:                         "}">                                : DEFAULT
+    | <FIELD_NAME:                          "name">                             : FIELD_STRING_EXPECTED
+    | <FIELD_LABEL:                         "label">                            : FIELD_STRING_EXPECTED
+    | <FIELD_SELECT:                        "select">                           : FIELD_STRING_EXPECTED
+    | <FIELD_BOBJ:                          "businessobject">                   : FIELD_STRING_EXPECTED
+    | <FIELD_REL:                           "relationship">                     : FIELD_STRING_EXPECTED
+    | <FIELD_RANGE:                         "range">                            : FIELD_STRING_EXPECTED
+    | <FIELD_HREF:                          "href">                             : FIELD_STRING_EXPECTED
+    | <FIELD_ALT:                           "alt">                              : FIELD_STRING_EXPECTED
+    | <FIELD_USER:                          "user">                             : FIELD_STRING_EXPECTED
+    | <FIELD_SETTING:                       "setting">                          : FIELD_SETTING_EXPECTED
+}
+
+<FIELD_STRING_EXPECTED> TOKEN :
+{
+      <FIELD_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : FIELD_EXPECTED
+    | <FIELD_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : FIELD_EXPECTED
+}
+
+<FIELD_SETTING_EXPECTED> TOKEN :
+{
+      <FIELD_SETTING_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : FIELD_STRING_EXPECTED
+    | <FIELD_SETTING_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : FIELD_STRING_EXPECTED
+
 }
 
 /************************************************** User Interface -> Inquiry */
@@ -938,6 +920,54 @@ void parseTable(final Table_mxJPO _table)
           <COLUMN_CLOSE> )
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_table, "properties", "propertiesStack", property);} )
     )*
+}
+
+<DEFAULT> TOKEN :
+{
+      <COLUMN:                              "column">                           : COLUMN_OPENEXPECTED
+}
+
+<COLUMN_OPENEXPECTED> TOKEN :
+{
+      <COLUMN_OPEN:                         "{">                                : COLUMN_EXPECTED
+}
+
+<COLUMN_EXPECTED> TOKEN :
+{
+      <COLUMN_CLOSE:                        "}">                                : DEFAULT
+    | <COLUMN_NAME:                         "name">                             : COLUMN_STRING_EXPECTED
+    | <COLUMN_LABEL:                        "label">                            : COLUMN_STRING_EXPECTED
+    | <COLUMN_SELECT:                       "select">                           : COLUMN_STRING_EXPECTED
+    | <COLUMN_BOBJ:                         "businessobject">                   : COLUMN_STRING_EXPECTED
+    | <COLUMN_REL:                          "relationship">                     : COLUMN_STRING_EXPECTED
+    | <COLUMN_RANGE:                        "range">                            : COLUMN_STRING_EXPECTED
+    | <COLUMN_HREF:                         "href">                             : COLUMN_STRING_EXPECTED
+    | <COLUMN_ALT:                          "alt">                              : COLUMN_STRING_EXPECTED
+    | <COLUMN_HIDDEN_TRUE:                  "hidden">                           : COLUMN_EXPECTED
+    | <COLUMN_HIDDEN_FALSE:                 "!hidden">                          : COLUMN_EXPECTED
+    | <COLUMN_USER:                         "user">                             : COLUMN_STRING_EXPECTED
+    | <COLUMN_SORTTYPE:                     "sorttype">                         : COLUMN_SORTTYPE_EXPECTED
+    | <COLUMN_SETTING:                      "setting">                          : COLUMN_SETTING_STRING_EXPECTED
+}
+
+<COLUMN_STRING_EXPECTED> TOKEN :
+{
+      <COLUMN_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : COLUMN_EXPECTED
+    | <COLUMN_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : COLUMN_EXPECTED
+}
+
+<COLUMN_SETTING_STRING_EXPECTED> TOKEN :
+{
+      <SETTING_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : COLUMN_STRING_EXPECTED
+    | <SETTING_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : COLUMN_STRING_EXPECTED
+}
+
+<COLUMN_SORTTYPE_EXPECTED> TOKEN :
+{
+      <COLUMN_SORTTYPE_ALPHA:               "alpha">                            : COLUMN_EXPECTED
+    | <COLUMN_SORTTYPE_NUMERIC:             "numeric">                          : COLUMN_EXPECTED
+    | <COLUMN_SORTTYPE_OTHER:               "other">                            : COLUMN_EXPECTED
+    | <COLUMN_SORTTYPE_NONE:                "none">                             : COLUMN_EXPECTED
 }
 
 /**************************************************************************** */

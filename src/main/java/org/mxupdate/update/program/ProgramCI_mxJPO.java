@@ -30,6 +30,7 @@ import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateException_mxJPO;
+import org.mxupdate.update.zparser.MxParser_mxJPO;
 import org.mxupdate.util.FileUtils_mxJPO;
 import org.mxupdate.util.JPOUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
@@ -128,7 +129,7 @@ public class ProgramCI_mxJPO
     public void parseUpdate(final String _code)
         throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException, ParseException
     {
-        new ProgramParser_mxJPO(new StringReader(_code)).parse(this);
+        new MxParser_mxJPO(new StringReader(_code)).parseProgram(this);
         this.prepare();
     }
 
@@ -365,7 +366,7 @@ public class ProgramCI_mxJPO
     }
 
     /** Enumeration for programs. */
-    enum Kind
+    public enum Kind
     {
         /** EKL program. */
         EKL,
@@ -378,7 +379,7 @@ public class ProgramCI_mxJPO
     }
 
     /** */
-    enum Execute
+    public enum Execute
     {
 
         /** */
