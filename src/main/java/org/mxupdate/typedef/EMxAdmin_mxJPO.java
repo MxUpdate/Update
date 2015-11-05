@@ -36,6 +36,7 @@ import org.mxupdate.update.datamodel.Type_mxJPO;
 import org.mxupdate.update.program.Page_mxJPO;
 import org.mxupdate.update.program.ProgramCI_mxJPO;
 import org.mxupdate.update.system.PackageCI_mxJPO;
+import org.mxupdate.update.system.UniqueKeyCI_mxJPO;
 import org.mxupdate.update.user.Association_mxJPO;
 import org.mxupdate.update.user.Group_mxJPO;
 import org.mxupdate.update.user.PersonCI_mxJPO;
@@ -157,7 +158,8 @@ public enum EMxAdmin_mxJPO
             return ret;
         }
     },
-    Type(Type_mxJPO.class);
+    Type(Type_mxJPO.class),
+    UniqueKey(UniqueKeyCI_mxJPO.class);
 
     /** Key used for the select statements. */
     private static final String SELECT_KEY = "@@@2@@@2@@@";

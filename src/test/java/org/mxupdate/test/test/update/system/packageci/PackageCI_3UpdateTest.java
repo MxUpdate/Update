@@ -13,7 +13,7 @@
  *
  */
 
-package org.mxupdate.test.test.update.system;
+package org.mxupdate.test.test.update.system.packageci;
 
 import org.mxupdate.test.AbstractDataExportUpdate;
 import org.mxupdate.test.AbstractTest;

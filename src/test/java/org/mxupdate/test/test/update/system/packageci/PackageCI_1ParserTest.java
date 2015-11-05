@@ -13,7 +13,7 @@
  *
  */
 
-package org.mxupdate.test.test.update.system;
+package org.mxupdate.test.test.update.system.packageci;
 
 import org.mxupdate.test.test.update.AbstractParserTest;
 import org.mxupdate.update.system.PackageCI_mxJPO;
@@ -116,29 +116,29 @@ public class PackageCI_1ParserTest
                 "description \"\" !hidden !custom "
                         + "member unknown \"111\""},
             // properties
-            {"7a) property",
+            {"10a) property",
                 "",
                 "description \"\" !hidden !custom property \"111\""},
-            {"7b) property with value",
+            {"10b) property with value",
                 "",
                 "description \"\" !hidden !custom property \"111\" value \"222\""},
-            {"7c) property with referenced admin object",
+            {"10c) property with referenced admin object",
                 "",
                 "description \"\" !hidden !custom property \"111\" to type \"TestType\""},
-            {"7d) property with referenced admin object and value",
+            {"10d) property with referenced admin object and value",
                 "",
                 "description \"\" !hidden !custom property \"111\" to type \"TestType\" value \"222\""},
             // two properties for sorting
-            {"8a) sorting property",
+            {"11a) sorting property",
                  "description \"\" !hidden !custom property \"111\" property \"222\"",
                 "description \"\" !hidden !custom  property \"222\" property \"111\""},
-            {"8b) sorting property with value",
+            {"11b) sorting property with value",
                 "description \"\" !hidden !custom property \"111\" value \"222\" property \"111\" value \"333\"",
                 "description \"\" !hidden !custom property \"111\" value \"333\" property \"111\" value \"222\""},
-            {"8c) sorting  property with referenced admin object",
+            {"11c) sorting  property with referenced admin object",
                 "description \"\" !hidden !custom property \"111\" to type \"TestType1\" property \"111\" to type \"TestType2\"",
                 "description \"\" !hidden !custom property \"111\" to type \"TestType2\" property \"111\" to type \"TestType1\""},
-            {"8d) sorting  property with referenced admin object and value",
+            {"11d) sorting  property with referenced admin object and value",
                 "description \"\" !hidden !custom property \"111\" to type \"TestType\" value \"222\" property \"111\" to type \"TestType\" value \"333\"",
                 "description \"\" !hidden !custom property \"111\" to type \"TestType\" value \"333\" property \"111\" to type \"TestType\" value \"222\""},
          };
