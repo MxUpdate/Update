@@ -441,7 +441,7 @@ public class PolicyCI_1ParserTest
                 {"131c) single state user: reserve no",        "", simple + "state \"A\" { " + state + " user \"createor\" {read} no        reserve }"},
                 {"131d) single state user: reserve inclusive", "", simple + "state \"A\" { " + state + " user \"createor\" {read} inclusive reserve }"},
 
-                // reserve
+                // maturity
                 {"134a) all state user: maturity any", simple + "allstate { user \"createor\" {read} }", simple + "allstate { user \"createor\" {read} any maturity }"},
                 {"140b) all state user: maturity no",         "", simple + "allstate { user \"createor\" {read} no         maturity }"},
                 {"140c) all state user: maturity public",     "", simple + "allstate { user \"createor\" {read} public     maturity }"},
@@ -449,13 +449,16 @@ public class PolicyCI_1ParserTest
                 {"140e) all state user: maturity private",    "", simple + "allstate { user \"createor\" {read} private    maturity }"},
                 {"140f) all state user: maturity notprivate", "", simple + "allstate { user \"createor\" {read} notprivate maturity }"},
                 {"140g) all state user: maturity ppp",        "", simple + "allstate { user \"createor\" {read} ppp        maturity }"},
-                {"131a) single state user: maturity any", simple + "state \"A\" { " + state + " user \"createor\" {read} }", simple + "state \"A\" { " + state + " user \"createor\" {read} any maturity }"},
-                {"131b) single state user: maturity no",         "", simple + "state \"A\" { " + state + " user \"createor\" {read} no         maturity }"},
-                {"131c) single state user: maturity public",     "", simple + "state \"A\" { " + state + " user \"createor\" {read} public     maturity }"},
-                {"131d) single state user: maturity protected",  "", simple + "state \"A\" { " + state + " user \"createor\" {read} protected  maturity }"},
-                {"131e) single state user: maturity private",    "", simple + "state \"A\" { " + state + " user \"createor\" {read} private    maturity }"},
-                {"131f) single state user: maturity notprivate", "", simple + "state \"A\" { " + state + " user \"createor\" {read} notprivate maturity }"},
-                {"131g) single state user: maturity ppp",        "", simple + "state \"A\" { " + state + " user \"createor\" {read} ppp        maturity }"},
+                {"141a) single state user: maturity any", simple + "state \"A\" { " + state + " user \"createor\" {read} }", simple + "state \"A\" { " + state + " user \"createor\" {read} any maturity }"},
+                {"141b) single state user: maturity no",         "", simple + "state \"A\" { " + state + " user \"createor\" {read} no         maturity }"},
+                {"141c) single state user: maturity public",     "", simple + "state \"A\" { " + state + " user \"createor\" {read} public     maturity }"},
+                {"141d) single state user: maturity protected",  "", simple + "state \"A\" { " + state + " user \"createor\" {read} protected  maturity }"},
+                {"141e) single state user: maturity private",    "", simple + "state \"A\" { " + state + " user \"createor\" {read} private    maturity }"},
+                {"141f) single state user: maturity notprivate", "", simple + "state \"A\" { " + state + " user \"createor\" {read} notprivate maturity }"},
+                {"141g) single state user: maturity ppp",        "", simple + "state \"A\" { " + state + " user \"createor\" {read} ppp        maturity }"},
+                // check public access after owner access
+                {"142a) all state public after owner (to ensure only public maturity is interpereted as maturity)", "", simple + "allstate { owner {read} public {read} }"},
+                {"142b) single state public after owner (to ensure only public maturity is interpereted as maturity)", "", simple + "state \"A\" { " + state + " owner {read} public {read} }"},
 
                 // category
                 {"150a) all state user: category any", simple + "allstate { user \"createor\" {read} }", simple + "allstate { user \"createor\" {read} any category }"},

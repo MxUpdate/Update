@@ -516,6 +516,76 @@ LocalPathType localPathType()
     }
 }
 
+/********************************************************************* Access */
+<AC_ACCESS_STRING_EXPECTED> TOKEN :
+{
+    <AC_ACCESS_STRING: (["a"-"z"])+>
+   | <AC_CLOSE: "}"> : DEFAULT
+}
+
+/**
+ * Parses the access definition.
+ */
+Access access() :
+{
+    String str;
+    Token tmp;
+    Access access = new Access();
+    @SuppressWarnings("rawtypes") Set accessSet = new HashSet();
+}
+{
+    ( <REVOKE>                    {this.setValue(access, "revoke", true);} ) ?
+    ( <LOGIN>                     {this.setValue(access, "login", true);} ) ?
+
+    ( <OWNER>                     {this.setValue(access, "kind", "owner");}
+    | <PUBLIC>                    {this.setValue(access, "kind", "public");}
+    | <USER>    str = string()    {this.setValue(access, "kind", "user");this.setValue(access, "userRef", str);} )
+
+    (
+        (
+              ( <BRACE_OPEN> {token_source.SwitchTo(AC_ACCESS_STRING_EXPECTED);} ( tmp = <AC_ACCESS_STRING> {accessSet.add(tmp.image);} )* <AC_CLOSE> ) {this.appendValues(access, "access", accessSet);}
+            | ( <KEY> str = string()  {this.setValue(access, "key", str);} )
+            | ( <FILTER>                  str = multiLineString()               {this.setValue(access, "filter", str);} )
+            | ( <LOCALFILTER>             str = multiLineString()               {this.setValue(access, "localfilter", str);} )
+            | ( <ANCESTOR>              ( tmp = <ORGANIZATION>
+                                        | tmp = <PROJECT> )                     {this.setValue(access, tmp.image, "ancestor");} )
+            | ( <ANY>                   ( tmp = <CATEGORY>
+                                        | tmp = <MATURITY>
+                                        | tmp = <ORGANIZATION>
+                                        | tmp = <OWNER>
+                                        | tmp = <PROJECT>
+                                        | tmp = <RESERVE> )                     {this.setValue(access, tmp.image, "any");} )
+            | ( <CONTEXT >              ( tmp = <OWNER>
+                                        | tmp = <RESERVE> )                     {this.setValue(access, tmp.image, "context");} )
+            | ( <CONTRACTOR>            ( tmp = <CATEGORY> )                    {this.setValue(access, tmp.image, "contractor");} )
+            | ( <CUSTOMER>              ( tmp = <CATEGORY> )                    {this.setValue(access, tmp.image, "customer");} )
+            | ( <DESCENDANT>            ( tmp = <ORGANIZATION>
+                                        | tmp = <PROJECT> )                     {this.setValue(access, tmp.image, "descendant");} )
+            | ( <GOLDPARTNER>           ( tmp = <CATEGORY> )                    {this.setValue(access, tmp.image, "goldpartner");} )
+            | ( <INCLUSIVE>             ( tmp = <RESERVE> )                     {this.setValue(access, tmp.image, "inclusive");} )
+            | ( <NO>                    ( tmp = <MATURITY>
+                                        | tmp = <RESERVE> )                     {this.setValue(access, tmp.image, "no");} )
+            | ( <NOTPRIVATE>            ( tmp = <MATURITY> )                    {this.setValue(access, tmp.image, "notprivate");} )
+            | ( <OEM>                   ( tmp = <CATEGORY> )                    {this.setValue(access, tmp.image, "oem");} )
+            | ( <PARTNER>               ( tmp = <CATEGORY> )                    {this.setValue(access, tmp.image, "partner");} )
+            | ( <PPP>                   ( tmp = <MATURITY> )                    {this.setValue(access, tmp.image, "ppp");} )
+            | ( <PRIVATE>               ( tmp = <MATURITY> )                    {this.setValue(access, tmp.image, "private");} )
+            | ( <PROTECTED>             ( tmp = <MATURITY> )                    {this.setValue(access, tmp.image, "protected");} )
+            | ( <RELATED>               ( tmp = <ORGANIZATION>
+                                        | tmp = <PROJECT> )                     {this.setValue(access, tmp.image, "related");} )
+            | ( <SINGLE>                ( tmp = <ORGANIZATION>
+                                        | tmp = <PROJECT> )                     {this.setValue(access, tmp.image, "single");} )
+            | ( <SUPPLIER>              ( tmp = <CATEGORY> )                    {this.setValue(access, tmp.image, "supplier");} )
+        )
+        // lookahead for 'public maturity' (because 'public' also defines as user!)
+        // lookahead is already an or statement => the lookahead is defined separatly
+        ([ LOOKAHEAD(<PUBLIC>, {getToken(2).kind == MATURITY } ) <PUBLIC> ( tmp = <MATURITY> )  {this.setValue(access, tmp.image, "public");} ])
+    )*
+    {
+        return access;
+    }
+}
+
 /**************************************************** Data Model -> Attribute */
 
 /**
@@ -1011,7 +1081,7 @@ void parsePolicy(final Policy_mxJPO _policy)
     Token tmp;
     AdminProperty property;
     Policy_mxJPO.State state;
-    Access access = new Access();
+    Access access;
 }
 {
     (
@@ -1019,27 +1089,23 @@ void parsePolicy(final Policy_mxJPO _policy)
       | ( <UUID>                      property = uuidProperty()                 {this.appendValue(_policy, "properties", "propertiesStack", property);} )
       | ( <SYMBOLICNAME>              str = string()                            {this.appendValue(_policy, "symbolicNames", str);} )
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_policy, "description", str);} )
-      | ( <FORMAT_ALL>                                                          {this.setValue(_policy, "allFormats",                           true);} )
-      | ( <FORMAT>                    str = string()                            {this.appendValue(_policy, "formats",                           str);} )
+      | ( <FORMAT_ALL>                                                          {this.setValue(_policy, "allFormats", true);} )
+      | ( <FORMAT>                    str = string()                            {this.appendValue(_policy, "formats", str);} )
       | ( <TYPE>                      str = string()                            {if ("all".equals(str)) {this.setValue(_policy, "allTypes", true);} else {this.appendValue(_policy, "types", str);}} )
-      | ( <DEFAULTFORMAT>             str = string()                            {this.setValue(_policy, "defaultFormat",                        str);} )
-      | ( <ENFORCE_TRUE>                                                        {this.setValue(_policy, "enforce",                              true);} )
-      | ( <ENFORCE_FALSE>                                                       {this.setValue(_policy, "enforce",                              false);} )
-      | ( <DELIMITER>               ( tmp = <DELIMITERSTRING>                   {this.setValue(_policy, "delimiter",                            this.getString(tmp.image));}
-                                    | tmp = <DELIMITERSINGLE>                   {this.setValue(_policy, "delimiter",                            this.getSingle(tmp.image));} ) )
-      | ( ( <SEQUENCE> | <MINORSEQUENCE> ) str = string()                       {this.setValue(_policy, "minorsequence",                        str);} )
-      | ( <MAJORSEQUENCE>             str = string()                            {this.setValue(_policy, "majorsequence",                        str);} )
-      | ( <STORE>                     str = string()                            {this.setValue(_policy, "store",                                str);} )
-      | ( <HIDDEN_TRUE>                                                         {this.setValue(_policy, "hidden",                               true);} )
-      | ( <HIDDEN_FALSE>                                                        {this.setValue(_policy, "hidden",                               false);} )
-      | ( <ALLSTATE> "{"                                                        {this.setValue(_policy, "allState",                             true);}
-               ( ( <REVOKE>                                                     {this.setValue(access, "revoke",                                true);} ) ?
-                 ( <LOGIN>                                                      {this.setValue(access, "login",                                 true);} ) ?
-                        ( <OWNER>                                               {this.setValue(access, "kind", "owner");}
-                        | <PUBLIC>                                              {this.setValue(access, "kind", "public");}
-                        | <USER>      str = string()                            {this.setValue(access, "kind", "user");this.setValue(access, "userRef", str);} )
-                                                stateAccessDef(access)          {this.appendValue(_policy, "allStateAccess", "accessList", access);/*reset*/access = new Access();} )*
-                                                        "}" )
+      | ( <DEFAULTFORMAT>             str = string()                            {this.setValue(_policy, "defaultFormat", str);} )
+      | ( <ENFORCE_TRUE>                                                        {this.setValue(_policy, "enforce", true);} )
+      | ( <ENFORCE_FALSE>                                                       {this.setValue(_policy, "enforce", false);} )
+      | ( <DELIMITER>               ( tmp = <DELIMITERSTRING>                   {this.setValue(_policy, "delimiter", this.getString(tmp.image));}
+                                    | tmp = <DELIMITERSINGLE>                   {this.setValue(_policy, "delimiter", this.getSingle(tmp.image));} ) )
+      | ( ( <SEQUENCE> | <MINORSEQUENCE> ) str = string()                       {this.setValue(_policy, "minorsequence", str);} )
+      | ( <MAJORSEQUENCE>             str = string()                            {this.setValue(_policy, "majorsequence", str);} )
+      | ( <STORE>                     str = string()                            {this.setValue(_policy, "store", str);} )
+      | ( <HIDDEN_TRUE>                                                         {this.setValue(_policy, "hidden", true);} )
+      | ( <HIDDEN_FALSE>                                                        {this.setValue(_policy, "hidden", false);} )
+      | ( <ALLSTATE>                                                            {this.setValue(_policy, "allState", true);}
+                <BRACE_OPEN>
+                       ( access = access()                                      {this.appendValue(_policy, "allStateAccess", "accessList", access);} )*
+                <BRACE_CLOSE> )
       | ( <STATE>                     state = state()                           {this.appendValue(_policy, "states", state);} )
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_policy, "properties", "propertiesStack", property);} )
     )*
@@ -1071,7 +1137,7 @@ Policy_mxJPO.State state() :
     Trigger trigger;
     Policy_mxJPO.Signature signature;
     AdminProperty property;
-    Access access = new Access();
+    Access access;
 }
 {
     ( str = string()                                                            {this.setValue(state, "name", str);} )
@@ -1091,12 +1157,7 @@ Policy_mxJPO.State state() :
       | ( <ENFORCERESERVEACCESS_FALSE>                                          {this.setValue(state, "enforcereserveaccess", false);} )
       | ( <PUBLISHED_TRUE>                                                      {this.setValue(state, "published", true);} )
       | ( <PUBLISHED_FALSE>                                                     {this.setValue(state, "published", false);} )
-      | ( ( <REVOKE>                                                            {this.setValue(access, "revoke", true);} ) ?
-          ( <LOGIN>                                                             {this.setValue(access, "login", true);} ) ?
-                    ( <OWNER>                                                   {this.setValue(access, "kind", "owner");}
-                    | <PUBLIC>                                                  {this.setValue(access, "kind", "public");}
-                    | <USER>    str = string()                                  {this.setValue(access, "kind", "user");this.setValue(access, "userRef", str);} )
-                                            stateAccessDef(access)              {this.appendValue(state, "access", "accessList", access);/*reset*/access = new Access();} )
+      | ( access = access()                                                     {this.appendValue(state, "access", "accessList", access);} )
       | ( <ACTION>              str = string()                                  {this.setValue(state, "actionProgram", str);}
                      <INPUT>    str = string()                                  {this.setValue(state, "actionInput", str);} )
       | ( <CHECK>               str = string()                                  {this.setValue(state, "checkProgram", str);}
@@ -1124,61 +1185,6 @@ Policy_mxJPO.State state() :
     {return state;}
 }
 
-
-<AC_ACCESS_STRING_EXPECTED> TOKEN :
-{
-    <AC_ACCESS_STRING: (["a"-"z"])+>
-   | <AC_CLOSE: "}"> : DEFAULT
-}
-
-void stateAccessDef(final Access _access) :
-{
-    String str;
-    Token tmp;
-    @SuppressWarnings("rawtypes") Set access = new HashSet();
-}
-{
-    // choice conflict for public can be ignore, because public is used outside of the access statement
-    (
-          ( <BRACE_OPEN> {token_source.SwitchTo(AC_ACCESS_STRING_EXPECTED);} ( tmp = <AC_ACCESS_STRING> {access.add(tmp.image);} )* <AC_CLOSE> )
-        | ( <KEY> str = string()  {this.setValue(_access, "key", str);} )
-        | ( <FILTER>                  str = multiLineString()               {this.setValue(_access, "filter", str);} )
-        | ( <LOCALFILTER>             str = multiLineString()               {this.setValue(_access, "localfilter", str);} )
-        | ( <ANCESTOR>              ( tmp = <ORGANIZATION>
-                                    | tmp = <PROJECT> )                     {this.setValue(_access, tmp.image, "ancestor");} )
-        | ( <ANY>                   ( tmp = <CATEGORY>
-                                    | tmp = <MATURITY>
-                                    | tmp = <ORGANIZATION>
-                                    | tmp = <OWNER>
-                                    | tmp = <PROJECT>
-                                    | tmp = <RESERVE> )                     {this.setValue(_access, tmp.image, "any");} )
-        | ( <CONTEXT >              ( tmp = <OWNER>
-                                    | tmp = <RESERVE> )                     {this.setValue(_access, tmp.image, "context");} )
-        | ( <CONTRACTOR>            ( tmp = <CATEGORY> )                    {this.setValue(_access, tmp.image, "contractor");} )
-        | ( <CUSTOMER>              ( tmp = <CATEGORY> )                    {this.setValue(_access, tmp.image, "customer");} )
-        | ( <DESCENDANT>            ( tmp = <ORGANIZATION>
-                                    | tmp = <PROJECT> )                     {this.setValue(_access, tmp.image, "descendant");} )
-        | ( <GOLDPARTNER>           ( tmp = <CATEGORY> )                    {this.setValue(_access, tmp.image, "goldpartner");} )
-        | ( <INCLUSIVE>             ( tmp = <RESERVE> )                     {this.setValue(_access, tmp.image, "inclusive");} )
-        | ( <NO>                    ( tmp = <MATURITY>
-                                    | tmp = <RESERVE> )                     {this.setValue(_access, tmp.image, "no");} )
-        | ( <NOTPRIVATE>            ( tmp = <MATURITY> )                    {this.setValue(_access, tmp.image, "notprivate");} )
-        | ( <OEM>                   ( tmp = <CATEGORY> )                    {this.setValue(_access, tmp.image, "oem");} )
-        | ( <PARTNER>               ( tmp = <CATEGORY> )                    {this.setValue(_access, tmp.image, "partner");} )
-        | ( <PPP>                   ( tmp = <MATURITY> )                    {this.setValue(_access, tmp.image, "ppp");} )
-        | ( <PRIVATE>               ( tmp = <MATURITY> )                    {this.setValue(_access, tmp.image, "private");} )
-        | ( <PROTECTED>             ( tmp = <MATURITY> )                    {this.setValue(_access, tmp.image, "protected");} )
-        | ( <PUBLIC>                ( tmp = <MATURITY> )                    {this.setValue(_access, tmp.image, "public");} )
-        | ( <RELATED>               ( tmp = <ORGANIZATION>
-                                    | tmp = <PROJECT> )                     {this.setValue(_access, tmp.image, "related");} )
-        | ( <SINGLE>                ( tmp = <ORGANIZATION>
-                                    | tmp = <PROJECT> )                     {this.setValue(_access, tmp.image, "single");} )
-        | ( <SUPPLIER>              ( tmp = <CATEGORY> )                    {this.setValue(_access, tmp.image, "supplier");} )
-    )*
-    {
-        this.appendValues(_access, "access", access);
-    }
-}
 /** Route */
 <DEFAULT> TOKEN :
 {
@@ -1262,9 +1268,8 @@ void parseRule(final Rule_mxJPO _rule)
     throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
 {
     String str;
-    Token tmp;
     AdminProperty property;
-    Access access = new Access();
+    Access access;
 }
 {
     (
@@ -1276,12 +1281,7 @@ void parseRule(final Rule_mxJPO _rule)
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_rule, "hidden", false);} )
       | ( <ENFORCERESERVEACCESS_TRUE>                                           {this.setValue(_rule, "enforcereserveaccess", true);} )
       | ( <ENFORCERESERVEACCESS_FALSE>                                          {this.setValue(_rule, "enforcereserveaccess", false);} )
-      | ( ( <REVOKE>                                                            {this.setValue(access, "revoke",  true);} ) ?
-          ( <LOGIN>                                                             {this.setValue(access, "login", true);} ) ?
-                ( <OWNER>                                                       {this.setValue(access, "kind", "owner");}
-                | <PUBLIC>                                                      {this.setValue(access, "kind", "public");}
-                | <USER>  str = string()                                        {this.setValue(access, "kind", "user");this.setValue(access, "userRef", str);} )
-                                      stateAccessDef(access)                    {this.appendValue(_rule, "accessList", "accessList", access);/*reset*/access = new Access();} )
+      | ( access = access()                                                     {this.appendValue(_rule, "accessList", "accessList", access);} )
       | (<PROPERTY>                   property = property()                     {this.appendValue(_rule, "properties", "propertiesStack", property);} )
     )*
 }

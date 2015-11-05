@@ -197,6 +197,10 @@ public class RuleCI_1ParserTest
                             + "revoke login user \"creator\" key \"test\" {read} "
                             + "login user \"creator\" key \"test\" {read} "
                             + "revoke user \"creator\" key \"test\" {read}"},
+            // public after owner (to check public maturity)
+            {"20) public after owner access (to check that not public maturity is read)",
+                                "",
+                                "description \"\"  hidden !enforcereserveaccess owner {read} public {read}"},
         };
     }
 
