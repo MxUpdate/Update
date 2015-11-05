@@ -687,6 +687,9 @@ public class ParameterCache_mxJPO
         /** Defines the program where all administration objects must be registered with symbolic names. */
         RegisterSymbolicNames,
 
+        /** Format of the file date used within installation. */
+        InstallFileDateFormatJava,
+
         ////////////////////////////////////////////////////////////////////////
 
         /**

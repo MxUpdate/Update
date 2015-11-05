@@ -27,7 +27,6 @@ import java.util.TreeSet;
 
 import org.mxupdate.mapping.PropertyDef_mxJPO;
 import org.mxupdate.typedef.TypeDef_mxJPO;
-import org.mxupdate.update.util.MqlUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
 import org.mxupdate.update.util.StringUtil_mxJPO;
@@ -46,11 +45,8 @@ import matrix.util.MatrixException;
  */
 public class InstallDataModel_mxJPO
 {
-    /** Name of the parameter defining the format of the file date / format. */
-    private static final String PARAM_INSTALLFILEDATEFORMAT = "InstallFileDateFormatJava";
-
-    /** MQL statement to list of MxUpdate Update programs for which the symbolic names must be registered. */
-    private static final String LIST_MXUPDATE_PROGRAMS = "escape list program MxUpdate,org.mxupdate* select name isjavaprogram dump @";
+    /** Wildcard for list of MxUpdate Update programs for which the symbolic names must be registered. */
+    private static final String MATCH_MXUPDATE_PROGRAMS = "MxUpdate,org.mxupdate*";
 
     /**
      * Method used as entry from the MQL interface to install / update the data
@@ -87,7 +83,7 @@ public class InstallDataModel_mxJPO
         // initialize mapping
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, false);
 
-        final SimpleDateFormat dateFormat = new SimpleDateFormat(paramCache.getValueString(InstallDataModel_mxJPO.PARAM_INSTALLFILEDATEFORMAT));
+        final SimpleDateFormat dateFormat = new SimpleDateFormat(paramCache.getValueString(ValueKeys.InstallFileDateFormatJava));
         dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+00"));
 
         final String fileDate = dateFormat.format(new Date());
@@ -121,14 +117,11 @@ public class InstallDataModel_mxJPO
                                     final String _installedDate)
         throws Exception
     {
-        final String applName =     _paramCache.getValueString(ValueKeys.RegisterApplicationName);
-        final String authorName     = _paramCache.getValueString(ValueKeys.RegisterAuthorName);
-        final String installerName  = _paramCache.getValueString(ValueKeys.RegisterInstallerName);
-        final String progs = MqlUtil_mxJPO.execMql(_paramCache, InstallDataModel_mxJPO.LIST_MXUPDATE_PROGRAMS);
-        for (final String progLine : new TreeSet<>(Arrays.asList(progs.split("\n"))))  {
-            final String[] progLineArr = progLine.split("@");
-            final String progName = progLineArr[0];
-            // do we have a JPO?
+        final String applName      = _paramCache.getValueString(ValueKeys.RegisterApplicationName);
+        final String authorName    = _paramCache.getValueString(ValueKeys.RegisterAuthorName);
+        final String installerName = _paramCache.getValueString(ValueKeys.RegisterInstallerName);
+        final String progs         = MqlBuilderUtil_mxJPO.mql().cmd("escape list program ").arg(InstallDataModel_mxJPO.MATCH_MXUPDATE_PROGRAMS).exec(_paramCache.getContext());
+        for (final String progName : new TreeSet<>(Arrays.asList(progs.split("\n"))))  {
             _paramCache.logInfo("check program '" + progName + "'");
             this.registerObject(_paramCache, "program", progName);
 
