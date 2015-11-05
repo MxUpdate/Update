@@ -27,13 +27,13 @@ eval  {
     # get the installation directory
     # is the installation directory defined as local MX environment variable?
     if {[mql exists env "${ENV_NAME_MXUPDATE_PATH}"] > 0} {
-        set sPath [mql get env "${ENV_NAME_MXUPDATE_PATH}"]
+        set sRoot [mql get env "${ENV_NAME_MXUPDATE_PATH}"]
     # maybe as global environment variable?
     } elseif {[mql exists env global "${ENV_NAME_MXUPDATE_PATH}"] > 0} {
-        set sPath [mql get env global "${ENV_NAME_MXUPDATE_PATH}"]
+        set sRoot [mql get env global "${ENV_NAME_MXUPDATE_PATH}"]
     # or as shell enviroment variable?
     } elseif {[info exists env(${ENV_NAME_MXUPDATE_PATH})] > 0}  {
-        set sPath $env(${ENV_NAME_MXUPDATE_PATH})
+        set sRoot $env(${ENV_NAME_MXUPDATE_PATH})
     # otherwise error!!!!
     } else  {
         error "\nRequired enviroment variable '${ENV_NAME_MXUPDATE_PATH}' is not defined!"
@@ -68,19 +68,22 @@ eval  {
     }
 
     # check if original structure is used (defined within SVN)
-    set bIsOrigStructure [expr [file exists [file join "${sPath}" org]] == 0]
+    set bIsOrigStructure [expr [file exists [file join "${sRoot}" org]] == 0]
 
     # define path for mapping properties file
     if ${bIsOrigStructure}  {
-        set sMappingFileOriginal [file join "${sPath}" "resources" "org" "mxupdate" "mapping.properties"]
+        set sRootJPOs        [file join "${sRoot}" "java"]
+        set sRootResources   [file join "${sRoot}" "resources"]
     } else  {
-        set sMappingFileOriginal [file join "${sPath}" "org" "mxupdate" "mapping.properties"]
+        set sRootJPOs        [file join "${sRoot}"]
+        set sRootResources   [file join "${sRoot}"]
     }
+    set sMappingFileOriginal [file join "${sRootResources}" "org" "mxupdate" "mapping.properties"]
 
     ############################################################################
     # Read the mapping configuration between MX names and internal used names
     ############################################################################
-    proc pReadMapping {_sRoot}  {
+    proc pReadMapping {}  {
         global asMapping
         global sMappingFileExtension
         global sMappingFileOriginal
@@ -117,15 +120,15 @@ eval  {
     ##############################################################################
     # The procedure installs given property within the given root path.
     ##############################################################################
-    proc pInstallProperties {_sRoot _sVersion _sProgName}  {
+    proc pInstallProperties {_sVersion _sProgName}  {
         global asMapping
         global sMappingFileExtension
         global sMappingFileOriginal
 
         # if a file extension exists, both file dates must be checked!
-        set sFileDate [clock format [file mtime "${sMappingFileOriginal}"]  -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
+        set sFileDate [clock format [file mtime "${sMappingFileOriginal}"] -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]
         if {"${sMappingFileExtension}" != ""}  {
-            set sFileDate "${sFileDate}, [clock format [file mtime "${sMappingFileExtension}"]  -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]"
+            set sFileDate "${sFileDate}, [clock format [file mtime "${sMappingFileExtension}"] -gmt true -format $asMapping(ParameterDef.InstallFileDateFormatTCL.Default)]"
         }
 
         if {[mql list prog "${_sProgName}"] == ""}  {
@@ -161,11 +164,12 @@ eval  {
     ##############################################################################
     # The procedure installs given JPO within the given root path.
     ##############################################################################
-    proc pInstallJPO {_sRoot _sJPOName _sVersion}  {
+    proc pInstallJPO {_sVersion _sJPOName}  {
         global asMapping
+        global sRootJPOs
 
         regsub -all {\.} "${_sJPOName}" {/} sFileName
-        set sFileName [file join "${_sRoot}" "${sFileName}_mxJPO.java"]
+        set sFileName [file join "${sRootJPOs}" "${sFileName}_mxJPO.java"]
         if {[mql list prog "${_sJPOName}"] == ""}  {
             set sJPODate ""
         } else  {
@@ -224,27 +228,15 @@ eval  {
     mql verbose off
     mql set escape off
 
-    pReadMapping "${sPath}"
+    pReadMapping
 
-    pInstallProperties "${sPath}" "${VERSION}" "org.mxupdate.mapping.properties"
-
-    if ${bIsOrigStructure}  {
-        pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.install.Insert"       "${VERSION}"
-        pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.util.JPOHandler"      "${VERSION}"
-        pInstallJPO       [file join "${sPath}" "java"] "org.mxupdate.util.MqlBuilderUtil"  "${VERSION}"
-        mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}" "java"] "${VERSION}" "$asMapping(ParameterDef.InstallFileDateFormatJava.Default)"
-    } else  {
-        pInstallJPO       [file join "${sPath}"]        "org.mxupdate.install.Insert"       "${VERSION}"
-        pInstallJPO       [file join "${sPath}"]        "org.mxupdate.util.JPOHandler"      "${VERSION}"
-        pInstallJPO       [file join "${sPath}"]        "org.mxupdate.util.MqlBuilderUtil"  "${VERSION}"
-        mql exec prog "org.mxupdate.install.Insert" [file join "${sPath}"] "${VERSION}" "$asMapping(ParameterDef.InstallFileDateFormatJava.Default)"
-    }
+    pInstallProperties "${VERSION}" "org.mxupdate.mapping.properties"
+    pInstallJPO "${VERSION}" "org.mxupdate.install.Insert"
+    pInstallJPO "${VERSION}" "org.mxupdate.util.JPOHandler"
+    pInstallJPO "${VERSION}" "org.mxupdate.util.MqlBuilderUtil"
+    mql exec prog "org.mxupdate.install.Insert" "${sRootJPOs}" "${VERSION}" "$asMapping(ParameterDef.InstallFileDateFormatJava.Default)"
 
     pCompileJPO
 
-    if ${bIsOrigStructure}  {
-        mql exec prog "org.mxupdate.install.InstallDataModel" [file join "${sPath}" "resources"] "${VERSION}"
-    } else  {
-        mql exec prog "org.mxupdate.install.InstallDataModel" [file join "${sPath}"] "${VERSION}"
-    }
+    mql exec prog "org.mxupdate.install.InstallDataModel" "${VERSION}"
 }

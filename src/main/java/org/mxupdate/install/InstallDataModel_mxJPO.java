@@ -62,11 +62,8 @@ public class InstallDataModel_mxJPO
      *     {@link #registerMxUpdate(ParameterCache_mxJPO, String, String)}</li>
      * </ul>
      *
-     * @param _context      MX context for this request
-     * @param _args         first value defines the source installation path
-     *                      (in development it is the resources sub directory),
-     *                      second value the version of MxUpdate which must be
-     *                      installed
+     * @param _context  MX context for this request
+     * @param _args     defines the version of MxUpdate which is installed
      * @throws Exception if installation failed
      * @see #updateAttributes(ParameterCache_mxJPO, String, String, String, String, String, String)
      * @see #updateBusTypes(ParameterCache_mxJPO)
@@ -78,7 +75,7 @@ public class InstallDataModel_mxJPO
                        final String... _args)
             throws Exception
     {
-        final String applVersion = _args[1];
+        final String applVersion = _args[0];
 
         // initialize mapping
         final ParameterCache_mxJPO paramCache = new ParameterCache_mxJPO(_context, false);
