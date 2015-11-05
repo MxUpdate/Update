@@ -48,6 +48,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.HashSet;
 
+import org.mxupdate.update.BusObject_mxJPO;
 import org.mxupdate.update.datamodel.AttributeCI_mxJPO;
 import org.mxupdate.update.datamodel.Dimension_mxJPO;
 import org.mxupdate.update.datamodel.Expression_mxJPO;
@@ -157,6 +158,7 @@ PARSER_END(MxParser)
     | <DESCENDANT:                          "descendant">                                   : DEFAULT
     | <EXECUTE:                             "execute">                                      : DEFAULT
     | <FLOAT:                               "float">                                        : DEFAULT
+    | <FROM:                                "from">                                         : DEFAULT
     | <GOLDPARTNER:                         "goldpartner">                                  : DEFAULT
     | <IMMEDIATE:                           "immediate">                                    : DEFAULT
     | <INCLUSIVE:                           "inclusive">                                    : DEFAULT
@@ -182,12 +184,15 @@ PARSER_END(MxParser)
     | <REVOKE:                              "revoke">                                       : DEFAULT
     | <SINGLE:                              "single">                                       : DEFAULT
     | <SUPPLIER:                            "supplier">                                     : DEFAULT
+    | <TO:                                  "to">                                           : DEFAULT
 
     // special cases
     | <FORMAT_ALL:                          "format" ([" ","\t","\n"])+ "all">              : DEFAULT
     | <USER:                                ("add" ([" ","\t","\n","\r"])+ )? "user">       : USER_EXPECTED
     | <BRACE_OPEN:                          "{">                                            : BRACE_OPEN_EXPECTED
     | <BRACE_CLOSE:                         "}">                                            : DEFAULT
+    | <FROM_WITH_BRACE:                     "from" ([" ","\t","\n"])+ "{">                  : DEFAULT
+    | <TO_WITH_BRACE:                       "to"   ([" ","\t","\n"])+ "{">                  : DEFAULT
 
     | <APPROVE_LIST:                        "approve" ([" ","\t","\n"])+ "{">               : LISTOLD_EXPECTED
     | <IGNORE_LIST:                         "ignore" ([" ","\t","\n"])+ "{">                : LISTOLD_EXPECTED
@@ -210,6 +215,8 @@ PARSER_END(MxParser)
     | <CHANNEL:                             "channel">                                      : STRING_EXPECTED
     | <CHECK:                               "check">                                        : STRING_EXPECTED
     | <COMMAND:                             ("add" ([" ","\t","\n","\r"])+ )? "command">    : STRING_EXPECTED
+    | <CONNECTION:                          "connection">                                   : STRING_EXPECTED
+    | <CURRENT:                             "current">                                      : STRING_EXPECTED
     | <DEFAULTFORMAT:                       "defaultformat">                                : STRING_EXPECTED
     | <DEFINITION:                          "definition">                                   : STRING_EXPECTED
     | <DERIVED:                             "derived">                                      : STRING_EXPECTED
@@ -265,8 +272,8 @@ PARSER_END(MxParser)
 
 <STRING_STRING_EXPECTED> TOKEN :
 {
-      <STRING_STRING_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : STRING_EXPECTED
-    | <STRING_STRING_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : STRING_EXPECTED
+      <STRING_STRING_STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : AFTER_STRING_STRING_EXPECTED
+    | <STRING_STRING_SINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : AFTER_STRING_STRING_EXPECTED
 
 }
 
@@ -282,7 +289,7 @@ String stringString() :
 }
 
 /************************************************************** Common String */
-<STRING_EXPECTED, FIELD_OPEN_EXPECTED, TYPE_OPEN_EXPECTED, USER_EXPECTED, VERSION_EXPECTED> TOKEN :
+<STRING_EXPECTED, AFTER_STRING_STRING_EXPECTED, FIELD_OPEN_EXPECTED, TYPE_OPEN_EXPECTED, USER_EXPECTED, VERSION_EXPECTED> TOKEN :
 {
       <STRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : DEFAULT
     | <SINGLE_STRING: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
@@ -300,7 +307,7 @@ String string() :
 }
 
 /*************************************************** Common Multi-Line-String */
-<MULTILINESTRING_EXPECTED> TOKEN :
+<MULTILINESTRING_EXPECTED, AFTER_STRING_STRING_EXPECTED> TOKEN :
 {
       <MULTILINESTRING: ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\n" | "\t" | "\\\"" | "\\\\" | "\\{" | "\\}" | "\\n" | "\\t" | "\\u" )* "\"" )> : DEFAULT
     | <MULTILINESINGLE: ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : DEFAULT
@@ -312,8 +319,10 @@ String multiLineString() :
     String ret = null;
 }
 {
-    ( tmp = <MULTILINESTRING>  {ret = this.getString(tmp.image);}
-    | tmp = <MULTILINESINGLE>  {ret = this.getSingle(tmp.image);} )
+    ( tmp = <STRING>            {ret = this.getString(tmp.image);}
+    | tmp = <SINGLE_STRING>     {ret = this.getString(tmp.image);}
+    | tmp = <MULTILINESTRING>   {ret = this.getString(tmp.image);}
+    | tmp = <MULTILINESINGLE>   {ret = this.getSingle(tmp.image);} )
     {return ret;}
 }
 
@@ -344,7 +353,6 @@ Integer naturalNumber() :
 <DEFAULT, BRACE_OPEN_EXPECTED> TOKEN :
 {
       <PROPERTY:                            "property">                                     : STRING_EXPECTED
-    | <PROPERTYTO:                          "to">                                           : STRING_STRING_EXPECTED
     | <PROPERTYVAL:                         "value">                                        : STRING_EXPECTED
 }
 
@@ -384,7 +392,8 @@ AdminProperty property() :
 {
     str1 = string()                                             {this.setValue(property, "name", str1);}
     ( ( <PROPERTYVAL>  str1 = string()                          {this.setValue(property, "value", str1);} )
-    | ( <PROPERTYTO>   str1 = stringString()  str2 = string()   {this.setValue(property, "refAdminType", str1);this.setValue(property, "refAdminName", str2);} ) )*
+    | ( <TO>                                                    {token_source.SwitchTo(STRING_STRING_EXPECTED);}
+                       str1 = stringString()  str2 = string()   {this.setValue(property, "refAdminType", str1);this.setValue(property, "refAdminName", str2);} ) )*
     {return property;}
 }
 
@@ -478,7 +487,7 @@ LocalAttribute localAttribute()
 /**
  * Parses the local path type definition.
  */
-LocalPathType localPathType() 
+LocalPathType localPathType()
     throws ParseException, SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
 {
     String name;
@@ -836,7 +845,7 @@ void parseExpression(final Expression_mxJPO _expression)
                                                                                         token_source.SwitchTo(MULTILINESTRING_EXPECTED);
                                                                                     }
                                                                                 }
-                          ( str = string()  | str = multiLineString() )         {   // hint: token value is used twice
+                                      ( str = multiLineString() )               {   // hint: token value is used twice
                                                                                     // (for property and as expression value)
                                                                                     // => staffed via property variable
                                                                                     if (property == null)  {
@@ -848,7 +857,8 @@ void parseExpression(final Expression_mxJPO _expression)
                                                                                 } )
       | ( <PROPERTY>                                                            {property = new AdminProperty();this.appendValue(_expression, "properties", "propertiesStack", property);}
                                       str = string()                            {this.setValue(property, "name", str);}
-                     ( <PROPERTYTO>   str = stringString()                      {this.setValue(property, "refAdminType", str);}
+                     ( <TO>                                                     {token_source.SwitchTo(STRING_STRING_EXPECTED);}
+                                      str = stringString()                      {this.setValue(property, "refAdminType", str);}
                                       str = string()                            {this.setValue(property, "refAdminName", str);} )? )
     )*
 }
@@ -961,7 +971,7 @@ void parsePathType(final PathType_mxJPO _pathType)
       | ( <DESCRIPTION>               str = multiLineString()                   {this.setValue(_pathType, "description", str);} )
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_pathType, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_pathType, "hidden", false);} )
-      | ( <FROM>
+      | ( <FROM_WITH_BRACE>
                        (   ( <CARDINALITY_ONE>                                  {this.setValue(_pathType, "fromCardinality", PathType_mxJPO.Cardinality.One);} )
                          | ( <CARDINALITY_MANY>                                 {this.setValue(_pathType, "fromCardinality", PathType_mxJPO.Cardinality.Many);} )
                          | ( <TYPE>             str = string()                  {this.appendValue(_pathType, "fromTypes", str);} )
@@ -969,7 +979,7 @@ void parsePathType(final PathType_mxJPO _pathType)
                          | ( <RELATIONSHIP>     str = string()                  {this.appendValue(_pathType, "fromRelations", str);} )
                          | ( <RELATIONSHIP_ALL>                                 {this.setValue(_pathType, "fromRelationAll", true);} ) )*
                   "}" )
-      | ( <TO>
+      | ( <TO_WITH_BRACE>
                        (   ( <TYPE>             str = string()                  {this.appendValue(_pathType, "toTypes", str);} )
                          | ( <TYPE_ALL>                                         {this.setValue(_pathType, "toTypeAll", true);} )
                          | ( <RELATIONSHIP>     str = string()                  {this.appendValue(_pathType, "toRelations", str);} )
@@ -984,9 +994,7 @@ void parsePathType(final PathType_mxJPO _pathType)
 /** From / To Information */
 <DEFAULT> TOKEN :
 {
-      <FROM:                                "from" ([" ","\t","\n"])+ "{">                  : DEFAULT
-    | <TO:                                  "to"   ([" ","\t","\n"])+ "{">                  : DEFAULT
-    | <CARDINALITY_ONE:                     "cardinality" ([" ","\t","\n"])+ "one">         : DEFAULT
+      <CARDINALITY_ONE:                     "cardinality" ([" ","\t","\n"])+ "one">         : DEFAULT
     | <CARDINALITY_MANY:                    "cardinality" ([" ","\t","\n"])+ "many">        : DEFAULT
     | <TYPE_ALL:                            "type" ([" ","\t","\n"])+ "all">                : DEFAULT
     | <RELATIONSHIP_ALL:                    "relationship" ([" ","\t","\n"])+ "all">        : DEFAULT
@@ -1223,8 +1231,8 @@ void parseRelationship(final Relationship_mxJPO _relationship)
       | ( <PREVENTDUPLICATES_FALSE>                                             {this.setValue(_relationship, "preventDuplicates", false);} )
       | ( <RULE>                      str = string()                            {this.setValue(_relationship, "rule", str);} )
       | ( <TRIGGER>                   trigger = trigger()                       {this.appendValue(_relationship, "triggers", "triggersStack", trigger);} )
-      | ( ( <FROM>                                                              {fromTo = "from";}
-          | <TO>                                                                {fromTo = "to";} )
+      | ( ( <FROM_WITH_BRACE>                                                   {fromTo = "from";}
+          | <TO_WITH_BRACE>                                                     {fromTo = "to";} )
                 (   ( <PROPAGATEMODIFY_TRUE>                                    {this.setValue(_relationship, fromTo, "propagateModify", true);} )
                   | ( <PROPAGATEMODIFY_FALSE>                                   {this.setValue(_relationship, fromTo, "propagateModify", false);} )
                   | ( <PROPAGATECONNECTION_TRUE>                                {this.setValue(_relationship, fromTo, "propagateConnection", true);} )
@@ -1259,7 +1267,7 @@ void parseRelationship(final Relationship_mxJPO _relationship)
  * @param _rule   target rule to update with parsed values
  */
 void parseRule(final Rule_mxJPO _rule)
-    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException : 
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
 {
     String str;
     Token tmp;
@@ -2071,6 +2079,43 @@ void parseTable(final Table_mxJPO _table)
     | <COLUMN_SORTTYPE_NUMERIC:             "numeric">                          : COLUMN_EXPECTED
     | <COLUMN_SORTTYPE_OTHER:               "other">                            : COLUMN_EXPECTED
     | <COLUMN_SORTTYPE_NONE:                "none">                             : COLUMN_EXPECTED
+}
+
+/**************************************************************************** */
+
+/**
+ * Parses one complete business object definition.
+ *
+ * @param _busObject  target business object to update with parsed values
+ */
+void parseBusObject(BusObject_mxJPO _busObject)
+    throws SecurityException, IllegalArgumentException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException :
+{
+    String str;
+    Token tmp;
+    BusObject_mxJPO.Connection connection;
+    String attrName;
+}
+{
+    (
+        ( <TYPE>                      str = string()                            {this.setValue(_busObject, "busType", str);} )
+      | (<DESCRIPTION>                str = multiLineString()                   {this.setValue(_busObject, "description", str);} )
+      | (<CURRENT>                    str = string()                            {this.setValue(_busObject, "busCurrent", str);} )
+      | ( <ATTRIBUTE>                                                           // work-around, because two strings are needed (vs. one for interface, relationship, path type, type)
+                                                                                {token_source.SwitchTo(STRING_STRING_EXPECTED);}
+                         attrName = stringString() str = multiLineString()      {this.putValue(_busObject, "attrValues", attrName, str);} )
+      | ( <CONNECTION>  str = string()                                          {connection = new BusObject_mxJPO.Connection();this.appendValue(_busObject, "connections", connection);this.setValue(connection, "relName", str);}
+                                                                                // work-around with switches, so that business object is crorect parsed!
+                ( tmp = <FROM> | tmp = <TO> )                                   {this.setValue(connection, "direction", tmp.image);token_source.SwitchTo(STRING_EXPECTED);}
+                str = string()                                                  {this.setValue(connection, "type", str);token_source.SwitchTo(STRING_EXPECTED);}
+                str = string()                                                  {this.setValue(connection, "name", str);token_source.SwitchTo(STRING_EXPECTED);}
+                str = string()                                                  {this.setValue(connection, "revision", str);}
+                ( <BRACE_OPEN>
+                      ( <ATTRIBUTE>                                             {token_source.SwitchTo(STRING_STRING_EXPECTED);}
+                             attrName = stringString() str = multiLineString()  {this.putValue(connection, "attrValues", attrName, str);} )*
+                  <BRACE_CLOSE> )?
+       )
+   )*
 }
 
 /**************************************************************************** */
