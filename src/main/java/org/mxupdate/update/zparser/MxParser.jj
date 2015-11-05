@@ -248,6 +248,7 @@ PARSER_END(MxParser)
     | <PHONE:                               "phone">                                        : STRING_EXPECTED
     | <PRINT:                               "print">                                        : STRING_EXPECTED
     | <REGISTEREDNAME:                      "registeredname">                               : STRING_EXPECTED
+    | <RELATIONSHIP:                        "relationship">                                 : STRING_EXPECTED
     | <ROLE:                                "role" >                                        : STRING_EXPECTED
     | <RULE:                                "rule">                                         : STRING_EXPECTED
     | <SEQUENCE:                            "sequence">                                     : STRING_EXPECTED
@@ -977,26 +978,17 @@ void parsePathType(final PathType_mxJPO _pathType)
       | ( <FROM_WITH_BRACE>
                        (   ( <CARDINALITY>    ( <ONE>                           {this.setValue(_pathType, "fromCardinality", PathType_mxJPO.Cardinality.One);}
                                               | <MANY>                          {this.setValue(_pathType, "fromCardinality", PathType_mxJPO.Cardinality.Many);} ) )
-                         | ( <TYPE>             str = string()                  {if ("all".equals(str)) {this.setValue(_pathType, "fromTypeAll", true);} else  {this.appendValue(_pathType, "fromTypes", str);}} )
-                         | ( <RELATIONSHIP>     str = string()                  {this.appendValue(_pathType, "fromRelations", str);} )
-                         | ( <RELATIONSHIP_ALL>                                 {this.setValue(_pathType, "fromRelationAll", true);} ) )*
-                  "}" )
+                         | ( <TYPE>             str = string()                  {if ("all".equals(str)) {this.setValue(_pathType, "fromTypeAll",     true);} else {this.appendValue(_pathType, "fromTypes",     str);}} )
+                         | ( <RELATIONSHIP>     str = string()                  {if ("all".equals(str)) {this.setValue(_pathType, "fromRelationAll", true);} else {this.appendValue(_pathType, "fromRelations", str);}} ) )*
+                  <BRACE_CLOSE> )
       | ( <TO_WITH_BRACE>
-                       (   ( <TYPE>             str = string()                  {if ("all".equals(str)) {this.setValue(_pathType, "toTypeAll", true);} else {this.appendValue(_pathType, "toTypes", str);}} )
-                         | ( <RELATIONSHIP>     str = string()                  {this.appendValue(_pathType, "toRelations", str);} )
-                         | ( <RELATIONSHIP_ALL>                                 {this.setValue(_pathType, "toRelationAll", true);} ) )*
-                  "}" )
+                       (   ( <TYPE>             str = string()                  {if ("all".equals(str)) {this.setValue(_pathType, "toTypeAll",     true);} else {this.appendValue(_pathType, "toTypes",     str);}} )
+                         | ( <RELATIONSHIP>     str = string()                  {if ("all".equals(str)) {this.setValue(_pathType, "toRelationAll", true);} else {this.appendValue(_pathType, "toRelations", str);}} ) )*
+                  <BRACE_CLOSE> )
       | ( <ATTRIBUTE>                 str = string()                            {this.appendValue(_pathType, "globalAttributes", str);} )
       | ( <LOCAL> <ATTRIBUTE>         localAttr = localAttribute()              {this.appendValue(_pathType, "localAttributes", localAttr);} )
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_pathType, "properties", "propertiesStack", property);} )
     )*
-}
-
-/** From / To Information */
-<DEFAULT> TOKEN :
-{
-      <RELATIONSHIP_ALL:                    "relationship" ([" ","\t","\n"])+ "all">        : DEFAULT
-    | <RELATIONSHIP:                        "relationship">                                 : STRING_EXPECTED
 }
 
 /******************************************************* Data Model -> Policy */
@@ -1243,11 +1235,10 @@ void parseRelationship(final Relationship_mxJPO _relationship)
                                             | <REPLICATE>                       {this.setValue(_relationship, fromTo, "cloneAction", "replicate");} ) )
                   | ( <CARDINALITY>         ( <ONE>                             {this.setValue(_relationship, fromTo, "cardinality", "one");}
                                             | <MANY>                            {this.setValue(_relationship, fromTo, "cardinality", "many");} ) )
-                  | ( <TYPE>                  str = string()                    {if ("all".equals(str)) {this.setValue(_relationship, fromTo, "typeAll", true);} else {this.appendValue(_relationship, fromTo, "types", str);}} )
-                  | ( <RELATIONSHIP>          str = string()                    {this.appendValue(_relationship, fromTo, "relations", str);} )
-                  | ( <RELATIONSHIP_ALL>                                        {this.setValue(_relationship, fromTo, "relationAll", true);} )
+                  | ( <TYPE>                  str = string()                    {if ("all".equals(str)) {this.setValue(_relationship, fromTo, "typeAll",     true);} else {this.appendValue(_relationship, fromTo, "types",     str);}} )
+                  | ( <RELATIONSHIP>          str = string()                    {if ("all".equals(str)) {this.setValue(_relationship, fromTo, "relationAll", true);} else {this.appendValue(_relationship, fromTo, "relations", str);}} )
                 )*
-          "}" )
+          <BRACE_CLOSE> )
       | ( <ATTRIBUTE>                 str = string()                            {this.appendValue(_relationship, "globalAttributes", str);} )
       | ( <LOCAL>  ( <ATTRIBUTE>      localAttr = localAttribute()              {this.appendValue(_relationship, "localAttributes", localAttr);}
                    | <PATHTYPE>       localPathType = localPathType()           {this.appendValue(_relationship, "localPathTypes", localPathType);} ) )
