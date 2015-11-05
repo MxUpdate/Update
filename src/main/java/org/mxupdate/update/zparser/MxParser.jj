@@ -149,6 +149,7 @@ PARSER_END(MxParser)
     | <ALLSTATE:                            "allstate">                                     : DEFAULT
     | <ANCESTOR:                            "ancestor">                                     : DEFAULT
     | <ANY:                                 "any">                                          : DEFAULT
+    | <CARDINALITY:                         "cardinality">                                  : DEFAULT
     | <CATEGORY:                            "category">                                     : DEFAULT
     | <CLONE:                               "clone">                                        : DEFAULT
     | <CONTEXT:                             "context">                                      : DEFAULT
@@ -164,11 +165,13 @@ PARSER_END(MxParser)
     | <INCLUSIVE:                           "inclusive">                                    : DEFAULT
     | <LOCAL:                               "local">                                        : DEFAULT
     | <LOGIN:                               "login">                                        : DEFAULT
+    | <MANY:                                "many">                                         : DEFAULT
     | <MATURITY:                            "maturity">                                     : DEFAULT
     | <NEWROW:                              "newrow">                                       : DEFAULT
     | <NO:                                  "no">                                           : DEFAULT
     | <NONE:                                "none">                                         : DEFAULT
     | <NOTPRIVATE:                          "notprivate">                                   : DEFAULT
+    | <ONE:                                 "one">                                          : DEFAULT
     | <OEM:                                 "oem">                                          : DEFAULT
     | <ORGANIZATION:                        "organization">                                 : DEFAULT
     | <OWNER:                               "owner">                                        : DEFAULT
@@ -972,8 +975,8 @@ void parsePathType(final PathType_mxJPO _pathType)
       | ( <HIDDEN_TRUE>                                                         {this.setValue(_pathType, "hidden", true);} )
       | ( <HIDDEN_FALSE>                                                        {this.setValue(_pathType, "hidden", false);} )
       | ( <FROM_WITH_BRACE>
-                       (   ( <CARDINALITY_ONE>                                  {this.setValue(_pathType, "fromCardinality", PathType_mxJPO.Cardinality.One);} )
-                         | ( <CARDINALITY_MANY>                                 {this.setValue(_pathType, "fromCardinality", PathType_mxJPO.Cardinality.Many);} )
+                       (   ( <CARDINALITY>    ( <ONE>                           {this.setValue(_pathType, "fromCardinality", PathType_mxJPO.Cardinality.One);}
+                                              | <MANY>                          {this.setValue(_pathType, "fromCardinality", PathType_mxJPO.Cardinality.Many);} ) )
                          | ( <TYPE>             str = string()                  {this.appendValue(_pathType, "fromTypes", str);} )
                          | ( <TYPE_ALL>                                         {this.setValue(_pathType, "fromTypeAll", true);} )
                          | ( <RELATIONSHIP>     str = string()                  {this.appendValue(_pathType, "fromRelations", str);} )
@@ -994,9 +997,7 @@ void parsePathType(final PathType_mxJPO _pathType)
 /** From / To Information */
 <DEFAULT> TOKEN :
 {
-      <CARDINALITY_ONE:                     "cardinality" ([" ","\t","\n"])+ "one">         : DEFAULT
-    | <CARDINALITY_MANY:                    "cardinality" ([" ","\t","\n"])+ "many">        : DEFAULT
-    | <TYPE_ALL:                            "type" ([" ","\t","\n"])+ "all">                : DEFAULT
+      <TYPE_ALL:                            "type" ([" ","\t","\n"])+ "all">                : DEFAULT
     | <RELATIONSHIP_ALL:                    "relationship" ([" ","\t","\n"])+ "all">        : DEFAULT
     | <RELATIONSHIP:                        "relationship">                                 : STRING_EXPECTED
 }
@@ -1244,8 +1245,8 @@ void parseRelationship(final Relationship_mxJPO _relationship)
                   | ( <CLONE>               ( <NONE>                            {this.setValue(_relationship, fromTo, "cloneAction", "none");}
                                             | <FLOAT>                           {this.setValue(_relationship, fromTo, "cloneAction", "float");}
                                             | <REPLICATE>                       {this.setValue(_relationship, fromTo, "cloneAction", "replicate");} ) )
-                  | ( <CARDINALITY_ONE>                                         {this.setValue(_relationship, fromTo, "cardinality", "one");} )
-                  | ( <CARDINALITY_MANY>                                        {this.setValue(_relationship, fromTo, "cardinality", "many");} )
+                  | ( <CARDINALITY>         ( <ONE>                             {this.setValue(_relationship, fromTo, "cardinality", "one");}
+                                            | <MANY>                            {this.setValue(_relationship, fromTo, "cardinality", "many");} ) )
                   | ( <TYPE>                  str = string()                    {this.appendValue(_relationship, fromTo, "types", str);} )
                   | ( <TYPE_ALL>                                                {this.setValue(_relationship, fromTo, "typeAll", true);} )
                   | ( <RELATIONSHIP>          str = string()                    {this.appendValue(_relationship, fromTo, "relations", str);} )
@@ -1614,11 +1615,11 @@ void parsePerson(final PersonCI_mxJPO _person)
                                     | ( <TYPE_FULL>                             {this.appendValue(_person, "types", TypeItem.FULL);} )
                                     | ( <TYPE_BUSINESS>                         {this.appendValue(_person, "types", TypeItem.BUSINESS);} )
                                     | ( <TYPE_SYSTEM>                           {this.appendValue(_person, "types", TypeItem.SYSTEM);} ) )* <TYPE_CLOSE > )
-      | (<VAULT>                      str = string()                            {this.setValue(_person, "vault", str);} )
-      | (<APPLICATION>                str = string()                            {this.setValue(_person, "application", str);} )
-      | (<SITE>                       str = string()                            {this.setValue(_person, "site", str);} )
-      | (<GROUP>                      str = string()                            {this.appendValue(_person, "groups", str);} )
-      | (<ROLE>                       str = string()                            {this.appendValue(_person, "roles", str);} )
+      | ( <VAULT>                     str = string()                            {this.setValue(_person, "vault", str);} )
+      | ( <APPLICATION>               str = string()                            {this.setValue(_person, "application", str);} )
+      | ( <SITE>                      str = string()                            {this.setValue(_person, "site", str);} )
+      | ( <GROUP>                     str = string()                            {this.appendValue(_person, "groups", str);} )
+      | ( <ROLE>                      str = string()                            {this.appendValue(_person, "roles", str);} )
       | ( <PROPERTY>                  property = property()                     {this.appendValue(_person, "properties", "propertiesStack", property);} )
     )*
 }
