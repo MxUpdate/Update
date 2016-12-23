@@ -23,19 +23,22 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import matrix.util.MatrixException;
-
 import org.mxupdate.test.AbstractTest;
 import org.mxupdate.test.ExportParser;
 import org.mxupdate.test.ExportParser.Line;
 import org.mxupdate.test.data.AbstractAdminData;
+import org.mxupdate.test.data.AbstractData;
 import org.mxupdate.test.data.datamodel.helper.Access;
 import org.mxupdate.test.data.user.AbstractUserData;
 import org.mxupdate.test.data.util.FlagList;
 import org.mxupdate.test.data.util.FlagList.Create;
+import org.mxupdate.test.data.util.KeyNotDefinedList;
+import org.mxupdate.test.data.util.KeyValueList;
 import org.mxupdate.test.data.util.PropertyDef;
 import org.mxupdate.test.data.util.PropertyDefList;
 import org.testng.Assert;
+
+import matrix.util.MatrixException;
 
 /**
  * Used to define a policy, create them and test the result.
@@ -49,7 +52,7 @@ public class PolicyData
     private AllState allState;
 
     /** All states for this policy. */
-    private final List<State> states = new ArrayList<State>();
+    private final List<State> states = new ArrayList<>();
 
     /**
      * Initialize this policy data with given <code>_name</code>.
@@ -192,6 +195,7 @@ public class PolicyData
         }
         for (final State state : this.states)  {
             state.properties.createDependings();
+            state.getKeyValues().createDependings();
             for (final Access access : state.access)  {
                 access.createDependings();
             }
@@ -227,9 +231,9 @@ public class PolicyData
             this.allState.checkExport(_exportParser);
         }
         // check all states
-        for (final State state : this.states)
-        {
-            state.checkExport(_exportParser);
+        int idx = 0;
+        for (final State state : this.states)  {
+            state.checkExport(_exportParser, "state[" + (idx++) + "]");
         }
     }
 
@@ -275,9 +279,13 @@ public class PolicyData
     public static abstract class AbstractState<AS extends AbstractState<AS>>
     {
         /** Access definitions for this state. */
-        public final List<Access> access = new ArrayList<Access>();
+        public final List<Access> access = new ArrayList<>();
         /** Values of this state. */
-        private final Map<String,Object> values = new HashMap<String,Object>();
+        private final Map<String,Object> values = new HashMap<>();
+        /** All key / values with tag for this data piece. */
+        private final KeyValueList keyValues = new KeyValueList();
+        /** All keys which must not defined. */
+        private final KeyNotDefinedList keyNotDefineds = new KeyNotDefinedList();
         /** Defines flags for this state. */
         private final FlagList flags = new FlagList();
 
@@ -317,6 +325,70 @@ public class PolicyData
         public Map<String,Object> getValues()
         {
             return this.values;
+        }
+
+        /**
+         * Defines a new value entry which is put into {@link #keyValues}.
+         *
+         * @param _key      key of the value (e.g. &quot;description&quot;)
+         * @param _value    value of the value
+         * @return this state instance
+         */
+        @SuppressWarnings("unchecked")
+        public AS def4KeyValue(final String _tag,
+                               final String _key,
+                               final String _value)
+        {
+            this.keyValues.addKeyValue(_tag, _key, _value);
+            return (AS) this;
+        }
+
+        /**
+         * Defines a new value entry which is put into {@link #keyValues}.
+         *
+         * @param _key      key of the value (e.g. &quot;description&quot;)
+         * @param _value    value of the value
+         * @return this state instance
+         */
+        @SuppressWarnings("unchecked")
+        public AS def4KeyValue(final String _tag,
+                               final AbstractData<?> _key,
+                               final String _value)
+        {
+            this.keyValues.addKeyValue(_tag, _key, _value);
+            return (AS) this;
+        }
+
+        /**
+         * Returns the {@link #keyValues} of this state.
+         *
+         * @return defined values
+         */
+        public KeyValueList getKeyValues()
+        {
+            return this.keyValues;
+        }
+        /**
+         * Defines a new value entry which is put into {@link #keyNotDefineds}.
+         *
+         * @param _key      not defined key
+         * @return this state instance
+         */
+        @SuppressWarnings("unchecked")
+        public AS def4KeyNotDefined(final String _key)
+        {
+            this.keyNotDefineds.defKeyNotDefined(_key);;
+            return (AS) this;
+        }
+
+        /**
+         * Returns the {@link #keyNotDefineds} of this state.
+         *
+         * @return not defined key list
+         */
+        public KeyNotDefinedList getKeyNotDefined()
+        {
+            return this.keyNotDefineds;
         }
 
         /**
@@ -375,7 +447,7 @@ public class PolicyData
         /** Name of the state. */
         private String name;
         /** List of all signatures for this state. */
-        private final List<Signature> signatures = new ArrayList<Signature>();
+        private final List<Signature> signatures = new ArrayList<>();
         /** All properties for this state. */
         private final PropertyDefList properties = new PropertyDefList();
 
@@ -434,7 +506,8 @@ public class PolicyData
             {
                 signature.append4CIFile(_cmd);
             }
-            this.properties.append4Update("        ", _cmd);
+            this.getKeyValues().append4Update("        ", _cmd);
+            this.properties    .append4Update("        ", _cmd);
             _cmd.append("    }\n");
         }
 
@@ -506,20 +579,27 @@ public class PolicyData
         }
 
         /**
+         * Checks given state.
          *
          * @param _exportParser     export parsed
+         * @param _path             path to check
          * @throws MatrixException if information could not be fetched
          */
-        public void checkExport(final ExportParser _exportParser)
+        public void checkExport(final ExportParser _exportParser,
+                                final String _path)
         {
             boolean found = false;
             final String value = "\"" + AbstractTest.convertUpdate(this.name) + "\"";
+
+            this.getKeyValues().check4Export(_exportParser, _path);
+            this.getKeyNotDefined().check4Export(_exportParser, _path);
+
             for (final ExportParser.Line line : _exportParser.getRootLines().get(0).getChildren())  {
                 if ("state".equals(line.getTag()) && line.getValue().startsWith(value))  {
                     found = true;
 
                     // access filter
-                    final List<String> exportAccess  = new ArrayList<String>();
+                    final List<String> exportAccess  = new ArrayList<>();
                     for (final Line subLine : line.getChildren())  {
                         if (subLine.getTag().equals("public")
                                 || subLine.getTag().equals("owner")
@@ -530,7 +610,7 @@ public class PolicyData
                             exportAccess.add(subLine.getTag() + ' ' + subLine.getValue());
                         }
                     }
-                    final List<String> expAccess  = new ArrayList<String>();
+                    final List<String> expAccess  = new ArrayList<>();
                     for (final Access accessFilter : this.access)  {
                         final StringBuilder tmp = new StringBuilder();
                         accessFilter.append4CIFile(tmp);
@@ -631,7 +711,7 @@ public class PolicyData
                     found++;
 
                     // prepare export definition
-                    final SortedSet<String> curAccess = new TreeSet<String>();
+                    final SortedSet<String> curAccess = new TreeSet<>();
                     for (final Line subLine : line.getChildren())  {
                         if (subLine.getTag().equals("public")
                                 || subLine.getTag().equals("owner")
@@ -643,7 +723,7 @@ public class PolicyData
                         }
                     }
                     // prepare expected definition
-                    final SortedSet<String> expAccess = new TreeSet<String>();
+                    final SortedSet<String> expAccess = new TreeSet<>();
                     for (final Access access : this.access)  {
                         final StringBuilder tmp = new StringBuilder();
                         access.append4CIFile(tmp);
@@ -664,11 +744,11 @@ public class PolicyData
         /** Name of the signature. */
         private String name;
         /** Approve users of the signature. */
-        private final List<AbstractUserData<?>> approve = new ArrayList<AbstractUserData<?>>();
+        private final List<AbstractUserData<?>> approve = new ArrayList<>();
         /** Ignore users of the signature. */
-        private final List<AbstractUserData<?>> ignore = new ArrayList<AbstractUserData<?>>();
+        private final List<AbstractUserData<?>> ignore = new ArrayList<>();
         /** Reject users of the signature. */
-        private final List<AbstractUserData<?>> reject = new ArrayList<AbstractUserData<?>>();
+        private final List<AbstractUserData<?>> reject = new ArrayList<>();
         /** Filter of the signature. */
         private String filter;
         /** Branch of the signature. */
@@ -775,24 +855,24 @@ public class PolicyData
          */
         protected void append4CIFile(final StringBuilder _cmd)
         {
-            final SortedSet<String> approveSet = new TreeSet<String>();
+            final SortedSet<String> approveSet = new TreeSet<>();
             for (final AbstractUserData<?> user : this.approve)  {
                 approveSet.add(user.getName());
             }
-            final SortedSet<String> ignoreSet = new TreeSet<String>();
+            final SortedSet<String> ignoreSet = new TreeSet<>();
             for (final AbstractUserData<?> user : this.ignore)  {
                 ignoreSet.add(user.getName());
             }
-            final SortedSet<String> rejectSet = new TreeSet<String>();
+            final SortedSet<String> rejectSet = new TreeSet<>();
             for (final AbstractUserData<?> user : this.reject)  {
                 rejectSet.add(user.getName());
             }
 
             _cmd.append("        signature \"").append(AbstractTest.convertUpdate(this.name)).append("\" {\n")
                 .append("            branch \"").append(AbstractTest.convertUpdate(this.branch)).append("\"\n")
-                .append("            approve {").append(AbstractTest.convertUpdate(true, new ArrayList<String>(approveSet), "")).append("}\n")
-                .append("            ignore {").append(AbstractTest.convertUpdate(true, new ArrayList<String>(ignoreSet), "")).append("}\n")
-                .append("            reject {").append(AbstractTest.convertUpdate(true, new ArrayList<String>(rejectSet), "")).append("}\n")
+                .append("            approve {").append(AbstractTest.convertUpdate(true, new ArrayList<>(approveSet), "")).append("}\n")
+                .append("            ignore {").append(AbstractTest.convertUpdate(true, new ArrayList<>(ignoreSet), "")).append("}\n")
+                .append("            reject {").append(AbstractTest.convertUpdate(true, new ArrayList<>(rejectSet), "")).append("}\n")
                 .append("            filter \"").append(AbstractTest.convertUpdate(this.filter)).append("\"\n")
                 .append("        }\n");
         }
@@ -805,15 +885,15 @@ public class PolicyData
          */
         protected void checkExport(final ExportParser.Line _exportState)
         {
-            final SortedSet<String> approveSet = new TreeSet<String>();
+            final SortedSet<String> approveSet = new TreeSet<>();
             for (final AbstractUserData<?> user : this.approve)  {
                 approveSet.add(user.getName());
             }
-            final SortedSet<String> ignoreSet = new TreeSet<String>();
+            final SortedSet<String> ignoreSet = new TreeSet<>();
             for (final AbstractUserData<?> user : this.ignore)  {
                 ignoreSet.add(user.getName());
             }
-            final SortedSet<String> rejectSet = new TreeSet<String>();
+            final SortedSet<String> rejectSet = new TreeSet<>();
             for (final AbstractUserData<?> user : this.reject)  {
                 rejectSet.add(user.getName());
             }
@@ -829,15 +909,15 @@ public class PolicyData
                             "check for correct branch");
                     Assert.assertEquals(
                             line.evalSingleValue("approve"),
-                            "{" + AbstractTest.convertUpdate(true, new ArrayList<String>(approveSet), "") + "}",
+                            "{" + AbstractTest.convertUpdate(true, new ArrayList<>(approveSet), "") + "}",
                             "check for correct approve user");
                     Assert.assertEquals(
                             line.evalSingleValue("ignore"),
-                            "{" + AbstractTest.convertUpdate(true, new ArrayList<String>(ignoreSet), "") + "}",
+                            "{" + AbstractTest.convertUpdate(true, new ArrayList<>(ignoreSet), "") + "}",
                             "check for correct ignore user");
                     Assert.assertEquals(
                             line.evalSingleValue("reject"),
-                            "{" + AbstractTest.convertUpdate(true, new ArrayList<String>(rejectSet), "") + "}",
+                            "{" + AbstractTest.convertUpdate(true, new ArrayList<>(rejectSet), "") + "}",
                             "check for correct reject user");
                     Assert.assertEquals(
                             line.evalSingleValue("filter"),

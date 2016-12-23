@@ -42,7 +42,6 @@ import org.mxupdate.update.util.CompareToUtil_mxJPO;
 import org.mxupdate.update.util.DeltaUtil_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO.ValueKeys;
-import org.mxupdate.update.util.StringUtil_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO;
 import org.mxupdate.update.util.UpdateBuilder_mxJPO.UpdateLine;
 import org.mxupdate.update.util.UpdateException_mxJPO;
@@ -52,6 +51,7 @@ import org.mxupdate.update.zparser.MxParser_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MqlBuilder;
 import org.mxupdate.util.MqlBuilderUtil_mxJPO.MultiLineMqlBuilder;
+import org.mxupdate.util.StringUtils_mxJPO;
 
 import matrix.util.MatrixException;
 
@@ -545,8 +545,8 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
 
         /** Route message of this state. */
         private String routeMessage;
-        /** Route users of this state. */
-        private final Set<String> routeUsers = new TreeSet<>();
+        /** Route user of this state. */
+        private String routeUser;
 
         /** Handles the state depending properties. */
         private final AdminPropertyList_mxJPO properties = new AdminPropertyList_mxJPO();
@@ -611,7 +611,7 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
             } else if ("/routeMessage".equals(_url))  {
                 this.routeMessage = _content;
             } else if ("/routeUser/userRef".equals(_url))  {
-                this.routeUsers.add(_content);
+                this.routeUser = _content;
 
             } else if (_url.startsWith("/propertyList"))  {
                 ret = this.properties.parse(_paramCache, _url.substring(13), _content);
@@ -744,8 +744,8 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
                     .flag(          "checkouthistory",      false, this.checkoutHistory)
                     .flagIfTrue(    "published",            false, this.published,                  _updateBuilder.getParamCache().getValueBoolean(ValueKeys.DMPolicyStateSupportsPublished));
             // route
-            if (((this.routeMessage != null) && !this.routeMessage.isEmpty()) || !this.routeUsers.isEmpty())  {
-                _updateBuilder.stepStartNewLine().stepSingle("route {" + StringUtil_mxJPO.convertUpdate(true, this.routeUsers, null) + "}").stepString(this.routeMessage).stepEndLine();
+            if (!StringUtils_mxJPO.isEmpty(this.routeUser))  {
+                _updateBuilder.stepStartNewLine().stepSingle("route").stepString(this.routeUser).stepString(this.routeMessage).stepEndLine();
             }
 
             this.access.write(_updateBuilder);
@@ -804,13 +804,14 @@ throw new UpdateException_mxJPO(null,"some states are not defined anymore!");
             if (_paramCache.getValueBoolean(ValueKeys.DMPolicyStateSupportsPublished))  {
                 DeltaUtil_mxJPO.calcValueDelta(_mql, "published", String.valueOf(this.published), (_oldState == null) ? null : String.valueOf(_oldState.published));
             }
-            // route message
-            DeltaUtil_mxJPO.calcValueDelta(_mql, "route message", String.valueOf(this.routeMessage), (_oldState == null) ? null : String.valueOf(_oldState.routeMessage));
-            for (final String routeUser : this.routeUsers)  {
-                if ((_oldState == null) || !_oldState.routeUsers.contains(routeUser))  {
-                    _mql.newLine()
-                        .cmd(" add route ").cmd(routeUser);
-                }
+            // route user with message
+            if (!StringUtils_mxJPO.isEmpty(this.routeUser) && ((_oldState == null) || !this.routeUser.equals(_oldState.routeUser)))  {
+                _mql.newLine().cmd(" add route ").arg(this.routeUser);
+            } else if (StringUtils_mxJPO.isEmpty(this.routeUser) && (_oldState != null) && !StringUtils_mxJPO.isEmpty(_oldState.routeUser))  {
+                _mql.newLine().cmd(" remove route ");
+            }
+            if (!StringUtils_mxJPO.isEmpty(this.routeUser))  {
+                DeltaUtil_mxJPO.calcValueDelta(_mql, "route message", this.routeMessage, (_oldState == null) ? null : String.valueOf(_oldState.routeMessage));
             }
 
             // access list

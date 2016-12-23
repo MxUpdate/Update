@@ -23,6 +23,7 @@ import org.mxupdate.test.data.datamodel.PolicyData.State;
 import org.mxupdate.test.data.datamodel.TypeData;
 import org.mxupdate.test.data.datamodel.helper.Access;
 import org.mxupdate.test.data.system.PackageData;
+import org.mxupdate.test.data.user.PersonData;
 import org.mxupdate.test.test.update.AbstractDeltaCalculationTest;
 import org.mxupdate.update.datamodel.Policy_mxJPO;
 import org.mxupdate.update.util.ParameterCache_mxJPO;
@@ -141,6 +142,35 @@ public class PolicyCI_2DeltaCalculationTest
                             .addState(new State().setName("A")),
                     new PolicyData(this, "Test")
                             .addState(new State().setName("A"))},
+
+            // route
+            {"50a) state route defined",
+                    new PolicyData(this, "Test")
+                            .addState(new State().setName("A")),
+                    new PolicyData(this, "Test")
+                            .addState(new State().setName("A")
+                                    .def4KeyValue("route", new PersonData(this, "test"), "my message"))},
+            {"50b) state route with updated message",
+                    new PolicyData(this, "Test")
+                            .addState(new State().setName("A")
+                                    .def4KeyValue("route", new PersonData(this, "test"), "my message")),
+                    new PolicyData(this, "Test")
+                            .addState(new State().setName("A")
+                                    .def4KeyValue("route", AbstractTest.PREFIX + "test", "my new message"))},
+            {"50c) state route with updated user",
+                    new PolicyData(this, "Test")
+                            .addState(new State().setName("A")
+                                    .def4KeyValue("route", new PersonData(this, "test"), "my message")),
+                    new PolicyData(this, "Test")
+                            .addState(new State().setName("A")
+                                    .def4KeyValue("route", new PersonData(this, "test2"), "my new message"))},
+            {"50d) state route removed",
+                    new PolicyData(this, "Test")
+                            .addState(new State().setName("A")
+                                    .def4KeyValue("route", new PersonData(this, "test"), "my message")),
+                    new PolicyData(this, "Test")
+                            .addState(new State().setName("A")
+                                    .def4KeyNotDefined("route"))},
        };
     }
 
@@ -153,6 +183,7 @@ public class PolicyCI_2DeltaCalculationTest
         this.cleanup(AbstractTest.CI.DM_POLICY);
         this.cleanup(AbstractTest.CI.DM_FORMAT);
         this.cleanup(AbstractTest.CI.DM_TYPE);
+        this.cleanup(AbstractTest.CI.USR_PERSON);
         this.cleanup(AbstractTest.CI.SYS_PACKAGE);
     }
 

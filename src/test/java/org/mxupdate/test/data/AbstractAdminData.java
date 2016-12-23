@@ -300,13 +300,14 @@ public abstract class AbstractAdminData<DATA extends AbstractAdminData<?>>
         return (DATA) this;
     }
 
-    @Override()
+    @Override
     @SuppressWarnings("unchecked")
     public DATA createDependings()
         throws MatrixException
     {
-        this.datas      .createDependings();
-        this.properties .createDependings();
+        this.datas          .createDependings();
+        this.properties     .createDependings();
+        this.getKeyValues() .createDependings();
 
         return (DATA) this;
     }

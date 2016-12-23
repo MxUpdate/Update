@@ -208,6 +208,7 @@ PARSER_END(MxParser)
 
     | <SETTING:                             ("add" ([" ","\t","\n","\r"])+ )? "setting">    : STRING_STRING_EXPECTED
     | <ARGUMENT:                            "argument">                                     : STRING_STRING_EXPECTED
+    | <ROUTE:                               "route">                                        : STRING_STRING_EXPECTED
 
 
     | <ACTION:                              "action">                                       : STRING_EXPECTED
@@ -1130,7 +1131,7 @@ void parsePolicy(final Policy_mxJPO _policy)
  */
 Policy_mxJPO.State state() :
 {
-    String str;
+    String str1, str2;
     final Policy_mxJPO.State state = new Policy_mxJPO.State();
     Set<String> tmpSet;
     Token tmp;
@@ -1140,9 +1141,9 @@ Policy_mxJPO.State state() :
     Access access;
 }
 {
-    ( str = string()                                                            {this.setValue(state, "name", str);} )
+    ( str1 = string()                                                           {this.setValue(state, "name", str1);} )
     <BRACE_OPEN>
-      ( ( <REGISTEREDNAME>            str = string()                            {this.appendValue(state, "symbolicNames", str);} )
+      ( ( <REGISTEREDNAME>            str1 = string()                           {this.appendValue(state, "symbolicNames", str1);} )
       | ( ( <MINORREVISION_TRUE>  | <REVISION> )                                {this.setValue(state, "minorrevisionable", true);} )
       | ( ( <MINORREVISION_FALSE> | <REVISION_FALSE> )                          {this.setValue(state, "minorrevisionable", false);} )
       | ( <MAJORREVISION_TRUE>                                                  {this.setValue(state, "majorrevisionable", true);} )
@@ -1158,44 +1159,29 @@ Policy_mxJPO.State state() :
       | ( <PUBLISHED_TRUE>                                                      {this.setValue(state, "published", true);} )
       | ( <PUBLISHED_FALSE>                                                     {this.setValue(state, "published", false);} )
       | ( access = access()                                                     {this.appendValue(state, "access", "accessList", access);} )
-      | ( <ACTION>              str = string()                                  {this.setValue(state, "actionProgram", str);}
-                     <INPUT>    str = string()                                  {this.setValue(state, "actionInput", str);} )
-      | ( <CHECK>               str = string()                                  {this.setValue(state, "checkProgram", str);}
-                     <INPUT>    str = string()                                  {this.setValue(state, "checkInput", str);} )
-      | ( <ROUTE>      ( tmp = <ROUTEUSERSTRING>                                {this.appendValue(state, "routeUsers",                          this.getString(tmp.image));}
-                       | tmp = <ROUTEUSERSINGLE>                                {this.appendValue(state, "routeUsers",                          this.getSingle(tmp.image));} )* <ROUTEUSERCLOSE>
-                                      str = string()                            {this.setValue(state, "routeMessage", str);} )
+      | ( <ACTION>              str1 = string()                                 {this.setValue(state, "actionProgram", str1);}
+                     <INPUT>    str1 = string()                                 {this.setValue(state, "actionInput", str1);} )
+      | ( <CHECK>               str1 = string()                                 {this.setValue(state, "checkProgram", str1);}
+                     <INPUT>    str1 = string()                                 {this.setValue(state, "checkInput", str1);} )
+      | ( <ROUTE>    str1 = stringString()  str2 = string()                     {this.setValue(state, "routeUser", str1); this.setValue(state, "routeMessage", str2);} )
       | ( <TRIGGER>                   trigger = trigger()                       {this.appendValue(state, "triggers", "triggersStack", trigger);} )
       | ( <SIGNATURE>                                                           {signature = new Policy_mxJPO.Signature();this.appendValue(state, "signatures", signature);}
-                  str = string()                                                {this.setValue(signature, "name", str);}
+                  str1 = string()                                               {this.setValue(signature, "name", str1);}
                     <BRACE_OPEN>
-                        ( ( <BRANCH>          str = string()                    {this.setValue(signature, "branch", str);} )
+                        ( ( <BRANCH>          str1 = string()                   {this.setValue(signature, "branch", str1);} )
                         | ( <APPROVE_LIST>  ( tmp = <LISTSTRING>                {this.appendValue(signature, "approverUsers",                   this.getString(tmp.image));}
                                             | tmp = <LISTSINGLE>                {this.appendValue(signature, "approverUsers",                   this.getSingle(tmp.image));} )* <LISTCLOSE>)
                         | ( <IGNORE_LIST>   ( tmp = <LISTSTRING>                {this.appendValue(signature, "ignoreUsers",                     this.getString(tmp.image));}
                                             | tmp = <LISTSINGLE>                {this.appendValue(signature, "ignoreUsers",                     this.getSingle(tmp.image));} )* <LISTCLOSE>)
                         | ( <REJECT_LIST>   ( tmp = <LISTSTRING>                {this.appendValue(signature, "rejectUsers",                     this.getString(tmp.image));}
                                             | tmp = <LISTSINGLE>                {this.appendValue(signature, "rejectUsers",                     this.getSingle(tmp.image));} )* <LISTCLOSE>)
-                        | ( <FILTER>          str = multiLineString()           {this.setValue(signature, "filter", str);} ) )*
+                        | ( <FILTER>          str1 = multiLineString()          {this.setValue(signature, "filter", str1);} ) )*
                     <BRACE_CLOSE> )
       | ( <PROPERTY>                  property = property()                     {this.appendValue(state, "properties", "propertiesStack", property);} )
     )*
     <BRACE_CLOSE>
 
     {return state;}
-}
-
-/** Route */
-<DEFAULT> TOKEN :
-{
-      <ROUTE:                               "route" ([" ","\t","\n"])+ "{">                 : ROUTEUSER_EXPECTED
-}
-
-<ROUTEUSER_EXPECTED> TOKEN :
-{
-      <ROUTEUSERSTRING : ( "\"" ( ~["\u0000"-"\u001f","\"","\\","\u0100"-"\uffff"] | "\\\"" | "\\\\" | "\\{" | "\\}" )* "\"" )> : ROUTEUSER_EXPECTED
-    | <ROUTEUSERSINGLE : ( ~["\u0000"-"\u0020","\"","\\","{","}","\u0100"-"\uffff"] )+> : ROUTEUSER_EXPECTED
-    | <ROUTEUSERCLOSE : "}">   : STRING_EXPECTED
 }
 
 /************************************************* Data Model -> Relationship */

@@ -64,7 +64,7 @@ public abstract class AbstractData<DATA extends AbstractData<?>>
     private final SingleValueList singles = new SingleValueList();
     /** Values of this data piece. */
     private final StringValueList values = new StringValueList();
-    /** All properties for this data piece. */
+    /** All key / values with tag for this data piece. */
     private final KeyValueList keyValues = new KeyValueList();
     /** All not defined keys. */
     private final KeyNotDefinedList keyNotDefineds = new KeyNotDefinedList();

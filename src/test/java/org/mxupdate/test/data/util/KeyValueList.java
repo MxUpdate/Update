@@ -16,10 +16,15 @@
 package org.mxupdate.test.data.util;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.mxupdate.test.AbstractTest;
+import org.mxupdate.test.data.AbstractData;
+
+import matrix.util.MatrixException;
 
 /**
  * Key/value list.
@@ -30,7 +35,9 @@ public class KeyValueList
     extends AbstractList
 {
     /** All key values with prefix. */
-    private final List<ImmutableTriple<String,String,String>> keyValues = new ArrayList<ImmutableTriple<String,String,String>>();
+    private final List<ImmutableTriple<String,String,String>> keyValues = new ArrayList<>();
+    /** Depending data sets to create. */
+    private final Set<AbstractData<?>> datas = new HashSet<>();
 
     /**
      * Defines key / value for given {@code _tag}.
@@ -43,7 +50,22 @@ public class KeyValueList
                             final String _key,
                             final String _value)
     {
-        this.keyValues.add(new ImmutableTriple<String,String,String>(_tag, _key, _value));
+        this.keyValues.add(new ImmutableTriple<>(_tag, _key, _value));
+    }
+
+    /**
+     * Defines key / value for given {@code _tag}.
+     *
+     * @param _tag          used tag (name) of the flag
+     * @param _key          key
+     * @param _value        value
+     */
+    public void addKeyValue(final String _tag,
+                            final AbstractData<?> _key,
+                            final String _value)
+    {
+        this.keyValues.add(new ImmutableTriple<>(_tag, _key.getName(), _value));
+        this.datas.add(_key);
     }
 
     /**
@@ -77,6 +99,19 @@ public class KeyValueList
             _cmd.append(' ').append(item.left)
                 .append(" \"").append(AbstractTest.convertMql(item.middle)).append('\"')
                 .append(" \"").append(AbstractTest.convertMql(item.right)).append('\"');
+        }
+    }
+
+    /**
+     * Creates depending objects defined through this list.
+     *
+     * @throws MatrixException if create failed
+     */
+    public void createDependings()
+        throws MatrixException
+    {
+        for (final AbstractData<?> data : this.datas)  {
+            data.create();
         }
     }
 }

@@ -363,14 +363,8 @@ public class PolicyCI_1ParserTest
                 {"45h) single state user", "", simple + "state \"A\" { " + state + " revoke login user \"createor\" key \"key\" {read show write} }"},
 
                 // state route
-                {"50a) state with route",                "", simple + "state \"A\" { " + state + " route {\"abc\"} \"\"     }"},
-                {"50b) state with route & message",      "", simple + "state \"A\" { " + state + " route {\"abc\"} \"abc\"  }"},
-                {"50c) state with multiple route users (to test sorting)",
-                        simple + "state \"A\" { " + state + " route {\"abc\" \"def\"} \"\" }",
-                        simple + "state \"A\" { " + state + " route {\"def\" \"abc\"} \"\" }"},
-                {"50d) state with empty route user",
-                        simple + "state \"A\" { " + state + "               }",
-                        simple + "state \"A\" { " + state + " route {} \"\" }"},
+                {"50a) state with route & empty message",   "", simple + "state \"A\" { " + state + " route \"abc\" \"\"     }"},
+                {"50b) state with route & message",         "", simple + "state \"A\" { " + state + " route \"abc\" \"abc\"  }"},
 
                 // state trigger
                 {"60a) state with check trigger",               "", simple + "state \"A\" { " + state + " trigger modify check    \"Prog\" input \"\" }"},
