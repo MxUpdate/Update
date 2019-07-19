@@ -9,3 +9,9 @@ For more information see the Wiki
 
 The Wiki pages itself are concatenated to one PDF manual. The manual could be
 [downloaded](http://code.google.com/p/mxupdate/downloads/list).
+
+# License
+USAGE IS NOT ALLOWED IN PRODUCTIVE SYSTEMS.
+
+# Further Development
+Development is stopped. Recommendation is to use the Spinner tool from Dassault System.
